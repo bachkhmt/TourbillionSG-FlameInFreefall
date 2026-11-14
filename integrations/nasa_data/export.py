@@ -13,7 +13,11 @@ from app.models import Base
 from app.services.demo_manifest import snapshot_rows
 
 from .challenge import build_challenge_release
+from .coverage import build_coverage_release
 from .pilot import uid
+
+# "unified" is the default dataset for web + RAG; "challenge" rebuilds the v1 release.
+BUILDERS = {"unified": build_coverage_release, "challenge": build_challenge_release}
 
 
 def build_snapshot(release):
@@ -106,11 +110,11 @@ def build_snapshot(release):
     }
 
 
-def export_bundle(destination):
+def export_bundle(destination, profile="unified"):
     destination = Path(destination)
     if destination.exists():
         raise ValueError("Output already exists; choose a new directory")
-    release = build_challenge_release()
+    release = BUILDERS[profile]()
     snapshot = build_snapshot(release)
     destination.mkdir(parents=True)
     (destination / "artifacts").mkdir()
@@ -157,5 +161,6 @@ def export_bundle(destination):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--profile", choices=sorted(BUILDERS), default="unified")
     args = parser.parse_args()
-    print(export_bundle(args.output))
+    print(export_bundle(args.output, args.profile))

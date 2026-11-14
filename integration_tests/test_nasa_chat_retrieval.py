@@ -5,12 +5,12 @@ from app.integrations.chat import RagRequest
 
 from integrations.nasa_chat.provider import ExtractiveProvider
 from integrations.nasa_chat.retrieval import Passage, refusal, select_passages, terms
-from integrations.nasa_data.challenge import build_challenge_release
+from integrations.nasa_data.coverage import build_coverage_release
 
 
 @pytest.fixture(scope="module")
 def passages():
-    release = build_challenge_release()
+    release = build_coverage_release()
     sources = {s["id"]: s for s in release["sources"]}
     studies = {s["id"]: s for s in release["investigations"]}
     return tuple(
