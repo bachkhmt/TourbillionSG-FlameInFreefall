@@ -15,6 +15,7 @@ import {
   X,
   RotateCcw,
   ExternalLink,
+  BookOpen,
 } from 'lucide-react';
 import { DockPillButton } from './DockPillButton';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
@@ -45,6 +46,12 @@ export const NAV_ITEMS: NavItemConfig[] = [
     label: 'Mission Scenario',
     description: 'Gap matrix & predictive lab',
     icon: Rocket,
+  },
+  {
+    path: '/resources',
+    label: 'Official Resources',
+    description: 'NASA data, science context & case studies',
+    icon: BookOpen,
   },
 ];
 
@@ -166,6 +173,20 @@ export const Sidebar: React.FC = () => {
 
           {/* BOTTOM SECTION: QUICK ACTIONS */}
           <motion.div variants={dockItemVariants} className="relative z-10 flex flex-col items-start gap-3 w-full">
+            <DockPillButton
+              id="sidebar-studio-button"
+              href="/studio"
+              isExpanded={isExpanded}
+              icon={
+                <Flame
+                  className="w-4 h-4 text-amber-500 group-hover:text-amber-600 transition-colors"
+                  strokeWidth={2.5}
+                />
+              }
+              label="3D Flame Studio"
+              description="Interactive 3D combustion model"
+              tooltipText={isExpanded ? undefined : 'Launch 3D Flame Studio'}
+            />
             <DockPillButton
               id="sidebar-reset-button"
               onClick={handleResetWorkspace}

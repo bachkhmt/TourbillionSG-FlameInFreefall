@@ -1,0 +1,1325 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Flame in Freefall Playbook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:wght@600;700&display=swap">
+<style>
+/* Layout: sticky index on the left, one reading column on the right. Blue marks evidence and structure, flame orange marks gaps, risks and warnings. */
+:root{
+  --bg:#f4f6f9;--surface:#ffffff;--surface2:#eaeff6;--ink:#0c1828;--muted:#4f5f76;--line:#d3dbe6;
+  --blue:#1a5fc4;--blue-soft:#dce9fb;--flame:#b34a07;--flame-soft:#fde8d2;--ok:#14764a;--ok-soft:#d9f1e4;--bad:#b3261e;--code:#e8edf5;
+  --serif:"Source Serif 4","Noto Serif",Georgia,serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#08111d;--surface:#0f1b2c;--surface2:#162539;--ink:#e6edf8;--muted:#9aabc4;--line:#23364f;
+  --blue:#6aa8ff;--blue-soft:#12305a;--flame:#ffa24d;--flame-soft:#3a230c;--ok:#52d394;--ok-soft:#0f3322;--bad:#ff8f86;--code:#0c1726;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#08111d;--surface:#0f1b2c;--surface2:#162539;--ink:#e6edf8;--muted:#9aabc4;--line:#23364f;
+  --blue:#6aa8ff;--blue-soft:#12305a;--flame:#ffa24d;--flame-soft:#3a230c;--ok:#52d394;--ok-soft:#0f3322;--bad:#ff8f86;--code:#0c1726;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 var(--sans);
+  padding-block:0 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+h1,h2,h3,h4{font-family:var(--serif);line-height:1.2;margin:0;text-wrap:balance}
+h1{font-size:clamp(2.3rem,6vw,3.7rem);letter-spacing:-.015em}
+h2{font-size:clamp(1.6rem,3.4vw,2.1rem);margin-bottom:10px}
+h3{font-size:1.3rem;margin:44px 0 6px}
+h4{font:600 1rem var(--sans);margin:22px 0 4px}
+p{margin:0 0 12px;max-width:70ch}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+code{font-family:var(--mono);font-size:.86em;background:var(--code);padding:1px 6px;border-radius:4px;overflow-wrap:anywhere}
+ul,ol{margin:6px 0 14px;padding-left:22px}li{margin:4px 0;max-width:72ch}
+.muted{color:var(--muted)}
+.kicker{font:500 .76rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--flame);margin:0 0 6px}
+.lead{color:var(--muted);font-size:1.05rem;max-width:66ch}
+
+/* shell */
+.shell{display:grid;grid-template-columns:196px minmax(0,1fr);gap:48px;max-width:1160px;margin:0 auto}
+.idx{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);align-self:start;padding-top:28px}
+.idx .brand{font:500 .74rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.idx nav{display:flex;flex-direction:column;gap:2px}
+.idx a{padding:6px 10px;color:var(--muted);text-decoration:none;border-radius:6px;font-size:.93rem}
+.idx a:hover{color:var(--ink);background:var(--surface2)}
+.idx a.on{color:var(--ink);background:var(--blue-soft);font-weight:600}
+.cd{margin-top:18px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:.85rem;color:var(--muted)}
+.cd b{display:block;font:600 1.7rem var(--serif);color:var(--ink);line-height:1.1}
+main{min-width:0}
+@media (max-width:900px){
+  .shell{display:block}
+  .idx{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line)}
+  .idx .brand,.idx .cd{display:none}
+  .idx nav{flex-direction:row;overflow-x:auto;gap:6px;scrollbar-width:thin}
+  .idx a{white-space:nowrap;border:1px solid var(--line);background:var(--surface)}
+}
+.sec{padding-top:72px;scroll-margin-top:56px}
+.hero{padding:44px 0 4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:3px 10px;font:500 .8rem var(--mono);color:var(--muted)}
+
+/* blocks */
+.big{font:600 clamp(1.2rem,2.6vw,1.55rem)/1.45 var(--serif);max-width:60ch;margin:6px 0 18px}
+.pull{font:600 clamp(1.15rem,2.4vw,1.4rem)/1.5 var(--serif);border-block:1px solid var(--line);padding:16px 0;margin:26px 0;max-width:62ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px;margin:16px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;min-width:0}
+.card h4{margin:0 0 4px}
+.card p{margin:0;font-size:.94rem;color:var(--muted)}
+.card ul{margin:6px 0 0;padding-left:18px;font-size:.92rem;color:var(--muted)}
+.callout{border:1px solid var(--flame);background:var(--flame-soft);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:.94rem}
+.callout p:last-child{margin-bottom:0}
+.callout b.t{font:600 .78rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--flame);display:block;margin-bottom:2px}
+.ok-box{border:1px solid var(--ok);background:var(--ok-soft);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:.94rem}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:12px 0}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.9rem}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--surface2);font-weight:600;font-size:.82rem;letter-spacing:.02em}
+tr:last-child td{border-bottom:0}
+td.num,th.num{font-variant-numeric:tabular-nums}
+.dia{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;margin:14px 0;overflow-x:auto}
+.cap{font-size:.86rem;color:var(--muted);margin:-4px 0 14px;max-width:80ch}
+pre.code{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:14px;overflow-x:auto;font:.82rem/1.55 var(--mono);margin:12px 0;color:var(--ink)}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--sans);fill:var(--muted);font-size:11px}
+figure{margin:18px 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px}
+figcaption{font-size:.86rem;color:var(--muted);margin-top:8px}
+
+/* tags */
+.tag{display:inline-block;border-radius:4px;padding:1px 8px;font:600 .76rem var(--mono);white-space:nowrap}
+.t-must{background:var(--blue-soft);color:var(--blue)}.t-should{background:var(--flame-soft);color:var(--flame)}.t-skip{background:var(--surface2);color:var(--muted)}
+.st-ok{background:var(--ok-soft);color:var(--ok)}.st-chk{background:var(--flame-soft);color:var(--flame)}.st-unk{background:var(--surface2);color:var(--muted);border:1px dashed var(--muted)}
+
+/* controls */
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 10px;align-items:center}
+input[type=search],select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-width:0}
+input[type=search]{flex:1 1 220px}
+.pill{font:inherit;font-size:.88rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 12px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+:root[data-theme="dark"] .pill[aria-pressed="true"]{color:#06101f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pill[aria-pressed="true"]{color:#06101f}}
+.btn{font:inherit;font-size:.88rem;color:var(--ink);background:var(--surface);border:1px solid var(--blue);border-radius:6px;padding:5px 14px;cursor:pointer}
+.btn:hover{background:var(--blue-soft)}
+.checks{list-style:none;padding:0;margin:8px 0}
+.checks li{margin:0;max-width:none}
+.checks label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:7px 0;border-bottom:1px solid var(--line)}
+.checks li:last-child label{border-bottom:0}
+.checks input{margin-top:6px;accent-color:var(--blue);flex:none}
+.checks input:checked+span{color:var(--muted);text-decoration:line-through}
+
+/* data viz rows */
+.rows{display:grid;gap:8px;margin:12px 0}
+.r{display:grid;grid-template-columns:minmax(120px,190px) 1fr 96px;gap:10px;align-items:center;font-size:.9rem}
+.track{height:14px;background:var(--surface2);border-radius:7px;position:relative;overflow:hidden}
+.fill{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:7px}
+.fill.f{background:var(--flame)}
+.fill.fade{background:var(--blue);opacity:.45}
+.r .v{font:500 .82rem var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:640px){.r{grid-template-columns:1fr 80px}.r>span:first-child{grid-column:1/-1}}
+
+/* definitions */
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;margin-top:10px}
+.gl div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;min-width:0}
+.gl dt{font:600 .9rem var(--mono);color:var(--blue)}
+.gl dd{margin:2px 0 0;font-size:.92rem;color:var(--muted)}
+dl{margin:0}
+
+/* steps */
+.steps{display:grid;gap:12px;margin:14px 0}
+.step{display:grid;grid-template-columns:128px minmax(0,1fr);gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 18px}
+.step .when{font:500 .82rem var(--mono);color:var(--flame);letter-spacing:.02em}
+.step h4{margin:0 0 4px}
+.step p,.step ul{margin:0;font-size:.93rem;color:var(--muted)}
+.step ul{padding-left:18px}
+@media (max-width:640px){.step{grid-template-columns:1fr;gap:4px}}
+
+/* jev */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+.panel dl{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px 12px;margin:10px 0 0;font-size:.93rem}
+.panel dt{color:var(--muted)}.panel dd{margin:0}
+.ctl{display:grid;grid-template-columns:minmax(150px,240px) 1fr 84px;gap:10px;align-items:center;margin:8px 0;font-size:.9rem}
+.ctl b{font:500 .85rem var(--mono);text-align:right}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px;margin-top:14px}
+.out .card b{display:block;font:600 1.3rem var(--serif);color:var(--ink);margin-top:2px}
+.pb{font:500 .82rem var(--mono)}.lo{color:var(--bad)}.hi{color:var(--ok)}
+@media (max-width:640px){.ctl{grid-template-columns:1fr 70px}.ctl label{grid-column:1/-1}.panel dl{grid-template-columns:1fr}}
+.src-meta{font-size:.86rem;color:var(--muted);margin:6px 0}
+td a{overflow-wrap:anywhere}
+footer{margin-top:72px;padding-top:16px;border-top:1px solid var(--line);font-size:.86rem;color:var(--muted);max-width:80ch}
+</style>
+
+<div class="shell">
+<aside class="idx" aria-label="Mục lục">
+  <div class="brand">TourbillionSG</div>
+  <nav id="nav">
+    <a href="#de-bai">Hiểu đề</a>
+    <a href="#app">App trông thế nào</a>
+    <a href="#ke-hoach">Kế hoạch 48 giờ</a>
+    <a href="#kien-truc">Kiến trúc</a>
+    <a href="#rag-jev">RAG với Jev</a>
+    <a href="#du-lieu">Dữ liệu và link</a>
+    <a href="#danh-gia">Đánh giá và rủi ro</a>
+  </nav>
+  <div class="cd" id="cd"><b id="cdn">12 ngày</b><span>đến ngày 14/11/2026, giờ mở hackathon</span></div>
+</aside>
+
+<main>
+<header class="hero">
+  <p class="kicker">NASA Space Apps Challenge 2026</p>
+  <h1>Flame in Freefall</h1>
+  <p class="lead">Đề bài, kế hoạch, kiến trúc, dữ liệu và link nguồn của đội, gom về một trang. Đọc phần đầu nếu bạn muốn hiểu đề và biết mình phải làm gì. Các phần sau là tài liệu tra cứu cho cả đội.</p>
+  <div class="chips"><span class="chip">14–15/11/2026</span><span class="chip">48 giờ</span><span class="chip">6 người</span><span class="chip">Đóng băng tính năng ở H36</span><span class="chip">Mức Intermediate đến Advanced</span></div>
+  <div class="callout"><b class="t">Quy định của đề</b><p>Không được bắt đầu làm dự án trước khi hackathon mở. Đọc đề và lập danh sách nguồn thì được. Tải dữ liệu, trích xuất và viết code phải để sau 14/11. Trang này chỉ là chuẩn bị. Nếu không chắc, đọc lại luật chính thức của cuộc thi.</p></div>
+</header>
+
+<!-- ============ HIỂU ĐỀ ============ -->
+<section class="sec" id="de-bai">
+<p class="kicker">Hiểu đề</p>
+<h2>Đề bài này bắt bạn làm gì</h2>
+<p class="big">Build một trang web có AI. Người dùng chọn một tình huống, ví dụ “căn cứ Mặt Trăng”. Trang web chỉ ra những thí nghiệm lửa nào của NASA liên quan nhất, xếp hạng, so sánh và giải thích, luôn kèm nguồn. Chỗ nào chưa có dữ liệu thì nói thẳng là chưa có.</p>
+
+<div class="grid">
+  <div class="card"><h4>Giống một thủ thư thông minh</h4><p>NASA có khoảng 20 hồ sơ thí nghiệm về lửa trong không trọng lực. Mỗi hồ sơ có nhiều tài liệu, số liệu và video. Người thường không biết bắt đầu từ đâu. App của bạn tìm đúng hồ sơ, so sánh và tóm tắt giúp họ.</p></div>
+  <div class="card"><h4>Biết nói “chưa có dữ liệu”</h4><p>Theo phạm vi PSI của đề, chưa có số đo cháy ở trọng lực Mặt Trăng trong kho. LUCI có kết quả công bố ngoài PSI và được gắn nhãn riêng. App phải nói rõ điều đó và không bịa con số. Đây là điểm có thể thắng hoặc thua.</p></div>
+  <div class="card"><h4>Không phải hệ thống an toàn</h4><p>App chỉ cho thấy bằng chứng đã có và điều kiện đã thử. Nó không bao giờ kết luận một vật liệu “an toàn” hay “không an toàn”.</p></div>
+</div>
+
+<h3>Vì sao lửa trong không trọng lực lại khác</h3>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));align-items:center">
+  <div>
+    <p>Trên Trái Đất, khí nóng bay lên và kéo oxy mới vào chân lửa. Vì vậy ngọn nến có hình giọt nước và chập chờn.</p>
+    <p>Trong không trọng lực không có khí nóng bay lên. Oxy chỉ tới lửa bằng cách khuếch tán chậm, nên lửa thành một quả cầu xanh mờ. Tốc độ dòng khí trở thành yếu tố rất quan trọng.</p>
+    <p>Hệ quả: một bài thử cháy làm ở 1g trên Trái Đất chưa chắc cho kết quả đúng trong tàu vũ trụ.</p>
+  </div>
+  <svg viewBox="0 0 260 190" role="img" aria-label="Ngọn lửa hình giọt nước ở 1g và hình cầu ở 0g">
+    <defs>
+      <radialGradient id="sp" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#bfe0ff"/><stop offset=".55" stop-color="#4f9bff"/><stop offset="1" stop-color="#1f6fd1" stop-opacity=".15"/></radialGradient>
+      <linearGradient id="dr" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffb454"/><stop offset=".6" stop-color="#ff7a2e"/><stop offset="1" stop-color="#ffd9a0" stop-opacity=".2"/></linearGradient>
+    </defs>
+    <path d="M60 150 C20 130 40 80 60 30 C80 80 100 130 60 150Z" fill="url(#dr)"/>
+    <rect x="52" y="150" width="16" height="22" rx="2" fill="var(--muted)"/>
+    <circle cx="190" cy="95" r="52" fill="url(#sp)"/>
+    <text x="60" y="187" text-anchor="middle">1g: giọt nước</text><text x="190" y="187" text-anchor="middle">0g: quả cầu</text>
+  </svg>
+</div>
+
+<h3>Vì sao căn cứ Mặt Trăng là bài toán khó</h3>
+<p>Bộ đồ du hành chỉ có áp suất 4,3 psi với 100% oxy, để phi hành gia dễ cử động. Để họ ra ngoài nhanh mà không bị bệnh giảm áp, căn cứ Mặt Trăng và rover có áp suất dự kiến ở mức giữa bộ đồ và Trái Đất. Oxy từ 30% trở lên, áp suất từ 10,2 psi trở xuống. Nhiều oxy hơn thì vật liệu cháy dễ hơn rõ rệt. Câu hỏi của đề: dữ liệu hiện có nói được gì về điều kiện đó.</p>
+<figure>
+  <div class="rows" id="envchart" aria-label="So sánh nồng độ oxy và áp suất giữa các môi trường"></div>
+  <figcaption>Số liệu lấy từ đề, riêng 21% là nồng độ oxy của không khí. Mỗi thang vẽ đúng tỷ lệ. Vạch nhạt là giá trị tối đa hoặc tối thiểu, không phải một giá trị cố định.</figcaption>
+</figure>
+
+<h3>Ba trụ cột an toàn cháy và các thí nghiệm</h3>
+<p>NASA chia công việc thành phòng ngừa, phát hiện và dập lửa. Mỗi thí nghiệm thuộc một hoặc nhiều trụ cột. Đây là bản đồ để bạn không bị lạc giữa hàng chục tên viết tắt.</p>
+<div class="tw"><table>
+<thead><tr><th>Nhóm</th><th>Thí nghiệm</th><th>Điểm cần nhớ</th></tr></thead>
+<tbody>
+<tr><td><b>Vật liệu rắn</b><br><span class="muted">phòng ngừa</span></td><td>BASS, BASS-II, SPICE, SLICE</td><td>Chạy trong Glovebox (MSG) với cùng khung dòng khí dựng cho SPICE. Có cả nhiên liệu rắn và khí.</td></tr>
+<tr><td><b>Cháy quy mô lớn</b><br><span class="muted">phòng ngừa</span></td><td>Saffire-I, II, III</td><td>I đo tốc độ lan lửa, tiêu hao khối lượng, nhiệt tỏa ra. II kiểm giới hạn oxy ở trọng lực thấp. III như I nhưng dòng khí khoảng 30 cm/s thay vì 20 cm/s. Bay trên tàu hàng tiếp tế.</td></tr>
+<tr><td><b>Phát hiện</b></td><td>SAME, SAME-R</td><td>Khói và aerosol. Một thiết bị đo của SAME được dùng lại để đo bụi trong DAFT và DAFT-2.</td></tr>
+<tr><td><b>Dập lửa</b></td><td>FLEX, FLEX-2, CFI</td><td>Giọt lỏng đang cháy, thiết bị MDCA trong CIR. FLEX dập lửa bằng cách pha loãng khí quyển với CO₂ hoặc heli.</td></tr>
+<tr><td><b>Lửa khí</b></td><td>ACME (6 thí nghiệm)</td><td>Cùng một bộ phần cứng module trong CIR. BRE nghiên cứu độ bắt cháy vật liệu trong khí quyển tĩnh. CFI-G có oxy tới 85%. E-FIELD Flames dùng điện trường để mô phỏng một phần trọng lực.</td></tr>
+</tbody></table></div>
+
+<h3>Đề gợi ý gì và app của mình đáp lại thế nào</h3>
+<p>Mọi gợi ý trong đề đều là “có thể làm”, không bắt buộc. Cột phải là cách đội chọn đáp lại.</p>
+<div class="tw"><table>
+<thead><tr><th>Đề nói</th><th>Màn hình hoặc tính năng của app</th></tr></thead>
+<tbody>
+<tr><td>Tìm thí nghiệm liên quan tới môi trường sống (tàu, trạm, căn cứ Mặt Trăng và Sao Hỏa, rover)</td><td>Mission Brief: chọn kịch bản, nhận bảng xếp hạng có breakdown và thanh trượt trọng số</td></tr>
+<tr><td>Trích dữ liệu hỗ trợ mô hình dự đoán cháy</td><td>Compare &amp; Extract: xuất CSV/JSON kèm Data Card và notebook mẫu</td></tr>
+<tr><td>Chỉ ra nghiên cứu cho thiết bị an toàn thế hệ sau</td><td>Scorecard ba trụ cột và danh sách “thí nghiệm nên làm tiếp” lấy từ các ô trống</td></tr>
+<tr><td>Hiển thị mục tiêu, nhiên liệu, điều kiện thử, biến, cảm biến</td><td>Trang chi tiết mỗi investigation, dựng từ schema ở phần Kiến trúc</td></tr>
+<tr><td>So sánh giống và khác giữa các investigation</td><td>Compare: “mã gen” của 2 đến 4 investigation</td></tr>
+<tr><td>Dữ liệu quá nhiều, khó tìm, khó hiểu</td><td>Ask &amp; Verify: hỏi đáp có trích nguồn từng câu, biết từ chối</td></tr>
+<tr><td>Chưa có dữ liệu trọng lực một phần</td><td>Evidence Map và dải trọng lực: ô trống hiện rõ, không nội suy thành số</td></tr>
+<tr><td>Ứng dụng trên Trái Đất (bình phun sương, đồ lính cứu hỏa)</td><td>Lăng kính Vũ trụ và Trái Đất: thẻ tĩnh (mức Should)</td></tr>
+</tbody></table></div>
+<p class="muted">Đề không nêu tiêu chí chấm điểm. Các mục trên được rút ra từ phần Objectives và Potential Considerations của đề.</p>
+
+<h3>Bạn cần làm gì, theo thứ tự</h3>
+<div class="steps">
+  <div class="step"><div class="when">Từ nay đến 13/11</div><div><h4>Chuẩn bị, chưa code</h4><p>Cả đội đọc trang này. Mở tab Resources của trang thử thách vì đề nói có thể bổ sung tài nguyên trước ngày thi. Chốt ai làm gì. Danh sách nguồn đã có sẵn ở phần Dữ liệu và link.</p></div></div>
+  <div class="step"><div class="when">H0 đến H3</div><div><h4>Kiểm tra dữ liệu thật</h4><p>Trả lời các câu hỏi về dữ liệu PSI (danh sách ở phần Kế hoạch). Câu trả lời quyết định bản đồ có bao nhiêu điểm và xuất dữ liệu sâu đến đâu.</p></div></div>
+  <div class="step"><div class="when">H3 đến H36</div><div><h4>Build bốn màn hình</h4><p>Mission Brief, Evidence Map, Compare &amp; Extract, Ask &amp; Verify. Hai data analyst tuyển chọn và kiểm chứng 15 đến 25 investigation ngay từ đầu, vì đó là nút thắt thật của dự án.</p></div></div>
+  <div class="step"><div class="when">H36 đến H48</div><div><h4>Đóng băng, demo, nộp</h4><p>Không thêm tính năng. Chỉnh lỗi, thu demo, viết mô tả nộp bài, chuẩn bị phương án dự phòng.</p></div></div>
+</div>
+
+<h3>Từ điển các từ viết tắt</h3>
+<p>Gõ để lọc. Các định nghĩa dùng ngôn ngữ đơn giản và bám theo đề.</p>
+<div class="bar"><input type="search" id="glq" placeholder="Tìm: BASS, CIR, RAG, LOI..." aria-label="Tìm thuật ngữ"></div>
+<dl class="gl" id="gl"></dl>
+</section>
+
+<!-- ============ APP ============ -->
+<section class="sec" id="app">
+<p class="kicker">Ý tưởng sản phẩm</p>
+<h2>App trông thế nào</h2>
+<div class="pull">Bài thử tiêu chuẩn ở 1g chưa chắc là trường hợp xấu nhất, và PSI chưa có dữ liệu trọng lực một phần. App chỉ ra NASA đã biết gì về lửa, và tri thức đó dừng ở đâu so với môi trường Moon base.</div>
+<p>Mọi tính năng phục vụ câu này, nên bài pitch gọn và mạch lạc. Có hai bằng chứng ủng hộ luận điểm: Olson (2004) cho thấy giới hạn oxy ở 1g khoảng 16,5% nhưng với luồng cỡ thông gió tàu lửa vẫn duy trì ở 14%, và nghiên cứu về khí quyển khám phá cho thấy test ở khí quyển chuẩn đánh giá thấp khả năng bắt lửa trên tàu. Link ở phần Dữ liệu và link.</p>
+
+<h3>Bốn màn hình cốt lõi</h3>
+<div class="grid">
+  <div class="card"><h4>Mission Brief</h4><p>Chọn kịch bản, nhận bảng xếp hạng có breakdown và thanh trượt trọng số, kèm điểm độ phủ bằng chứng cho ba trụ cột: phòng ngừa, phát hiện, dập lửa.</p></div>
+  <div class="card"><h4>Evidence Map</h4><p>Bản đồ oxy × luồng khí, đổi được sang oxy × áp suất. Phủ vùng mục tiêu (Trái Đất, ISS, bộ đồ, Moon base) và tô sáng ô chưa từng được thử. Bên dưới là dải trọng lực 0g đến 1g.</p></div>
+  <div class="card"><h4>Compare &amp; Extract</h4><p>So sánh “mã gen” của 2 đến 4 investigation (giống đâu, khác đâu), rồi xuất bộ dữ liệu sẵn cho mô hình hóa.</p></div>
+  <div class="card"><h4>Ask &amp; Verify</h4><p>Hỏi đáp có trích nguồn từng câu, biết nói “chưa đủ dữ liệu”, và có chế độ kiểm tra phát biểu.</p></div>
+</div>
+
+<h3>Hai hình minh họa cho khoảnh khắc “wow”</h3>
+<div class="callout"><b class="t">Đây là hình minh họa</b><p>Các ô và điểm trong hai hình dưới là ví dụ để cả đội hình dung giao diện. Chúng không phải dữ liệu PSI.</p></div>
+<figure>
+  <svg id="map" viewBox="0 0 560 270" role="img" aria-label="Sơ đồ minh họa Evidence Map: oxy theo luồng khí, ô trống trong vùng Moon base được tô sáng"></svg>
+  <figcaption>Evidence Map (minh họa): ô xanh là điều kiện đã có bằng chứng, ô cam là vùng Moon base chưa ai thử. Với vật liệu rắn, trục dọc là luồng khí vì lửa trong vi trọng lực nhạy nhất ở đó. Với thí nghiệm khí hoặc giọt lỏng (ACME, MDCA), dùng trục oxy × áp suất.</figcaption>
+</figure>
+<figure>
+  <svg viewBox="0 0 560 130" role="img" aria-label="Dải trọng lực từ 0g đến 1g, khoảng giữa chưa có dữ liệu">
+    <defs><pattern id="hat" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="var(--flame)" stroke-width="2"/></pattern></defs>
+    <rect x="68" y="48" width="400" height="24" fill="url(#hat)" opacity=".45" stroke="var(--flame)" stroke-dasharray="4 3"/>
+    <line x1="40" y1="60" x2="68" y2="60" stroke="var(--blue)" stroke-width="3"/><line x1="468" y1="60" x2="520" y2="60" stroke="var(--blue)" stroke-width="3"/>
+    <circle cx="40" cy="60" r="7" fill="var(--blue)"/><circle cx="520" cy="60" r="7" fill="var(--blue)"/>
+    <line x1="104" y1="40" x2="104" y2="80" stroke="var(--ink)"/><line x1="192" y1="40" x2="192" y2="80" stroke="var(--ink)"/>
+    <text x="40" y="95" text-anchor="middle">0g: có dữ liệu</text><text x="520" y="95" text-anchor="middle">1g: có dữ liệu</text>
+    <text x="104" y="32" text-anchor="middle">Mặt Trăng 0,16g</text><text x="192" y="32" text-anchor="middle">Sao Hỏa 0,38g</text>
+    <text x="330" y="116" text-anchor="middle">PSI chưa có số đo partial-g. Không nội suy thành con số.</text>
+  </svg>
+  <figcaption>Dải trọng lực: hai đầu là kết quả đã đo, khoảng giữa gạch chéo và chỉ được xem như cận trên, cận dưới.</figcaption>
+</figure>
+
+<h3>Ba khoảnh khắc “wow” cho demo</h3>
+<div class="grid">
+  <div class="card"><h4>Đổi kịch bản</h4><p>Chuyển từ ISS sang Moon base, bảng xếp hạng đổi thứ tự và tooltip giải thích lý do.</p></div>
+  <div class="card"><h4>Vùng mù lộ ra</h4><p>Trên Evidence Map, vùng Moon base sáng lên với rất ít điểm dữ liệu, và dải trọng lực để trống rõ ràng.</p></div>
+  <div class="card"><h4>Câu hỏi của giám khảo</h4><p>Gõ “vật liệu qua bài thử 1g thì an toàn trên Mặt Trăng”. App trả lời PSI chưa đề cập, kèm trích dẫn tài liệu ngoài, gắn nhãn là giả thuyết.</p></div>
+</div>
+
+<h3>Những chỗ đã chỉnh so với bản ý tưởng trước</h3>
+<div class="grid">
+  <div class="card"><h4>Câu hỏi thiết kế</h4><p>Câu “Vải này dùng trong rover 30% O₂ có ổn không?” được nhập vào Claim Checker. App chỉ trả về bằng chứng gần nhất và điều kiện chưa thử, không bao giờ kết luận “ổn” hay “không ổn”.</p></div>
+  <div class="card"><h4>Trục của bản đồ</h4><p>Luồng khí làm trục chính cho vật liệu rắn. Thí nghiệm khí hoặc giọt lỏng dùng oxy × áp suất.</p></div>
+  <div class="card"><h4>Scorecard ba trụ cột</h4><p>Giữ lại, thêm đầu ra “thí nghiệm nên làm tiếp” để dashboard không chỉ tóm tắt quá khứ.</p></div>
+  <div class="card"><h4>Tài liệu ngoài PSI</h4><p>Kết quả trọng lực Mặt Trăng (LUCI), Saffire-V và các nguồn tương tự chỉ hiện dưới dạng dấu mốc có nhãn riêng, không trộn vào số liệu PSI.</p></div>
+</div>
+</section>
+
+<!-- ============ KẾ HOẠCH ============ -->
+<section class="sec" id="ke-hoach">
+<p class="kicker">Kế hoạch</p>
+<h2>Kế hoạch 48 giờ cho 6 người</h2>
+<p class="lead">Đội có 2 AI engineer (AI A, AI B), 2 data analyst (Analyst A, B) và 2 full-stack (Full-stack A, B). Giờ công là ước lượng thô của đội, chưa kiểm chứng với dữ liệu thật.</p>
+
+<h3>Danh sách tính năng và người làm</h3>
+<div class="bar" role="group" aria-label="Lọc theo mức ưu tiên">
+  <button class="pill" data-f="all" aria-pressed="true">Tất cả</button>
+  <button class="pill" data-f="Must" aria-pressed="false">Must</button>
+  <button class="pill" data-f="Should" aria-pressed="false">Should</button>
+  <button class="pill" data-f="Bỏ" aria-pressed="false">Bỏ hoặc để sau</button>
+</div>
+<div class="tw"><table><thead><tr><th>Mức</th><th>Tính năng</th><th>Giờ công</th><th>Người làm chính</th></tr></thead><tbody id="tb"></tbody></table></div>
+
+<h4>Tổng giờ công so với quỹ giờ</h4>
+<div class="rows" id="hours"></div>
+<p class="muted" style="font-size:.88rem">Thanh đậm là mức thấp, thanh nhạt là phần chênh tới mức cao. Toàn thanh bằng khoảng 200 giờ công của 6 người trước lúc đóng băng tính năng ở H36.</p>
+<div class="callout"><b class="t">Nút thắt</b><p>Nút thắt thật sự không phải là code mà là việc tuyển chọn và kiểm chứng 15 đến 25 investigation, do hai analyst gánh. Cho họ bắt đầu sớm nhất. Mọi giá trị phải có nguồn và trạng thái verified, unverified hoặc placeholder.</p></div>
+
+<h3>Mỗi người làm gì</h3>
+<div class="grid" id="roles"></div>
+
+<h3>Thứ tự các giai đoạn</h3>
+<p>Mốc dưới đây lấy từ bản thiết kế RAG, tính theo giờ làm việc thực. Chỉnh lại theo lịch thật của đội khi hackathon mở. Đóng băng tính năng ở H36, phần còn lại của 48 giờ để demo và nộp.</p>
+<div class="tw"><table><thead><tr><th>Mốc</th><th>Việc chính</th></tr></thead><tbody>
+<tr><td>Giờ 0 đến 2</td><td>Xem file thật, đếm token, chọn parser, chốt schema</td></tr>
+<tr><td>Giờ 2 đến 6</td><td>Pipeline đọc và trích xuất, kiểm tay các ô quan trọng; dựng khung web</td></tr>
+<tr><td>Giờ 6 đến 10</td><td>Chỉ mục BM25 và vector; bộ lọc và xếp hạng bản đầu; trang chi tiết thí nghiệm</td></tr>
+<tr><td>Giờ 10 đến 14</td><td>Reranker, chat có trích dẫn, quy tắc từ chối; màn so sánh</td></tr>
+<tr><td>Giờ 14 đến 18</td><td>Chạy bộ câu hỏi mẫu, chỉnh trọng số; hoàn thiện giao diện; ghi chú trọng lực Mặt Trăng</td></tr>
+<tr><td>Giờ 18 trở đi</td><td>Quay demo, viết mô tả nộp bài, dự phòng</td></tr>
+</tbody></table></div>
+
+<h3>Danh sách việc để tick</h3>
+<p class="muted" style="font-size:.9rem">Dấu tick chỉ lưu trong trình duyệt của bạn, không chia sẻ cho người khác.</p>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))">
+  <div class="card"><h4>Trước giờ G (đến 13/11)</h4><ul class="checks" id="ck-pre"></ul></div>
+  <div class="card"><h4>3 giờ đầu của hackathon</h4><ul class="checks" id="ck-h3"></ul></div>
+</div>
+<p>Kết quả của ba câu hỏi đầu trong danh sách H0 đến H3 quyết định thiết kế. Nếu PSI không có trường tốc độ luồng khí ở mức từng test, Evidence Map dùng oxy × áp suất và luồng khí chỉ hiện ở mức investigation.</p>
+
+<div class="callout"><b class="t">Lưu ý quy định</b><p>Trong app, luôn ghi rõ đây là công cụ tham khảo nghiên cứu, không phải hệ thống an toàn vận hành.</p></div>
+</section>
+
+<!-- ============ KIẾN TRÚC ============ -->
+<section class="sec" id="kien-truc">
+<p class="kicker">Kiến trúc</p>
+<h2>Kiến trúc hệ thống</h2>
+<p class="lead">Thiết kế đầy đủ cho dashboard: sơ đồ hệ thống, pipeline dữ liệu, RAG, mô hình dữ liệu, xếp hạng, dự phòng và triển khai. Đây là đề xuất thiết kế, chưa kiểm chứng với dữ liệu PSI thật.</p>
+<div class="callout"><b class="t">Nguyên tắc xuyên suốt</b><p>Không bịa dữ liệu. Mọi giá trị có nguồn và trạng thái (verified, unverified, placeholder). AI không đưa kết luận “an toàn” hay “không an toàn”. App phải chạy được kể cả khi API LLM hỏng.</p></div>
+
+<h3>Hai bản thiết kế khác nhau chỗ nào, và chọn gì</h3>
+<p>Đội có hai bản thiết kế: bản kiến trúc dashboard (JSON tĩnh trên Vercel) và bản RAG trong tài liệu docx (có bảng SQL, reranker). Hai bản khớp ở nguyên tắc nhưng khác ở vài lựa chọn. Cột “Chốt” là đề xuất của mình để cả đội khỏi tranh luận ở giờ đầu. Sửa nếu đội muốn khác.</p>
+<div class="tw"><table>
+<thead><tr><th>Chủ đề</th><th>Bản kiến trúc</th><th>Bản docx</th><th>Chốt</th></tr></thead>
+<tbody>
+<tr><td>Lưu bảng thí nghiệm</td><td>JSON tĩnh, kiểm bằng Zod</td><td>Bảng SQL</td><td>JSON tĩnh. Dưới 50 investigation thì lọc trong TypeScript là đủ, demo không phụ thuộc mạng</td></tr>
+<tr><td>Tìm từ khóa</td><td>MiniSearch (BM25)</td><td>SQLite FTS5 hoặc thư viện BM25</td><td>MiniSearch</td></tr>
+<tr><td>Tìm theo nghĩa (vector)</td><td>Tùy chọn, vector tính trước khi build</td><td>Có, mô hình embedding tự chọn</td><td>Làm sau, khi BM25 và bộ câu hỏi mẫu đã chạy</td></tr>
+<tr><td>Rerank</td><td>Không nêu (lọc metadata và tăng điểm)</td><td>Có, giữ 5 đến 8 đoạn</td><td>Tùy chọn. Chỉ thêm nếu Recall@5 dưới 0,85. Có thể dùng bước chấm liên quan của Jev hoặc LLM</td></tr>
+<tr><td>Gắn nhãn đoạn</td><td>Metadata mỗi chunk</td><td>Thêm tiền tố ngữ cảnh 50 đến 100 token (Contextual Retrieval)</td><td>Làm cả hai. Sinh tiền tố bằng LLM một lần lúc build</td></tr>
+<tr><td>Tóm tắt một thí nghiệm</td><td>Chunk loại fact_card</td><td>Đưa nguyên tài liệu vào LLM</td><td>Đếm token thật trước. Nếu vừa thì dùng long context, cache kết quả lúc build</td></tr>
+<tr><td>Phân vai</td><td>Không nêu</td><td>3 vai chung</td><td>Dùng 6 người của bản kế hoạch</td></tr>
+<tr><td>Tiêu chí xếp hạng</td><td>7 tiêu chí, trọng số theo kịch bản</td><td>6 thành phần, có trọng số khởi điểm</td><td>Bắt đầu với 6 thành phần của docx. Thêm “dữ liệu tải được” và “độ mới” nếu còn giờ</td></tr>
+</tbody></table></div>
+
+<h3>1. Bối cảnh hệ thống</h3>
+<p>Ai dùng app, app nói chuyện với những hệ thống nào bên ngoài. Dữ liệu NASA không được gọi trực tiếp lúc chạy mà được tuyển chọn trước, nên app nhanh và ổn định khi demo.</p>
+<div class="dia"><pre class="mermaid">
+flowchart LR
+  U["Nhà nghiên cứu, kỹ sư, sinh viên"] --> APP["Dashboard web&lt;br/&gt;Next.js trên Vercel"]
+  APP --> LLM["LLM API&lt;br/&gt;chỉ gọi từ server"]
+  APP --- DATA[("Dữ liệu tĩnh JSON&lt;br/&gt;đã kiểm chứng")]
+  PSI["NASA PSI và tài liệu nguồn"] -. "tuyển chọn thủ công kèm script" .-> DATA
+  TEAM["Đội dữ liệu"] --> DATA
+  GH["GitHub và CI"] --> APP
+</pre></div>
+
+<h3>2. Thành phần</h3>
+<p>Phần lớn logic chạy trong trình duyệt: xếp hạng, bản đồ, so sánh, xuất ZIP. Server chỉ có một endpoint <code>/api/ask</code> để giữ khóa API và kiểm soát RAG.</p>
+<div class="dia"><pre class="mermaid">
+flowchart TB
+  subgraph Browser["Trình duyệt"]
+    UI["UI: Mission Brief, Evidence Map,&lt;br/&gt;Compare, Ask and Verify"]
+    ST["URL state: kịch bản, trọng số, lựa chọn"]
+    RK["Ranking engine&lt;br/&gt;TypeScript thuần"]
+    IDX["MiniSearch index&lt;br/&gt;cho tìm kiếm cục bộ"]
+    EXP["Exporter: CSV, JSON, Data Card, notebook"]
+  end
+  subgraph Static["Tài sản tĩnh lúc build"]
+    J[("investigations.json")]
+    C[("chunks.json")]
+    V[("vectors.json tùy chọn")]
+    S[("scenarios.json")]
+  end
+  subgraph Server["Vercel Function: /api/ask"]
+    RL["Rate limit và cache"] --> RET["Retriever"]
+    RET --> PB["Prompt builder"]
+    PB --> LC["LLM client có timeout"]
+    LC --> VAL["Citation validator"]
+  end
+  LLMP["LLM provider"]
+  UI <--> ST
+  ST --> RK
+  J --> RK
+  J --> EXP
+  C --> IDX
+  UI -- "câu hỏi" --> RL
+  C --> RET
+  V --> RET
+  LC <--> LLMP
+  VAL -- "câu trả lời có trích dẫn" --> UI
+  S --> RK
+</pre></div>
+
+<h3>3. Pipeline dữ liệu (chạy ngoại tuyến)</h3>
+<p>Đây là nút thắt của dự án. LLM chỉ soạn bản nháp trích xuất, và mọi trường phải có người đối chiếu nguồn trước khi được gắn nhãn verified.</p>
+<div class="dia"><pre class="mermaid">
+flowchart LR
+  A["Nguồn: PSI, báo cáo, bài báo"] --> B["Thu thập và lưu nguồn&lt;br/&gt;URL, ngày truy cập"]
+  B --> C["Trích xuất nháp theo schema&lt;br/&gt;LLM hoặc thủ công"]
+  C --> D{"Người kiểm chứng&lt;br/&gt;đối chiếu nguồn"}
+  D -- "đạt" --> E["Gắn nhãn verified"]
+  D -- "chưa chắc" --> F["Gắn nhãn unverified"]
+  E --> G["Zod validate và data:check"]
+  F --> G
+  G --> H["Sinh chunks.json&lt;br/&gt;và investigations.json"]
+  H --> I["Build index, vectors tùy chọn"]
+  I --> J["Commit, CI, deploy"]
+</pre></div>
+<h4>Ba bậc chiến lược dữ liệu</h4>
+<div class="grid">
+  <div class="card"><h4>Bậc A</h4><p>API hoặc tệp tải về chính thức, nếu có.</p></div>
+  <div class="card"><h4>Bậc B</h4><p>Xuất metadata rồi làm sạch.</p></div>
+  <div class="card"><h4>Bậc C</h4><p>Tự biên soạn 15 đến 25 investigation ưu tiên.</p></div>
+</div>
+<p>Quyết định chọn bậc nào trong vài giờ đầu hackathon, sau khi xem tab Resources và chạy các kiểm tra H0 đến H3. Chi tiết các bước của docx: thu thập file PSI, đọc và làm sạch (giữ số trang để trích dẫn), trích xuất bằng AI theo schema kèm nguồn từng giá trị, cắt đoạn và thêm tiền tố ngữ cảnh, rồi lập chỉ mục BM25, vector và kho tài liệu gốc.</p>
+
+<h3>4. Thiết kế RAG</h3>
+<p>Kho tri thức nhỏ (vài chục investigation, vài trăm chunk), nên BM25 là nền tảng, thêm embedding ở dạng tùy chọn, không cần vector DB. Ưu tiên của RAG ở đây là trả lời đúng nguồn và biết từ chối, không phải trả lời hay.</p>
+<h4>4.1 Luồng xử lý truy vấn</h4>
+<div class="dia"><pre class="mermaid">
+flowchart TB
+  Q["Câu hỏi người dùng"] --> N["Chuẩn hóa và phát hiện ý định"]
+  N --> OOS{"Ngoài phạm vi?&lt;br/&gt;tên lửa, kết luận an toàn"}
+  OOS -- "có" --> REF["Trả lời từ chối có hướng dẫn&lt;br/&gt;kèm bằng chứng gần nhất"]
+  OOS -- "không" --> X["Mở rộng truy vấn&lt;br/&gt;từ điển alias: CIR, MDCA, BASS..."]
+  X --> R1["BM25 top-k"]
+  X --> R2["Vector top-k tùy chọn"]
+  R1 --> M["Trộn kết quả (RRF)"]
+  R2 --> M
+  M --> FL["Lọc metadata và tăng điểm&lt;br/&gt;theo kịch bản, trụ cột, trạng thái"]
+  FL --> CTX["Lắp ngữ cảnh&lt;br/&gt;mỗi chunk có id và nguồn"]
+  CTX --> GEN["LLM sinh JSON có cấu trúc"]
+  GEN --> CHK{"Validator:&lt;br/&gt;mọi câu có trích dẫn hợp lệ?"}
+  CHK -- "không, thử lại 1 lần" --> GEN
+  CHK -- "không, hết lượt" --> FB["Chế độ retrieval-only"]
+  CHK -- "có" --> COV["Tính coverage: full, partial, none"]
+  COV --> OUT["Câu trả lời + chip trích dẫn + phần còn thiếu"]
+</pre></div>
+<p class="cap">RRF (Reciprocal Rank Fusion) gộp hai danh sách xếp hạng thành một: mục nào đứng cao ở cả hai danh sách được ưu tiên.</p>
+
+<h4>4.2 Trình tự gọi</h4>
+<div class="dia"><pre class="mermaid">
+sequenceDiagram
+  participant U as Người dùng
+  participant UI as Giao diện
+  participant API as /api/ask
+  participant CA as Cache
+  participant RT as Retriever
+  participant L as LLM
+  participant V as Validator
+  U->>UI: Nhập câu hỏi
+  UI->>API: POST câu hỏi, kịch bản, chế độ
+  API->>CA: Tra khóa hash câu hỏi
+  alt trúng cache
+    CA-->>API: Câu trả lời đã lưu
+    API-->>UI: Trả về, meta = cached
+  else chưa có
+    API->>RT: Truy xuất top-k chunk
+    RT-->>API: Chunk kèm id và nguồn
+    API->>L: Prompt chỉ cho phép dùng chunk
+    L-->>API: JSON segments, citations
+    API->>V: Kiểm tra id trích dẫn và coverage
+    alt hợp lệ
+      V-->>API: OK
+      API->>CA: Lưu kết quả
+      API-->>UI: Câu trả lời, meta = full
+    else lỗi hoặc timeout
+      API-->>UI: Top chunk, meta = retrieval_only
+    end
+  end
+  UI-->>U: Câu trả lời có chip trích dẫn
+</pre></div>
+
+<h4>4.3 Chiến lược chunking</h4>
+<div class="tw"><table><thead><tr><th>Loại chunk</th><th>Nội dung</th><th>Sinh bằng</th><th>Ghi chú</th></tr></thead><tbody>
+<tr><td><code>fact_card</code></td><td>Một thẻ cho mỗi investigation: mục tiêu, nhiên liệu, phần cứng, trụ cột</td><td>Tự sinh từ JSON</td><td>Luôn có provenance, nguồn chính cho câu trả lời</td></tr>
+<tr><td><code>condition_row</code></td><td>Một dải điều kiện: O₂, áp suất, luồng khí, trọng lực</td><td>Tự sinh từ JSON</td><td>Trả lời câu hỏi định lượng và vẽ bản đồ</td></tr>
+<tr><td><code>source_passage</code></td><td>Tóm tắt ngắn hoặc đoạn trích có nhãn mục và trang</td><td>Người duyệt</td><td>Chỉ lưu tóm tắt cùng liên kết nếu chưa rõ giấy phép</td></tr>
+<tr><td><code>glossary</code></td><td>CIR, MDCA, MSG, BASS, ACME và các thuật ngữ</td><td>Thủ công</td><td>Phục vụ chế độ Sinh viên và mở rộng truy vấn</td></tr>
+<tr><td><code>gap_note</code></td><td>Ghi chú vùng chưa có dữ liệu (ví dụ chưa có dữ liệu trọng lực một phần)</td><td>Thủ công</td><td>Cho phép app nói “PSI chưa đề cập” có căn cứ</td></tr>
+</tbody></table></div>
+<p>Metadata mỗi chunk: <code>id</code>, <code>investigationId</code>, <code>type</code>, <code>pillar</code>, <code>hardware</code>, <code>o2Range</code>, <code>sourceRef</code>, <code>status</code>. Chunk nhỏ (khoảng 100 đến 250 từ), một ý một chunk, để trích dẫn chính xác.</p>
+
+<h4>4.4 Hợp đồng API</h4>
+<pre class="code">POST /api/ask
+{ "question": "string", "scenarioId": "moon_base?", "mode": "engineer | student" }
+
+200 {
+  "answer": {
+    "segments": [ { "text": "string", "citations": ["chunk_id"] } ],
+    "coverage": "full | partial | none",
+    "missing": ["điều kiện hoặc thông tin chưa có trong dữ liệu"]
+  },
+  "chunks": [ { "id": "...", "text": "...", "sourceRef": { "title": "...", "url": "..." } } ],
+  "meta": { "mode": "full | retrieval_only | cached", "latencyMs": 0 }
+}</pre>
+
+<h4>4.5 Quy tắc trả lời và từ chối</h4>
+<ul>
+<li><b>Prompt:</b> chỉ trả lời từ chunk được cấp, trả JSON đúng schema, không đưa phán quyết an toàn. Thiếu bằng chứng thì đặt coverage là none.</li>
+<li><b>Validator phía server:</b> loại mọi câu không có citation nằm trong tập chunk đã cấp. Đây là cơ chế biến “AI không bịa” thành tính năng kiểm tra được.</li>
+<li><b>Nhãn mức bằng chứng:</b> Đo trực tiếp, Suy ra từ nhiều thí nghiệm, Ước lượng (nội suy giữa vi trọng lực và trọng lực thường).</li>
+<li><b>Hỏi về trọng lực Mặt Trăng hoặc Sao Hỏa:</b> nói rõ PSI chưa có dữ liệu đo, chỉ có hai đầu chặn và thí nghiệm E-FIELD mô phỏng một phần. Không đưa số ước lượng như dữ liệu đo.</li>
+<li><b>Dự phòng:</b> giới hạn tần suất theo IP, timeout 15 giây, cache theo hash câu hỏi, và 3 câu trả lời dựng sẵn cho demo.</li>
+</ul>
+
+<h3>5. Mô hình dữ liệu</h3>
+<p>Mỗi trường lá mang <code>{ value, source, status }</code>. Trường chưa chắc chắn hiện huy hiệu trên giao diện.</p>
+<div class="dia"><pre class="mermaid">
+erDiagram
+  INVESTIGATION ||--o{ TEST_CONDITION : "gồm"
+  INVESTIGATION ||--o{ FUEL : "đốt"
+  INVESTIGATION }o--|| HARDWARE : "dùng"
+  INVESTIGATION ||--o{ SENSOR_USE : "đo bằng"
+  INVESTIGATION ||--o{ DATASET : "có"
+  INVESTIGATION ||--o{ SOURCE : "trích dẫn"
+  SOURCE ||--o{ CHUNK : "cung cấp"
+  INVESTIGATION ||--o{ CHUNK : "được lập chỉ mục"
+  SCENARIO ||--o{ WEIGHT : "định nghĩa"
+  INVESTIGATION {
+    string id PK
+    string name
+    string pillars
+    int habitat_relevance
+  }
+  TEST_CONDITION {
+    float o2_min
+    float o2_max
+    float pressure_psi_min
+    float pressure_psi_max
+    float airflow_cm_s
+    string gravity_level
+  }
+  CHUNK {
+    string id PK
+    string type
+    string text
+    string status
+  }
+  SCENARIO {
+    string id PK
+    float o2_target
+    float pressure_target_psi
+  }
+</pre></div>
+<h4>Các cột của bảng investigation</h4>
+<div class="tw"><table><thead><tr><th>Cột</th><th>Ghi chú</th></tr></thead><tbody>
+<tr><td><code>experiment_id, name, family</code></td><td>Ví dụ Saffire-II, nhóm Saffire</td></tr>
+<tr><td><code>hardware</code></td><td>CIR/ACME, CIR/MDCA, MSG khung dòng khí, tàu hàng</td></tr>
+<tr><td><code>safety_area</code></td><td>Phòng ngừa, phát hiện, dập lửa</td></tr>
+<tr><td><code>purpose</code></td><td>Mục tiêu thí nghiệm, 1 đến 2 câu</td></tr>
+<tr><td><code>fuel_type, material, sample_geometry</code></td><td>Rắn, lỏng hoặc khí; vật liệu; hình dạng và kích thước mẫu hoặc đầu đốt</td></tr>
+<tr><td><code>o2_pct_min, o2_pct_max</code></td><td>Ghi rõ là phần trăm thể tích hay áp suất riêng phần</td></tr>
+<tr><td><code>pressure_min, pressure_max</code></td><td>Chuẩn hóa về một đơn vị (kPa hoặc psi)</td></tr>
+<tr><td><code>flow_cm_s_min, flow_cm_s_max</code></td><td>Tốc độ dòng khí; null nếu khí quyển tĩnh</td></tr>
+<tr><td><code>diluent</code></td><td>CO₂, heli, nitơ nếu có</td></tr>
+<tr><td><code>gravity_level</code></td><td>Vi trọng lực, trọng lực thường, mô phỏng một phần (E-FIELD)</td></tr>
+<tr><td><code>sensors</code></td><td>Danh sách cảm biến và phép đo</td></tr>
+<tr><td><code>variables_varied</code></td><td>Các lần thử khác nhau ở điểm nào</td></tr>
+<tr><td><code>key_findings</code></td><td>Kết quả chính, kèm nguồn</td></tr>
+<tr><td><code>data_links</code></td><td>Liên kết tới dữ liệu thô, video</td></tr>
+<tr><td><code>source_refs</code></td><td>Mỗi ô: tài liệu và trang</td></tr>
+<tr><td><code>verified</code></td><td>Đã được người kiểm hay mới do AI trích</td></tr>
+</tbody></table></div>
+
+<h3>6. Engine xếp hạng</h3>
+<p>Hàm thuần, có kiểm thử đơn vị, tính lại ngay khi kéo thanh trượt. Dữ liệu thiếu hiển thị là “no data” và không bao giờ tính ngầm thành 0.</p>
+<div class="dia"><pre class="mermaid">
+flowchart LR
+  SC["Kịch bản: O2, áp suất"] --> D["Khoảng cách khí quyển&lt;br/&gt;tới điểm hoặc dải đã thử gần nhất"]
+  INV["Investigation"] --> D
+  D --> S["Điểm thành phần s1..sn trong 0 đến 1"]
+  INV --> S
+  W["Trọng số w1..wn theo kịch bản"] --> SUM["Tổng có trọng số"]
+  S --> SUM
+  MD{"Dữ liệu thiếu?"} -- "phạt hoặc loại, do người dùng chọn" --> SUM
+  SUM --> OUT["Danh sách đã xếp hạng&lt;br/&gt;kèm breakdown từng tiêu chí"]
+</pre></div>
+<p><code>score = Σ (w<sub>i</sub> × s<sub>i</sub>)</code>, mỗi điểm thành phần nằm trong [0, 1]. Điểm gần: nếu điều kiện người dùng nằm trong khoảng [min, max] của thí nghiệm thì 1, ngoài khoảng thì giảm tuyến tính theo khoảng cách đã chuẩn hóa tới biên gần nhất. Thiếu giá trị thì không phạt điểm mà hiện nhãn “chưa rõ” và giảm độ tin cậy. Trạng thái (kịch bản, trọng số, lựa chọn) nằm trong tham số URL để chia sẻ được.</p>
+<h4>Trọng số khởi điểm (phỏng đoán, phải chỉnh bằng bộ câu hỏi mẫu)</h4>
+<div class="rows" id="weights"></div>
+
+<h3>7. Cơ chế dự phòng</h3>
+<div class="dia"><pre class="mermaid">
+flowchart TD
+  A["Người dùng đặt câu hỏi"] --> B{"Có khóa LLM?"}
+  B -- "không" --> R["Chế độ retrieval-only"]
+  B -- "có" --> C{"Trúng cache?"}
+  C -- "có" --> K["Trả từ cache"]
+  C -- "không" --> D{"LLM phản hồi trong 15 giây?"}
+  D -- "không" --> R
+  D -- "có" --> E{"JSON hợp lệ và trích dẫn đúng?"}
+  E -- "không, thử lại 1 lần" --> D
+  E -- "không, hết lượt" --> R
+  E -- "có" --> F["Chế độ đầy đủ"]
+  R --> G["Hiển thị top chunk kèm liên kết nguồn"]
+</pre></div>
+<p>Bốn chế độ giao diện: đầy đủ, cache, retrieval-only và từ chối. Các phần còn lại của app (xếp hạng, bản đồ, so sánh, xuất dữ liệu) không phụ thuộc LLM.</p>
+
+<h3>8. Triển khai và CI/CD</h3>
+<div class="dia"><pre class="mermaid">
+flowchart LR
+  DEV["Push, Pull Request"] --> CI["GitHub Actions:&lt;br/&gt;lint, typecheck, test, data:check, build"]
+  CI -- "xanh" --> PRV["Vercel Preview"]
+  PRV -- "merge main" --> PROD["Vercel Production"]
+  ENV["Biến môi trường:&lt;br/&gt;LLM_PROVIDER, LLM_MODEL, LLM_API_KEY"] --> PROD
+  PROD --> MON["Log lỗi và độ trễ /api/ask"]
+</pre></div>
+<div class="tw"><table><thead><tr><th>Lớp</th><th>Lựa chọn</th><th>Lý do</th></tr></thead><tbody>
+<tr><td>Framework</td><td>Next.js (App Router), TypeScript, Tailwind</td><td>Một repo, deploy một cú nhấp trên Vercel</td></tr>
+<tr><td>Biểu đồ</td><td>SVG tùy biến với d3-scale, d3-shape</td><td>Nhẹ, kiểm soát hoàn toàn bản đồ bằng chứng và hatch cho vùng mù</td></tr>
+<tr><td>Kiểm tra dữ liệu</td><td>Zod</td><td>Schema dùng chung cho build và API</td></tr>
+<tr><td>Truy xuất</td><td>MiniSearch (BM25), vector tính trước tùy chọn</td><td>Kho nhỏ, không cần vector DB</td></tr>
+<tr><td>Kiểm thử</td><td>Vitest, một ca Playwright smoke</td><td>Bảo vệ engine xếp hạng và validator</td></tr>
+</tbody></table></div>
+<pre class="code">/data            investigations.json, scenarios.json, chunks.json
+/scripts         data-check.ts, build-chunks.ts, build-vectors.ts
+/src/app         page.tsx (Mission Brief), map, compare, ask, about, api/ask/route.ts
+/src/lib         schema.ts, ranking.ts, retrieval.ts, validator.ts, export.ts
+/src/components  RankedList, EvidenceMap, GravityStrip, DnaMatrix, AskPanel
+/tests           ranking.test.ts, validator.test.ts, smoke.spec.ts</pre>
+
+<h3>9. Các quyết định kiến trúc chính</h3>
+<div class="tw"><table><thead><tr><th>Quyết định</th><th>Lý do</th><th>Đánh đổi</th></tr></thead><tbody>
+<tr><td>Dữ liệu tĩnh JSON, không database</td><td>Nhanh, demo không phụ thuộc mạng, dễ kiểm chứng bằng Git</td><td>Cập nhật dữ liệu cần build lại</td></tr>
+<tr><td>BM25 trước, vector sau</td><td>Kho nhỏ, thuật ngữ chuyên ngành chính xác (BASS, CIR), ít phụ thuộc bên ngoài</td><td>Câu hỏi diễn đạt xa từ khóa có thể kém hơn, nên thêm alias và vector tùy chọn</td></tr>
+<tr><td>Một endpoint server duy nhất</td><td>Giữ khóa an toàn, ít thành phần để hỏng</td><td>Mọi truy vấn RAG đi qua một hàm, cần rate limit tốt</td></tr>
+<tr><td>Validator trích dẫn bắt buộc</td><td>Biến “không bịa” thành cơ chế kiểm tra được</td><td>Đôi khi loại cả câu đúng nếu LLM quên trích dẫn</td></tr>
+<tr><td>Không nội suy trọng lực Mặt Trăng, Sao Hỏa</td><td>PSI chưa có dữ liệu trọng lực một phần</td><td>Dải trống nhìn “ít tính năng” hơn, nhưng trung thực</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- ============ RAG VỚI JEV ============ -->
+<section class="sec" id="rag-jev">
+<p class="kicker">Tùy chọn nâng cấp RAG</p>
+<h2>Để LLM viết, để Jev quyết định</h2>
+<p class="lead">Jev của TypeSafe AI đảm nhận các bước “chọn đường, chấm điểm, cho phép trả lời”, còn LLM chỉ còn một việc là soạn câu trả lời. Đây là phần tùy chọn: kiến trúc ở trên chạy được mà không cần Jev.</p>
+<div class="pull">Phần lớn lệnh gọi LLM trong một pipeline RAG không cần viết chữ nào. Chúng chỉ cần chọn một nhãn và nói chắc đến đâu. Đó chính là việc của một System One model.</div>
+
+<h3>Jev là gì, và chưa chắc điều gì</h3>
+<div class="grid">
+  <div class="card"><h4 style="font-size:1.5rem;color:var(--blue)">3 primitive</h4><p><code>choice</code> (chọn một đáp án), <code>score</code> (điểm 0 đến 1), <code>null</code> (không áp dụng). Đầu ra có kiểu cố định, kèm xác suất.</p></div>
+  <div class="card"><h4 style="font-size:1.5rem;color:var(--blue)">70–500 ms</h4><p>Độ trễ đầu-cuối theo TypeSafe. Các câu hỏi khai báo được đánh giá song song, không sinh token tuần tự.</p></div>
+  <div class="card"><h4 style="font-size:1.5rem;color:var(--blue)">$0,042 / 1M</h4><p>Token đầu vào, token đầu ra miễn phí. Ngữ cảnh 32K. Đang early access, vào qua danh sách chờ.</p></div>
+</div>
+<div class="callout"><b class="t">Cần kiểm chứng</b><p>Các con số “nhanh gấp 133 đến 193 lần, rẻ gấp 444 lần so với LLM” là của TypeSafe. Các nguồn báo chí ghi hệ số khác nhau và chưa có benchmark độc lập. Jev không viết văn bản nên không thay được bước soạn câu trả lời. Vì còn trong danh sách chờ, đừng đặt kế hoạch 48 giờ phụ thuộc vào Jev. Mọi con số của Jev trong phần này là giả định có thể chỉnh.</p></div>
+
+<h3>Năm điểm quyết định, một lệnh gọi LLM</h3>
+<p>Đường truy xuất giữ nguyên nền BM25, vector và RRF. Jev chen vào năm chỗ mà trước đây phải dùng LLM làm giám khảo.</p>
+<div class="dia"><pre class="mermaid">
+flowchart TB
+  Q["Câu hỏi"] --> G{"① Jev: cổng phạm vi&lt;br/&gt;choice + null"}
+  G -- "ngoài phạm vi" --> REF["Từ chối, kèm bằng chứng gần nhất"]
+  G -- "trong phạm vi" --> RT["② Jev: chọn đường truy xuất&lt;br/&gt;choice"]
+  RT --> B["BM25 top-k"]
+  RT --> V["Vector top-k"]
+  B --> F["Trộn RRF"]
+  V --> F
+  F --> RR["③ Jev: chấm liên quan từng chunk&lt;br/&gt;score, song song"]
+  RR --> CV{"④ Jev: coverage&lt;br/&gt;full, partial, none"}
+  CV -- "none" --> RO["Retrieval-only, nói rõ PSI chưa đề cập"]
+  CV -- "full hoặc partial" --> GEN["LLM soạn JSON có trích dẫn&lt;br/&gt;System 2, một lệnh gọi"]
+  GEN --> SC["⑤ Jev: mỗi câu có chunk hỗ trợ?&lt;br/&gt;score"]
+  SC -- "đạt ngưỡng τ" --> OUT["Trả lời + chip trích dẫn"]
+  SC -- "dưới τ" --> RO
+</pre></div>
+<p>Chọn từng điểm để xem Jev nhận gì, trả gì và thay cho cái gì.</p>
+<div class="tabs" id="tabs" role="group" aria-label="Chọn điểm quyết định"></div>
+<div class="panel" id="panel"></div>
+
+<h3>Thử ngưỡng tin cậy τ</h3>
+<p>Kéo τ để thấy cùng một xác suất cho ra đường đi khác nhau. Xác suất dưới đây là minh họa, không phải đầu ra thật của Jev.</p>
+<div class="ctl"><label for="tau">Ngưỡng τ (độ chắc tối thiểu)</label><input type="range" id="tau" min="50" max="95" value="80"><b id="tauv">0,80</b></div>
+<div class="tw"><table><thead><tr><th>Câu hỏi mẫu</th><th>Trong phạm vi</th><th>Đủ bằng chứng</th><th>Câu được hỗ trợ</th><th>Kết quả</th></tr></thead><tbody id="sim"></tbody></table></div>
+<p class="muted" style="font-size:.9rem;margin-top:10px">Quy tắc: dưới τ ở cổng phạm vi thì từ chối. Dưới τ ở coverage hoặc kiểm tra trích dẫn thì lùi về retrieval-only. τ cao thì ít bịa nhưng từ chối nhiều, nên chọn τ bằng bộ dữ liệu có nhãn.</p>
+
+<h3>Ước tính chi phí và độ trễ</h3>
+<p>So sánh LLM làm giám khảo với Jev cho cùng năm điểm quyết định. Mọi giá trị chỉnh được, mặc định là giả định.</p>
+<div class="ctl"><label for="q">Số truy vấn mỗi ngày</label><input type="range" id="q" min="100" max="50000" step="100" value="5000"><b id="qv"></b></div>
+<div class="ctl"><label for="k">Số chunk đem chấm điểm</label><input type="range" id="k" min="10" max="100" step="5" value="30"><b id="kv"></b></div>
+<div class="ctl"><label for="jl">Độ trễ mỗi lệnh Jev (ms)</label><input type="range" id="jl" min="70" max="500" step="10" value="300"><b id="jlv"></b></div>
+<div class="ctl"><label for="ll">Độ trễ mỗi lệnh LLM (ms)</label><input type="range" id="ll" min="500" max="4000" step="100" value="1500"><b id="llv"></b></div>
+<div class="ctl"><label for="lp">Giá LLM, $ mỗi 1M token vào</label><input type="range" id="lp" min="0.25" max="15" step="0.25" value="3"><b id="lpv"></b></div>
+<div class="out" id="out"></div>
+<p class="muted" style="font-size:.88rem;margin-top:10px">Mô hình: 5 lệnh gọi tuần tự, tổng token vào ≈ 300 + 300 + (k × 250 + 300) + 1.200 + 1.500. LLM có thêm khoảng 40 token đầu ra mỗi lệnh, tính $15 mỗi 1M. Một tháng tính 30 ngày. Chưa tính bước soạn câu trả lời, vì cả hai phương án đều giữ nguyên bước đó.</p>
+
+<h3>Đo xem có đáng dùng không</h3>
+<div class="tw"><table><thead><tr><th>Chỉ số</th><th>Đo cái gì</th><th>Mục tiêu đề xuất</th></tr></thead><tbody>
+<tr><td>Recall@k, MRR</td><td>Chunk đúng có nằm trong top-k, và đứng cao đến đâu, sau bước ③</td><td>Không thấp hơn LLM giám khảo</td></tr>
+<tr><td>Độ chính xác trích dẫn</td><td>Tỷ lệ câu trả lời có trích dẫn thật sự chứa ý đó (bước ⑤)</td><td>≥ 95%, kiểm bằng người</td></tr>
+<tr><td>Độ chính xác từ chối</td><td>Từ chối đúng câu ngoài phạm vi, không từ chối nhầm câu hợp lệ</td><td>Cân bằng theo ví dụ demo</td></tr>
+<tr><td>ECE (sai số hiệu chỉnh)</td><td>Jev nói 80% thì đúng khoảng 80% lần không? Quyết định chọn τ</td><td>Càng thấp càng tốt, đo trên dữ liệu của bạn</td></tr>
+<tr><td>p50 và p95 độ trễ</td><td>Thời gian thật của cả 5 điểm, gồm mạng</td><td>Thấp hơn rõ so với LLM giám khảo</td></tr>
+</tbody></table></div>
+
+<h3>Lộ trình triển khai</h3>
+<div class="grid">
+  <div class="card"><h4>1. Bộ nhãn vàng</h4><p>Gán nhãn 100 đến 200 câu hỏi: trong hay ngoài phạm vi, chunk liên quan, coverage đúng. Đây là tài sản dùng cho mọi bước sau, kể cả khi bỏ Jev. Với hackathon 2 ngày, thu nhỏ còn 20 đến 30 câu.</p></div>
+  <div class="card"><h4>2. Chạy bóng</h4><p>Jev chạy song song với LLM giám khảo, chỉ ghi log. So khớp quyết định, đo ECE và độ trễ, chọn τ.</p></div>
+  <div class="card"><h4>3. Bật có dự phòng</h4><p>Jev quyết định thật. Lỗi, quá thời gian hoặc xác suất dưới τ thì lùi về luồng cũ: LLM giám khảo hoặc retrieval-only.</p></div>
+</div>
+<ul>
+<li>Giữ BM25 và validator trích dẫn tất định làm lớp bảo vệ cuối. Jev bổ sung chứ không thay.</li>
+<li>Gói Jev sau một giao diện <code>Decider</code> để đổi sang LLM giám khảo bằng một biến môi trường.</li>
+<li>Jev chỉ nhận ngữ cảnh 32K, nên chia chunk ngắn và chấm theo lô khi k lớn.</li>
+</ul>
+</section>
+
+<!-- ============ DỮ LIỆU ============ -->
+<section class="sec" id="du-lieu">
+<p class="kicker">Dữ liệu và nguồn</p>
+<h2>Dữ liệu ở đâu và link nguồn</h2>
+<p class="lead">Playbook là tài liệu gốc. Phần này đã gộp 25 mục tài liệu và 10 mục dataset/cổng dữ liệu từ “Flame in Freefall: nguồn tài liệu và dataset” ngày 02/11/2026: đối chiếu 19 mục có sẵn, bổ sung 16 mục mới, tổng cộng 55 nguồn duy nhất theo URL hoặc mã NTRS.</p>
+<div class="callout"><b class="t">Phân biệt bằng chứng và trạng thái nguồn</b><p>Thông tin giấy phép, DOI, phiên bản và nội dung dataset dưới đây được giữ theo tài liệu bổ sung của đội; lần gộp này chưa kiểm chứng độc lập các trang bên ngoài. “Link có thật” không có nghĩa đã kiểm quyền sử dụng hoặc đã kiểm đúng số liệu. Với ghi chú hạn chế hoặc chưa rõ quyền, tạm chỉ lưu metadata, tóm tắt của đội và liên kết.</p></div>
+<p><a href="#dataset-catalog">Dataset, DOI và phiên bản</a> · <a href="#source-library">Tra cứu toàn bộ 55 nguồn</a> · <a href="#source-rights">Quyền sử dụng và các bản cần hạn chế</a></p>
+<h3>Bốn phát hiện ảnh hưởng tới kế hoạch</h3>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))">
+ <div class="card"><h4>AWS chưa được xác nhận có dữ liệu cháy</h4><p>Tài liệu cũ ghi bucket nasa-psi chỉ liệt kê DSI và OASIS, còn bản RAG docx cho rằng có thể dùng AWS Open Data. Chưa xác minh trực tiếp. Sau giờ mở hackathon, kiểm tra <code>aws s3 ls --no-sign-request s3://nasa-psi/</code>; ưu tiên PSI và NTRS cho dữ liệu cháy.</p></div>
+ <div class="card"><h4>PSI chạy bằng JavaScript; API chưa chốt</h4><p>Danh mục bổ sung chưa tìm được API công khai chính thức; thông tin “phải tải thủ công” mới là dẫn lại từ hướng dẫn không chính thức. Xem DevTools để kiểm tra cách trang tải dữ liệu hoặc hỏi msfc-psi-help@mail.nasa.gov. Endpoint nội bộ không tự động trở thành API công khai được hỗ trợ.</p></div>
+ <div class="card"><h4>LUCI có kết quả ngoài PSI</h4><p>Khoảng trống partial-g của PSI theo đề không có nghĩa mọi nguồn NASA đều chưa có dữ liệu Mặt Trăng. Playbook ghi LUCI đã có kết quả công bố; để dưới nhãn ngoài PSI. FM2 cần kiểm tra tình trạng bay, và từng bản LUCI/FM2 có ghi chú quyền riêng.</p></div>
+ <div class="card"><h4>Bài thử 1g chưa chắc là trường hợp xấu nhất</h4><p>Giữ luận điểm từ Olson (2004) và nghiên cứu khí quyển khám phá trong Playbook. FM2 là nguồn bổ sung cần đọc đúng trạng thái công bố. Mỗi phát biểu định lượng phải gắn tài liệu, điều kiện thử và trạng thái kiểm chứng.</p></div>
+</div>
+<h3 id="dataset-catalog">Dataset, DOI và phiên bản</h3>
+<p>Đây là danh mục định vị nguồn, chưa phải dữ liệu đã tải. PSI là nguồn cháy chính; danh mục ghi các trang PSI đã đọc có CC0-1.0 và dữ liệu sử dụng cần trích dẫn DOI. Chỉ áp dụng sau khi kiểm ngay trên đúng bản dataset. Không suy rộng giấy phép dataset sang bài báo/PDF đi kèm.</p>
+<div class="tw"><table style="min-width:900px"><thead><tr><th>Dataset hoặc cổng</th><th>Phạm vi và cách dùng</th><th>DOI / phiên bản</th><th>Thông tin từ danh mục bổ sung</th><th>Trạng thái quyền theo danh mục</th></tr></thead><tbody><tr><td><a href="https://psi.nasa.gov/physci/repo/search?q=&amp;data_source=psi&amp;data_type=investigation" target="_blank" rel="noopener noreferrer">PSI Data Repository (cổng chính, dữ liệu cháy)</a></td><td>Cổng chính PSI; lọc Research Area = Combustion Science.</td><td>Chưa ghi nhận DOI</td><td>Trang tìm kiếm chạy bằng JavaScript. Hãy lọc Research Area = Combustion Science.</td><td>Danh mục ghi dùng được</td></tr>
+<tr><td><a href="https://psi.nasa.gov/physci/repo/data/investigations/PSI-60" target="_blank" rel="noopener noreferrer">PSI-60: phân tích SPICE (ground investigation)</a></td><td>Phân tích SPICE trên mặt đất (ground investigation); phân biệt với test vi trọng lực.</td><td><a href="https://doi.org/10.60555/mzjm-yv57" target="_blank" rel="noopener noreferrer">10.60555/mzjm-yv57</a></td><td>DOI 10.60555/mzjm-yv57. CC0-1.0. Hơn 1.600 ảnh thô, nhiệt độ và thể tích muội.</td><td>Danh mục ghi dùng được</td></tr>
+<tr><td><a href="https://psi.nasa.gov/physci/repo/data/investigations/PSI-69" target="_blank" rel="noopener noreferrer">PSI-69: FLEX, phiên bản 5</a></td><td>FLEX, phiên bản 5; số dòng/cột được dẫn từ repo khác, chưa xác nhận trực tiếp.</td><td><a href="https://doi.org/10.60555/mbq8-0451" target="_blank" rel="noopener noreferrer">10.60555/mbq8-0451</a><br>Phiên bản 5</td><td>DOI 10.60555/mbq8-0451. Theo một repo công khai: 274 test × 16 cột, CC0-1.0. Cần xác nhận trên trang PSI.</td><td>Chưa kiểm quyền</td></tr>
+<tr><td><a href="https://psi.nasa.gov/physci/repo/data/investigations/PSI-159" target="_blank" rel="noopener noreferrer">PSI-159: ACME CFI-G (O₂ cao nhất trong vi trọng lực)</a></td><td>ACME CFI-G; đã có PSI-ID trong danh mục, chưa ghi nhận DOI/giấy phép.</td><td>Chưa ghi nhận DOI</td><td>Mình chỉ thấy mã trong danh sách PSI. Hãy mở trang và đọc DOI, giấy phép.</td><td>Chưa kiểm quyền</td></tr>
+<tr><td><a href="https://www.nasa.gov/physical-sciences-informatics-psi/psi-investigations-by-research-area/" target="_blank" rel="noopener noreferrer">PSI: danh sách investigation theo lĩnh vực</a></td><td>Cổng kiểm kê investigation theo lĩnh vực; không phải một dataset riêng.</td><td>Chưa ghi nhận DOI</td><td>Liệt kê ACME BRE, E-FIELD, S-Flames, BASS, BASS-II, CFI, FLEX, FLEX-2, SAME-R, SPICE…</td><td>Danh mục ghi dùng được</td></tr>
+<tr><td><a href="https://www.nasa.gov/physical-sciences-informatics-psi/psi-nra-awarded-research-by-area/" target="_blank" rel="noopener noreferrer">PSI: nghiên cứu mặt đất dùng dữ liệu PSI (NRA)</a></td><td>Danh mục nghiên cứu phái sinh dùng dữ liệu PSI; PSI-117 chỉ được nhắc là sắp có.</td><td>Chưa ghi nhận DOI</td><td>Danh sách bộ dữ liệu phái sinh, ví dụ cool flame (PSI-117 sắp có).</td><td>Danh mục ghi dùng được</td></tr>
+<tr><td><a href="https://data.nist.gov/od/id/mds2-2314" target="_blank" rel="noopener noreferrer">NIST Fire Calorimetry Database (ứng dụng trên Trái Đất)</a></td><td>Dữ liệu đo cháy trên Trái Đất; nguồn tham khảo ngoài PSI.</td><td><a href="https://doi.org/10.18434/mds2-2314" target="_blank" rel="noopener noreferrer">10.18434/mds2-2314</a></td><td>DOI 10.18434/mds2-2314. Giấy phép NIST Open (https://www.nist.gov/open/license). Nhiệt giải phóng, CO, muội.</td><td>Danh mục ghi dùng được</td></tr>
+<tr><td><a href="https://darts.isas.jaxa.jp/app/kibo-pm-experiments/experiment/combustion/gc" target="_blank" rel="noopener noreferrer">JAXA DARTS: Kibo Group Combustion (nguồn quốc tế)</a></td><td>Dữ liệu cháy giọt trên ISS của JAXA; nguồn quốc tế ngoài PSI.</td><td>Chưa ghi nhận DOI</td><td>Dữ liệu cháy giọt trên ISS. Chưa đọc giấy phép.</td><td>Chưa kiểm quyền</td></tr>
+<tr><td><a href="https://data.mendeley.com/datasets/2gw4pjhkxz/1" target="_blank" rel="noopener noreferrer">Mendeley: phân loại kết quả cháy vật liệu rắn trong vi trọng lực</a></td><td>Bản đồ/phân loại tài liệu; không phải số liệu thô của thí nghiệm.</td><td><a href="https://doi.org/10.17632/2gw4pjhkxz.1" target="_blank" rel="noopener noreferrer">10.17632/2gw4pjhkxz.1</a></td><td>DOI 10.17632/2gw4pjhkxz.1. Bản đồ tài liệu, không phải số liệu thô. Chưa đọc giấy phép.</td><td>Chưa kiểm quyền</td></tr>
+<tr><td><a href="https://ntrs.nasa.gov/citations/20040084025" target="_blank" rel="noopener noreferrer">MAPTIS (kết quả NASA-STD-6001, Test 1)</a></td><td>CSDL có kiểm soát truy cập; URL trong danh mục là bài NTRS giới thiệu, không phải endpoint tải MAPTIS.</td><td>Chưa ghi nhận DOI</td><td>Cơ sở dữ liệu cần tài khoản, không mở công khai. Chỉ dùng bài NTRS này (Work of the US Gov) để minh họa.</td><td>Danh mục ghi có hạn chế</td></tr></tbody></table></div>
+<div class="callout"><b class="t">Không đánh đồng hai con số FLEX</b><p>Báo cáo NTRS 20150023456 trình bày 284 test đầu tiên. Mục PSI-69 phiên bản 5 được danh mục dẫn từ một repo công khai là 274 test × 16 cột. Đây là hai mô tả của hai nguồn/phạm vi khác nhau; chưa có đối chiếu trực tiếp để kết luận thiếu 10 test hay dùng hai con số thay thế nhau.</p></div>
+<ul>
+ <li><b>PSI-60:</b> ghi nhận DOI <code>10.60555/mzjm-yv57</code>, hơn 1.600 ảnh thô, nhiệt độ và thể tích muội; là ground investigation phân tích SPICE.</li>
+ <li><b>PSI-69:</b> ghi nhận DOI <code>10.60555/mbq8-0451</code>, phiên bản 5. Phải xác minh kích thước bảng, header, đơn vị và giấy phép trên PSI trước khi chọn làm dataset nền.</li>
+ <li><b>PSI-159:</b> chỉ có mã ACME CFI-G; không tự điền DOI, giấy phép hoặc file chưa thấy. <b>PSI-117</b> chỉ được nhắc là sắp có trong danh mục NRA, chưa tính là dataset sẵn dùng.</li>
+ <li><b>NIST Fire Calorimetry:</b> DOI <code>10.18434/mds2-2314</code>, nhiệt giải phóng, CO và muội; danh mục nêu <a href="https://www.nist.gov/open/license" target="_blank" rel="noopener noreferrer">NIST Open License</a>. Để riêng ở ứng dụng Trái Đất.</li>
+ <li><b>JAXA DARTS:</b> nguồn quốc tế về cháy giọt trên ISS, chưa đọc giấy phép. <b>Mendeley:</b> DOI <code>10.17632/2gw4pjhkxz.1</code>, chỉ là bản đồ tài liệu, chưa đọc giấy phép. <b>MAPTIS:</b> theo danh mục cần tài khoản; bài NTRS giới thiệu không đồng nghĩa được truy cập toàn bộ CSDL.</li>
+</ul>
+<h3>Thông tin cần lưu trước khi nạp dữ liệu</h3>
+<p>Mỗi dataset cần có PSI-ID hoặc mã kho, DOI, phiên bản, URL trang và file, ngày truy cập, giấy phép đúng phiên bản, danh sách file, số test/hàng/cột và người kiểm. Với mỗi giá trị, giữ nguồn, trang hoặc test-ID, đơn vị và trạng thái <code>verified</code>, <code>unverified</code> hoặc <code>placeholder</code> như schema gốc.</p>
+<p>Trích dẫn dataset bằng DOI kèm phiên bản; trích dẫn tài liệu bằng mã NTRS hoặc URL và trang. Trong hồ sơ nộp Space Apps, ghi nhận mọi nguồn đã sử dụng, kể cả nguồn mở. Nội dung do AI tạo không được tự gắn nhãn “theo NASA”.</p>
+<h3 id="source-library">Danh sách link nguồn hợp nhất</h3>
+<p>Các bản trùng mã NTRS được gộp thành một dòng, giữ cả trang hồ sơ và PDF. Tìm theo tên, PSI-ID, DOI, mã NTRS, ghi chú hoặc lọc quyền; sao chép CSV/JSON giữ thông tin quyền do danh mục ghi nhận và xuất xứ.</p>
+<div class="bar"><input type="search" id="sq" placeholder="Tìm: PSI-69, DOI, Saffire, mã NTRS..." aria-label="Tìm nguồn"><select id="sg" aria-label="Lọc theo nhóm"></select><select id="sl" aria-label="Lọc theo thông tin quyền"><option value="">Tất cả trạng thái quyền</option><option value="reported_permitted">Danh mục ghi dùng được</option><option value="restricted">Danh mục ghi có hạn chế</option><option value="unchecked">Chưa kiểm quyền</option><option value="not_reviewed">Chưa có thông tin quyền</option></select><button class="btn" id="cpcsv" type="button">Sao chép CSV</button><button class="btn" id="cpjson" type="button">Sao chép JSON</button></div>
+<p class="src-meta" id="sc" role="status"></p><div class="tw"><table style="min-width:900px"><thead><tr><th>Nguồn và PDF</th><th>Loại</th><th>Xử lý trong RAG</th><th>Trạng thái link</th><th>Quyền theo danh mục</th><th>Ghi chú</th></tr></thead><tbody id="srcb"></tbody></table></div>
+<h3 id="source-rights">Quyền sử dụng và các bản cần hạn chế</h3>
+<p>Danh mục bổ sung phân loại “dùng được” khi tác giả danh mục đã thấy Public Use Permitted hoặc là trang NASA; “chỉ tóm tắt + link” khi thấy hạn chế; “chưa kiểm” khi chưa đọc được trường Copyright. Đây là ghi nhận theo tài liệu đó, không phải kết luận rằng mọi nội dung trên một trang NASA đều được phép tái sử dụng.</p>
+<div class="tw"><table style="min-width:850px"><thead><tr><th>Bản tài liệu</th><th>Đúng file được ghi nhận</th><th>Ghi chú quyền trong danh mục</th><th>Cách xử lý tạm thời trong RAG</th></tr></thead><tbody><tr><td>BASS-II Summary Report 2021</td><td><a href="https://ntrs.nasa.gov/api/citations/20210011385/downloads/TM-20210011385.pdf" target="_blank" rel="noopener noreferrer">PDF 20210011385</a></td><td>Use by or on behalf of the US Gov. Permitted.</td><td>Chỉ metadata, tóm tắt của đội và link; chưa đưa toàn văn vào corpus công khai.</td></tr>
+<tr><td>LUCI</td><td><a href="https://ntrs.nasa.gov/api/citations/20250010653/downloads/ASGSR%202025-LUCI-Ferkul-Presentation-v2-20250010653.pdf" target="_blank" rel="noopener noreferrer">PDF 20250010653</a></td><td>Use by or on behalf of the US Gov. Permitted.</td><td>Chỉ metadata, tóm tắt của đội và link; chưa đưa toàn văn vào corpus công khai.</td></tr>
+<tr><td>FM2: poster</td><td><a href="https://ntrs.nasa.gov/api/citations/20240015307/downloads/Glenn_2024_ZayacPoster.pdf" target="_blank" rel="noopener noreferrer">PDF 20240015307</a></td><td>Use by or on behalf of the US Gov. Permitted.</td><td>Chỉ metadata, tóm tắt của đội và link; chưa đưa toàn văn vào corpus công khai.</td></tr>
+<tr><td>Saffire IV/V: hai bản ICES 2021</td><td><a href="https://ntrs.nasa.gov/api/citations/20210017780/downloads/Saffire%20ICES%202021%20Saffire%20Final%20presentation%20compressed.pdf" target="_blank" rel="noopener noreferrer">PDF 20210017780</a><br><a href="https://ntrs.nasa.gov/api/citations/20210011521/downloads/ICES%202021-266%200503-2021%20final.pdf" target="_blank" rel="noopener noreferrer">PDF 20210011521</a></td><td>Portions of document may include copyright protected material.</td><td>Chỉ metadata, tóm tắt của đội và link; chưa đưa toàn văn vào corpus công khai.</td></tr>
+<tr><td>Saffire VI: ICES 2024</td><td><a href="https://ntrs.nasa.gov/api/citations/20240002981/downloads/Saffire-ICES-2024-ICES-365-accepted%20final.pdf" target="_blank" rel="noopener noreferrer">PDF 20240002981</a></td><td>Portions of document may include copyright protected material.</td><td>Chỉ metadata, tóm tắt của đội và link; chưa đưa toàn văn vào corpus công khai.</td></tr></tbody></table></div>
+<ul>
+ <li><b>Đã được danh mục ghi nhận Public Use Permitted:</b> BASS-II 20160000593; FLEX 20150023456; báo cáo NASA Glenn/SAME 20170007283; NESC 2026 20260003925. Vẫn kiểm đúng bản tải và phần nội dung bên thứ ba trước khi đưa toàn văn vào corpus.</li>
+ <li><b>Các bản còn chờ kiểm quyền:</b> Saffire I; Olson 2004; SAME-2; NIST pub_id 904707; so sánh chất dập lửa; bay parabol; nước phun sương của Colorado School of Mines; Saffire status 2016; JASMAC-33; SoFIE; cảm biến CSA-CP/CDM; nghiên cứu bắt lửa 20080013149. Thông tin khoa học đã trích trong Playbook không tự chứng minh quyền nạp toàn văn.</li>
+ <li><b>Bài tạp chí:</b> giữ metadata, tóm tắt của đội và link nếu chưa xác định quyền. Cùng một investigation có thể có bản NASA, bản hội nghị và bản tạp chí với điều khoản khác nhau.</li>
+ <li><b>NTRS khác PSI:</b> NTRS có tài liệu API với <code>POST /citations/search</code> và <code>GET /citations/{id}</code>. Điều này không xác nhận PSI có API công khai tương tự.</li>
+</ul>
+<p>Mã [N1], [T1], [G2] trong docx vẫn thiếu Phụ lục B để ánh xạ URL. Mã [R1] (Contextual Retrieval) giữ nhãn chưa đối chiếu. Phần này gộp từ danh mục nguồn và dataset của đội đã được gộp đầy đủ ở trên; nội dung bổ sung không thay đổi các quyết định sản phẩm, kiến trúc và ưu tiên Must/Should của Playbook.</p>
+</section>
+
+<!-- ============ ĐÁNH GIÁ & RỦI RO ============ -->
+<section class="sec" id="danh-gia">
+<p class="kicker">Chất lượng</p>
+<h2>Đánh giá, rủi ro và những gì cố ý bỏ</h2>
+
+<h3>Bộ câu hỏi mẫu</h3>
+<p>Làm bộ 20 đến 30 câu có đáp án đã biết, chạy lại sau mỗi thay đổi lớn (cách cắt đoạn, embedding, trọng số). Tách đo truy hồi (Recall@K, MRR) khỏi đo câu trả lời (đúng và trung thực với nguồn) để biết lỗi nằm ở lớp nào. Các đáp án dưới đây phải được đối chiếu lại với tài liệu PSI thật trước khi dùng làm chuẩn.</p>
+<div class="tw"><table><thead><tr><th>Câu hỏi mẫu</th><th>Kỳ vọng</th></tr></thead><tbody>
+<tr><td>Thí nghiệm nào kiểm tra giới hạn oxy ở trọng lực thấp?</td><td>Saffire-II</td></tr>
+<tr><td>Thí nghiệm nào dập lửa bằng CO₂ hoặc heli?</td><td>FLEX</td></tr>
+<tr><td>Thí nghiệm nào thử phát hiện khói?</td><td>SAME, SAME-R</td></tr>
+<tr><td>Thí nghiệm nào có nồng độ oxy cao nhất?</td><td>CFI-G (ACME), tới 85%</td></tr>
+<tr><td>Thí nghiệm nào mô phỏng trọng lực một phần?</td><td>E-FIELD Flames (ACME)</td></tr>
+<tr><td>Có dữ liệu cháy ở trọng lực Mặt Trăng trong PSI không?</td><td>Theo đề, PSI chưa có số đo partial-g. LUCI đã có kết quả công bố ngoài PSI; phân biệt phạm vi nguồn, không nội suy từ 0g và 1g thành số đo Mặt Trăng.</td></tr>
+<tr><td>Nhiên liệu tên lửa cháy thế nào?</td><td>Ngoài phạm vi, từ chối</td></tr>
+<tr><td>Vải này dùng trong rover 30% O₂ có an toàn không?</td><td>Không kết luận. Trả bằng chứng gần nhất và điều kiện chưa thử</td></tr>
+<tr><td>Vật liệu qua bài thử 1g thì an toàn trên Mặt Trăng</td><td>PSI chưa đề cập. Kèm trích dẫn tài liệu ngoài, gắn nhãn giả thuyết</td></tr>
+<tr><td>Thời tiết Houston hôm nay?</td><td>Ngoài chủ đề, từ chối</td></tr>
+</tbody></table></div>
+
+<h4>Chỉ số và mục tiêu đề xuất</h4>
+<div class="tw"><table><thead><tr><th>Chỉ số</th><th>Cách đo</th><th>Mục tiêu</th></tr></thead><tbody>
+<tr><td>Recall@5</td><td>Bộ câu hỏi vàng, chunk đúng có nằm trong top 5 không</td><td class="num">≥ 0,85</td></tr>
+<tr><td>Độ chính xác trích dẫn</td><td>Câu trích dẫn có thật sự được chunk hỗ trợ không (duyệt tay)</td><td class="num">≥ 0,95</td></tr>
+<tr><td>Từ chối đúng</td><td>Câu ngoài phạm vi có ra coverage none không</td><td class="num">≥ 0,90</td></tr>
+<tr><td>Độ trễ</td><td>p95 của đường đầy đủ</td><td class="num">&lt; 6 giây</td></tr>
+</tbody></table></div>
+
+<h3>Rủi ro và cách giảm</h3>
+<div class="tw"><table><thead><tr><th>Rủi ro</th><th>Cách giảm</th></tr></thead><tbody>
+<tr><td>Định dạng dữ liệu khó đọc</td><td>Thử vài parser trên 10 đến 20 tài liệu thật. Nhập tay phần thiết yếu của các thí nghiệm chính</td></tr>
+<tr><td>Trích xuất sai số liệu</td><td>Người kiểm các ô quan trọng (oxy, áp suất, dòng khí). Lưu nguồn từng ô</td></tr>
+<tr><td>Nhầm đơn vị (phần trăm oxy hay áp suất riêng phần, cm/s hay m/s)</td><td>Chuẩn hóa khi trích xuất. Header nhiều dòng và dòng đơn vị là nguồn lỗi quen thuộc</td></tr>
+<tr><td>AI bịa</td><td>Quy tắc trả lời ở phần Kiến trúc và kiểm tra mã nguồn trích dẫn</td></tr>
+<tr><td>Làm quá nhiều</td><td>Khóa bộ nhỏ làm tốt: lọc, so sánh, giải thích có trích dẫn. Ứng dụng Trái Đất và xuất dữ liệu làm sau</td></tr>
+<tr><td>Chi phí và độ trễ gọi API</td><td>Chạy trích xuất một lần, cache tóm tắt</td></tr>
+<tr><td>Vi phạm luật đề</td><td>Không code trước 14/11. Đối chiếu luật với đề gốc</td></tr>
+<tr><td>Số liệu nguồn là blog hoặc nhà cung cấp</td><td>Kiểm lại trước khi trích trong bài nộp. Số liệu Jev là tuyên bố của TypeSafe</td></tr>
+<tr><td>Phụ thuộc Jev khi còn danh sách chờ</td><td>Bọc sau giao diện Decider, luôn có đường lùi về LLM giám khảo hoặc retrieval-only</td></tr>
+</tbody></table></div>
+
+<h3>Cố ý bỏ, và khi nào xét lại</h3>
+<div class="tw"><table><thead><tr><th>Kỹ thuật hoặc tính năng</th><th>Vì sao bỏ</th><th>Xét lại khi</th></tr></thead><tbody>
+<tr><td>GraphRAG, LazyGraphRAG, LightRAG</td><td>Chi phí dựng. Quan hệ gọn trong bảng</td><td>Corpus tăng nhiều hoặc cần tóm tắt cấp toàn corpus</td></tr>
+<tr><td>Multi-vector (ColPali, MUVERA)</td><td>Lưu trữ gấp 10 đến 100 lần embedding đơn, quy mô nhỏ</td><td>Tài liệu chủ yếu là ảnh, biểu đồ mà OCR hỏng</td></tr>
+<tr><td>DiskANN, quantization</td><td>Chỉ có ý nghĩa từ vài trăm triệu vector</td><td>Không áp dụng cho đề này</td></tr>
+<tr><td>Agentic nhiều vòng</td><td>Tăng độ trễ và token, demo cần nhanh</td><td>Có câu hỏi nhiều bước thật sự</td></tr>
+<tr><td>Long context cho cả corpus</td><td>Chi phí và độ trễ</td><td>Chỉ dùng cho tóm tắt từng thí nghiệm</td></tr>
+<tr><td>Contradiction Finder</td><td>Dễ báo sai, hậu quả khi demo cao (8 giờ công trở lên)</td><td>Sau khi các màn Must đã ổn định</td></tr>
+</tbody></table></div>
+
+<h3>Những điều chưa chắc</h3>
+<div class="callout"><b class="t">Cần xác minh</b>
+<ul>
+<li>Kho AWS nasa-psi có dữ liệu cháy hay không (hai tài liệu mâu thuẫn).</li>
+<li>PSI có trường tốc độ luồng khí ở mức từng test không, và mỗi investigation có dữ liệu tải được hay chỉ có tài liệu.</li>
+<li>FM2 đã bay chưa. Chưa xác nhận, phải kiểm trước khi viết vào bài nộp.</li>
+<li>PSI-69 phiên bản 5 có đúng 274 test × 16 cột và CC0-1.0 không; thông tin hiện được dẫn gián tiếp. Kiểm DOI, file và giấy phép trực tiếp trên PSI.</li>
+<li>PSI-159 còn thiếu DOI/giấy phép; PSI-117 mới được nhắc là sắp có. JAXA và Mendeley chưa đọc điều khoản; MAPTIS là nguồn có kiểm soát truy cập.</li>
+<li>Con số “khoảng 20 thí nghiệm” là ước tính từ danh sách trong đề.</li>
+<li>Trọng số xếp hạng khởi điểm là phỏng đoán, phải chỉnh bằng bộ câu hỏi mẫu.</li>
+<li>Giờ công trong kế hoạch là ước lượng thô.</li>
+<li>Các kết quả định lượng của Contextual Retrieval (giảm lỗi truy hồi 49%, thêm reranking thì 67%) đo trên codebase, tiểu thuyết và paper, không phải dữ liệu cháy.</li>
+<li>Nguồn báo chí về ACME BRE cần đối chiếu với trang NASA.</li>
+</ul></div>
+</section>
+
+<footer>Playbook là tài liệu gốc của đội. Tổng hợp từ các tài liệu: đề chính thức NASA Space Apps 2026 (Flame in Freefall), gói ý tưởng và kế hoạch 48 giờ, kiến trúc hệ thống dashboard, kiến trúc RAG với Jev, tài liệu RAG và nguồn nghiên cứu (docx), và danh sách link đã kiểm chứng; đã gộp thêm danh mục “Flame in Freefall: nguồn tài liệu và dataset” ngày 02/11/2026, giữ trạng thái chưa xác minh và ghi chú quyền theo từng bản. Các hình minh họa Evidence Map và dải trọng lực không chứa dữ liệu thật. Trang này là công cụ chuẩn bị, không phải hệ thống an toàn vận hành.</footer>
+</main>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var esc=function(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")};
+var vn=function(x,d){return x.toFixed(d).replace(".",",")};
+
+/* ---------- countdown ---------- */
+try{
+  var t=new Date(2026,10,14),n=new Date();n.setHours(0,0,0,0);
+  var d=Math.round((t-n)/864e5);
+  if(d>0){$("cdn").textContent=d+" ngày"}
+  else if(d===0){$("cdn").textContent="Hôm nay";$("cd").lastElementChild.textContent="hackathon mở cửa"}
+  else{$("cdn").textContent="Đã mở";$("cd").lastElementChild.textContent="hackathon bắt đầu từ 14/11/2026"}
+}catch(e){}
+
+/* ---------- nav highlight ---------- */
+try{
+  var links=[].slice.call(document.querySelectorAll("#nav a"));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute("href"))});
+  if("IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)})}})
+    },{rootMargin:"-20% 0px -70% 0px"});
+    secs.forEach(function(s){if(s)io.observe(s)});
+  }
+}catch(e){}
+
+/* ---------- environment chart (drawn to scale) ---------- */
+(function(){
+  var groups=[
+    {t:"Nồng độ oxy, thang 0 đến 100%",max:100,rows:[["Không khí Trái Đất",21,"21%",0],["Căn cứ Mặt Trăng (dự kiến, tối thiểu)",30,"từ 30%",1],["CFI-G trong ACME (tối đa)",85,"tới 85%",0],["Bộ đồ du hành",100,"100%",0]]},
+    {t:"Áp suất, thang 0 đến 15 psi",max:15,rows:[["Trái Đất, mực nước biển",14.7,"14,7 psi",0],["Căn cứ Mặt Trăng (dự kiến, tối đa)",10.2,"đến 10,2 psi",1],["Bộ đồ du hành",4.3,"4,3 psi",0]]}
+  ],h="";
+  groups.forEach(function(g){
+    h+='<div class="muted" style="font:500 .78rem var(--mono);letter-spacing:.04em;margin-top:6px">'+g.t+'</div>';
+    g.rows.forEach(function(r){
+      h+='<div class="r"><span>'+r[0]+'</span><div class="track" aria-hidden="true"><div class="fill'+(r[3]?" f":"")+'" style="width:'+(r[1]/g.max*100)+'%"></div></div><span class="v">'+r[2]+'</span></div>';
+    });
+  });
+  $("envchart").innerHTML=h;
+})();
+
+/* ---------- glossary ---------- */
+var G=[
+["PSI","Physical Sciences Informatics. Kho dữ liệu công khai của NASA về thí nghiệm khoa học vật lý, gồm cả cháy. Mỗi nghiên cứu có dữ liệu thô, dữ liệu đã xử lý, tài liệu, hình ảnh và danh sách công bố."],
+["Investigation","Một thí nghiệm hoặc dự án thí nghiệm trong PSI, ví dụ BASS. App của đội xoay quanh đơn vị này."],
+["Vi trọng lực, 0g, 1g","Vi trọng lực là gần như không có trọng lực, như trên ISS. 1g là trọng lực Trái Đất. Mặt Trăng khoảng 0,16g, Sao Hỏa khoảng 0,38g."],
+["Partial gravity","Trọng lực một phần, giữa 0g và 1g. PSI hiện chưa có dữ liệu cháy ở mức này."],
+["ISS","Trạm Vũ trụ Quốc tế, nơi chạy hầu hết các thí nghiệm trong đề."],
+["O₂ (nồng độ oxy)","Phần trăm oxy trong không khí. Không khí Trái Đất khoảng 21%. Oxy càng cao vật liệu càng dễ cháy."],
+["psi","Đơn vị áp suất. Mực nước biển là 14,7 psi."],
+["Dòng khí (airflow)","Tốc độ khí thổi qua mẫu cháy, tính bằng cm/s. Trong vi trọng lực không có đối lưu tự nhiên nên yếu tố này rất quan trọng."],
+["LOI","Limiting Oxygen Index. Mức oxy thấp nhất để lửa còn duy trì được. Olson (2004) nêu LOI ở 1g khoảng 16,5% O₂."],
+["Prevention, Detection, Suppression","Phòng ngừa, phát hiện, dập lửa. Ba trụ cột an toàn cháy của NASA."],
+["BASS, BASS-II","Burning and Suppression of Solids. Đốt vật liệu rắn như vải và nhựa, thử luồng khí và dập. Chạy trong Glovebox."],
+["SPICE, SLICE","Smoke Point In Co-flow Experiment và Structure and Liftoff In Combustion Experiment. Cùng BASS dùng chung khung dòng khí dựng cho SPICE."],
+["Saffire","Spacecraft Fire Safety Demonstration. Đốt mẫu lớn trên tàu hàng tiếp tế ISS, không có người bên cạnh."],
+["SAME, SAME-R","Smoke and Aerosol Measurement Experiment. Đo hạt khói để cải thiện cảm biến phát hiện cháy."],
+["DAFT, DAFT-2","Dust and Aerosol Measurement Feasibility Test. Dùng lại một thiết bị đo của SAME để đo bụi."],
+["FLEX, FLEX-2","Flame Extinguishment Experiment. Dập giọt lỏng đang cháy bằng cách pha loãng khí quyển với CO₂ hoặc heli."],
+["CFI, CFI-G","Cool Flames Investigation. CFI dùng giọt lỏng. CFI-G thuộc ACME, dùng khí, có luồng oxy tới 85%."],
+["ACME","Advanced Combustion via Microgravity Experiments. Sáu thí nghiệm lửa khí, cùng một bộ phần cứng module trong CIR."],
+["BRE","Burning Rate Emulator, thuộc ACME. Đốt khí nhưng nghiên cứu độ bắt cháy của vật liệu trong khí quyển tĩnh."],
+["E-FIELD Flames","Thí nghiệm ACME dùng điện trường tác động lên ion trong lửa, mô phỏng một phần hiệu ứng trọng lực."],
+["CIR","Combustion Integrated Rack. Tủ thí nghiệm cháy trên ISS."],
+["MSG","Microgravity Science Glovebox. Hộp găng tay kín để làm thí nghiệm trên ISS."],
+["MDCA","Multi-user Droplet Combustion Apparatus. Thiết bị đốt giọt lỏng trong CIR, dùng cho FLEX, FLEX-2 và CFI."],
+["LUCI, FM2","Hai thí nghiệm trọng lực Mặt Trăng. Đề kỳ vọng dữ liệu của chúng sẽ được thêm vào PSI sau. LUCI đã có kết quả công bố."],
+["NTRS","NASA Technical Reports Server. Kho báo cáo kỹ thuật công khai của NASA, có API."],
+["SI","Viết tắt “super intelligence” trong đề. Trong thực tế đội dùng AI và LLM."],
+["RAG","Retrieval-Augmented Generation. Tìm các đoạn tài liệu liên quan trước, rồi mới nhờ AI trả lời chỉ dựa trên các đoạn đó."],
+["Chunk","Đoạn tài liệu nhỏ, mỗi đoạn một ý, có id và nguồn để trích dẫn."],
+["BM25","Cách tìm theo từ khóa có trọng số. Tốt với thuật ngữ chính xác như BASS hay CIR."],
+["Vector, embedding","Cách tìm theo nghĩa. Tốt khi câu hỏi diễn đạt xa từ khóa."],
+["RRF","Reciprocal Rank Fusion. Gộp hai danh sách xếp hạng thành một."],
+["Reranker","Bước chấm lại các đoạn đã tìm được để giữ vài đoạn tốt nhất."],
+["Coverage","Mức bằng chứng đủ để trả lời: full, partial hoặc none."],
+["Jev","Model của TypeSafe AI chỉ chọn nhãn hoặc chấm điểm rất nhanh, không viết văn bản. Dùng làm bộ quyết định trong RAG."]
+];
+function drawGl(){
+  var q=($("glq").value||"").toLowerCase().trim(),h="";
+  G.forEach(function(g){
+    if(!q||(g[0]+" "+g[1]).toLowerCase().indexOf(q)>-1)h+='<div><dt>'+esc(g[0])+'</dt><dd>'+esc(g[1])+'</dd></div>';
+  });
+  $("gl").innerHTML=h||'<div><dd>Không có thuật ngữ khớp.</dd></div>';
+}
+$("glq").addEventListener("input",drawGl);drawGl();
+
+/* ---------- evidence map (illustration) ---------- */
+(function(){
+  var s=$("map"),X=["21","25","30","40","50","70","85","100"],tested={"0,0":1,"0,1":1,"0,2":1,"1,0":1,"1,1":1,"2,1":1,"3,1":1,"6,2":1},o="",cw=58,ch=42,x0=70,y0=30,c,r;
+  o+='<rect x="'+(x0+2*cw)+'" y="14" width="'+3*cw+'" height="'+(4*ch+22)+'" fill="var(--flame)" opacity=".08"/>';
+  for(c=0;c<8;c++)for(r=0;r<4;r++){
+    var t=tested[c+","+(3-r)],moon=c>=2&&c<=4,cls=t?'fill="var(--blue)" opacity=".8"':(moon?'fill="var(--flame-soft)" stroke="var(--flame)"':'fill="none" stroke="var(--line)"');
+    o+='<rect x="'+(x0+c*cw+2)+'" y="'+(y0+r*ch+2)+'" width="'+(cw-4)+'" height="'+(ch-4)+'" rx="3" '+cls+'/>';
+  }
+  for(c=0;c<8;c++)o+='<text x="'+(x0+c*cw+cw/2)+'" y="'+(y0+4*ch+16)+'" text-anchor="middle">'+X[c]+'%</text>';
+  o+='<text x="'+(x0+cw/2)+'" y="12" text-anchor="middle">Trái Đất</text><text x="'+(x0+3.5*cw)+'" y="12" text-anchor="middle">Moon base (30% O₂ trở lên)</text><text x="'+(x0+7.5*cw)+'" y="12" text-anchor="middle">Bộ đồ</text>';
+  o+='<text x="12" y="'+(y0+2*ch)+'" transform="rotate(-90 12 '+(y0+2*ch)+')" text-anchor="middle">Luồng khí tăng dần</text><text x="'+(x0+4*cw)+'" y="'+(y0+4*ch+34)+'" text-anchor="middle">Nồng độ oxy</text>';
+  s.innerHTML=o;
+})();
+
+/* ---------- plan: features, hours, roles ---------- */
+var rows=[
+["Must","Xếp hạng theo kịch bản, breakdown, trượt trọng số","8–10",[["Analyst B","công thức"],["Full-stack A","giao diện"]]],
+["Must","Evidence Map (oxy × luồng khí, đổi sang áp suất, tô ô trống)","10–12",[["Analyst B","dữ liệu"],["Full-stack A","đồ thị"]]],
+["Must","Dải trọng lực, khoảng giữa gạch chéo, không nội suy","3–4",[["Full-stack A",""],["Analyst A",""]]],
+["Must","So sánh “mã gen” investigation","6–8",[["Full-stack A",""],["Analyst A",""]]],
+["Must","Hỏi đáp trích nguồn, từ chối khi thiếu bằng chứng","12–14",[["AI A",""],["AI B",""],["Full-stack B",""]]],
+["Must","Xuất CSV/JSON kèm Data Card và notebook mẫu","4–6",[["Full-stack B",""],["Analyst B",""]]],
+["Should","Claim Checker: được hỗ trợ, bị phản bác, hoặc PSI chưa đề cập","4–6",[["AI B",""]]],
+["Should","Scorecard ba trụ cột và danh sách “thí nghiệm nên làm tiếp” từ các ô trống","4–5",[["Analyst A",""],["Full-stack A",""]]],
+["Should","Lăng kính Vũ trụ và Trái Đất (thẻ tĩnh)","3",[["Analyst A",""]]],
+["Should","Chế độ Sinh viên và Kỹ sư (chú giải, đổi cách diễn đạt)","3–4",[["AI A",""],["Analyst A",""]]],
+["Should","Hoạt hình mở đầu 10 giây (lửa giọt nước, quả cầu, điểm trên bản đồ)","3",[["Full-stack A",""]]],
+["Bỏ","Contradiction Finder (dễ báo sai, hậu quả khi demo cao)","8+",[]]
+];
+var tb=$("tb"),cls={Must:"t-must",Should:"t-should","Bỏ":"t-skip"};
+function who(p){return p.map(function(x){return x[0]+(x[1]?" ("+x[1]+")":"")}).join(", ")||"Để sau"}
+tb.innerHTML=rows.map(function(r){return '<tr data-t="'+r[0]+'"><td><span class="tag '+cls[r[0]]+'">'+r[0]+'</span></td><td>'+esc(r[1])+'</td><td class="num">'+r[2]+'</td><td>'+esc(who(r[3]))+'</td></tr>'}).join("");
+[].forEach.call(document.querySelectorAll("[data-f]"),function(b){b.addEventListener("click",function(){
+  [].forEach.call(document.querySelectorAll("[data-f]"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});
+  var f=b.getAttribute("data-f");
+  [].forEach.call(tb.querySelectorAll("tr"),function(tr){tr.hidden=!(f==="all"||tr.getAttribute("data-t")===f)});
+})});
+(function(){
+  var cap=200,bars=[["Các mục Must",43,54],["Các mục Should",17,21],["Must và Should",60,75]],h="";
+  bars.forEach(function(b){
+    h+='<div class="r"><span>'+b[0]+'</span><div class="track" aria-hidden="true"><div class="fill" style="width:'+(b[1]/cap*100)+'%"></div><div class="fill fade" style="left:'+(b[1]/cap*100)+'%;width:'+((b[2]-b[1])/cap*100)+'%;border-radius:0 7px 7px 0"></div></div><span class="v">'+b[1]+'–'+b[2]+' giờ</span></div>';
+  });
+  $("hours").innerHTML=h;
+  var ppl={};
+  rows.forEach(function(r){r[3].forEach(function(p){(ppl[p[0]]=ppl[p[0]]||[]).push(r[1]+(p[1]?" ("+p[1]+")":""))})});
+  var sub={"Full-stack A":"Full-stack","Full-stack B":"Full-stack","Analyst A":"Data analyst","Analyst B":"Data analyst","AI A":"AI engineer","AI B":"AI engineer"},rh="";
+  ["Full-stack A","Full-stack B","Analyst A","Analyst B","AI A","AI B"].forEach(function(nm){
+    rh+='<div class="card"><h4>'+nm+'</h4><p style="font:500 .78rem var(--mono);margin-bottom:6px">'+sub[nm]+'</p><ul>'+(ppl[nm]||[]).map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul></div>';
+  });
+  $("roles").innerHTML=rh;
+})();
+
+/* ---------- checklists (per-viewer, optional storage) ---------- */
+(function(){
+  var KEY="ff-checks-v1",state={};
+  try{state=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){state={}}
+  var pre=[
+    "Mở tab Resources của trang thử thách (đề nói có thể bổ sung tài nguyên trước ngày thi)",
+    "Cả đội đọc trang này và chốt vai trò 6 người",
+    "Đọc lại luật chính thức về việc không bắt đầu dự án trước giờ G",
+    "Không tải dữ liệu, không trích xuất, không viết code trước 14/11",
+    "Gợi ý: chuẩn bị sẵn tài khoản GitHub, Vercel và khóa API LLM để khỏi mất giờ đầu",
+    "Nếu muốn thử Jev: đăng ký danh sách chờ sớm, và vẫn giữ đường lùi về LLM"
+  ];
+  var h3=[
+    "Chạy aws s3 ls --no-sign-request s3://nasa-psi/ xem bucket có dữ liệu cháy không",
+    "Mở trang tìm kiếm PSI bằng trình duyệt, xem tab Network để tìm API nội bộ",
+    "PSI có trường tốc độ luồng khí ở mức từng test không? (không thì Evidence Map dùng oxy × áp suất)",
+    "Mỗi investigation có dữ liệu tải được hay chỉ có tài liệu? (quyết định độ sâu của bộ xuất dữ liệu)",
+    "Bao nhiêu investigation đủ trường oxy và áp suất? (quyết định số điểm trên bản đồ)",
+    "Đếm token thật của tài liệu để chốt long context hay RAG cho phần tóm tắt",
+    "Thử vài parser trên 10 đến 20 tài liệu thật, chọn một",
+    "Chốt schema và chọn bậc dữ liệu A, B hay C",
+    "Đối chiếu PSI-ID, DOI, phiên bản và giấy phép của từng dataset; tách số test trong báo cáo FLEX khỏi bảng PSI-69",
+    "Kiểm quyền đúng file PDF: LUCI, poster FM2, BASS-II 2021 và Saffire IV/V/VI có ghi chú hạn chế trong danh mục bổ sung"
+  ];
+  function build(id,list,pfx){
+    $(id).innerHTML=list.map(function(t,i){var k=pfx+i;return '<li><label><input type="checkbox" data-k="'+k+'"'+(state[k]?" checked":"")+'><span>'+esc(t)+'</span></label></li>'}).join("");
+  }
+  build("ck-pre",pre,"p");build("ck-h3",h3,"h");
+  [].forEach.call(document.querySelectorAll(".checks input"),function(c){c.addEventListener("change",function(){
+    state[c.getAttribute("data-k")]=c.checked;
+    try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}
+  })});
+})();
+
+/* ---------- ranking weights ---------- */
+(function(){
+  var w=[["Khớp vật liệu hoặc loại nhiên liệu",.25],["Gần oxy",.25],["Gần tốc độ dòng khí",.15],["Điểm reranker trên mô tả văn bản",.15],["Gần áp suất",.10],["Độ phù hợp mức trọng lực",.10]],h="";
+  w.forEach(function(x){h+='<div class="r"><span>'+x[0]+'</span><div class="track" aria-hidden="true"><div class="fill" style="width:'+(x[1]/.3*100)+'%"></div></div><span class="v">'+vn(x[1],2)+'</span></div>'});
+  h+='<div class="muted" style="font-size:.86rem">Tổng bằng 1,00. Đo trực tiếp ở trọng lực được điểm cao hơn ước lượng. Thanh vẽ theo thang 0 đến 0,30.</div>';
+  $("weights").innerHTML=h;
+})();
+
+/* ---------- Jev: decision points ---------- */
+var D=[
+["① Cổng phạm vi","choice + null","Câu hỏi + danh sách nhãn: <code>trong_phạm_vi</code>, <code>đòi_kết_luận_an_toàn</code>, <code>ngoài_chủ_đề</code>","Nhãn kèm xác suất; <code>null</code> nếu không khớp nhãn nào","LLM phân loại ý định trước khi truy xuất","Chặn sớm câu cần từ chối, đỡ tốn truy xuất và soạn"],
+["② Chọn đường truy xuất","choice","Câu hỏi + nhãn: <code>chỉ_BM25</code>, <code>chỉ_vector</code>, <code>cả_hai</code>","Đường truy xuất kèm xác suất","Quy tắc if/else dễ vỡ hoặc LLM định tuyến","Thuật ngữ như CIR, BASS đi BM25; câu diễn đạt xa từ khóa đi vector"],
+["③ Chấm liên quan","score (song song)","Câu hỏi + từng chunk từ RRF","Điểm 0 đến 1 cho mỗi chunk, xếp lại top","LLM rerank tuần tự hoặc cross-encoder tự lưu trữ","Chỗ tiết kiệm nhiều nhất vì số chunk lớn"],
+["④ Coverage","choice","Câu hỏi + top chunk đã chấm: <code>full</code>, <code>partial</code>, <code>none</code>","Mức phủ kèm xác suất","LLM giám khảo hoặc heuristic điểm BM25","Quyết định có gọi LLM soạn hay trả “PSI chưa đề cập”"],
+["⑤ Hỗ trợ trích dẫn","score / null","Từng câu của bản nháp + chunk nó trích","Điểm hỗ trợ cho mỗi câu; <code>null</code> nếu câu không cần trích","LLM kiểm chứng sau khi sinh","Chặn câu không có chứng cứ; dưới τ thì lùi retrieval-only"]
+];
+var tabs=$("tabs"),panel=$("panel");
+function showD(i){
+  [].forEach.call(tabs.children,function(b,j){b.setAttribute("aria-pressed",i===j?"true":"false")});
+  var d=D[i];
+  panel.innerHTML='<h4 style="margin-top:0">'+d[0]+' <span class="tag t-must">'+d[1]+'</span></h4><dl><dt>Đầu vào</dt><dd>'+d[2]+'</dd><dt>Đầu ra</dt><dd>'+d[3]+'</dd><dt>Thay cho</dt><dd>'+d[4]+'</dd><dt>Lợi ích</dt><dd>'+d[5]+'</dd></dl>';
+}
+D.forEach(function(d,i){var b=document.createElement("button");b.type="button";b.className="pill";b.textContent=d[0];b.setAttribute("aria-pressed","false");b.addEventListener("click",function(){showD(i)});tabs.appendChild(b)});
+showD(0);
+
+/* ---------- Jev: tau simulator ---------- */
+var S=[["“Vải này dùng trong rover 30% O₂ có an toàn không?”",.38,.80,.70],["“Tốc độ lan truyền lửa ở 0g so với 1g trong PSI?”",.96,.88,.93],["“Lửa ở trọng lực Mặt Trăng 0,16g lan nhanh thế nào?”",.93,.22,.50],["“Thí nghiệm CIR dùng nhiên liệu nào?”",.90,.81,.64],["“Thời tiết Houston hôm nay?”",.05,.10,.10]];
+var tau=$("tau"),sim=$("sim");
+function pc(p,t){return '<span class="pb '+(p<t?"lo":"hi")+'">'+vn(p,2)+'</span>'}
+function drawSim(){
+  var t=tau.value/100;$("tauv").textContent=vn(t,2);
+  sim.innerHTML=S.map(function(s){
+    var r;
+    if(s[1]<t)r='<span class="tag st-chk">Từ chối kèm bằng chứng gần nhất</span>';
+    else if(s[2]<t)r='<span class="tag st-unk">Retrieval-only: chưa đủ bằng chứng</span>';
+    else if(s[3]<t)r='<span class="tag st-unk">Retrieval-only: trích dẫn bị loại</span>';
+    else r='<span class="tag st-ok">Trả lời đầy đủ có trích dẫn</span>';
+    return '<tr><td>'+s[0]+'</td><td>'+pc(s[1],t)+'</td><td>'+pc(s[2],t)+'</td><td>'+pc(s[3],t)+'</td><td style="white-space:normal">'+r+'</td></tr>';
+  }).join("");
+}
+tau.addEventListener("input",drawSim);drawSim();
+
+/* ---------- Jev: cost calculator ---------- */
+var ids=["q","k","jl","ll","lp"],fm=new Intl.NumberFormat("vi-VN");
+function usd(x){return "$"+(x>=100?fm.format(Math.round(x)):vn(x,2))}
+function calc(){
+  var v={};ids.forEach(function(i){v[i]=+$(i).value});
+  $("qv").textContent=fm.format(v.q);$("kv").textContent=v.k;$("jlv").textContent=v.jl+" ms";$("llv").textContent=fm.format(v.ll)+" ms";$("lpv").textContent="$"+vn(v.lp,2);
+  var tok=300+300+(v.k*250+300)+1200+1500,jc=tok/1e6*0.042,lc=tok/1e6*v.lp+5*40/1e6*15,m=v.q*30,jl=5*v.jl,ll=5*v.ll;
+  $("out").innerHTML=
+    '<div class="card"><p>Token vào mỗi truy vấn</p><b>'+fm.format(tok)+'</b></div>'+
+    '<div class="card"><p>Chi phí mỗi tháng: Jev</p><b>'+usd(jc*m)+'</b></div>'+
+    '<div class="card"><p>Chi phí mỗi tháng: LLM giám khảo</p><b>'+usd(lc*m)+'</b></div>'+
+    '<div class="card"><p>Độ trễ thêm mỗi truy vấn: Jev</p><b>'+fm.format(jl)+' ms</b></div>'+
+    '<div class="card"><p>Độ trễ thêm mỗi truy vấn: LLM</p><b>'+fm.format(ll)+' ms</b></div>'+
+    '<div class="card"><p>Chênh lệch chi phí / độ trễ</p><b>'+Math.round(lc/jc)+'× / '+vn(ll/jl,1)+'×</b></div>';
+}
+ids.forEach(function(i){$(i).addEventListener("input",calc)});calc();
+
+/* ---------- sources ---------- */
+var H={pub:"Chỉ nạp toàn văn sau khi kiểm quyền từng bản",meta:"Chỉ metadata, tóm tắt của đội và link",web:"Lưu link và tóm tắt"};
+var RIGHTS={"reported_permitted": "Danh mục ghi dùng được", "restricted": "Danh mục ghi có hạn chế", "unchecked": "Chưa kiểm quyền", "not_reviewed": "Chưa có thông tin quyền"};
+var ST={ok:["st-ok","Link có thật"],chk:["st-chk","Cần đối chiếu"],unk:["st-unk","Chưa xác nhận"]};
+var N="https://ntrs.nasa.gov/citations/";
+var SRC=[
+["Cổng PSI","Kho dữ liệu PSI (tìm investigation)","https://psi.nasa.gov/physci/repo/search?q=&data_source=psi&data_type=investigation","web","unk","Trang chạy bằng JavaScript nên chưa đọc được nội dung. Mở bằng trình duyệt, xem tab Network để tìm API nội bộ. Bổ sung từ danh mục: Trang tìm kiếm chạy bằng JavaScript. Hãy lọc Research Area = Combustion Science.",{"rightsStatus":"reported_permitted","rightsEvidence":"Trang tìm kiếm chạy bằng JavaScript. Hãy lọc Research Area = Combustion Science.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"dataset","catalogTitle":"PSI Data Repository (cổng chính, dữ liệu cháy)"}],
+["Cổng PSI","Giới thiệu và lịch sử PSI","https://science.nasa.gov/physical-sciences-informatics-psi/history-of-physical-science-informatics/","web","ok","Mỗi nghiên cứu có dữ liệu thô, dữ liệu xử lý, mô hình, hình ảnh, tài liệu và danh sách công bố, nên mỗi investigation có gói tài liệu làm nguồn RAG.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Cổng PSI","Danh sách investigation Combustion Science (PSI research opportunity)","https://science.nasa.gov/physical-sciences-informatics-psi/nasa-psi-research-opportunity/","web","ok","Checklist 15 đến 25 mục: ACME CLD, E-Field, s-Flames, BASS, BASS-II, CFI, DAFT, FLEX, FLEX-2, SAFFIRE I–III, SAME, SAME-R, SLICE, SPICE, ACME BRE. Đây là danh sách đủ điều kiện cho đề xuất PSI, chưa chắc là toàn bộ kho.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Cổng PSI","Researcher’s Guide to PSI","https://www.nasa.gov/connect/ebooks/researchers-guide-to-physical-sciences-informatics-system","web","ok","Cách dùng PSI.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Cổng PSI","PSI: liên hệ, hướng dẫn và link liên quan","https://www.nasa.gov/content/psi-contacts-tutorials-and-related-links","web","ok","Email hỗ trợ: msfc-psi-help@mail.nasa.gov. Có thể hỏi trước về API, đừng chờ trả lời.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Cổng PSI","Microgravity Analytics Tool","https://science.nasa.gov/physical-sciences-informatics-psi/microgravity-analytics-tool/","web","ok","Quy trình so sánh ảnh và video trong không gian với trên Trái Đất. Trích dẫn ở phần tương lai.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Vật liệu rắn","BASS-II: kết quả tổng hợp","https://ntrs.nasa.gov/citations/20160000593","pub","ok","Luồng khí tới 53 cm/s, hơn 100 test. Dưới 1 cm/s lửa mờ, ổn định nhưng có thể bùng nhanh khi luồng tăng đột ngột. Rất hợp với trục luồng khí của Evidence Map. Bổ sung từ danh mục: Public Use Permitted. Luồng khí đến 53 cm/s, hơn 100 test.",{"rightsStatus":"reported_permitted","rightsEvidence":"Public Use Permitted. Luồng khí đến 53 cm/s, hơn 100 test.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"document","catalogTitle":"BASS-II: kết quả tổng hợp (slide)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20160000593/downloads/20160000593.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20160000593"}],
+["Vật liệu rắn","ACME BRE: vật liệu cháy trong không khí tĩnh (báo chí)","https://nc.inverse.com/science/iss-fire-experiments","web","chk","BRE cho thấy vật liệu có thể cháy hàng phút khi không có luồng khí, trong khí quyển tàu có người lái đang được cân nhắc. Nguồn báo chí, cần đối chiếu với trang NASA.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Vật liệu rắn","Saffire I (quy mô lớn)","https://ntrs.nasa.gov/citations/20170008805","meta","ok","Bổ sung từ danh mục: Chưa mở được trang để xác nhận.",{"rightsStatus":"unchecked","rightsEvidence":"Chưa mở được trang để xác nhận.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"Saffire I (NTRS 20170008805)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20170008805/downloads/20170008805.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20170008805"}],
+["Vật liệu rắn","Saffire IV và V","https://ntrs.nasa.gov/citations/20210017780","meta","ok","Công suất tỏa nhiệt tới 10 kW nhưng điều kiện trung bình của tàu không vượt mức không chấp nhận được. Có cảnh báo một phần tài liệu có thể chứa nội dung có bản quyền. Bổ sung từ danh mục: Portions of document may include copyright protected material.",{"rightsStatus":"restricted","rightsEvidence":"Portions of document may include copyright protected material.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"warn","kind":"document","catalogTitle":"Saffire IV/V: slide ICES 2021","downloadUrl":"https://ntrs.nasa.gov/api/citations/20210017780/downloads/Saffire%20ICES%202021%20Saffire%20Final%20presentation%20compressed.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20210017780"}],
+["Vật liệu rắn","Saffire VI","https://ntrs.nasa.gov/citations/20240002981","meta","ok","Bổ sung từ danh mục: Portions of document may include copyright protected material.",{"rightsStatus":"restricted","rightsEvidence":"Portions of document may include copyright protected material.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"warn","kind":"document","catalogTitle":"Saffire VI: kết quả sơ bộ (ICES 2024)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20240002981/downloads/Saffire-ICES-2024-ICES-365-accepted%20final.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20240002981"}],
+["Phát hiện khói","SAME: tóm tắt của NASA (PDF)","https://www.nasa.gov/wp-content/uploads/2025/07/smoke-aerosol-measurement-experiment-same.pdf","pub","ok","Bổ sung từ danh mục: Tài liệu NASA.",{"rightsStatus":"reported_permitted","rightsEvidence":"Tài liệu NASA.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"document","catalogTitle":"Smoke Aerosol Measurement Experiment (SAME), tóm tắt NASA","downloadUrl":"https://www.nasa.gov/wp-content/uploads/2025/07/smoke-aerosol-measurement-experiment-same.pdf"}],
+["Phát hiện khói","SAME-2","https://ntrs.nasa.gov/api/citations/20130000422/downloads/20130000422.pdf","meta","ok","Bổ sung từ danh mục: Bài ghi là tác phẩm chính phủ Mỹ; cần xác nhận trên NTRS.",{"rightsStatus":"unchecked","rightsEvidence":"Bài ghi là tác phẩm chính phủ Mỹ; cần xác nhận trên NTRS.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"SAME-2 (AIAA)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20130000422/downloads/20130000422.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20130000422"}],
+["Phát hiện khói","Báo cáo cuối của NIST về khói","https://www.nist.gov/node/1863886","web","ok","Phần lớn hạt khói của các vật liệu được thử nhỏ hơn 500 nm. Giấy phép chưa rõ, nên lưu metadata và tóm tắt.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Phát hiện khói","DAFT","https://ntrs.nasa.gov/citations/20050215648","pub","ok","Đánh giá máy đếm hạt P-Trak, một thiết bị chính của SAME, trong vi trọng lực dài hạn. Ví dụ đúng cho chi tiết đề nhắc về việc dùng lại một thiết bị.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Dập lửa","FLEX: báo cáo chi tiết","https://ntrs.nasa.gov/citations/20150023456","pub","ok","Trình bày 284 test đầu tiên và cố ý không diễn giải, chỉ cung cấp dữ liệu. Nguồn rất tốt cho bảng số liệu và nút xuất dữ liệu. Bổ sung từ danh mục: Public Use Permitted. Báo cáo số liệu, không diễn giải.",{"rightsStatus":"reported_permitted","rightsEvidence":"Public Use Permitted. Báo cáo số liệu, không diễn giải.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"document","catalogTitle":"FLEX: báo cáo chi tiết 284 test","downloadUrl":"https://ntrs.nasa.gov/api/citations/20150023456/downloads/20150023456.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20150023456"}],
+["Dập lửa","FLEX: tổng quan (Springer)","https://link.springer.com/doi/10.1007/s12217-014-9372-2","meta","ok","Có bản quyền. Chỉ lưu metadata và tóm tắt của đội. Nêu giới hạn oxy khi pha loãng bằng CO₂ và heli cho metanol và heptan.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Dập lửa","So sánh CO₂, N₂ và He","https://ntrs.nasa.gov/citations/20040161262","meta","ok","Bổ sung từ danh mục: Chưa kiểm.",{"rightsStatus":"unchecked","rightsEvidence":"Chưa kiểm.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"FLEX: so sánh chất dập lửa","downloadUrl":"https://ntrs.nasa.gov/api/citations/20040161262/downloads/20040161262.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20040161262"}],
+["ACME","Tổng quan ACME: Space station’s quest for the secrets of fire","https://www.nasa.gov/humans-in-space/space-stations-quest-for-the-secrets-of-fire/","web","ok","ACME gồm 6 investigation, hơn 1.500 ngọn lửa.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["ACME","Danh sách công bố theo từng investigation ACME (PDF)","https://www1.grc.nasa.gov/wp-content/uploads/ACME-publications-20230830.pdf","pub","ok","Rất hữu ích để lập sourceRef cho từng thí nghiệm. Bổ sung từ danh mục: Tài liệu NASA. Dùng để lập sourceRef theo investigation.",{"rightsStatus":"reported_permitted","rightsEvidence":"Tài liệu NASA. Dùng để lập sourceRef theo investigation.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"document","catalogTitle":"Danh sách công bố ACME (Glenn)","downloadUrl":"https://www1.grc.nasa.gov/wp-content/uploads/ACME-publications-20230830.pdf"}],
+["ACME","Slide kết quả chính ACME (JASMAC-33)","https://ntrs.nasa.gov/api/citations/20210022542/downloads/ACME%20JASMAC-33%2020211007.pdf","meta","ok","Bổ sung từ danh mục: Chưa kiểm.",{"rightsStatus":"unchecked","rightsEvidence":"Chưa kiểm.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"ACME: slide kết quả (JASMAC-33)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20210022542/downloads/ACME%20JASMAC-33%2020211007.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20210022542"}],
+["ACME","Trang ACME của NASA Glenn","https://www1.grc.nasa.gov/space/iss-research/iss-fcf/cir/acme/","web","ok","",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Ngoài PSI: Moon base","LUCI: tên lửa thăm dò quay tạo trọng lực Mặt Trăng","https://ntrs.nasa.gov/citations/20250010653","meta","ok","Test cháy kéo dài hơn 25 giây. Đã có kết quả công bố. Dùng làm dấu mốc có nhãn riêng, không trộn vào số liệu PSI. Bổ sung từ danh mục: Use by or on behalf of the US Gov. Permitted.",{"rightsStatus":"restricted","rightsEvidence":"Use by or on behalf of the US Gov. Permitted.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"warn","kind":"document","catalogTitle":"LUCI: tên lửa quay, trọng lực Mặt Trăng","downloadUrl":"https://ntrs.nasa.gov/api/citations/20250010653/downloads/ASGSR%202025-LUCI-Ferkul-Presentation-v2-20250010653.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20250010653"}],
+["Ngoài PSI: Moon base","FM2: Flammability of Materials on the Moon (poster)","https://ntrs.nasa.gov/citations/20240015307","meta","ok","Bổ sung từ danh mục: Use by or on behalf of the US Gov. Permitted.",{"rightsStatus":"restricted","rightsEvidence":"Use by or on behalf of the US Gov. Permitted.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"warn","kind":"document","catalogTitle":"FM2: Flammability of Materials on the Moon (poster)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20240015307/downloads/Glenn_2024_ZayacPoster.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20240015307"}],
+["Ngoài PSI: Moon base","FM2: slide LPSC 2026 (có số liệu)","https://ntrs.nasa.gov/api/citations/20260001966/downloads/Ferkul-Lunar%20and%20Planetary%20Science%20Conf%202026%20v2.pdf","pub","chk","Nêu giả thuyết giới hạn oxy cực tiểu ở gần trọng lực Mặt Trăng. Chưa xác nhận FM2 đã bay chưa, phải kiểm tra trước khi viết.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Ngoài PSI: Moon base","Máy bay parabol 0,1 đến 1g","https://ntrs.nasa.gov/citations/20040053567","meta","ok","Bổ sung từ danh mục: Chưa kiểm.",{"rightsStatus":"unchecked","rightsEvidence":"Chưa kiểm.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"Bay parabol 0,1–1g","downloadUrl":"https://ntrs.nasa.gov/api/citations/20040053567/downloads/20040053567.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20040053567"}],
+["Ngoài PSI: Moon base","Olson (2004), NASA/TM-2004-213114","https://ntrs.nasa.gov/api/citations/20040084156/downloads/20040084156.pdf","meta","ok","LOI ở 1g khoảng 16,5% O₂, nhưng với luồng cỡ thông gió tàu lửa có thể duy trì ở 14%. Bằng chứng cho luận điểm bài thử 1g chưa chắc là xấu nhất. Bổ sung từ danh mục: Báo cáo NASA, chưa đọc trường Copyright.",{"rightsStatus":"unchecked","rightsEvidence":"Báo cáo NASA, chưa đọc trường Copyright.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"Olson 2004: LOI và luồng khí (NASA/TM)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20040084156/downloads/20040084156.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20040084156"}],
+["Ngoài PSI: Moon base","Khí quyển khám phá 8,2 psia, 34% O₂","https://ntrs.nasa.gov/citations/20240003211","pub","ok","Khuyến nghị đổi từ 8 psia và 32% lên 8,2 psia và 34% O₂ để giảm nguy cơ thiếu oxy.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Ngoài PSI: Moon base","Tính dễ cháy ở khí quyển khám phá (2026)","https://ntrs.nasa.gov/citations/20260003925","pub","ok","Kết luận tính dễ cháy của vật liệu là rào cản lớn nhất ở 8,2 psia và 34 đến 40% O₂, khoảng 70% hệ con cần thay vật liệu. Bổ sung từ danh mục: Public Use Permitted. 8,2 psia và 34–40% O₂.",{"rightsStatus":"reported_permitted","rightsEvidence":"Public Use Permitted. 8,2 psia và 34–40% O₂.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"document","catalogTitle":"Tác động khí quyển áp suất thấp lên ECLSS (NESC 2026)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20260003925/downloads/20260003925.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20260003925"}],
+["Ngoài PSI: Moon base","Độ trễ bắt lửa ở khí quyển khám phá","https://ntrs.nasa.gov/api/citations/20080013149/downloads/20080013149.pdf","meta","ok","Test ở khí quyển chuẩn sẽ đánh giá thấp khả năng bắt lửa trên tàu. Bổ sung từ danh mục: Chưa kiểm.",{"rightsStatus":"unchecked","rightsEvidence":"Chưa kiểm.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"Tính dễ cháy ở khí quyển khám phá","downloadUrl":"https://ntrs.nasa.gov/api/citations/20080013149/downloads/20080013149.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20080013149"}],
+["Ngoài PSI: Moon base","Bài tổng quan y khoa và khí quyển (Aerospace Medicine and Human Performance)","https://asma.kglmeridian.com/downloadpdf/view/journals/amhp/89/9/article-p792.pdf","meta","ok","Bài tạp chí, coi như có bản quyền.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Ngoài PSI: Moon base","NASA-STD-6001B (PDF)","https://standards.nasa.gov/sites/default/files/standards/NASA/B-w/CHANGE-2/2/NASA-STD-6001B-w-Change-2_Admin-Change.pdf","web","ok","Test 1 là thử nghiệm lan truyền lửa hướng lên ở 1g, một trong các test bắt buộc. Đây chính là “bài thử 1g” mà app đặt dấu hỏi.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Ngoài PSI: Moon base","NASA-STD-6001: trang chuẩn","https://standards.nasa.gov/standard/nasa/nasa-std-6001","web","ok","",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Ngoài PSI: Moon base","SoFIE (thay ACME trong CIR)","https://ntrs.nasa.gov/citations/20200000361","meta","ok","Thí nghiệm GEL của SoFIE chạy test đầu ngày 13/1/2023. SoFIE không nằm trong danh sách đề nên coi là dấu mốc ngoài PSI. Bổ sung từ danh mục: Chưa kiểm. Không nằm trong danh sách investigation của đề.",{"rightsStatus":"unchecked","rightsEvidence":"Chưa kiểm. Không nằm trong danh sách investigation của đề.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"SoFIE","downloadUrl":"https://ntrs.nasa.gov/api/citations/20200000361/downloads/20200000361.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20200000361"}],
+["Ứng dụng Trái Đất","Spinoff NASA: bình chữa cháy phun sương nước mịn","https://spinoff.nasa.gov/node/11065","web","ok","Bình phun sương thay bình CO₂ không tương thích với thiết bị thở khẩn cấp. Chiếc cuối đến trạm năm 2016.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Ứng dụng Trái Đất","Lịch sử dự án phun sương (Colorado School of Mines)","https://ntrs.nasa.gov/api/citations/20170009414/downloads/20170009414.pdf","meta","ok","Bổ sung từ danh mục: Tác giả đại học, nhiều khả năng cần hạn chế.",{"rightsStatus":"unchecked","rightsEvidence":"Tác giả đại học, nhiều khả năng cần hạn chế.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"Slide nước phun sương (Colorado School of Mines)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20170009414/downloads/20170009414.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20170009414"}],
+["Ứng dụng Trái Đất","Mines Newsroom: fighting fire with fine water mist","https://minesnewsroom.com/news/fighting-fire-fine-water-mist","web","ok","",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Nạp vào RAG","Tài liệu API của NTRS (OpenAPI, PDF)","https://sti.nasa.gov/docs/20221122_OpenAPI_Documentation.pdf","web","ok","POST /citations/search và GET /citations/{id}, kèm đường dẫn tải tài liệu. Tự viết script ngày H0 rất nhanh.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Nạp vào RAG","Contextual Retrieval (Anthropic), mã R1 trong docx","https://www.anthropic.com/news/contextual-retrieval","web","unk","Link do mình thêm theo mã R1 trong docx, chưa đối chiếu vì Phụ lục B không có trong file. Số liệu 49% và 67% đo trên codebase, tiểu thuyết, paper, không phải dữ liệu cháy.",{"rightsStatus":"not_reviewed","rightsEvidence":"Chưa được đối chiếu trong danh mục bổ sung.","origin":"Playbook gốc"}],
+["Tài liệu bổ sung","Spacecraft Fire Safety Research at NASA Glenn (SAME)","https://ntrs.nasa.gov/api/citations/20170007283/downloads/20170007283.pdf","pub","unk","Bổ sung từ danh mục: Work of the US Gov. Public Use Permitted.",{"rightsStatus":"reported_permitted","rightsEvidence":"Work of the US Gov. Public Use Permitted.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"document","catalogTitle":"Spacecraft Fire Safety Research at NASA Glenn (SAME)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20170007283/downloads/20170007283.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20170007283"}],
+["Tài liệu bổ sung","Fluids and Combustion Facility (trang NASA Glenn)","https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/science-facilities-on-the-iss/fluids-combustion-facility/","web","unk","Bổ sung từ danh mục: Trang NASA. Chưa kiểm phần bên thứ ba.",{"rightsStatus":"reported_permitted","rightsEvidence":"Trang NASA. Chưa kiểm phần bên thứ ba.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"document","catalogTitle":"Fluids and Combustion Facility (trang NASA Glenn)"}],
+["Tài liệu bổ sung","BASS-II Summary Report (Olson et al. 2021)","https://ntrs.nasa.gov/api/citations/20210011385/downloads/TM-20210011385.pdf","meta","unk","Bổ sung từ danh mục: Use by or on behalf of the US Gov. Permitted.",{"rightsStatus":"restricted","rightsEvidence":"Use by or on behalf of the US Gov. Permitted.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"warn","kind":"document","catalogTitle":"BASS-II Summary Report (Olson et al. 2021)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20210011385/downloads/TM-20210011385.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20210011385"}],
+["Tài liệu bổ sung","Saffire IV/V: bài ICES 2021-266","https://ntrs.nasa.gov/api/citations/20210011521/downloads/ICES%202021-266%200503-2021%20final.pdf","meta","unk","Bổ sung từ danh mục: Portions of document may include copyright protected material.",{"rightsStatus":"restricted","rightsEvidence":"Portions of document may include copyright protected material.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"warn","kind":"document","catalogTitle":"Saffire IV/V: bài ICES 2021-266","downloadUrl":"https://ntrs.nasa.gov/api/citations/20210011521/downloads/ICES%202021-266%200503-2021%20final.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20210011521"}],
+["Tài liệu bổ sung","Báo cáo NIST về khói (pub_id 904707)","https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=904707","meta","unk","Bổ sung từ danh mục: Cơ quan chính phủ Mỹ; chưa đọc điều khoản.",{"rightsStatus":"unchecked","rightsEvidence":"Cơ quan chính phủ Mỹ; chưa đọc điều khoản.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"Báo cáo NIST về khói (pub_id 904707)","downloadUrl":"https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=904707"}],
+["Tài liệu bổ sung","Saffire status 2016 (slide)","https://ntrs.nasa.gov/api/citations/20170002628/downloads/20170002628.pdf","meta","unk","Bổ sung từ danh mục: Chưa kiểm.",{"rightsStatus":"unchecked","rightsEvidence":"Chưa kiểm.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"Saffire status 2016 (slide)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20170002628/downloads/20170002628.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20170002628"}],
+["Tài liệu bổ sung","BASS-II: cảm biến CSA-CP và CDM (ICES 2015)","https://ntrs.nasa.gov/api/citations/20150019858/downloads/20150019858.pdf","meta","unk","Bổ sung từ danh mục: Chưa kiểm.",{"rightsStatus":"unchecked","rightsEvidence":"Chưa kiểm.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"document","catalogTitle":"BASS-II: cảm biến CSA-CP và CDM (ICES 2015)","downloadUrl":"https://ntrs.nasa.gov/api/citations/20150019858/downloads/20150019858.pdf","recordUrl":"https://ntrs.nasa.gov/citations/20150019858"}],
+["Dataset PSI và cổng tra cứu","PSI-60: phân tích SPICE (ground investigation)","https://psi.nasa.gov/physci/repo/data/investigations/PSI-60","web","unk","Bổ sung từ danh mục: DOI 10.60555/mzjm-yv57. CC0-1.0. Hơn 1.600 ảnh thô, nhiệt độ và thể tích muội.",{"rightsStatus":"reported_permitted","rightsEvidence":"DOI 10.60555/mzjm-yv57. CC0-1.0. Hơn 1.600 ảnh thô, nhiệt độ và thể tích muội.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"dataset","catalogTitle":"PSI-60: phân tích SPICE (ground investigation)","psiId":"PSI-60","doi":"10.60555/mzjm-yv57"}],
+["Dataset PSI và cổng tra cứu","PSI-69: FLEX, phiên bản 5","https://psi.nasa.gov/physci/repo/data/investigations/PSI-69","web","unk","Bổ sung từ danh mục: DOI 10.60555/mbq8-0451. Theo một repo công khai: 274 test × 16 cột, CC0-1.0. Cần xác nhận trên trang PSI. Nhãn dùng được của danh mục là thông tin gián tiếp; cần kiểm lại giấy phép và kích thước ngay trên PSI.",{"rightsStatus":"unchecked","rightsEvidence":"DOI 10.60555/mbq8-0451. Theo một repo công khai: 274 test × 16 cột, CC0-1.0. Cần xác nhận trên trang PSI.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"dataset","catalogTitle":"PSI-69: FLEX, phiên bản 5","version":"5","psiId":"PSI-69","doi":"10.60555/mbq8-0451"}],
+["Dataset PSI và cổng tra cứu","PSI-159: ACME CFI-G (O₂ cao nhất trong vi trọng lực)","https://psi.nasa.gov/physci/repo/data/investigations/PSI-159","meta","unk","Bổ sung từ danh mục: Mình chỉ thấy mã trong danh sách PSI. Hãy mở trang và đọc DOI, giấy phép.",{"rightsStatus":"unchecked","rightsEvidence":"Mình chỉ thấy mã trong danh sách PSI. Hãy mở trang và đọc DOI, giấy phép.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"dataset","catalogTitle":"PSI-159: ACME CFI-G (O₂ cao nhất trong vi trọng lực)","psiId":"PSI-159"}],
+["Dataset PSI và cổng tra cứu","PSI: danh sách investigation theo lĩnh vực","https://www.nasa.gov/physical-sciences-informatics-psi/psi-investigations-by-research-area/","web","unk","Bổ sung từ danh mục: Liệt kê ACME BRE, E-FIELD, S-Flames, BASS, BASS-II, CFI, FLEX, FLEX-2, SAME-R, SPICE…",{"rightsStatus":"reported_permitted","rightsEvidence":"Liệt kê ACME BRE, E-FIELD, S-Flames, BASS, BASS-II, CFI, FLEX, FLEX-2, SAME-R, SPICE…","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"dataset","catalogTitle":"PSI: danh sách investigation theo lĩnh vực"}],
+["Dataset PSI và cổng tra cứu","PSI: nghiên cứu mặt đất dùng dữ liệu PSI (NRA)","https://www.nasa.gov/physical-sciences-informatics-psi/psi-nra-awarded-research-by-area/","web","unk","Bổ sung từ danh mục: Danh sách bộ dữ liệu phái sinh, ví dụ cool flame (PSI-117 sắp có).",{"rightsStatus":"reported_permitted","rightsEvidence":"Danh sách bộ dữ liệu phái sinh, ví dụ cool flame (PSI-117 sắp có).","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"dataset","catalogTitle":"PSI: nghiên cứu mặt đất dùng dữ liệu PSI (NRA)"}],
+["Dataset và dữ liệu ngoài PSI","NIST Fire Calorimetry Database (ứng dụng trên Trái Đất)","https://data.nist.gov/od/id/mds2-2314","web","unk","Bổ sung từ danh mục: DOI 10.18434/mds2-2314. Giấy phép NIST Open (https://www.nist.gov/open/license). Nhiệt giải phóng, CO, muội.",{"rightsStatus":"reported_permitted","rightsEvidence":"DOI 10.18434/mds2-2314. Giấy phép NIST Open (https://www.nist.gov/open/license). Nhiệt giải phóng, CO, muội.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"ok","kind":"dataset","catalogTitle":"NIST Fire Calorimetry Database (ứng dụng trên Trái Đất)","doi":"10.18434/mds2-2314"}],
+["Dataset và dữ liệu ngoài PSI","JAXA DARTS: Kibo Group Combustion (nguồn quốc tế)","https://darts.isas.jaxa.jp/app/kibo-pm-experiments/experiment/combustion/gc","meta","unk","Bổ sung từ danh mục: Dữ liệu cháy giọt trên ISS. Chưa đọc giấy phép.",{"rightsStatus":"unchecked","rightsEvidence":"Dữ liệu cháy giọt trên ISS. Chưa đọc giấy phép.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"dataset","catalogTitle":"JAXA DARTS: Kibo Group Combustion (nguồn quốc tế)"}],
+["Dataset và dữ liệu ngoài PSI","Mendeley: phân loại kết quả cháy vật liệu rắn trong vi trọng lực","https://data.mendeley.com/datasets/2gw4pjhkxz/1","meta","unk","Bổ sung từ danh mục: DOI 10.17632/2gw4pjhkxz.1. Bản đồ tài liệu, không phải số liệu thô. Chưa đọc giấy phép.",{"rightsStatus":"unchecked","rightsEvidence":"DOI 10.17632/2gw4pjhkxz.1. Bản đồ tài liệu, không phải số liệu thô. Chưa đọc giấy phép.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"todo","kind":"dataset","catalogTitle":"Mendeley: phân loại kết quả cháy vật liệu rắn trong vi trọng lực","doi":"10.17632/2gw4pjhkxz.1"}],
+["Dataset và dữ liệu ngoài PSI","MAPTIS (kết quả NASA-STD-6001, Test 1)","https://ntrs.nasa.gov/citations/20040084025","meta","unk","Bổ sung từ danh mục: Cơ sở dữ liệu cần tài khoản, không mở công khai. Chỉ dùng bài NTRS này (Work of the US Gov) để minh họa.",{"rightsStatus":"restricted","rightsEvidence":"Cơ sở dữ liệu cần tài khoản, không mở công khai. Chỉ dùng bài NTRS này (Work of the US Gov) để minh họa.","origin":"Flame in Freefall_ nguồn tài liệu và dataset.html","catalogTier":"warn","kind":"dataset","catalogTitle":"MAPTIS (kết quả NASA-STD-6001, Test 1)","recordUrl":"https://ntrs.nasa.gov/citations/20040084025"}]
+];
+function srcType(u){
+  var h=u.replace(/^https?:\/\//,"").split("/")[0];
+  if(h==="ntrs.nasa.gov")return "NTRS";
+  if(/nasa\.gov$/.test(h))return "NASA";
+  if(/nist\.gov$/.test(h))return "NIST";
+  if(/springer\.com$/.test(h))return "Springer";
+  if(/anthropic\.com$/.test(h))return "Anthropic";
+  return h.replace(/^www\./,"");
+}
+var groups=[];SRC.forEach(function(s){if(groups.indexOf(s[0])<0)groups.push(s[0])});
+$("sg").innerHTML='<option value="">Tất cả nhóm ('+SRC.length+')</option>'+groups.map(function(g){return '<option>'+esc(g)+'</option>'}).join("");
+function filtered(){
+  var q=($("sq").value||"").toLowerCase().trim(),g=$("sg").value,l=$("sl").value;
+  return SRC.map(function(s,i){return {i:i,s:s}}).filter(function(o){
+    var s=o.s,m=s[6]||{};
+    return (!g||s[0]===g)&&(!l||(m.rightsStatus||"not_reviewed")===l)&&(!q||(s[0]+" "+s[1]+" "+s[2]+" "+s[5]+" "+JSON.stringify(m)).toLowerCase().indexOf(q)>-1);
+  });
+}
+function drawSrc(){
+  var f=filtered(),h="",last="";
+  f.forEach(function(o){
+    var s=o.s,m=s[6]||{},rights=m.rightsStatus||"not_reviewed",cls=rights==="reported_permitted"?"st-ok":rights==="restricted"?"st-chk":"st-unk";
+    if(s[0]!==last){last=s[0];h+='<tr><td colspan="6" style="background:var(--surface2);font:600 .8rem var(--mono);letter-spacing:.04em">'+esc(s[0])+'</td></tr>'}
+    var links='<a href="'+esc(s[2])+'" target="_blank" rel="noopener noreferrer">'+esc(s[1])+'</a>';
+    if(m.downloadUrl&&m.downloadUrl!==s[2])links+='<br><a href="'+esc(m.downloadUrl)+'" target="_blank" rel="noopener noreferrer">PDF trong danh mục ↗</a>';
+    if(m.recordUrl&&m.recordUrl!==s[2])links+='<br><a href="'+esc(m.recordUrl)+'" target="_blank" rel="noopener noreferrer">Hồ sơ NTRS ↗</a>';
+    if(m.doi)links+='<br><a href="https://doi.org/'+esc(m.doi)+'" target="_blank" rel="noopener noreferrer">DOI '+esc(m.doi)+'</a>';
+    h+='<tr><td>'+links+'</td><td>'+esc(srcType(s[2]))+'</td><td>'+esc(H[s[3]])+'</td><td><span class="tag '+ST[s[4]][0]+'">'+ST[s[4]][1]+'</span></td><td><span class="tag '+cls+'">'+esc(RIGHTS[rights])+'</span><p class="src-meta">'+esc(m.rightsEvidence||"")+'</p></td><td class="muted">'+esc(s[5])+'</td></tr>';
+  });
+  $("srcb").innerHTML=h||'<tr><td colspan="6">Không có nguồn khớp.</td></tr>';
+  $("sc").textContent="Hiển thị "+f.length+" trên "+SRC.length+" nguồn. Trạng thái link và thông tin quyền là hai trường riêng.";
+}
+$("sq").addEventListener("input",drawSrc);$("sg").addEventListener("change",drawSrc);$("sl").addEventListener("change",drawSrc);drawSrc();
+function sourceObject(o){
+  var s=o.s,m=s[6]||{};
+  return {id:"src-"+(o.i+1),group:s[0],title:s[1],url:s[2],type:srcType(s[2]),handling:H[s[3]],status:ST[s[4]][1],note:s[5],recordUrl:m.recordUrl||"",downloadUrl:m.downloadUrl||"",doi:m.doi||"",version:m.version||"",psiId:m.psiId||"",rightsStatus:m.rightsStatus||"not_reviewed",rightsEvidence:m.rightsEvidence||"",origin:m.origin||"Playbook gốc",catalogTitle:m.catalogTitle||"",kind:m.kind||"reference"};
+}
+function toCSV(){
+  var quote=function(x){return '"'+String(x).replace(/"/g,'""')+'"'},keys=["id","group","title","url","type","handling","status","note","recordUrl","downloadUrl","doi","version","psiId","rightsStatus","rightsEvidence","origin","catalogTitle","kind"],out=[keys.join(",")];
+  filtered().forEach(function(o){var row=sourceObject(o);out.push(keys.map(function(k){return quote(row[k])}).join(","))});
+  return out.join("\n");
+}
+function toJSON(){return JSON.stringify(filtered().map(sourceObject),null,2)}
+
+function copy(text,label){
+  var done=function(){$("sc").textContent="Đã sao chép "+label+" ("+filtered().length+" nguồn)."};
+  var fallback=function(){
+    try{
+      var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+      var ok=document.execCommand("copy");document.body.removeChild(ta);
+      if(ok)done();else $("sc").textContent="Trình duyệt chặn sao chép. Chọn bảng và sao chép bằng tay."
+    }catch(e){$("sc").textContent="Trình duyệt chặn sao chép. Chọn bảng và sao chép bằng tay."}
+  };
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fallback)}else fallback();
+  }catch(e){fallback()}
+}
+$("cpcsv").addEventListener("click",function(){copy(toCSV(),"CSV")});
+$("cpjson").addEventListener("click",function(){copy(toJSON(),"JSON")});
+})();
+</script>
+
+<!-- local-mermaid-runtime-begin -->
+<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
+<script>(function(){
+function startMermaid(){
+var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
+if(typeof mermaid==='undefined')return;
+var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
+if(!pres.length)return;
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+var root=document.documentElement;
+var items=pres.map(function(pre){
+var mount=document.createElement('div');mount.className='mermaid-diagram';
+return {pre:pre,mount:mount,src:pre.textContent||''};
+});
+var seq=0;
+var renderGen=0;
+var lastKey='';
+function pageBg(fallback){
+var els=[document.body,document.documentElement];
+for(var i=0;i<els.length;i++){
+var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
+if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
+}
+return fallback;
+}
+function render(){
+var theme=root.getAttribute('data-theme');
+var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
+var pal=dark?CFG.palettes.dark:CFG.palettes.light;
+var bg=pageBg(pal.bg);
+var key=(dark?'d':'l')+'|'+bg;
+if(key===lastKey)return;
+lastKey=key;
+var gen=++renderGen;
+var font=getComputedStyle(document.body).fontFamily||'sans-serif';
+var nat={useMaxWidth:false};
+mermaid.initialize({
+startOnLoad:false,securityLevel:'strict',theme:'base',
+flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
+gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
+quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
+packet:nat,kanban:nat,architecture:nat,radar:nat,
+themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
+primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
+nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
+clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
+darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
+attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
+fontSize:'16px',fontFamily:font},
+themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
+});
+items.forEach(function(it){
+var id='claude-mermaid-'+seq++;
+mermaid.render(id,it.src).then(function(r){
+if(gen!==renderGen)return;
+var prev=it.pre.previousElementSibling;
+if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
+it.mount.innerHTML=r.svg;
+if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
+it.pre.style.display='none';
+},function(){
+var scratch=document.getElementById(id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+scratch=document.getElementById('d'+id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+if(gen!==renderGen)return;
+if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
+it.pre.style.display='';
+});
+});
+}
+render();
+if(mq&&mq.addEventListener)mq.addEventListener('change',render);
+if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
+
+}
+function loadError(){
+  document.querySelectorAll('pre.mermaid').forEach(function(pre){
+    var note=document.createElement('p');note.className='mermaid-load-error';note.setAttribute('role','status');
+    note.textContent='Chưa nạp được Mermaid. Hãy giữ thư mục playbook-rag/web/assets cùng dự án; mã sơ đồ vẫn được hiển thị bên dưới.';
+    pre.parentNode.insertBefore(note,pre);
+  });
+}
+if(typeof mermaid!=='undefined'){startMermaid();return;}
+var path=location.pathname;
+var assetPath;
+if(path.indexOf('/sources/')===0){assetPath='/assets/mermaid-11.16.1.min.js';}
+else if(/\/data\/source\//.test(path)){assetPath='../../web/assets/mermaid-11.16.1.min.js';}
+else{assetPath='playbook-rag/web/assets/mermaid-11.16.1.min.js';}
+var script=document.createElement('script');script.src=assetPath;
+script.onload=function(){
+  if(typeof mermaid==='undefined'){loadError();return;}
+  mermaid.initialize({startOnLoad:false});
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(startMermaid);}else{startMermaid();}
+};
+script.onerror=loadError;document.head.appendChild(script);
+})();</script>
+<!-- local-mermaid-runtime-end -->
+
+</body></html>
