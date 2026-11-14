@@ -77,35 +77,61 @@ export const TelemetryPane: React.FC<TelemetryPaneProps> = ({
 
   return (
     <div data-testid="telemetry-pane" className="space-y-6">
-      {/* Header & Run Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h3 className="text-base font-bold text-zinc-950 flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#0B2374]" />
-            <span>Run Conditions &amp; Measured Observations</span>
-          </h3>
-          <p className="text-xs text-zinc-500">
-            {study.psiId} · {observations.length} investigation observations loaded
-          </p>
+      {/* Header & Run Selector Card */}
+      <div className="p-5 sm:p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-4">
+        {/* Top Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="text-base sm:text-lg font-bold text-zinc-950 flex items-center gap-2.5">
+              <span className="p-1.5 rounded-xl bg-[#0B2374]/10 text-[#0B2374] shrink-0">
+                <Activity className="w-4 h-4" />
+              </span>
+              <span className="truncate">Run Conditions &amp; Measured Observations</span>
+            </h3>
+            <p className="text-xs text-zinc-500 mt-1 pl-9">
+              <span className="font-semibold text-zinc-800">{study.psiId}</span> · {observations.length} investigation observations loaded
+            </p>
+          </div>
+
+          {activeRun && (
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 pl-9 sm:pl-0">
+              <span className="text-[11px] font-semibold text-zinc-500">Active Run:</span>
+              <span className="px-2.5 py-1 rounded-xl bg-gray-100 border border-gray-200/80 text-xs font-bold text-[#0B2374]">
+                {activeRun.externalRunKey ?? activeRun.id.slice(0, 8)}
+              </span>
+            </div>
+          )}
         </div>
 
+        {/* Dedicated Test Run Selector */}
         {runs.length > 0 && activeRun && (
-          <div className="flex items-center gap-1.5 overflow-x-auto p-1 rounded-2xl bg-gray-100 border border-gray-200/60 shrink-0">
-            {runs.map((run) => (
-              <button
-                key={run.id}
-                type="button"
-                data-testid={`telemetry-run-btn-${run.id}`}
-                onClick={() => setSelectedRunId(run.id)}
-                className={`px-3 py-1 rounded-xl text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
-                  activeRun.id === run.id
-                    ? 'bg-[#D4FC02] text-zinc-950 font-bold shadow-xs'
-                    : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/60'
-                }`}
-              >
-                {run.externalRunKey ?? run.id.slice(0, 8)}
-              </button>
-            ))}
+          <div className="pt-3 border-t border-gray-100 space-y-2">
+            <div className="flex items-center justify-between text-[11px] text-zinc-500 font-semibold">
+              <span className="uppercase tracking-wider">Select Test Run ({runs.length})</span>
+              <span className="text-zinc-400 font-normal">Click a run to inspect its scalar telemetry</span>
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto p-2 pb-2.5 rounded-2xl bg-gray-50/80 border border-gray-200/70 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-300/80 hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400 [&::-webkit-scrollbar-thumb]:rounded-full">
+              {runs.map((run) => {
+                const isSelected = activeRun.id === run.id;
+                const runLabel = run.externalRunKey ?? run.id.slice(0, 8);
+                return (
+                  <button
+                    key={run.id}
+                    type="button"
+                    data-testid={`telemetry-run-btn-${run.id}`}
+                    onClick={() => setSelectedRunId(run.id)}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                      isSelected
+                        ? 'bg-[#D4FC02] text-zinc-950 font-bold shadow-xs border border-black/15'
+                        : 'bg-white text-zinc-600 hover:text-zinc-950 hover:bg-gray-100/80 border border-gray-200/80'
+                    }`}
+                  >
+                    {runLabel}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
