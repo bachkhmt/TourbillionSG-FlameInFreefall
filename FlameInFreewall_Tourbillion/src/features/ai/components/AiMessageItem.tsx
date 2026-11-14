@@ -33,14 +33,14 @@ export const AiMessageItem: React.FC<AiMessageItemProps> = ({ message }) => {
 
   return (
     <article
+      aria-label={isUser ? 'Your message' : 'Assistant reply'}
       className={
         isUser
           ? 'ml-auto w-fit max-w-[85%] rounded-2xl rounded-tr-sm bg-[#0B2374] p-3 text-sm text-white'
-          : 'mr-auto w-fit max-w-[95%] rounded-2xl rounded-tl-sm border border-slate-200 bg-white p-3 text-sm text-slate-900'
+          : 'mr-auto w-fit max-w-[95%] rounded-2xl rounded-tl-sm border border-slate-300 bg-white px-4 py-3.5 text-sm text-slate-900 shadow-sm'
       }
     >
-      <strong className="text-xs">{isUser ? 'You' : 'FlameGuard AI'}</strong>
-      <p className="mt-1 whitespace-pre-wrap break-words">{answer.text}</p>
+      <p className="whitespace-pre-wrap break-words leading-relaxed">{answer.text}</p>
       {notice && (
         <p className="mt-2 rounded-lg border border-amber-300 bg-amber-50 px-2 py-1 text-xs text-amber-900">
           {notice}
@@ -54,9 +54,6 @@ export const AiMessageItem: React.FC<AiMessageItemProps> = ({ message }) => {
             citation={citation}
             index={idx + 1}
             corpusVersion={answer.corpusVersion}
-            showExcerpt={Boolean(
-              citation.sourceExcerpt && !answer.text.includes(citation.sourceExcerpt)
-            )}
           />
         ))}
     </article>

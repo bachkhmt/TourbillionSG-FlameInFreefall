@@ -197,8 +197,10 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
       expect(services.createChatSession).toHaveBeenCalledWith({});
       expect(services.sendChatMessage).toHaveBeenCalledWith(SESSION_ID, 'FLEX-007 D0?');
       expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(SESSION_ID);
-      expect(screen.getByText('You')).toBeDefined();
-      expect(screen.getByText('FlameGuard AI', { selector: 'strong' })).toBeDefined();
+      expect(screen.queryByText('You')).toBeNull();
+      expect(screen.queryByText('FlameGuard AI', { selector: 'strong' })).toBeNull();
+      expect(screen.getByRole('article', { name: 'Your message' }).textContent).toBe('FLEX-007 D0?');
+      expect(screen.getByRole('article', { name: 'Assistant reply' })).toBeDefined();
       expect(screen.getByText('[1] CSV row 8')).toBeDefined();
       expect(screen.getByText(/Scientific review has not been documented/)).toBeDefined();
       expect(useAiAssistantStore.getState().recent).toHaveLength(2);
@@ -319,10 +321,15 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
       expect(await screen.findByText('stored 50')).toBeDefined();
       expect(screen.queryByText('stored 0')).toBeNull();
       expect(useAiAssistantStore.getState().historyOffset).toBe(50);
+      expect(screen.getByRole('button', { name: 'Next' }).hasAttribute('disabled')).toBe(true);
 
       fireEvent.click(screen.getByRole('button', { name: 'Previous' }));
       expect(await screen.findByText('stored 0')).toBeDefined();
+      services.listChatMessages.mockResolvedValueOnce(
+        page([message('user', 'refreshed', userAnswer('Refreshed from server'))], 0)
+      );
       fireEvent.click(screen.getByRole('button', { name: 'Refresh history' }));
+      expect(await screen.findByText('Refreshed from server')).toBeDefined();
       await waitFor(() =>
         expect(services.listChatMessages).toHaveBeenLastCalledWith(
           SESSION_ID,
@@ -349,7 +356,7 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
       await ask('FLEX-007 D0?');
       await screen.findByText(/D0\) của FLEX-007 khác nhau/);
       openHistoryControls();
-      fireEvent.click(screen.getByRole('button', { name: 'Start new session' }));
+      fireEvent.click(screen.getByRole('button', { name: 'New chat' }));
       expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBeNull();
       expect(useAiAssistantStore.getState().recent).toHaveLength(0);
       expect(useAiAssistantStore.getState().sessionId).toBeNull();
@@ -404,7 +411,7 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
       await waitFor(() => expect(services.sendChatMessage).toHaveBeenCalled());
       openHistoryControls();
       expect(
-        screen.getByRole('button', { name: 'Start new session' }).hasAttribute('disabled')
+        screen.getByRole('button', { name: 'New chat' }).hasAttribute('disabled')
       ).toBe(true);
 
       useAiAssistantStore.getState().resetConversation();
@@ -425,27 +432,32 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
     }
 
     it('opens revision-pinned source metadata for a citation', async () => {
+      const fileUrl = 'https://psi.nasa.gov/geode-py/ws/studies/PSI-69/download?fileId=example';
       services.getChatSource.mockResolvedValue({
         source_document_id: SOURCE_ID,
         locator: 'CSV row 8',
         corpus_version: CORPUS,
         filename: 'PSI-69_Experimental table_FLEX.csv',
-        source_url: 'https://psi.nasa.gov/example.csv',
+        source_url: fileUrl,
         sha256: 'b'.repeat(64),
         license: 'CC0-1.0',
         title: 'FLEX',
         review_status: 'unreviewed',
       });
       await sendAndOpenSource();
-      const link = await screen.findByRole('link', { name: /PSI-69_Experimental table_FLEX.csv/ });
-      expect(link.getAttribute('href')).toBe('https://psi.nasa.gov/example.csv');
+      expect(screen.getByText(EXCERPT).tagName).toBe('BLOCKQUOTE');
+      const study = await screen.findByRole('link', { name: /View NASA study/ });
+      expect(study.getAttribute('href')).toBe('https://psi.nasa.gov/physci/repo/data/investigations/PSI-69');
+      expect(screen.getByRole('link', { name: /Open raw file/ }).getAttribute('href')).toBe(fileUrl);
       expect(services.getChatSource).toHaveBeenCalledWith(
         SOURCE_ID,
         'CSV row 8',
         CORPUS,
         expect.anything()
       );
-      expect(screen.getByText('CC0-1.0 · Original source')).toBeDefined();
+      expect(screen.getByText('CC0-1.0')).toBeDefined();
+      fireEvent.click(screen.getByRole('button', { name: 'Hide source 1' }));
+      expect(screen.queryByText(EXCERPT)).toBeNull();
     });
 
     it('explains when a citation belongs to an older corpus revision', async () => {
@@ -454,6 +466,7 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
       );
       await sendAndOpenSource();
       expect(await screen.findByText(/older corpus revision/i)).toBeDefined();
+      expect(screen.getByText(EXCERPT).tagName).toBe('BLOCKQUOTE');
     });
 
     it('reports an unavailable citation source', async () => {
