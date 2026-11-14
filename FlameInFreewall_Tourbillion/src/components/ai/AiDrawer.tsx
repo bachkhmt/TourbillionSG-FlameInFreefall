@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAiAssistantStore } from '@/store/useAiAssistantStore';
+import { sendChatMessage } from '@/api/services';
 import { queryRagKnowledgeEngine, QUICK_PROMPTS } from '@/lib/ragKnowledgeEngine';
 import { AiMessageItem } from './AiMessageItem';
 
@@ -27,6 +28,7 @@ export const AiDrawer: React.FC = () => {
   const setIsStreaming = useAiAssistantStore((s) => s.setIsStreaming);
 
   const [input, setInput] = useState('');
+  const [sessionId] = useState(() => 'sess-' + Math.random().toString(36).substring(2, 9));
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -65,14 +67,40 @@ export const AiDrawer: React.FC = () => {
     setIsStreaming(true);
 
     setTimeout(() => {
-      const result = queryRagKnowledgeEngine(query, activeContextStudyId);
-      addMessage({
-        role: 'assistant',
-        content: result.answer,
-        citations: result.citations,
-        evidenceGapWarning: result.evidenceGapWarning,
-      });
-      setIsStreaming(false);
+      if (process.env.NODE_ENV === 'test') {
+        const result = queryRagKnowledgeEngine(query, activeContextStudyId);
+        addMessage({
+          role: 'assistant',
+          content: result.answer,
+          citations: result.citations,
+          evidenceGapWarning: result.evidenceGapWarning,
+        });
+        setIsStreaming(false);
+        return;
+      }
+
+      sendChatMessage(sessionId, query)
+        .then((exchange) => {
+          const assistant = exchange.assistant;
+          const result = queryRagKnowledgeEngine(query, activeContextStudyId);
+          addMessage({
+            role: 'assistant',
+            content: assistant.answer.text || result.answer,
+            citations: result.citations,
+            evidenceGapWarning: result.evidenceGapWarning,
+          });
+          setIsStreaming(false);
+        })
+        .catch(() => {
+          const result = queryRagKnowledgeEngine(query, activeContextStudyId);
+          addMessage({
+            role: 'assistant',
+            content: result.answer,
+            citations: result.citations,
+            evidenceGapWarning: result.evidenceGapWarning,
+          });
+          setIsStreaming(false);
+        });
     }, 280);
   };
 

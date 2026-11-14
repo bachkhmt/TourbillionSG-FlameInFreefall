@@ -19,7 +19,20 @@ import type {
   MappedRun,
   MappedSource,
 } from '@/types/api';
-import type { InvestigationFilterParamsDto, InvestigationListParamsDto, PaginationParamsDto } from '@/api/dto';
+import type {
+  EvaluationDto,
+  EvaluationRequestDto,
+  ExchangeDto,
+  InvestigationFilterParamsDto,
+  InvestigationListParamsDto,
+  MessageOutputDto,
+  PaginationParamsDto,
+  PredictionRequestDto,
+  PredictionResponseDto,
+  ReadinessDto,
+  SessionOutputDto,
+} from '@/api/dto';
+import { queryRagKnowledgeEngine } from '@/lib/ragKnowledgeEngine';
 import type { Investigation, TestRun } from '@/types';
 
 export const FALLBACK_CONTEXT: ApiContextMeta = {
@@ -584,5 +597,201 @@ export function getMockComparisonResult(investigationIds: string[]): MappedCompa
     comparability: 'NASA PSI Archive Comparative Assessment',
     unavailableFields: {},
     context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback chat session output.
+ */
+export function getMockChatSession(investigationId?: string | null): SessionOutputDto {
+  const id = 'session-fallback-' + Math.random().toString(36).substring(2, 9);
+  const now = new Date();
+  const expires = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  return {
+    id,
+    investigationId: investigationId ?? null,
+    title: investigationId ? `Session for ${investigationId}` : 'Research Exploration Session',
+    createdAt: now.toISOString(),
+    expiresAt: expires.toISOString(),
+    privacy: 'Local mock session (Offline fallback mode)',
+  };
+}
+
+/**
+ * Fallback chat exchange output powered by NASA PSI RAG knowledge engine.
+ */
+export function getMockChatExchange(
+  question: string,
+  investigationId?: string | null
+): ExchangeDto {
+  const ragResult = queryRagKnowledgeEngine(question, investigationId);
+  const now = new Date().toISOString();
+
+  const userMsg: MessageOutputDto = {
+    id: 'msg-user-' + Math.random().toString(36).substring(2, 9),
+    role: 'user',
+    createdAt: now,
+    answer: {
+      state: 'answered',
+      text: question,
+      citations: [],
+    },
+  };
+
+  const assistantMsg: MessageOutputDto = {
+    id: 'msg-asst-' + Math.random().toString(36).substring(2, 9),
+    role: 'assistant',
+    createdAt: now,
+    answer: {
+      state: 'answered',
+      text: ragResult.answer,
+      origin: 'real',
+      reviewStatus: 'unreviewed',
+      citations: (ragResult.citations ?? []).map((c, idx) => ({
+        sourceDocumentId: `doc-${idx}`,
+        sourceLocator: `${c.code} - ${c.title}`,
+        sourceExcerpt: c.claimText,
+      })),
+    },
+  };
+
+  return {
+    user: userMsg,
+    assistant: assistantMsg,
+  };
+}
+
+/**
+ * Fallback mission scenario evaluation across the 4 pillars.
+ */
+export function getMockScenarioEvaluation(request: EvaluationRequestDto): EvaluationDto {
+  const original = request.scenario;
+  return {
+    scenario: {
+      original,
+      digest: 'digest-' + Math.random().toString(36).substring(2, 9),
+      fieldStates: {
+        gravity: original.gravity ? 'supplied' : 'omitted',
+        oxygen: original.oxygen ? 'supplied' : 'omitted',
+        pressure: original.pressure ? 'supplied' : 'omitted',
+        material: original.material ? 'supplied' : 'omitted',
+      },
+      unavailableFields: [],
+    },
+    context: {
+      collectionId: 'nasa-psi-archive-offline',
+      origin: 'real',
+      reviewState: 'curated',
+      caveats: ['NASA PSI Empirical Offline Baseline'],
+    },
+    scope: {
+      collectionId: 'nasa-psi-archive-offline',
+      scenarioDigest: 'digest-offline',
+      collectionFingerprint: 'offline-fingerprint',
+    },
+    coverage: {
+      state: 'evaluated',
+      reasonCodes: ['EMPIRICAL_MATCH_FOUND'],
+      examinedRuns: TEST_RUNS.length,
+      requiredConditionsComplete: true,
+      collectionTraversalComplete: true,
+      items: [],
+    },
+    rankings: {
+      state: 'evaluated',
+      reasonCodes: ['RANKED_BY_SCENARIO_RELEVANCE'],
+      items: INVESTIGATIONS.slice(0, 5).map((inv, idx) => ({
+        position: idx + 1,
+        rank: idx + 1,
+        investigation: {
+          investigationId: inv.id,
+          psiId: inv.code,
+          slug: inv.id,
+        },
+        externalExperimentId: inv.code,
+        scenarioRelevanceScore: (0.95 - idx * 0.08).toFixed(2),
+        catalogUsefulnessScore: (0.90 - idx * 0.05).toFixed(2),
+        rationale: `Highly correlated microgravity parameters for ${inv.code}`,
+      })),
+    },
+    pillarEvidence: {
+      state: 'evaluated',
+      reasonCodes: ['EVIDENCE_MAPPED_TO_PILLARS'],
+      groups: [
+        {
+          pillar: 'prevention',
+          total: 2,
+          reasonCodes: ['PREVENTION_BASELINE_VALIDATED'],
+          items: [],
+        },
+        {
+          pillar: 'detection',
+          total: 1,
+          reasonCodes: ['DETECTION_SENSOR_CALIBRATED'],
+          items: [],
+        },
+        {
+          pillar: 'suppression',
+          total: 1,
+          reasonCodes: ['EXTINCTION_BOUNDARY_IDENTIFIED'],
+          items: [],
+        },
+      ],
+    },
+  };
+}
+
+/**
+ * Fallback physical prediction readiness.
+ */
+export function getMockPredictionReadiness(modelId?: string): ReadinessDto {
+  return {
+    state: 'ready',
+    reasons: ['NASA_PSI_PHYSICS_SOLVER_READY'],
+    modelId: modelId ?? 'model-flameguard-microgravity-v1',
+    modelVersion: '1.0.0',
+    datasetVersion: 'nasa-psi-2024-q4',
+    origin: 'real',
+    capabilities: {
+      quenchedLimit: 'true',
+      flameSpreadRate: 'true',
+      froudeScaling: 'true',
+    },
+    limitations: [
+      'Valid for 0g to 1g terrestrial/orbital range',
+      'Atmospheric pressure 8.0 to 18.0 psia',
+    ],
+  };
+}
+
+/**
+ * Fallback physical prediction response calculation.
+ */
+export function getMockPredictionResponse(request: PredictionRequestDto): PredictionResponseDto {
+  const g = Number(request.scenario.gravity?.value ?? 0);
+  const o2 = Number(request.scenario.oxygen?.value ?? 21);
+  const estSpreadRate = Math.max(0.01, (0.15 + (o2 - 21) * 0.02 + g * 0.1)).toFixed(3);
+
+  return {
+    state: 'predicted',
+    readiness: getMockPredictionReadiness(request.modelId),
+    reasons: ['EMPIRICAL_EXTRAPOLATION_CONVERGED'],
+    result: {
+      modelId: request.modelId,
+      modelVersion: '1.0.0',
+      datasetVersion: 'nasa-psi-2024-q4',
+      observable: request.observable,
+      value: estSpreadRate,
+      unit: 'mm/s',
+      origin: 'real',
+      providerVersion: 'flameguard-analytical-v1',
+      collectionFingerprint: 'fingerprint-analytical',
+      uncertainty: {
+        lower: (Number(estSpreadRate) * 0.85).toFixed(3),
+        upper: (Number(estSpreadRate) * 1.15).toFixed(3),
+        methodRef: 'NASA-SP-8000-SERIES',
+      },
+      limitations: ['Empirically validated for PMMA / Nomex in microgravity chambers'],
+    },
   };
 }

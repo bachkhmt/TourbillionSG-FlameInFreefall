@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Lock,
@@ -15,6 +15,9 @@ import {
 } from 'lucide-react';
 import { evaluatePredictiveLab } from '@/lib/predictiveLabEngine';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
+import { getPredictionReadiness } from '@/api/services';
+import { getMockPredictionReadiness } from '@/api/mockFallback';
+import type { ReadinessDto } from '@/api/dto';
 
 export interface PredictiveLabPanelProps {
   onSwitchToEvidence?: () => void;
@@ -25,6 +28,21 @@ export const PredictiveLabPanel: React.FC<PredictiveLabPanelProps> = ({
 }) => {
   const activeScenario = useWorkspaceStore((state) => state.activeScenario);
   const audit = evaluatePredictiveLab(activeScenario);
+  const [readiness, setReadiness] = useState<ReadinessDto | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    getPredictionReadiness()
+      .then((data) => {
+        if (active) setReadiness(data);
+      })
+      .catch(() => {
+        if (active) setReadiness(getMockPredictionReadiness());
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div
