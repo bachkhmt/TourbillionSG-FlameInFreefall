@@ -53,10 +53,12 @@ All rules below are implemented in `integrations/nasa_data/unified.py` and
 **CFI (PSI-39)**
 - `Master Sheet`, `DATA`, `Igniter` and `Comments` are joined on `Flex Number`; each
   sheet holds the same 227 keys.
-- The 87 rows of the existing PSI-39 experimental-table CSV are an exact subset. Those
-  runs gain observations from the spreadsheet (with the spreadsheet's own source and
-  locator), and any field that differs between the two sources is recorded as an issue.
-  The other 140 tests become new records.
+- The existing PSI-39 experimental-table CSV has 87 rows covering 79 distinct Flex
+  Numbers (some keys repeat). All 79 appear in the spreadsheet. Every CSV row for an
+  overlapping key is linked to the spreadsheet row. Spreadsheet observations, with their
+  own source and locator, are attached to the first CSV row for that key. Any field that
+  differs between the two sources is recorded as an issue. The other 148 tests become
+  new records.
 - `DATA` values with a unit in the header (mm, mm^2/s) are numeric observations.
   Columns without a declared unit, and formula columns (`Rad Ratio`,
   `CF Rad Ratio`), are kept raw with `needs_review`.

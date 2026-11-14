@@ -15,9 +15,15 @@ from app.services.demo_manifest import snapshot_rows
 from .challenge import build_challenge_release
 from .coverage import build_coverage_release
 from .pilot import uid
+from .unified import build_unified_release
 
-# "unified" is the default dataset for web + RAG; "challenge" rebuilds the v1 release.
-BUILDERS = {"unified": build_coverage_release, "challenge": build_challenge_release}
+# "unified" is the default dataset for web + RAG (official resources only);
+# "coverage" and "challenge" rebuild the earlier releases unchanged.
+BUILDERS = {
+    "unified": build_unified_release,
+    "coverage": build_coverage_release,
+    "challenge": build_challenge_release,
+}
 
 
 def build_snapshot(release):
