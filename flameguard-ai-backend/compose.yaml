@@ -1,23 +1,44 @@
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-flameguard}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-development-only}
       POSTGRES_DB: ${POSTGRES_DB:-flameguard}
     ports:
-      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
-      interval: 10s
+      interval: 5s
       timeout: 3s
       retries: 5
-      start_period: 10s
+      start_period: 5s
     mem_limit: 256m
     cpus: 1.0
     shm_size: 64m
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - APP_NAME=FlameGuard AI Backend
+      - APP_ENV=development
+      - DEBUG=true
+      - API_V1_PREFIX=/api/v1
+      - LOG_LEVEL=INFO
+      - DATABASE_URL=postgresql+asyncpg://flameguard:local-development-only@postgres:5432/flameguard
+      - CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000","http://localhost:3001"]
+      - DB_CONNECT_TIMEOUT_SECONDS=5
+      - DB_READY_TIMEOUT_SECONDS=5
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres_data:
