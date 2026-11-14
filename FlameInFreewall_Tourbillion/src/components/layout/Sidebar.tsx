@@ -179,8 +179,8 @@ export const Sidebar: React.FC = () => {
               isExpanded={isExpanded}
               icon={
                 <Flame
-                  className="w-4 h-4 text-amber-500 group-hover:text-amber-600 transition-colors"
-                  strokeWidth={2.5}
+                  className="w-6 h-6 text-amber-500 group-hover:text-amber-600 transition-colors"
+                  strokeWidth={3}
                 />
               }
               label="3D Flame Studio"

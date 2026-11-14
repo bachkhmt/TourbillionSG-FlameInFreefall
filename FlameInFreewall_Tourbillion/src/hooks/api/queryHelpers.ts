@@ -19,31 +19,20 @@ export function resetTimeoutToastThrottle(): void {
 }
 
 /**
- * Detects whether an error represents a server response timeout, socket hangup, or connection reset.
+ * Detects whether an error specifically represents a server response timeout.
  */
 export function isTimeoutError(error: unknown): boolean {
   if (!error) return false;
   if (error instanceof ApiClientError) {
     if (error.code === 'REQUEST_TIMEOUT') return true;
-    if (
-      error.status === 0 ||
-      error.status === 500 ||
-      error.status === 502 ||
-      error.status === 503 ||
-      error.status === 504 ||
-      error.status === 408
-    ) {
-      return true;
-    }
-    if (/timeout|timed out|socket hang up|econnreset|internal server error/i.test(error.message)) {
-      return true;
-    }
+    if (error.status === 408 || error.status === 504) return true;
+    if (/timeout|timed out/i.test(error.message)) return true;
     return false;
   }
   if (error instanceof Error) {
     const code = (error as { code?: string }).code;
-    if (code === 'ECONNABORTED' || code === 'ETIMEDOUT' || code === 'ECONNRESET') return true;
-    if (/timeout|timed out|socket hang up|econnreset|server error/i.test(error.message)) return true;
+    if (code === 'ECONNABORTED' || code === 'ETIMEDOUT') return true;
+    if (/timeout|timed out/i.test(error.message)) return true;
     return false;
   }
   return false;
@@ -54,7 +43,7 @@ export function isTimeoutError(error: unknown): boolean {
  * throttled across concurrent query executions.
  */
 export function handleTimeoutFallback(error?: unknown): void {
-  if (error && !isTimeoutError(error)) return;
+  if (!error || !isTimeoutError(error)) return;
   const now = Date.now();
   if (now - lastTimeoutToastAt > 4000) {
     lastTimeoutToastAt = now;

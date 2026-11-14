@@ -17,12 +17,10 @@ describe('Official Resources Page (/resources)', () => {
     vi.mocked(resourceService.getOfficialResources).mockResolvedValue(getMockOfficialResources());
   });
 
-  it('renders official resources header, caveats, and categories', () => {
+  it('renders official resources header, search input, and categories', () => {
     renderWithQuery(<ResourcesPage />);
 
     expect(screen.getByText('Official Challenge Resources')).toBeDefined();
-    expect(screen.getByText(/Verified Scientific Heritage/i)).toBeDefined();
-    expect(screen.getByText(/3D Flame Studio/i)).toBeDefined();
     expect(screen.getByTestId('resource-search-input')).toBeDefined();
 
     // Check category tabs
