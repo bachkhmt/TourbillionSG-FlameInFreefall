@@ -9,7 +9,12 @@ import hashlib
 import json
 from pathlib import Path
 
-from app.services.corpus_policy import ADMITTED_LICENSE, CORPUS_POLICY_VERSION
+from app.services.corpus_policy import (
+    ADMITTED_LICENSE,
+    CHALLENGE_POLICY_VERSION,
+    CORPUS_POLICY_VERSION,
+    NASA_TEXT_LICENSE,
+)
 
 REGISTRY_FILENAME = "corpus-registry.json"
 
@@ -18,24 +23,32 @@ def registry_for(release: dict) -> dict:
     studies = {s["id"]: s for s in release["investigations"]}
     sources = {}
     for source in release["sources"]:
-        if source["license"] != ADMITTED_LICENSE:
+        scope = source.get("sourceScope", "investigation")
+        if scope != "challenge" and source["license"] != ADMITTED_LICENSE:
             continue  # unknown or restricted rights never enter the chat corpus
-        study = studies[source["investigationId"]]
+        study = studies.get(source["investigationId"])
         sources[source["id"]] = {
             "sha256": source["sha256"],
             "license": source["license"],
             "filename": source["filename"],
             "sourceUrl": source["sourceUrl"],
-            "investigationId": study["uuid"],
-            "slug": study["id"],
-            "title": study["title"],
-            "version": (
+            "investigationId": study["uuid"] if study else None,
+            "sourceScope": scope,
+            "slug": study["id"] if study else source["resourceId"],
+            "title": study["title"] if study else source["title"],
+            "status": source.get("status", "source_checked"),
+            "rightsUrl": source.get("rightsUrl"),
+            "rightsScope": source.get("rightsScope"),
+            "version": source.get("version")
+            or (
                 f"study:{source['studyVersion']}/file:{source['fileVersion']}"
                 f"/sha256:{source['sha256']}"
             ),
         }
     return {
-        "policyVersion": CORPUS_POLICY_VERSION,
+        "policyVersion": CHALLENGE_POLICY_VERSION
+        if any(s.get("sourceScope") == "challenge" for s in sources.values())
+        else CORPUS_POLICY_VERSION,
         "sourceRevision": release["revision"],
         "sources": sources,
         "chunks": {
@@ -46,6 +59,7 @@ def registry_for(release: dict) -> dict:
             }
             for chunk in release["chunks"]
             if chunk["sourceId"] in sources
+            and sources[chunk["sourceId"]]["license"] in {ADMITTED_LICENSE, NASA_TEXT_LICENSE}
         },
     }
 
@@ -53,9 +67,8 @@ def registry_for(release: dict) -> dict:
 def write_corpus_policy(manifest_path, release: dict) -> Path:
     """Write the registry next to a v2 collection manifest and declare it there."""
     manifest_path = Path(manifest_path)
-    raw = (
-        json.dumps(registry_for(release), sort_keys=True, ensure_ascii=False, indent=2) + "\n"
-    ).encode()
+    registry = registry_for(release)
+    raw = (json.dumps(registry, sort_keys=True, ensure_ascii=False, indent=2) + "\n").encode()
     path = manifest_path.parent / REGISTRY_FILENAME
     path.write_bytes(raw)
     config = json.loads(manifest_path.read_text("utf-8"))
@@ -63,7 +76,7 @@ def write_corpus_policy(manifest_path, release: dict) -> Path:
         admissionVersion=2, runtimeTables=["chat_message", "chat_session", "message_citation"]
     )
     config["corpusPolicy"] = {
-        "policyVersion": CORPUS_POLICY_VERSION,
+        "policyVersion": registry["policyVersion"],
         "registry": REGISTRY_FILENAME,
         "registrySha256": hashlib.sha256(raw).hexdigest(),
         "sourceRevision": release["revision"],

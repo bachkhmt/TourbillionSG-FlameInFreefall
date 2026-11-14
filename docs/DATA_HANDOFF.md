@@ -1,5 +1,54 @@
 # Bộ dữ liệu thống nhất NASA: bàn giao Data → Web/RAG
 
+## Cập nhật Backend/Data — 2026-11-14, chỉ mục 1 và 2
+
+Nhánh `feat/data-backend-handoff-20261114` dựa trên PR #3. Đã chọn phương án A:
+migration `0004_challenge_source_scope`, vẫn21 bảng. Nguồn cấp challenge có
+`source_scope=challenge`, `investigation_id=NULL`; CHECK ngăn scope/ownership sai.
+Không tạo investigation hoặc run giả. Migration cũ giữ nguyên; snapshot cũ vẫn đọc được.
+
+| Profile hiện tại | Investigations | Records | Sources | Chunks |
+| --- | ---: | ---: | ---: | ---: |
+| `unified` (mặc định, thêm resources) | 24 | 1.926 | 81 | 2.574 |
+| `psi` (tái lập unified PSI trước đây) | 24 | 1.926 | 71 | 2.508 |
+| `coverage` | 24 | 1.535 | 68 | 1.811 |
+| `challenge` | 18 | 910 | 51 | 1.045 |
+
+Đã import và kiểm cả `psi` và `unified` trên child DB mới riêng của server test
+`127.0.0.1:55435` được user duyệt. Không reset DB có sẵn. `GET /chat/readiness`
+báo2508/2574 tương ứng; `/chat/resources` trả0/10 nguồn tương ứng. Endpoint này
+cho biết `indexed`, `status`, quyền sử dụng và source ID để AI/FE tích hợp tiếp.
+Citation source metadata hỗ trợ investigation NULL và source scope.
+
+10 resource entries đều được lưu. Sáu bài NASA có66 chunk narration với raw/hash/
+locator và quyền `NASA-public-use-text`, tách khỏi policy CC0 cũ. PSI search là link
+khám phá; video chưa có transcript xác minh; Apollo1/13 bị lỗi tải nên không index.
+Researcher's Guide hiện chỉ có landing article, chưa có toàn bộ PDF liên kết.
+Chi tiết raw và trạng thái: `integrations/nasa_data/research/challenge-resources-2026-11-14/`.
+
+Mục3 đánh giá AI và mục4 conflict FE của PR2 vẫn do AI/tác giả PR2 thực hiện.
+
+Checklist phần nội dung Apollo/video/full Guide PDF còn thiếu và chủ trì:
+[`RESOURCE_CONTENT_HANDOFF.md`](RESOURCE_CONTENT_HANDOFF.md). PSI search là discovery
+link có chủ đích, không phải lỗi thiếu tài liệu. Checklist chưa được gửi cho team.
+
+Xác nhận integration cuối ngày14/11: **80 passed,0 failed,0 skipped**,458.88s trên
+PostgreSQL test55435. Dòng77passed/2failed trong verification là lịch sử trước sửa
+fixture; kết quả full-run mới và JSON evidence đã được đưa lên đầu báo cáo.
+Nhánh này không sửa FE hay thuật toán `app/integrations/rag/`. Docker/deployment
+chưa review được cất riêng trên `wip/docker-deployment-20261114` (`b950300`).
+
+Lệnh kiểm tra/import tái lập: `scripts/verify_data_handoff.py` qua
+`scripts/test_db.py run`; chuẩn bị preview riêng bằng
+`prepare_chat_preview.py --prepare-new-test-target --profile psi|unified`.
+Bằng chứng mới, migration impact và giới hạn ở
+`flameguard-ai-backend/specs/phase6c-challenge-resources/verification.md` và ADR-0006.
+
+## Bàn giao gốc PR #3 — lưu làm bằng chứng lịch sử
+
+Phần dưới mô tả nhánh Data trước phần mở rộng Backend/A; số liệu và các việc
+pending ở phần này không thay thế trạng thái hiện tại bên trên.
+
 Cập nhật 2026-11-14, branch `data/unified-dataset`. Branch tạo từ `feat/rag-nasa-chat`.
 
 ## Tóm tắt

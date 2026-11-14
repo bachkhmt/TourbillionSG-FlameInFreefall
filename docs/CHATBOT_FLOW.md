@@ -55,7 +55,7 @@ sequenceDiagram
     FE->>API: GET /api/v1/chat/readiness
     API->>Reader: admission + corpusPolicy + admit_passages
     API->>Writer: kiểm role/quyền/OID
-    API-->>FE: ready, retrieval_only, passages=2508
+    API-->>FE: ready, retrieval_only, passages=2574 (unified) or 2508 (psi)
     User->>FE: "FLEX-007 D0?"
     FE->>API: POST /chat/sessions (lần đầu), POST /chat/sessions/{id}/messages
     API->>Reader: snapshot (admission + passages)

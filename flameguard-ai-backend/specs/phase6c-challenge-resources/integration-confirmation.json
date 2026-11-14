@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-14",
+  "suite": "root integration_tests",
+  "target": "approved isolated PostgreSQL 127.0.0.1:55435",
+  "command": "python scripts/test_db.py run -- python -m pytest -q -p no:cacheprovider --tb=short --junitxml=.demo/root-integration-confirmation.xml",
+  "result": "PASS",
+  "counts": {
+    "tests": 80,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "junitSeconds": 458.883,
+  "pytestSeconds": 458.88,
+  "rawReport": ".demo/root-integration-confirmation.xml",
+  "scope": "Data handoff items 1-2; no AI quality or FE acceptance claim"
+}

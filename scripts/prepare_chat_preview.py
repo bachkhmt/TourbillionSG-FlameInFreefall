@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT / "flameguard-ai-backend")]
 
 
-async def main():
+async def main(profile="unified"):
     from integration_tests.chat_target import TEST_SERVER, persist_preview, prepare_target
 
     config = json.loads((ROOT / ".demo/test-db-settings.json").read_text("utf-8"))
@@ -24,7 +24,7 @@ async def main():
         *TEST_SERVER,
     ):
         raise ValueError("Settings do not point at the dedicated test container")
-    target = await prepare_target(config["PHASE4_ADMIN_URL"])
+    target = await prepare_target(config["PHASE4_ADMIN_URL"], profile=profile)
     print(persist_preview(target))
 
 
@@ -36,9 +36,12 @@ if __name__ == "__main__":
         required=True,
         help="Create and retain a new child DB/roles in tourbillion-test-pg (55435) only",
     )
-    parser.parse_args()
+    parser.add_argument(
+        "--profile", choices=["unified", "psi", "coverage", "challenge"], default="unified"
+    )
+    args = parser.parse_args()
     try:
-        asyncio.run(main())
+        asyncio.run(main(args.profile))
     except Exception as exc:
         print(
             f"Could not prepare chat preview ({type(exc).__name__}); no existing target was reset.",

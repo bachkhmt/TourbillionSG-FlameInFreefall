@@ -6,7 +6,7 @@ Trả lời bằng tiếng Việt; giữ code, identifiers và commands nguyên 
 
 | Thư mục | Vai trò | Quy tắc riêng |
 | --- | --- | --- |
-| `flameguard-ai-backend/` | BE FastAPI upstream, 21 bảng, migrations 0001→0003 | `flameguard-ai-backend/AGENTS.md` |
+| `flameguard-ai-backend/` | BE FastAPI upstream, 21 bảng, migrations 0001→0004 | `flameguard-ai-backend/AGENTS.md` |
 | `FlameInFreewall_Tourbillion/` | FE Next.js, TanStack Query + Axios | — |
 | `integrations/nasa_data/` | Data adapter offline: build release NASA, xuất snapshot 21 bảng, registry `corpusPolicy` | Không gọi network, không ghi DB |
 | `flameguard-ai-backend/app/integrations/rag/` | RAG extractive có citation (AI team), cắm vào BE qua `RagProvider` + `CHAT_PROVIDER=extractive` | ADR-0005, `docs/CHATBOT_FLOW.md` |
@@ -18,8 +18,10 @@ Trả lời bằng tiếng Việt; giữ code, identifiers và commands nguyên 
   extension point có sẵn (`RagProvider`, `select_provider`, `chat_provider_factory`), không
   dùng `dependency_overrides`, không subclass `ChatService`. Thay đổi BE theo workflow của
   `flameguard-ai-backend/AGENTS.md` (spec + ADR), báo người giữ BE upstream trước khi merge.
-- Chat chỉ trích nguyên văn chunk đã nhập từ nguồn CC0 có hash; không LLM, không
-  provider trả phí. `review_status` luôn `unreviewed`. Không đưa kết luận safe/unsafe.
+- Chat chỉ trích nguyên văn chunk đã nhập và qua corpus policy: CC0 cho PSI;
+  NASA-authored article text có bằng chứng quyền riêng theo ADR-0006 cho resource
+  cấp challenge. Không tự gán CC0 cho trang NASA, ảnh hoặc transcript. Không LLM,
+  không provider trả phí. `review_status` luôn `unreviewed`. Không đưa kết luận safe/unsafe.
 - Giữ nguyên giá trị mâu thuẫn và đơn vị gốc (ví dụ FLEX-007 D0: 1.87 mm và 1.82 mm).
   Null không phải 0. Điểm BM25 là độ liên quan, không phải xác suất rủi ro.
 - PSI id, UUID nội bộ và slug là ba định danh khác nhau.

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import UUID as SQLUUID
-from sqlalchemy import DateTime, ForeignKey, Integer, Text
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, UUIDPrimaryKey, utc_now
@@ -19,9 +19,19 @@ if TYPE_CHECKING:
 
 class SourceDocument(UUIDPrimaryKey, Base):
     __tablename__ = "source_document"
+    __table_args__ = (
+        CheckConstraint(
+            "(source_scope = 'investigation' AND investigation_id IS NOT NULL) OR "
+            "(source_scope = 'challenge' AND investigation_id IS NULL)",
+            name="source_scope_ownership",
+        ),
+    )
 
-    investigation_id: Mapped[UUID] = mapped_column(
-        SQLUUID(), ForeignKey("investigation.id"), index=True, nullable=False
+    investigation_id: Mapped[UUID | None] = mapped_column(
+        SQLUUID(), ForeignKey("investigation.id"), index=True, nullable=True
+    )
+    source_scope: Mapped[str] = mapped_column(
+        Text(), nullable=False, default="investigation", server_default=text("'investigation'")
     )
     source_url: Mapped[str] = mapped_column(Text(), nullable=False)
     doi: Mapped[str | None] = mapped_column(Text(), nullable=True)
@@ -29,7 +39,7 @@ class SourceDocument(UUIDPrimaryKey, Base):
     version: Mapped[str | None] = mapped_column(Text(), nullable=True)
     ingestion_status: Mapped[str] = mapped_column(Text(), nullable=False)
 
-    investigation: Mapped[Investigation] = relationship(
+    investigation: Mapped[Investigation | None] = relationship(
         "Investigation", back_populates="source_documents", lazy="raise"
     )
     claim_links: Mapped[list[ClaimSource]] = relationship(

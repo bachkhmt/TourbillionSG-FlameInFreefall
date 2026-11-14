@@ -84,7 +84,12 @@ def migrated_database() -> Iterator[MigratedDatabase]:
     asyncio.run(provision())
     snapshots = {}
     versions = []
-    for revision in ("0001_must_have", "0002_should_have", "0003_could_have"):
+    for revision in (
+        "0001_must_have",
+        "0002_should_have",
+        "0003_could_have",
+        "0004_challenge_source_scope",
+    ):
         env = {
             **os.environ,
             "DATABASE_URL": url.render_as_string(hide_password=False),

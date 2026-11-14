@@ -15,12 +15,14 @@ from app.services.demo_manifest import snapshot_rows
 from .challenge import build_challenge_release
 from .coverage import build_coverage_release
 from .pilot import uid
+from .resource_documents import build_resource_release
 from .unified import build_unified_release
 
 # "unified" is the default dataset for web + RAG (official resources only);
 # "coverage" and "challenge" rebuild the earlier releases unchanged.
 BUILDERS = {
-    "unified": build_unified_release,
+    "unified": build_resource_release,
+    "psi": build_unified_release,
     "coverage": build_coverage_release,
     "challenge": build_challenge_release,
 }
@@ -43,15 +45,17 @@ def build_snapshot(release):
         tables["source_document"].append(
             {
                 "id": source["id"],
-                "investigation_id": studies[source["investigationId"]],
+                "investigation_id": studies.get(source["investigationId"]),
+                "source_scope": source.get("sourceScope", "investigation"),
                 "source_url": source["sourceUrl"],
                 "doi": source.get("doi"),
                 "document_type": source["kind"],
-                "version": (
+                "version": source.get("version")
+                or (
                     f"study:{source['studyVersion']}/file:{source['fileVersion']}"
                     f"/sha256:{source['sha256']}"
                 ),
-                "ingestion_status": "source_checked",
+                "ingestion_status": source.get("status", "source_checked"),
             }
         )
     for run in release["runs"]:
@@ -111,7 +115,7 @@ def build_snapshot(release):
     return {
         "collectionId": "nasa-challenge-" + release["revision"][:16],
         "origin": "real",
-        "version": 1,
+        "version": 2,
         "tables": tables,
     }
 

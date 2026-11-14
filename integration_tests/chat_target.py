@@ -41,12 +41,12 @@ def settings_for(target):
     )
 
 
-async def prepare_target(raw):
+async def prepare_target(raw, *, profile="unified"):
     admin = validate_test_url(raw, Settings(_env_file=None).database_url.get_secret_value())
     if (admin.host, admin.port) != TEST_SERVER:
         raise ValueError("Only the dedicated local test container 127.0.0.1:55435 is supported")
     target = await provision_phase4(raw, populate=False)
-    bundle = export_bundle(target["collection"].parent / "nasa-chat-bundle")
+    bundle = export_bundle(target["collection"].parent / "nasa-chat-bundle", profile=profile)
     manifest = snapshot_rows(bundle / "snapshot.json")
     engine = create_async_engine(target["owner_url"], hide_parameters=True)
     try:

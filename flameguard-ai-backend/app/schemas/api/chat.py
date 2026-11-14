@@ -105,4 +105,23 @@ class ChatSourceOutput(BaseModel):
     sha256: str
     license: str
     title: str
+    investigation_id: UUID | None = None
+    source_scope: Literal["investigation", "challenge"] = "investigation"
     review_status: Literal["unreviewed"] = "unreviewed"
+
+
+class ChallengeResourceOutput(BaseModel):
+    source_document_id: UUID
+    resource_id: str
+    title: str
+    source_url: str
+    source_scope: Literal["challenge"] = "challenge"
+    investigation_id: None = None
+    license: str
+    status: str
+    indexed: bool
+
+
+class ChallengeResourcePage(BaseModel):
+    corpus_version: str
+    items: list[ChallengeResourceOutput]

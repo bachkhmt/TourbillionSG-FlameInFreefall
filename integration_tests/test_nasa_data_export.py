@@ -5,8 +5,8 @@ import json
 
 # Default "unified" release: official resources only (PSI files + PSI metadata).
 # See docs/DATA_HANDOFF.md.
-UNIFIED_PARSER = "nasa-unified-v1"
-UNIFIED = {"studies": 24, "runs": 1926, "sources": 71, "chunks": 2508}
+UNIFIED_PARSER = "nasa-challenge-resources-v1"
+UNIFIED = {"studies": 24, "runs": 1926, "sources": 81, "chunks": 2574}
 
 
 def test_real_snapshot_preserves_sources_and_originals(tmp_path):
@@ -26,7 +26,7 @@ def test_real_snapshot_preserves_sources_and_originals(tmp_path):
     assert len(snapshot["tables"]["source_document"]) == stats["sources"] == UNIFIED["sources"]
     assert len(snapshot["tables"]["document_chunk"]) == stats["chunks"] == UNIFIED["chunks"]
     assert all(
-        s["license"] != "unknown" or s["investigationId"] == "flame-design"
+        s["license"] != "unknown" or s["investigationId"] in {"flame-design", None}
         for s in payload["sources"]
     )
     assert not any(s["sourceUrl"].startswith("https://ntrs.nasa.gov") for s in payload["sources"])

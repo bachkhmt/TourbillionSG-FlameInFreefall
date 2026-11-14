@@ -9,6 +9,8 @@ from app.api.dependencies import get_scenarios
 from app.integrations.chat import UnavailableProvider, bounded
 from app.schemas.api.chat import (
     AdvisorOutput,
+    ChallengeResourceOutput,
+    ChallengeResourcePage,
     ChatReadiness,
     ChatSourceOutput,
     Exchange,
@@ -135,6 +137,33 @@ async def cited_source(
         sha256=entry["sha256"],
         license=entry["license"],
         title=entry["title"],
+        investigation_id=entry["investigationId"],
+        source_scope=entry.get("sourceScope", "investigation"),
+    )
+
+
+@router.get("/chat/resources", response_model=ChallengeResourcePage)
+async def challenge_resources(chat: Annotated[ChatService, Depends(service)]):
+    """Official resource inventory; linked/blocked entries are never presented as indexed."""
+    corpus = (await chat.snapshot(corpus=True)).corpus
+    if corpus is None:
+        raise HTTPException(503, "Source corpus policy unavailable")
+    indexed = {str(p.source_document_id) for p in corpus.passages}
+    return ChallengeResourcePage(
+        corpus_version=corpus.fingerprint,
+        items=[
+            ChallengeResourceOutput(
+                source_document_id=identity,
+                resource_id=entry["slug"],
+                title=entry["title"],
+                source_url=entry["sourceUrl"],
+                license=entry["license"],
+                status=entry.get("status", "unknown"),
+                indexed=identity in indexed,
+            )
+            for identity, entry in corpus.sources.items()
+            if entry.get("sourceScope") == "challenge"
+        ],
     )
 
 

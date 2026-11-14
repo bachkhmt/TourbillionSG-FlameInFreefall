@@ -90,11 +90,15 @@ def run(command: list[str]) -> None:
         **os.environ,
         "PHASE4_ADMIN_URL": settings["PHASE4_ADMIN_URL"],
         "TEST_DATABASE_URL": settings["TEST_DATABASE_URL"],
+        "DEBUG": "false",
     }
     env.pop("DATABASE_URL", None)
     # The backend fixtures write isolated manifests under this ignored directory.
     (ROOT / "flameguard-ai-backend" / ".tools").mkdir(exist_ok=True)
-    os.execvpe(command[0], command, env)
+    # Windows execvpe can crash before the child starts (0xC0000005). Keep the
+    # parent alive, inherit output and propagate the child's status portably.
+    completed = subprocess.run(command, env=env, check=False)
+    raise SystemExit(completed.returncode)
 
 
 if __name__ == "__main__":

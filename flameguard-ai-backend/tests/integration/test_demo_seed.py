@@ -44,6 +44,8 @@ async def test_unexpected_row_in_each_of_21_tables_is_refused(phase4_db, target_
                         row[col.name] = uuid5(namespace, "foreign-" + table.name)
                     elif col.foreign_keys:
                         row[col.name] = await parent(next(iter(col.foreign_keys)).column.table)
+                    elif table.name == "source_document" and col.name == "source_scope":
+                        row[col.name] = "investigation"
                     elif col.nullable:
                         row[col.name] = None
                     elif col.type.python_type is Decimal:

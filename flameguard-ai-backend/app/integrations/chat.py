@@ -43,7 +43,8 @@ class CorpusPassage(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
     chunk_id: UUID
     source_document_id: UUID
-    investigation_id: UUID
+    investigation_id: UUID | None
+    source_scope: str = "investigation"
     slug: str
     title: str
     locator: str
