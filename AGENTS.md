@@ -35,4 +35,9 @@ cd FlameInFreewall_Tourbillion && npm test && npx tsc --noEmit
 ```
 
 Test HTTP/PG cần `PHASE4_ADMIN_URL` (và BE suite cần thêm `TEST_DATABASE_URL`) trỏ tới
-container test; thiếu thì skip. Không gọi một lần skip là pass.
+container test; thiếu thì skip. Không gọi một lần skip là pass. Dùng helper:
+
+```bash
+python3 scripts/test_db.py create      # một lần, tạo tourbillion-test-pg
+python3 scripts/test_db.py run -- flameguard-ai-backend/.venv/bin/python -m pytest -q
+```
