@@ -5,12 +5,12 @@ from app.integrations.chat import CorpusPassage, RagRequest
 from app.integrations.rag.provider import ExtractiveProvider
 from app.integrations.rag.retrieval import refusal, select_passages, terms
 
-from integrations.nasa_data.challenge import build_challenge_release
+from integrations.nasa_data.unified import build_unified_release
 
 
 @pytest.fixture(scope="module")
 def passages():
-    release = build_challenge_release()
+    release = build_unified_release()
     sources = {s["id"]: s for s in release["sources"]}
     studies = {s["id"]: s for s in release["investigations"]}
     return tuple(
@@ -201,3 +201,19 @@ def test_named_record_never_returns_neighboring_records(passages):
 def test_named_study_and_compact_id_stay_scoped(passages, question, study):
     hits = select_passages(question, passages)
     assert hits and {h.passage.slug for h in hits} == {study}
+
+
+@pytest.mark.parametrize(
+    ("question", "slug"),
+    [
+        ("BRE chamber test point 19039A1 pressure and ignition", "bre"),
+        ("CFI Flex Number 1206 D0 and khot burning rate", "cfi"),
+        ("SPICE ethylene coflow air rate and nozzle", "spice"),
+        ("CFI-G inverse flame 21196 A2", "cfi-g"),
+        ("What was the objective of DAFT dust and aerosol research?", "daft"),
+    ],
+)
+def test_unified_sources_are_retrievable(passages, question, slug):
+    hits = select_passages(question, passages)
+    assert hits and slug in {h.passage.slug for h in hits}
+    assert all(h.excerpt in h.passage.text for h in hits)

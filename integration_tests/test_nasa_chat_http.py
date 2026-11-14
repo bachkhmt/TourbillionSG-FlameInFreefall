@@ -31,11 +31,11 @@ def target():
 @pytest.fixture
 async def client(target):
     application = create_app(settings_for(target))
-    async with application.router.lifespan_context(application):
-        async with AsyncClient(
-            transport=ASGITransport(app=application), base_url="http://test"
-        ) as client:
-            yield client, application
+    async with (
+        application.router.lifespan_context(application),
+        AsyncClient(transport=ASGITransport(app=application), base_url="http://test") as client,
+    ):
+        yield client, application
 
 
 async def new_session(client):
@@ -60,7 +60,7 @@ async def test_real_answer_history_source_binding_and_scientific_regression(clie
     assert readiness.headers["cache-control"] == "no-store"
     ready = readiness.json()
     assert (ready["state"], ready["mode"]) == ("ready", "retrieval_only")
-    assert ready["provider_version"] == VERSION and ready["passages"] == 1045
+    assert ready["provider_version"] == VERSION and ready["passages"] == 2574
     assert ready["review_status"] == "unreviewed"
     identity = await new_session(client)
     response = await ask(client, identity, "FLEX-007 D0 đường kính mâu thuẫn?")
@@ -97,8 +97,8 @@ async def test_real_answer_history_source_binding_and_scientific_regression(clie
     assert gap["state"] == "abstained" and not gap["citations"]
     summary = (await client.get("/api/v1/dashboard/summary")).json()
     assert (summary["investigationCount"], summary["runCount"], summary["claimCount"]) == (
-        18,
-        910,
+        24,
+        1926,
         0,
     )
     assert summary["context"]["reviewState"] == "unreviewed"
@@ -113,6 +113,41 @@ async def test_advisor_gets_no_corpus_and_reports_provider_unavailable(client):
     body = advisor.json()
     assert all(a["state"] == "unavailable" and not a["citations"] for a in body["pillars"].values())
     assert all("PROVIDER_UNAVAILABLE" in gaps for gaps in body["gaps"].values())
+
+
+async def test_challenge_source_inventory_and_null_citation_metadata(client, target):
+    client, app = client
+    from app.services.chat import ChatService
+
+    response = await client.get("/api/v1/chat/resources")
+    assert response.status_code == 200, response.text
+    page = response.json()
+    assert len(page["items"]) == 10
+    assert sum(item["indexed"] for item in page["items"]) == 6
+    assert all(item["investigation_id"] is None for item in page["items"])
+    assert all(item["source_scope"] == "challenge" for item in page["items"])
+    resources = {item["resource_id"]: item for item in page["items"]}
+    assert resources["sciencecasts-combustion"]["status"] == "transcript_not_verified"
+    assert not resources["apollo-1"]["indexed"]
+    registry = json.loads((target["collection"].parent / "corpus-registry.json").read_text("utf-8"))
+    source_id = resources["mir-fire"]["source_document_id"]
+    locator = next(c["locator"] for c in registry["chunks"].values() if c["sourceId"] == source_id)
+    source = await client.get(
+        f"/api/v1/chat/sources/{source_id}",
+        params={"locator": locator, "corpus_version": page["corpus_version"]},
+    )
+    assert source.status_code == 200, source.text
+    assert source.json()["investigation_id"] is None
+    assert source.json()["source_scope"] == "challenge"
+    assert source.json()["license"] == "NASA-public-use-text"
+    snapshot = await ChatService(app).snapshot(corpus=True)
+    study = next(p.investigation_id for p in snapshot.corpus.passages if p.investigation_id)
+    scoped = await ChatService(app).snapshot(study, corpus=True)
+    assert all(
+        p.investigation_id == study and p.source_scope == "investigation"
+        for p in scoped.corpus.passages
+    )
+    assert len([p for p in snapshot.corpus.passages if p.investigation_id is None]) == 66
 
 
 async def test_provider_cannot_invent_citations_or_partial_pairs(client):
@@ -178,6 +213,9 @@ async def test_tampered_registry_reports_corpus_policy_unavailable(client, targe
 
 async def test_concurrent_sends_keep_complete_pairs(client):
     client, app = client
+    # The full real snapshot is admitted before the provider starts. The barrier
+    # measures persistence/concurrency, not the production provider's10s deadline.
+    app.state.settings.chat_timeout_seconds = 60
     identity = await new_session(client)
     entered, release = asyncio.Event(), asyncio.Event()
     calls = []
@@ -192,7 +230,7 @@ async def test_concurrent_sends_keep_complete_pairs(client):
 
     app.state.chat_provider_factory = Delayed
     first = asyncio.create_task(ask(client, identity, "FLEX-007"))
-    await asyncio.wait_for(entered.wait(), 10)
+    await asyncio.wait_for(entered.wait(), 60)
     second = await ask(client, identity, "FLEX-007 D0?")
     assert second.status_code == 201, second.text
     release.set()
@@ -249,6 +287,7 @@ async def test_writer_cannot_change_science(target):
 
 async def test_cancelled_turn_stores_nothing(client):
     client, app = client
+    app.state.settings.chat_timeout_seconds = 60
     identity = await new_session(client)
     entered = asyncio.Event()
 
@@ -259,7 +298,7 @@ async def test_cancelled_turn_stores_nothing(client):
 
     app.state.chat_provider_factory = Blocked
     task = asyncio.create_task(ask(client, identity, "FLEX-007"))
-    await asyncio.wait_for(entered.wait(), 10)
+    await asyncio.wait_for(entered.wait(), 60)
     task.cancel()
     with pytest.raises(asyncio.CancelledError):
         await task

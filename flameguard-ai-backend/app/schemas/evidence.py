@@ -1,26 +1,36 @@
 """Scalar persistence contracts, not frontend projection or scientific validation schemas."""
 
 from datetime import datetime
-from typing import ClassVar
+from typing import ClassVar, Literal
 from uuid import UUID
+
+from pydantic import model_validator
 
 from app.schemas.base import PatchSchema, Schema
 
 
 class SourceDocumentCreate(Schema):
-    investigation_id: UUID
+    investigation_id: UUID | None = None
+    source_scope: Literal["investigation", "challenge"] = "investigation"
     source_url: str
     doi: str | None = None
     document_type: str
     version: str | None = None
     ingestion_status: str
 
+    @model_validator(mode="after")
+    def source_ownership(self):
+        if (self.source_scope == "investigation") != (self.investigation_id is not None):
+            raise ValueError("Source scope and investigation ownership disagree")
+        return self
+
 
 class SourceDocumentUpdate(PatchSchema):
     non_nullable_fields: ClassVar[frozenset[str]] = frozenset(
-        ("investigation_id", "source_url", "document_type", "ingestion_status")
+        ("source_scope", "source_url", "document_type", "ingestion_status")
     )
     investigation_id: UUID | None = None
+    source_scope: Literal["investigation", "challenge"] | None = None
     source_url: str | None = None
     doi: str | None = None
     document_type: str | None = None

@@ -1,0 +1,97 @@
+{
+  "date": "2026-11-14",
+  "target": "127.0.0.1:55435",
+  "profiles": [
+    {
+      "profile": "psi",
+      "database": "flameguard_test_phase4_d35981ecc7",
+      "migrationHead": "0004_challenge_source_scope",
+      "sources": 71,
+      "nullOwnedResources": 0,
+      "readiness": {
+        "state": "ready",
+        "mode": "retrieval_only",
+        "provider_version": "nasa-extractive-v2",
+        "corpus_version": "8bc18ab9467d0ccbdd5021dcfabf5afbd1bac8d19a1517c7f6ae4a0f086dbf32",
+        "source_revision": "33ea8e51a5a54560974d2c9f7f89fef570f571221fe38322bd7833bd31b155f4",
+        "passages": 2508,
+        "review_status": "unreviewed",
+        "reasons": []
+      },
+      "resourceStatuses": [],
+      "status": "PASS"
+    },
+    {
+      "profile": "unified",
+      "database": "flameguard_test_phase4_923768f845",
+      "migrationHead": "0004_challenge_source_scope",
+      "sources": 81,
+      "nullOwnedResources": 10,
+      "readiness": {
+        "state": "ready",
+        "mode": "retrieval_only",
+        "provider_version": "nasa-extractive-v2",
+        "corpus_version": "ebce7ca25fb3758087de0308bf936d2baf74249c32cbc34e50a28331d7fb100e",
+        "source_revision": "117e7ff954cd16fd88ad1e5a2e530d56871a355dee4285b595151595c3312cc0",
+        "passages": 2574,
+        "review_status": "unreviewed",
+        "reasons": []
+      },
+      "resourceStatuses": [
+        {
+          "resource_id": "psi-combustion",
+          "status": "discovery_link",
+          "indexed": false
+        },
+        {
+          "resource_id": "sciencecasts-combustion",
+          "status": "transcript_not_verified",
+          "indexed": false
+        },
+        {
+          "resource_id": "fireman-air-tanks",
+          "status": "source_checked",
+          "indexed": true
+        },
+        {
+          "resource_id": "fire-attire",
+          "status": "source_checked",
+          "indexed": true
+        },
+        {
+          "resource_id": "researchers-guide",
+          "status": "source_checked",
+          "indexed": true
+        },
+        {
+          "resource_id": "fire-detector",
+          "status": "source_checked",
+          "indexed": true
+        },
+        {
+          "resource_id": "nasa-combustion",
+          "status": "source_checked",
+          "indexed": true
+        },
+        {
+          "resource_id": "mir-fire",
+          "status": "source_checked",
+          "indexed": true
+        },
+        {
+          "resource_id": "apollo-1",
+          "status": "acquisition_unavailable",
+          "indexed": false
+        },
+        {
+          "resource_id": "apollo-13",
+          "status": "acquisition_unavailable",
+          "indexed": false
+        }
+      ],
+      "status": "PASS"
+    }
+  ],
+  "scope": "Data handoff items 1 and 2 only; no AI quality or FE acceptance evaluation",
+  "transport": "HTTPX ASGI through app.main.create_app with real isolated PostgreSQL"
+}

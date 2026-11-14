@@ -14,7 +14,7 @@ async def lock_and_check_schema(session):
     version = (
         (await session.execute(text("SELECT version_num FROM alembic_version"))).scalars().all()
     )
-    if version != ["0003_could_have"]:
+    if version != ["0004_challenge_source_scope"]:
         raise Phase4Error("SCHEMA_MISMATCH")
     columns = (
         await session.execute(

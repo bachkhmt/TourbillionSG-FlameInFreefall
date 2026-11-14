@@ -20,7 +20,7 @@ from app.integrations.chat import (
 )
 from app.models import ClaimSource, EvidenceClaim, Investigation, SourceDocument, TestRun
 from app.repositories.chat import ChatRepository
-from app.repositories.corpus import chunk_rows
+from app.repositories.corpus import challenge_source_rows, chunk_rows
 from app.schemas.api.chat import (
     Answer,
     Citation,
@@ -31,7 +31,12 @@ from app.schemas.api.chat import (
 )
 from app.schemas.api.scenarios import EvidenceContext
 from app.services.collection import admit_collection, collection_context
-from app.services.corpus_policy import CorpusPolicyError, admit_passages, load_corpus_policy
+from app.services.corpus_policy import (
+    CorpusPolicyError,
+    admit_passages,
+    admit_resource_sources,
+    load_corpus_policy,
+)
 from app.services.scenario_interpretation import fingerprint
 from app.services.unit_of_work import read_unit_of_work
 
@@ -214,6 +219,7 @@ class ChatService:
             )
             if policy is None:
                 return None
+            admit_resource_sources(await challenge_source_rows(session), policy)
             passages = admit_passages(await chunk_rows(session, investigation), policy)
         except CorpusPolicyError:
             raise HTTPException(503, CORPUS_POLICY_UNAVAILABLE) from None
@@ -229,7 +235,12 @@ class ChatService:
             ),
             source_revision=policy.source_revision,
             sources=policy.registry["sources"],
-            study_slugs=tuple(sorted(set(slugs.values()))),
+            study_slugs=tuple(
+                sorted(
+                    set(slugs.values())
+                    | {entry["slug"] for entry in policy.registry["sources"].values()}
+                )
+            ),
         )
 
     async def writer(self, session, oid):

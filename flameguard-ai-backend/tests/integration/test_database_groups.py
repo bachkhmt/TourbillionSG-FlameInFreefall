@@ -262,10 +262,11 @@ async def test_all_approved_nullable_columns_accept_unknowns(pg_session, graph, 
     nullable = approved_nullables()[table_name]
     if nullable:
         table = m.Base.metadata.tables[table_name]
+        values = {column: None for column in nullable}
+        if table_name == "source_document":
+            values["source_scope"] = "challenge"
         await pg_session.execute(
-            update(table)
-            .where(table.c.id == rows[table_name].id)
-            .values(**{column: None for column in nullable})
+            update(table).where(table.c.id == rows[table_name].id).values(**values)
         )
         await pg_session.flush()
 

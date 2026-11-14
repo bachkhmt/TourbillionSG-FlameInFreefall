@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "acquiredAt": "2026-11-14",
+  "artifacts": [
+    {
+      "id": "psi-combustion",
+      "url": "https://psi.nasa.gov/physci/repo/search?q=combustion",
+      "retrievedAt": "2026-11-14",
+      "statusCode": 200,
+      "resolvedUrl": "https://psi.nasa.gov/physci/repo/search?q=combustion",
+      "contentType": "text/html; charset=utf-8",
+      "localPath": "raw/psi-combustion.gz",
+      "sha256": "6066ec494339355e06b5eea930893457c7b80df3991fa57aeb4514d4513dd2b3",
+      "storedSha256": "be0faf20cae2542a01425cd35752475c030dd496c3d665e5590285cb00ef8519",
+      "byteCount": 954
+    },
+    {
+      "id": "nasa-combustion",
+      "url": "https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/",
+      "retrievedAt": "2026-11-14",
+      "statusCode": 200,
+      "resolvedUrl": "https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/",
+      "contentType": "text/html; charset=UTF-8",
+      "localPath": "raw/nasa-combustion.gz",
+      "sha256": "f25c34b1e4c60f82cbf302330baf757859e9f7b78be40b4430b121794928c7b4",
+      "storedSha256": "dea9379c43849204da4461173ec4196d0dbca9c6f053202705049e3b8bf3bcc9",
+      "byteCount": 334306
+    },
+    {
+      "id": "sciencecasts-combustion",
+      "url": "https://www.youtube.com/watch?v=W1oXykoz9zg",
+      "retrievedAt": "2026-11-14",
+      "statusCode": 200,
+      "resolvedUrl": "https://www.youtube.com/watch?v=W1oXykoz9zg",
+      "contentType": "text/html; charset=utf-8",
+      "localPath": "raw/sciencecasts-combustion.gz",
+      "sha256": "26d9d924c198e9841335cc3836ba0743abd9342603a92d13f735816ca9becb85",
+      "storedSha256": "3c3839e98e412e00d8ad82a55a85f886e67d3d9a5b6bc30dc7139b80e6c3cedd",
+      "byteCount": 1309581
+    },
+    {
+      "id": "researchers-guide",
+      "url": "https://www.nasa.gov/missions/station/a-researchers-guide-to-combustion-science/",
+      "retrievedAt": "2026-11-14",
+      "statusCode": 200,
+      "resolvedUrl": "https://www.nasa.gov/missions/station/a-researchers-guide-to-combustion-science/",
+      "contentType": "text/html; charset=UTF-8",
+      "localPath": "raw/researchers-guide.gz",
+      "sha256": "919bd9afa9a3b04449f61bfaafe8bac4e2125a5b3a1354e1d08bc177321bcc93",
+      "storedSha256": "f53a751b4d477098eb4e98a2131bd7f2faada65f115c4a79c00ab11c195c9faa",
+      "byteCount": 286457
+    },
+    {
+      "id": "apollo-1",
+      "url": "https://sma.nasa.gov/sma-disciplines/accllp/apollo-1",
+      "retrievedAt": "2026-11-14",
+      "statusCode": null,
+      "error": "URLError"
+    },
+    {
+      "id": "apollo-13",
+      "url": "https://sma.nasa.gov/sma-disciplines/accllp/apollo-13",
+      "retrievedAt": "2026-11-14",
+      "statusCode": null,
+      "error": "URLError"
+    },
+    {
+      "id": "mir-fire",
+      "url": "https://www.nasa.gov/history/25-years-ago-fire-aboard-space-station-mir/",
+      "retrievedAt": "2026-11-14",
+      "statusCode": 200,
+      "resolvedUrl": "https://www.nasa.gov/history/25-years-ago-fire-aboard-space-station-mir/",
+      "contentType": "text/html; charset=UTF-8",
+      "localPath": "raw/mir-fire.gz",
+      "sha256": "cab8bc6a0a34c212a23d0827e575a6f0d5ed4b569e3a3b09a3a19a554860c6ec",
+      "storedSha256": "d270656f209577b04ca8dd4fb57edb492fd70ed680d9d0ed46e904f3f9f2174c",
+      "byteCount": 271842
+    },
+    {
+      "id": "fireman-air-tanks",
+      "url": "https://spinoff.nasa.gov/node/9582",
+      "retrievedAt": "2026-11-14",
+      "statusCode": 200,
+      "resolvedUrl": "https://spinoff.nasa.gov/node/9582",
+      "contentType": "text/html; charset=utf-8",
+      "localPath": "raw/fireman-air-tanks.gz",
+      "sha256": "dd5b1203292e60120004a61ecd89f426c8e50d2bdfa75fcc560cf8e88f6d8764",
+      "storedSha256": "0e2419fd581df36a3031db6874b41c405c02a9eeda08a96902b44ce95b8ce88a",
+      "byteCount": 51727
+    },
+    {
+      "id": "fire-detector",
+      "url": "https://spinoff.nasa.gov/node/9407",
+      "retrievedAt": "2026-11-14",
+      "statusCode": 200,
+      "resolvedUrl": "https://spinoff.nasa.gov/node/9407",
+      "contentType": "text/html; charset=utf-8",
+      "localPath": "raw/fire-detector.gz",
+      "sha256": "ae02ae678a75fec41696c3fab962b7c3b6e5ce68e1fb77ef3edf653f23a81367",
+      "storedSha256": "7c90dfe61dd127578afb462b0b3df9b42735921cceeeda3d74b0dea5cad17aa5",
+      "byteCount": 51684
+    },
+    {
+      "id": "fire-attire",
+      "url": "https://spinoff.nasa.gov/node/9918",
+      "retrievedAt": "2026-11-14",
+      "statusCode": 200,
+      "resolvedUrl": "https://spinoff.nasa.gov/node/9918",
+      "contentType": "text/html; charset=utf-8",
+      "localPath": "raw/fire-attire.gz",
+      "sha256": "fa5bbda2a2d09c46a14b27098677e5fd71c3f019c5eb6031fc5f71603fc52115",
+      "storedSha256": "9df43343e5a37e631fb7f9a5b0fdb287e5f1f0b3180f2dba0aaec64c98326f81",
+      "byteCount": 52388
+    },
+    {
+      "id": "nasa-usage-guidelines",
+      "url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "retrievedAt": "2026-11-14",
+      "statusCode": 200,
+      "resolvedUrl": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "contentType": "text/html; charset=UTF-8",
+      "localPath": "raw/nasa-usage-guidelines.gz",
+      "sha256": "cc71f50c4f8bd825220c7ae2e51d220a402f7ff8cef85f14c7cf6e28a0d241ca",
+      "storedSha256": "4c7c16139e625ac1fbd3fcc8e5066550d40a78ded7e9e8743a93a9a646c08ffe",
+      "byteCount": 318227
+    }
+  ]
+}

@@ -55,7 +55,7 @@ sequenceDiagram
     FE->>API: GET /api/v1/chat/readiness
     API->>Reader: admission + corpusPolicy + admit_passages
     API->>Writer: kiểm role/quyền/OID
-    API-->>FE: ready, retrieval_only, passages=1045
+    API-->>FE: ready, retrieval_only, passages=2574 (unified) or 2508 (psi)
     User->>FE: "FLEX-007 D0?"
     FE->>API: POST /chat/sessions (lần đầu), POST /chat/sessions/{id}/messages
     API->>Reader: snapshot (admission + passages)
@@ -79,7 +79,7 @@ sequenceDiagram
 | Corpus admission | `app/services/corpus_policy.py`, `app/repositories/corpus.py` | BE | Registry CC0, hash, đối chiếu từng chunk/source |
 | Protocol | `app/integrations/chat.py` | BE | `RagProvider`, `CorpusRetriever`, `CorpusPassage`, `select_provider` |
 | RAG | `app/integrations/rag/{retrieval,bm25,provider}.py` | AI | BM25, alias, anchor, quy tắc từ chối, ghép trích đoạn |
-| Data | `integrations/nasa_data/{challenge,export,corpus_registry}.py` | Data | Release NASA offline, snapshot 21 bảng, registry + khai báo `corpusPolicy` |
+| Data | `integrations/nasa_data/{challenge,coverage,unified,xlsx,export,corpus_registry}.py` | Data | Release NASA offline (mặc định `unified`, chỉ nguồn chính thức), snapshot 21 bảng, registry + khai báo `corpusPolicy`. Xem `docs/DATA_HANDOFF.md` |
 
 ## Bảo đảm và giới hạn
 

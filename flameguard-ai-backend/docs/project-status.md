@@ -26,6 +26,21 @@ phase complete based on mock UI screenshots or unexecuted tests.
 
 ## Current backend implementation
 
+### Data handoff items1–2 update — 2026-11-14
+
+On `feat/data-backend-handoff-20261114` (base PR3): option A implemented with
+`0004_challenge_source_scope`, still21tables. Legacy rows/snapshots retain investigation
+ownership; ten challenge resources have nullable ownership, explicit scope/status and
+source/corpus hash admission. `GET /chat/resources` and nullable citation metadata are
+available. Both PSI2508 and extended2574-passage profiles imported/checked on newly
+created approved localhost55435 test DBs. Shared/demo/prod DBs were not changed.
+Fresh execution evidence is in [Phase6c verification](../specs/phase6c-challenge-resources/verification.md).
+Latest full root integration confirmation:80passed,0failed/errors/skipped,458.88s,
+exit0 on approved55435. Initial77passed/2failed is preserved as historical fixture evidence.
+Earlier phase counts below remain historical. AI quality/item3 and PR2 FE conflicts/item4
+stay pending with their owners; six articles indexed, Apollo/video/full Guide PDF gaps
+are explicit. No scientific validation, FE acceptance or deployment claim.
+
 - Backend: FastAPI modular monolith using Poetry/Python, SQLAlchemy async and Alembic.
 - ORM: 21 models across Must/Should/Could groups; migration revisions
   `0001_must_have`, `0002_should_have`, `0003_could_have`.

@@ -11,8 +11,13 @@ pytestmark = pytest.mark.integration
 
 
 def test_clean_database_upgrades_through_all_three_groups(migrated_database) -> None:
-    assert [len(tables) for tables in migrated_database.snapshots.values()] == [9, 16, 21]
-    assert migrated_database.versions == ["0001_must_have", "0002_should_have", "0003_could_have"]
+    assert [len(tables) for tables in migrated_database.snapshots.values()] == [9, 16, 21, 21]
+    assert migrated_database.versions == [
+        "0001_must_have",
+        "0002_should_have",
+        "0003_could_have",
+        "0004_challenge_source_scope",
+    ]
     assert migrated_database.snapshots["0003_could_have"] == set(erd_tables())
     assert "alembic_version" not in migrated_database.snapshots["0003_could_have"]
 

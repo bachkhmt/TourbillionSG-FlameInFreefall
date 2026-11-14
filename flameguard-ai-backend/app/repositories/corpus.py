@@ -16,3 +16,13 @@ async def chunk_rows(session: AsyncSession, investigation: UUID | None = None):
     if investigation is not None:
         statement = statement.where(SourceDocument.investigation_id == investigation)
     return (await session.execute(statement)).all()
+
+
+async def challenge_source_rows(session: AsyncSession):
+    return (
+        await session.scalars(
+            select(SourceDocument)
+            .where(SourceDocument.source_scope == "challenge")
+            .order_by(SourceDocument.id)
+        )
+    ).all()
