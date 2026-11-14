@@ -2,15 +2,17 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
+import { apiQueryKeys, isUuid } from '@/hooks/api';
 import {
-  apiQueryKeys,
-  isUuid,
+  useDashboardSummaryQuery,
+  useHealthQuery,
+  useReadyQuery,
+} from '@/features/dashboard';
+import {
   useCatalogCapabilitiesQuery,
   useClaimSourcesQuery,
   useCompareInvestigationsMutation,
   useComparisonQuery,
-  useDashboardSummaryQuery,
-  useHealthQuery,
   useInvestigationClaimsQuery,
   useInvestigationDetailQuery,
   useInvestigationMeasurementsQuery,
@@ -18,10 +20,9 @@ import {
   useInvestigationsQuery,
   useInvestigationSourcesQuery,
   useInvestigationTagsQuery,
-  useReadyQuery,
   useRunConditionsQuery,
   useRunMeasurementsQuery,
-} from '@/hooks/api';
+} from '@/features/explorer';
 import * as apiServices from '@/api/services';
 import { createTestQueryClient } from '../test-utils';
 import {

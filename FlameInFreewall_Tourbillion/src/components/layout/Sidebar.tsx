@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import {
   LayoutDashboard,
   Layers,
@@ -48,6 +48,31 @@ export const NAV_ITEMS: NavItemConfig[] = [
   },
 ];
 
+const dockContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const dockItemVariants: Variants = {
+  hidden: { opacity: 0, x: -18, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 240,
+      damping: 20,
+    },
+  },
+};
+
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -74,81 +99,89 @@ export const Sidebar: React.FC = () => {
         className="hidden sm:flex flex-col items-start justify-between h-[calc(100vh-1.5rem)] sticky top-3 my-3 ml-3.5 flex-shrink-0 z-30 select-none self-start"
         aria-label="FlameGuard AI primary navigation dock"
       >
-        {/* TOP SECTION: TOGGLE EXPAND / COLLAPSE BUTTON WITH CHEVRON */}
-        <div className="relative z-10 flex flex-col items-start gap-3 w-full">
-          <DockPillButton
-            id="sidebar-toggle-button"
-            onClick={() => setIsExpanded(!isExpanded)}
-            isExpanded={isExpanded}
-            icon={
-              isExpanded ? (
-                <ChevronLeft
-                  className="w-5 h-5 text-zinc-600 transition-transform group-hover:-translate-x-0.5 group-hover:text-zinc-950"
-                  strokeWidth={2.5}
-                />
-              ) : (
-                <ChevronRight
-                  className="w-5 h-5 text-zinc-600 transition-transform group-hover:translate-x-0.5 group-hover:text-zinc-950"
-                  strokeWidth={2.5}
-                />
-              )
-            }
-            label={isExpanded ? 'Collapse Dock' : 'Expand Dock'}
-            description={isExpanded ? 'Switch to compact icon view' : 'Show full labels & telemetry details'}
-            tooltipText={isExpanded ? undefined : 'Expand navigation dock'}
-          />
-        </div>
-
-        {/* MIDDLE SECTION: MAIN FLOW NAVIGATION PILLS */}
-        <div
-          className={`relative z-10 flex flex-col items-start w-full transition-all duration-300 ${
-            isExpanded ? 'space-y-1.5' : 'space-y-3'
-          }`}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={dockContainerVariants}
+          className="flex flex-col justify-between h-full w-full"
         >
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const active = isNavActive(item.path);
-
-            return (
-              <DockPillButton
-                key={item.path}
-                id={`nav-pill-${item.path.replace('/', '')}`}
-                href={item.path}
-                isExpanded={isExpanded}
-                active={active}
-                icon={
-                  <Icon
-                    className={`w-5 h-5 transition-colors ${
-                      active ? 'text-zinc-950' : 'text-zinc-600 group-hover:text-zinc-950'
-                    }`}
+          {/* TOP SECTION: TOGGLE EXPAND / COLLAPSE BUTTON WITH CHEVRON */}
+          <motion.div variants={dockItemVariants} className="relative z-10 flex flex-col items-start gap-3 w-full">
+            <DockPillButton
+              id="sidebar-toggle-button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              isExpanded={isExpanded}
+              icon={
+                isExpanded ? (
+                  <ChevronLeft
+                    className="w-5 h-5 text-zinc-600 transition-transform group-hover:-translate-x-0.5 group-hover:text-zinc-950"
                     strokeWidth={2.5}
                   />
-                }
-                label={item.label}
-                description={item.description}
-                tooltipText={isExpanded ? undefined : item.label}
-              />
-            );
-          })}
-        </div>
+                ) : (
+                  <ChevronRight
+                    className="w-5 h-5 text-zinc-600 transition-transform group-hover:translate-x-0.5 group-hover:text-zinc-950"
+                    strokeWidth={2.5}
+                  />
+                )
+              }
+              label={isExpanded ? 'Collapse Dock' : 'Expand Dock'}
+              description={isExpanded ? 'Switch to compact icon view' : 'Show full labels & telemetry details'}
+              tooltipText={isExpanded ? undefined : 'Expand navigation dock'}
+            />
+          </motion.div>
 
-        {/* BOTTOM SECTION: QUICK ACTIONS */}
-        <div className="relative z-10 flex flex-col items-start gap-3 w-full">
-          <DockPillButton
-            id="sidebar-reset-button"
-            onClick={handleResetWorkspace}
-            isExpanded={isExpanded}
-            icon={
-              <RotateCcw
-                className="w-4 h-4 text-zinc-500 group-hover:text-[#0B2374] transition-colors"
-                strokeWidth={2.5}
-              />
-            }
-            label="Reset Workspace"
-            description={`Current: ${activeScenario.name}`}
-            tooltipText={isExpanded ? undefined : 'Reset scenario to default baseline'}
-          />
-        </div>
+          {/* MIDDLE SECTION: MAIN FLOW NAVIGATION PILLS */}
+          <div
+            className={`relative z-10 flex flex-col items-start w-full transition-all duration-300 ${
+              isExpanded ? 'space-y-1.5' : 'space-y-3'
+            }`}
+          >
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              const active = isNavActive(item.path);
+
+              return (
+                <motion.div key={item.path} variants={dockItemVariants} className="w-full">
+                  <DockPillButton
+                    id={`nav-pill-${item.path.replace('/', '')}`}
+                    href={item.path}
+                    isExpanded={isExpanded}
+                    active={active}
+                    icon={
+                      <Icon
+                        className={`w-5 h-5 transition-colors ${
+                          active ? 'text-zinc-950' : 'text-zinc-600 group-hover:text-zinc-950'
+                        }`}
+                        strokeWidth={2.5}
+                      />
+                    }
+                    label={item.label}
+                    description={item.description}
+                    tooltipText={isExpanded ? undefined : item.label}
+                  />
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* BOTTOM SECTION: QUICK ACTIONS */}
+          <motion.div variants={dockItemVariants} className="relative z-10 flex flex-col items-start gap-3 w-full">
+            <DockPillButton
+              id="sidebar-reset-button"
+              onClick={handleResetWorkspace}
+              isExpanded={isExpanded}
+              icon={
+                <RotateCcw
+                  className="w-4 h-4 text-zinc-500 group-hover:text-[#0B2374] transition-colors"
+                  strokeWidth={2.5}
+                />
+              }
+              label="Reset Workspace"
+              description={`Current: ${activeScenario.name}`}
+              tooltipText={isExpanded ? undefined : 'Reset scenario to default baseline'}
+            />
+          </motion.div>
+        </motion.div>
       </motion.aside>
 
       {/* MOBILE TOP NAVIGATION BAR */}

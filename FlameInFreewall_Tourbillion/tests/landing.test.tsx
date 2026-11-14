@@ -1,11 +1,13 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { LandingHero } from '../src/components/landing/LandingHero';
-import { KurzgesagtFlameScene } from '../src/components/landing/KurzgesagtFlameScene';
-import { AtmosphericPhysics } from '../src/components/landing/AtmosphericPhysics';
-import { MissionControlCTA } from '../src/components/landing/MissionControlCTA';
-import { LandingFooter } from '../src/components/landing/LandingFooter';
+import {
+  LandingHero,
+  KurzgesagtFlameScene,
+  AtmosphericPhysics,
+  MissionControlCTA,
+  LandingFooter,
+} from '@/features/landing';
 import LandingPage from '../src/app/(landing)/page';
 
 // Mock next/navigation if needed

@@ -9,9 +9,11 @@ import { AppShell } from '../src/components/layout/AppShell';
 import { useWorkspaceStore } from '../src/store/useWorkspaceStore';
 import { toastStore } from '../src/components/toast/toast-store';
 
+let mockPathname = '/dashboard';
+
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
-  usePathname: () => '/dashboard',
+  usePathname: () => mockPathname,
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
@@ -21,6 +23,7 @@ vi.mock('next/navigation', () => ({
 
 describe('Layout System & StructPaper DockPill Navigation', () => {
   beforeEach(() => {
+    mockPathname = '/dashboard';
     useWorkspaceStore.getState().resetWorkspace();
     toastStore.clear();
     vi.clearAllMocks();
@@ -258,6 +261,18 @@ describe('Layout System & StructPaper DockPill Navigation', () => {
       expect(aside.className).toContain('self-start');
       expect(screen.getByTestId('dashboard-content')).toBeDefined();
       expect(screen.getByText('Telemetry Payload Content')).toBeDefined();
+    });
+
+    it('hides Sidebar on explorer study detail pages (/explorer/[id])', () => {
+      mockPathname = '/explorer/bass';
+      render(
+        <AppShell>
+          <div data-testid="detail-content">Study Detail Content</div>
+        </AppShell>
+      );
+
+      expect(screen.queryByLabelText(/FlameGuard AI primary navigation dock/i)).toBeNull();
+      expect(screen.getByTestId('detail-content')).toBeDefined();
     });
   });
 });

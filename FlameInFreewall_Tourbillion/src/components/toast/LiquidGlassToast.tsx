@@ -271,8 +271,8 @@ export const LiquidGlassToast = React.forwardRef<HTMLDivElement, LiquidGlassToas
                 data-testid="toast-dismiss-button"
                 onClick={() => onDismiss(id)}
                 className="w-6 h-6 rounded-full bg-black/5 hover:bg-black/10 text-zinc-500 hover:text-zinc-950 flex items-center justify-center transition-all cursor-pointer"
-                title="Đóng thông báo"
-                aria-label="Đóng thông báo"
+                title="Close notification"
+                aria-label="Close notification"
               >
                 <X className="w-3.5 h-3.5 stroke-[2.4]" />
               </button>

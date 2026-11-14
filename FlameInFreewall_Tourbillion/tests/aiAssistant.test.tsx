@@ -1,8 +1,7 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { FloatingAiDock } from '../src/components/ai/FloatingAiDock';
-import { AiDrawer } from '../src/components/ai/AiDrawer';
+import { AiDrawer, FloatingAiDock } from '@/features/ai';
 import { AppShell } from '../src/components/layout/AppShell';
 import { useAiAssistantStore } from '../src/store/useAiAssistantStore';
 import { CHAT_SESSION_KEY } from '../src/lib/chatSession';

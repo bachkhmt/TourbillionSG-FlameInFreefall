@@ -79,3 +79,10 @@ export interface ChatSourceDto {
   title: string;
   review_status: string;
 }
+
+/** `POST /advisor/assessments`: one bounded provider answer per pillar plus evidence gaps. */
+export interface ChatAdvisorOutputDto {
+  pillars: Record<string, ChatAnswerDto>;
+  gaps: Record<string, string[]>;
+  context: Record<string, unknown>;
+}
