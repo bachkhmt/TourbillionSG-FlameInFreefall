@@ -1,84 +1,93 @@
 # Chatbot NASA (RAG extractive): luồng hoạt động và cách chạy
 
-Cập nhật 2026-11-14. Kiến trúc mang từ repo tham chiếu `NASA` sang repo này. Phiên bản bộ
-trả lời là `nasa-extractive-v2`, phiên bản chính sách nguồn là `nasa-extractive-v1`.
+Cập nhật 2026-11-14.
 
-Chatbot trả lời bằng **trích đoạn nguyên văn** từ nguồn NASA PSI đã nhập. Mỗi trích đoạn
-có citation và gắn với một phiên bản corpus cụ thể. Không dùng LLM, provider trả phí hay
-câu trả lời mẫu. `origin=real` nghĩa là nguồn thật. `review_status` luôn là `unreviewed`
-vì chưa có thẩm định khoa học độc lập. Chatbot không đưa kết luận safe/unsafe.
+**Kiến trúc:** chat chạy trong chính backend của repo này. RAG cắm vào qua extension point
+`RagProvider` của Phase 6 và bật bằng `CHAT_PROVIDER=extractive`. Quyết định được ghi tại:
+- [ADR-0005](../flameguard-ai-backend/docs/decisions/ADR-0005-real-corpus-extractive-chat.md)
+- [spec Phase 6b](../flameguard-ai-backend/specs/phase6b-real-corpus-chat/spec.md)
+
+**Phạm vi trả lời:** chatbot chỉ trích **nguyên văn** chunk của nguồn CC0 đã admit, kèm
+citation gắn với một phiên bản corpus. Không có LLM và không có provider trả phí.
+`review_status` luôn là `unreviewed`; chatbot không đưa kết luận safe/unsafe.
 
 ## Theo thao tác người dùng
 
-1. **Mở AI Drawer.** FE gọi `GET /chat/readiness`. Khi chưa `ready`, nút Send bị khóa và
-   có nút "Retry connection".
-2. **Gửi câu hỏi.** Nếu tab chưa có session, FE tạo session (`POST /chat/sessions`) rồi
-   gửi câu hỏi. Session ID chỉ lưu trong `sessionStorage` của tab đó.
-3. **Server truy xuất.** Server đọc chunk của các nguồn CC0 đã nhập rồi xác định đúng
-   study/run được hỏi:
-   - Từ tiếng Việt được mở rộng bằng alias (ví dụ "đường kính" → diameter/d0).
-   - Các đoạn liên quan được xếp hạng bằng BM25.
-4. **Provider tạo câu trả lời.** Câu trả lời gồm tối đa 4 trích đoạn nguyên văn. Với các
-   số liệu mâu thuẫn, provider giữ cả hai; ví dụ D0 của FLEX-007 là 1.87 mm theo CSV và
-   1.82 mm theo TestSheet. Provider từ chối theo quy tắc trong các trường hợp:
-   - câu hỏi đòi kết luận an toàn,
-   - câu hỏi ngoài phạm vi,
-   - câu hỏi về trọng lực Mặt Trăng/Sao Hỏa,
-   - câu hỏi trộn nhiều run.
-5. **Server kiểm lại và lưu.** Server so lại provider output, fingerprint corpus và
-   registry nguồn. Sau đó user + assistant + citations được lưu trong **một transaction**,
-   dưới advisory lock theo session. Nếu có lỗi hoặc dữ liệu đổi giữa chừng thì không lưu
-   nửa cặp (409 hoặc 502).
-6. **FE hiển thị.** "View source n" gọi `GET /chat/sources/{id}?locator=…&corpus_version=…`
-   để mở file NASA gốc (link https, license, SHA-256). Citation thuộc corpus cũ trả 409;
-   khi đó trích đoạn gốc trong tin nhắn vẫn giữ nguyên.
+1. **Mở chat.** Panel (style chat nghiên cứu kiểu NASA) mở trên nền mờ của app.
+   FE gọi `GET /chat/readiness`. Nếu chưa `ready`, nút Send bị khóa và có nút
+   "Retry connection".
+2. **Gửi câu hỏi.**
+   - Nếu tab chưa có session, FE gọi `POST /chat/sessions` rồi lưu session ID vào
+     `sessionStorage`.
+   - Sau đó gửi `POST /chat/sessions/{id}/messages`.
+3. **Backend xử lý.**
+   - Đọc admission và corpus trong **cùng một snapshot**.
+   - Gọi `retrieve` của provider trên các passage đã admit (BM25, alias VI/EN, anchor
+     study/run, có deadline).
+   - **Tự kiểm từng hit**: nguồn thuộc corpus, excerpt là lát cắt nguyên văn của chunk.
+4. **Provider tạo câu trả lời** chỉ từ các hit đã kiểm, giữ mọi giá trị mâu thuẫn. Ví dụ
+   FLEX-007 D0: 1.87 mm theo CSV, 1.82 mm theo TestSheet. Provider từ chối các câu hỏi:
+   - đòi kết luận an toàn;
+   - về trọng lực Mặt Trăng/Sao Hỏa;
+   - ngoài phạm vi;
+   - trộn nhiều run.
+5. **Backend kiểm câu trả lời `real`**: đúng `corpus_version`, có `provider_version`,
+   citation nằm trong tập đã kiểm, và mọi số trong text đều có trong excerpt. Sau đó
+   backend kiểm lại fingerprint rồi ghi user + assistant + citations trong một
+   transaction. Lỗi trả 502/409 và không lưu gì.
+6. **Hiển thị.** "View source n" gọi
+   `GET /chat/sources/{source_document_id}?locator=…&corpus_version=…`. Citation của
+   corpus cũ trả 409; excerpt gốc trong tin nhắn vẫn giữ nguyên.
+7. **Lịch sử nằm trên server.**
+   - Panel hiển thị một trang lịch sử (50 tin), cộng thêm các tin mới của lần xem này.
+   - "Conversation history" có Refresh / Previous / Next / Start new session.
+   - Reload tab vẫn khôi phục được lịch sử của session.
 
 ```mermaid
 sequenceDiagram
     actor User
     participant FE as Next.js AiDrawer (TanStack Query)
-    participant Proxy as Next rewrite /api/proxy
-    participant API as FastAPI + integrations/nasa_chat
+    participant API as FastAPI app.main (CHAT_PROVIDER=extractive)
     participant Reader as PostgreSQL reader (SELECT-only)
-    participant Writer as PostgreSQL writer (3 chat tables)
-    User->>FE: Mở drawer
-    FE->>Proxy: GET /api/v1/chat/readiness
-    Proxy->>API: forward
-    API->>Reader: admit snapshot + registry CC0 + policy
-    API->>Writer: validate role/quyền/OID
-    API-->>FE: ready, passages=1045
+    participant RAG as app/integrations/rag (AI team)
+    participant Writer as PostgreSQL writer (3 bảng chat)
+    User->>FE: Mở chat
+    FE->>API: GET /api/v1/chat/readiness
+    API->>Reader: admission + corpusPolicy + admit_passages
+    API->>Writer: kiểm role/quyền/OID
+    API-->>FE: ready, retrieval_only, passages=1045
     User->>FE: "FLEX-007 D0?"
-    FE->>API: POST /chat/sessions (lần đầu)
-    FE->>API: POST /chat/sessions/{id}/messages
-    API->>Writer: BEGIN + advisory lock + đọc history
-    API->>Reader: chunks + sources đã admit
-    API->>API: BM25 + extractive provider + kiểm citation
-    API->>Reader: kiểm lại fingerprint corpus
-    API->>Writer: INSERT user/assistant/citations, COMMIT
+    FE->>API: POST /chat/sessions (lần đầu), POST /chat/sessions/{id}/messages
+    API->>Reader: snapshot (admission + passages)
+    API->>RAG: retrieve(question, passages, câu hỏi trước)
+    API->>API: verify_hits (nguyên văn, thuộc corpus)
+    API->>RAG: answer(RagRequest với allowed_sources đã kiểm)
+    API->>API: validate_citations + validate_real_answer
+    API->>Reader: kiểm lại fingerprint collection + corpus
+    API->>Writer: advisory lock + INSERT user/assistant/citations, COMMIT
     API-->>FE: Exchange (answer + citations + corpus_version)
 ```
 
 ## Các lớp code
 
-| Lớp | File | Trách nhiệm |
-| --- | --- | --- |
-| UI | `FlameInFreewall_Tourbillion/src/components/ai/{AiDrawer,AiMessageItem,CitationBadge}.tsx` | Readiness gate, gửi câu hỏi, khôi phục history, trạng thái answered/abstained/timeout, citations |
-| Hooks | `src/hooks/api/useChatQueries.ts` | Query readiness/history/source; mutation tạo session + gửi (thử lại 1 lần khi session hết hạn) |
-| Client | `src/api/services/chatService.ts`, `src/api/dto/chat.ts`, `src/api/mappers/chatMapper.ts` | Đúng contract BE (chat lõi snake_case, readiness/sources camelCase); timeout gửi 30 s |
-| Token | `src/lib/chatSession.ts` | Session ID trong `sessionStorage`, chỉ nhận UUID |
-| App integration | `integrations/nasa_chat/app.py` | `create_app()` gọi factory BE gốc, `dependency_overrides` cho chat; thêm `/chat/readiness`, `/chat/sources/{id}` |
-| Service | `integrations/nasa_chat/service.py` | Admission corpus, history, lock, kiểm provider, ghi atomic |
-| Retrieval | `integrations/nasa_chat/retrieval.py`, `bm25.py` | Chuẩn hóa, alias VI/EN, anchor study/run, BM25, cắt trích đoạn |
-| Provider | `integrations/nasa_chat/provider.py` | Ghép trích đoạn hoặc abstain; không tự tạo số liệu |
-| Policy | `integrations/nasa_chat/policy.py` | Registry CC0/hash/revision, policy version |
-| Data | `integrations/nasa_data/` | Build release NASA offline, xuất snapshot 21 bảng/slugs/artifacts |
-| BE nền | `flameguard-ai-backend/` | **Không sửa.** DTO chat, TTL session, repository, validator role runtime |
+| Lớp | File | Chủ sở hữu | Trách nhiệm |
+| --- | --- | --- | --- |
+| UI | `FlameInFreewall_Tourbillion/src/components/ai/{AiDrawer,AiMessageItem,CitationBadge}.tsx` | FE | Panel kiểu NASA trên backdrop mờ, readiness, history phân trang, citations |
+| Hooks/Client | `src/hooks/api/useChatQueries.ts`, `src/api/{services/chatService,dto/chat,mappers/chatMapper}.ts` | FE | Đúng contract snake_case; gửi với timeout 30 s; xử lý unmount, timeout, reset |
+| Endpoint | `flameguard-ai-backend/app/api/v1/endpoints/chat.py` | BE | Sessions/messages, `/chat/readiness`, `/chat/sources/{id}` |
+| Service | `app/services/chat.py` | BE | Snapshot, kiểm hit, grounding, kiểm drift, ghi atomic |
+| Corpus admission | `app/services/corpus_policy.py`, `app/repositories/corpus.py` | BE | Registry CC0, hash, đối chiếu từng chunk/source |
+| Protocol | `app/integrations/chat.py` | BE | `RagProvider`, `CorpusRetriever`, `CorpusPassage`, `select_provider` |
+| RAG | `app/integrations/rag/{retrieval,bm25,provider}.py` | AI | BM25, alias, anchor, quy tắc từ chối, ghép trích đoạn |
+| Data | `integrations/nasa_data/{challenge,export,corpus_registry}.py` | Data | Release NASA offline, snapshot 21 bảng, registry + khai báo `corpusPolicy` |
 
-## Giới hạn và đảm bảo
+## Bảo đảm và giới hạn
 
-- **Phạm vi nguồn:** chỉ nguồn CC0-1.0 có trong registry. Nguồn unknown-rights bị loại.
-  Mỗi chunk gắn source/locator/hash và được đối chiếu với DB trước khi dùng.
-- **Ý nghĩa điểm số:** BM25 là độ liên quan, không phải xác suất đúng hay xác suất rủi ro.
+- **Không đổi schema:** vẫn 21 bảng, không có migration mới. Collection không có
+  `corpusPolicy` và các provider `unavailable`/`mock` giữ nguyên hành vi Phase 6.
+- **Đồng thời (ADR-0004):** provider chạy ngoài transaction, commit tuần tự theo session
+  bằng advisory lock. Hai câu gửi cùng lúc có thể cùng thấy lịch sử cũ, nhưng các cặp
+  user/assistant luôn đầy đủ.
 - **Giới hạn kích thước:**
 
   | Đối tượng | Giới hạn |
@@ -86,14 +95,10 @@ sequenceDiagram
   | Câu hỏi | ≤ 4000 ký tự |
   | History gửi cho provider | ≤ 12 tin / 12000 ký tự |
   | Citations mỗi câu trả lời | ≤ 4 |
-  | Trang history | ≤ 100 tin |
+  | Trang history (FE) | 50 tin |
 
-- **Đồng thời:** mỗi session có advisory lock và `lock_timeout` 5 s. Provider bị giới
-  hạn 10 s. FE chờ tối đa 30 s cho một lần gửi.
-- **Quyền DB:** reader chỉ SELECT. Writer chỉ SELECT/INSERT trên `chat_session`,
-  `chat_message`, `message_citation` và phải cùng host/port/database/OID với reader.
-- **Session:** session ID là token demo công khai, không phải đăng nhập. Ai có token đều
-  xem được history trong 24 giờ. Access log HTTP được tắt.
+  Retrieval và provider có deadline `CHAT_TIMEOUT_SECONDS`; quá hạn thì lưu `state=timeout`.
+- **Session:** session ID là token demo công khai, không phải đăng nhập. Access log HTTP được tắt.
 
 ## Chạy lại (local)
 
@@ -105,8 +110,9 @@ python3 scripts/test_db.py create                  # container tourbillion-test-
 flameguard-ai-backend/.venv/bin/python scripts/prepare_chat_preview.py --prepare-new-test-target
 ```
 
-Lệnh cuối in ra đường dẫn file `.demo/nasa-chat-preview-<db>.json` (quyền 0600, nằm trong
-gitignore). Chạy BE và FE:
+Lệnh cuối in ra `.demo/nasa-chat-preview-<db>.json` (quyền 0600). File này có `DATABASE_URL`,
+`RUNTIME_DATABASE_URL`, `CATALOG_COLLECTION_MANIFEST` và `CHAT_PROVIDER=extractive`.
+Launcher chạy `uvicorn app.main:app`:
 
 ```bash
 flameguard-ai-backend/.venv/bin/python scripts/run_chat_backend.py --settings .demo/nasa-chat-preview-<db>.json --port 8112
@@ -116,16 +122,18 @@ flameguard-ai-backend/.venv/bin/python scripts/run_chat_backend.py --settings .d
 cd FlameInFreewall_Tourbillion && BACKEND_INTERNAL_URL=http://127.0.0.1:8112 npm run dev -- -p 3312
 ```
 
-Mở http://localhost:3312/dashboard và bấm nút AI ở góc phải.
+Khi chạy trên môi trường thật: đặt `CHAT_PROVIDER=extractive` và dùng manifest v2 có
+`corpusPolicy` (do `integrations/nasa_data/corpus_registry.py` ghi). Muốn tắt thì bỏ một
+trong hai thứ đó.
 
 ## Kiểm tra
 
 ```bash
-python3 scripts/test_db.py run -- flameguard-ai-backend/.venv/bin/python -m pytest -q
+cd flameguard-ai-backend && python3 ../scripts/test_db.py run -- .venv/bin/python -m pytest -q
 ```
 
 ```bash
-cd flameguard-ai-backend && python3 ../scripts/test_db.py run -- .venv/bin/python -m pytest -q
+python3 scripts/test_db.py run -- flameguard-ai-backend/.venv/bin/python -m pytest -q
 ```
 
 ```bash
@@ -136,9 +144,13 @@ Kết quả ngày 2026-11-14:
 
 | Phần | Kết quả |
 | --- | --- |
-| `integration_tests` | 38 passed, 0 skip; gồm 9 ca HTTP trên PostgreSQL thật (citation giả, đổi registry, gửi đồng thời, quyền writer, timeout, hết hạn phiên) |
-| BE upstream | 650 passed, 0 skip |
-| FE | vitest, `tsc` và `next build` đều pass |
-| Smoke trên trình duyệt qua proxy | FLEX-007 ra 1.87/1.82 mm có citation; mở được file CSV gốc; reload vẫn còn history; câu hỏi Mars bị từ chối; câu nối tiếp giữ anchor |
+| Backend (PostgreSQL) | 676 passed: 650 test cũ không phải sửa + 26 test mới (policy, grounding, provider) |
+| `integration_tests` (PostgreSQL, dữ liệu NASA thật) | 40 passed, 0 skip |
+| FE | vitest 279 passed; `tsc` và `next build` pass |
+| Smoke trên trình duyệt (`app.main:app` + FE qua proxy) | FLEX-007 ra 1.87/1.82 mm có citation; mở được CSV gốc (CC0-1.0); reload vẫn còn history; Enter gửi câu nối tiếp; Refresh history ra 2 cặp tin |
+
+`integration_tests` bao gồm: citation giả và số liệu bịa (502), registry đổi giữa chừng
+(409), gửi đồng thời, timeout của provider và retrieval, provider không có retrieve,
+Advisor báo `PROVIDER_UNAVAILABLE`, nguồn lạ (404) và corpus cũ (409).
 
 Đây là xác minh truy xuất và lưu trữ cho bản demo local, không phải đánh giá khoa học hay production.

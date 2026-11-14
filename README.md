@@ -93,10 +93,9 @@ For data and resources related to this challenge, refer to the [Resources tab](h
 
 | Thư mục | Nội dung |
 | --- | --- |
-| `flameguard-ai-backend/` | Backend FastAPI (catalog, evidence, scenario, chat, prediction readiness) |
+| `flameguard-ai-backend/` | Backend FastAPI (catalog, evidence, scenario, chat, prediction readiness); RAG extractive ở `app/integrations/rag/` (`CHAT_PROVIDER=extractive`) |
 | `FlameInFreewall_Tourbillion/` | Frontend Next.js (dashboard, explorer, mission, AI assistant) |
-| `integrations/nasa_data/` | Data adapter offline: build release NASA PSI và xuất snapshot 21 bảng |
-| `integrations/nasa_chat/` | RAG extractive có citation, cắm vào backend qua app factory, không sửa backend |
+| `integrations/nasa_data/` | Data adapter offline: build release NASA PSI, xuất snapshot 21 bảng và registry corpus cho chat |
 | `integration_tests/`, `scripts/` | Test cho integrations; container PostgreSQL test và launcher preview |
 
 Luồng chatbot, giới hạn và cách chạy: [docs/CHATBOT_FLOW.md](docs/CHATBOT_FLOW.md).
