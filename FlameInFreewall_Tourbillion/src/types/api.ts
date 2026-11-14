@@ -197,3 +197,63 @@ export interface MappedComparisonResult {
   unavailableFields: FieldAvailabilityMap;
   context: ApiContextMeta;
 }
+
+// ---------------------------------------------------------------------------
+// Chat (backend Phase 6 + ADR-0005): extractive, cited, unreviewed answers
+// ---------------------------------------------------------------------------
+
+export type ChatAnswerState = 'answered' | 'abstained' | 'unavailable' | 'timeout';
+
+export interface MappedChatCitation {
+  sourceDocumentId: string;
+  sourceLocator: string;
+  /** Verbatim slice of the stored source chunk. */
+  sourceExcerpt: string | null;
+  testRunId: string | null;
+}
+
+export interface MappedChatAnswer {
+  state: ChatAnswerState;
+  text: string;
+  origin: string;
+  reviewStatus: string;
+  providerVersion: string | null;
+  corpusVersion: string | null;
+  citations: MappedChatCitation[];
+}
+
+export interface MappedChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  createdAt: string;
+  answer: MappedChatAnswer;
+}
+
+export interface MappedChatReadiness {
+  state: 'ready' | 'not_ready';
+  mode: string;
+  providerVersion: string | null;
+  corpusVersion: string | null;
+  passages: number | null;
+  reasons: string[];
+}
+
+export interface MappedChatSession {
+  id: string;
+  investigationId: string | null;
+  expiresAt: string;
+  privacy: string;
+}
+
+export interface MappedChatSource {
+  sourceId: string;
+  locator: string;
+  corpusVersion: string;
+  filename: string;
+  /** `null` unless the registry URL is https. */
+  sourceUrl: string | null;
+  sha256: string;
+  license: string;
+  title: string;
+  reviewStatus: string;
+}

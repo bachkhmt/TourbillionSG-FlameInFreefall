@@ -7,7 +7,7 @@ describe('useWorkspaceStore & Comparison Guardrails', () => {
   beforeEach(() => {
     toastStore.clear();
     useWorkspaceStore.getState().resetWorkspace();
-    useAiAssistantStore.getState().clearMessages();
+    useAiAssistantStore.getState().resetConversation();
     useAiAssistantStore.getState().setOpen(false);
     useAiAssistantStore.getState().setActiveContextStudyId(null);
   });
@@ -107,7 +107,7 @@ describe('useWorkspaceStore & Comparison Guardrails', () => {
 
 describe('useAiAssistantStore', () => {
   beforeEach(() => {
-    useAiAssistantStore.getState().clearMessages();
+    useAiAssistantStore.getState().resetConversation();
     useAiAssistantStore.getState().setOpen(false);
     useAiAssistantStore.getState().setActiveContextStudyId(null);
   });
@@ -126,33 +126,41 @@ describe('useAiAssistantStore', () => {
     expect(useAiAssistantStore.getState().isOpen).toBe(false);
   });
 
-  it('records chat messages with citations and evidence gap warnings', () => {
+  it('keeps one server session conversation and resets the tab token', () => {
     const store = useAiAssistantStore.getState();
-    store.addMessage({
-      role: 'user',
-      content: 'Why does PMMA burn faster in low-speed airflow in 0g than in quiescent air?',
+    const message = (id: string, role: 'user' | 'assistant') => ({
+      id,
+      role,
+      createdAt: '2026-11-14T00:00:00Z',
+      answer: {
+        state: 'answered' as const,
+        text: id,
+        origin: 'real',
+        reviewStatus: 'unreviewed',
+        providerVersion: 'nasa-extractive-v2',
+        corpusVersion: 'c',
+        citations: [],
+      },
     });
+    sessionStorage.setItem('flameguard.chat.session.v1', '11111111-1111-4111-8111-111111111111');
+    store.setSession('s-1');
+    store.appendRecent('s-1', [message('u1', 'user'), message('a1', 'assistant')]);
+    store.appendRecent('s-1', [message('u2', 'user'), message('a2', 'assistant')]);
+    expect(useAiAssistantStore.getState().recent.map((m) => m.id)).toEqual(['u1', 'a1', 'u2', 'a2']);
 
-    store.addMessage({
-      role: 'assistant',
-      content:
-        'In microgravity without buoyant convection, quiescent combustion suffocates in its own combustion products. Low-speed forced convection supplies fresh oxygen.',
-      citations: [
-        {
-          investigationId: 'bass',
-          code: 'BASS',
-          title: 'Burning and Suppression of Solids',
-          claimText: 'Forced flow enhances combustion in microgravity',
-          badge: 'Measured',
-        },
-      ],
-    });
+    // A different session never splices into the previous conversation.
+    store.appendRecent('s-2', [message('u3', 'user')]);
+    expect(useAiAssistantStore.getState().recent.map((m) => m.id)).toEqual(['u3']);
 
-    const messages = useAiAssistantStore.getState().messages;
-    expect(messages.length).toBe(2);
-    expect(messages[0].role).toBe('user');
-    expect(messages[1].role).toBe('assistant');
-    expect(messages[1].citations?.length).toBe(1);
-    expect(messages[1].citations?.[0].code).toBe('BASS');
+    // A refreshed history page replaces the view and folds in recent exchanges.
+    store.setHistoryPage('s-2', { offset: 0, messages: [message('u3', 'user')], hasMore: false });
+    expect(useAiAssistantStore.getState().recent).toEqual([]);
+    expect(useAiAssistantStore.getState().messages.map((m) => m.id)).toEqual(['u3']);
+
+    store.resetConversation();
+    expect(useAiAssistantStore.getState().messages).toEqual([]);
+    expect(useAiAssistantStore.getState().recent).toEqual([]);
+    expect(useAiAssistantStore.getState().sessionId).toBeNull();
+    expect(sessionStorage.getItem('flameguard.chat.session.v1')).toBeNull();
   });
 });

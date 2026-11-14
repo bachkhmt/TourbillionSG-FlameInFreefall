@@ -1,0 +1,462 @@
+{
+  "observed_at_utc": "2026-11-10T06:26:56.584094+00:00",
+  "note": "Counts refer to file entries in the observed manifest, not to runs or independently verified content within ZIP files. Selected entries are bounded; full response remained temporary.",
+  "manifests": [
+    {
+      "accession": "PSI-69",
+      "study_version": 5,
+      "request_url": "https://psi.nasa.gov/geode-py/ws/files/v2",
+      "request_method": "POST",
+      "request_purpose": "read-only file listing used by public PSI website",
+      "request_json": {
+        "folder": "PSI-69/",
+        "fileType": "study",
+        "studyId": "PSI-69",
+        "version": 5,
+        "obfuscationcode": ""
+      },
+      "response_sha256": "5cca53f5d693a85dd73706de2060d25e1b42b9cbff400641336a7375a6eaa3bf",
+      "listed_file_count": 6555,
+      "file_extension_counts": {
+        ".zip": 1420,
+        ".csv": 1,
+        ".pdf": 422,
+        ".txt": 4208,
+        ".rtf": 271,
+        ".mp4": 228,
+        ".xls": 2,
+        ".eps": 1,
+        ".mpg": 1,
+        ".docx": 1
+      },
+      "selected_files": [
+        {
+          "key": "psi-data/PSI-69/metadata/PSI-69_metadata_PSI-133_FLEX.zip",
+          "id": "684344b79e44646b74027068",
+          "version": 4,
+          "bytes_size": 24780,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Experimental table/PSI-69_Experimental table_FLEX.csv",
+          "id": "6792be99b7b6ff8e65037e3a",
+          "version": 1,
+          "bytes_size": 24776,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Raw Data/PSI-69_Raw Data_FLEX-007_DropletData.txt",
+          "id": "684344b89e44646b7402706e",
+          "version": 1,
+          "bytes_size": 5366.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Raw Data/PSI-69_Raw Data_FLEX-007_ColorCamData.txt",
+          "id": "684344b89e44646b7402706f",
+          "version": 1,
+          "bytes_size": 7588.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Raw Data/PSI-69_Raw Data_FLEX-007_LLUVData.txt",
+          "id": "684344b89e44646b74027070",
+          "version": 1,
+          "bytes_size": 14508.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Raw Data/PSI-69_Raw Data_FLEX-007_Summary.pdf",
+          "id": "684344b89e44646b74027071",
+          "version": 1,
+          "bytes_size": 147809.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Raw Data/PSI-69_Raw Data_FLEX-007_TestSheet.txt",
+          "id": "684344b89e44646b74027072",
+          "version": 1,
+          "bytes_size": 906.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Raw Data/PSI-69_Raw Data_FLEX-007_TestSheet.rtf",
+          "id": "684344b99e44646b74027073",
+          "version": 1,
+          "bytes_size": 587664.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Raw Data/PSI-69_Raw Data_Readme-Test_009.txt",
+          "id": "684344b99e44646b7402707a",
+          "version": 1,
+          "bytes_size": 39.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Raw Data/PSI-69_Raw Data_256R002_Readme.txt",
+          "id": "684345af9e44646b740279de",
+          "version": 1,
+          "bytes_size": 417.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Calibration/PSI-69_Calibration_20CAL13_Readme.txt",
+          "id": "6843456f9e44646b74027753",
+          "version": 1,
+          "bytes_size": 526.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-69/Science Documents/PSI-69_Science Documents_FLEX DoD.docx",
+          "id": "684347459e44646b74028a00",
+          "version": 1,
+          "bytes_size": 18758.0,
+          "restricted": false,
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "accession": "PSI-25",
+      "study_version": 4,
+      "request_url": "https://psi.nasa.gov/geode-py/ws/files/v2",
+      "request_method": "POST",
+      "request_purpose": "read-only file listing used by public PSI website",
+      "request_json": {
+        "folder": "PSI-25/",
+        "fileType": "study",
+        "studyId": "PSI-25",
+        "version": 4,
+        "obfuscationcode": ""
+      },
+      "response_sha256": "5a05f22b397fdecc4ff0a26356c64b87b086f0c2cc86b9ba21e531a461703e16",
+      "listed_file_count": 695,
+      "file_extension_counts": {
+        ".zip": 265,
+        ".pptx": 1,
+        ".docx": 2,
+        ".mp4": 296,
+        ".pdf": 127,
+        ".xlsx": 2,
+        ".jpg": 1,
+        ".csv": 1
+      },
+      "selected_files": [
+        {
+          "key": "psi-data/PSI-25/metadata/PSI-25_metadata_PSI_metadata_PSI-101_BASS-II.zip",
+          "id": "6924803a7f6aa6a8302103ca",
+          "version": 4,
+          "bytes_size": 13439,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-25/Engineering Documents/PSI-25_Engineering Documents_BASS-II_Ops.docx",
+          "id": "6924805f7f6aa6a83021067e",
+          "version": 2,
+          "bytes_size": 1111856.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-25/Reference Data/PSI-25_Reference Data_Fan calibration data.xlsx",
+          "id": "692480587f6aa6a830210600",
+          "version": 2,
+          "bytes_size": 23973.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-25/Science Documents/PSI-25_Science Documents_BASS-II_ReadMe.docx",
+          "id": "692480587f6aa6a830210602",
+          "version": 2,
+          "bytes_size": 21538.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-25/Experimental table/PSI-25_Experimental table_BASS-II.csv",
+          "id": "67a3a17b09ed061032c19775",
+          "version": 1,
+          "bytes_size": 16590,
+          "restricted": false,
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "accession": "PSI-98",
+      "study_version": 4,
+      "request_url": "https://psi.nasa.gov/geode-py/ws/files/v2",
+      "request_method": "POST",
+      "request_purpose": "read-only file listing used by public PSI website",
+      "request_json": {
+        "folder": "PSI-98/",
+        "fileType": "study",
+        "studyId": "PSI-98",
+        "version": 4,
+        "obfuscationcode": ""
+      },
+      "response_sha256": "437d406a93a2b6075373e684b01a47dd427869830395b26d4f292afba6e9ee5f",
+      "listed_file_count": 76,
+      "file_extension_counts": {
+        ".zip": 62,
+        ".pdf": 6,
+        ".xlsx": 4,
+        ".docx": 3,
+        ".csv": 1
+      },
+      "selected_files": [
+        {
+          "key": "psi-data/PSI-98/Raw Data/PSI-98_Raw Data_Saffire I Sample 1 TM graphs.docx",
+          "id": "683f4a53746db1c87dcebeba",
+          "version": 1,
+          "bytes_size": 1412623.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-98/Raw Data/PSI-98_Raw Data_Saffire-I Sample 2 TM graphs.docx",
+          "id": "683f4a53746db1c87dcebebb",
+          "version": 1,
+          "bytes_size": 1016708.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-98/Science Documents/PSI-98_Science Documents_SAFFIRE-I and SAFFIRE-III Readme.docx",
+          "id": "683f4a58746db1c87dcebee9",
+          "version": 1,
+          "bytes_size": 65426.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-98/Experimental table/PSI-98_Experimental table_SAFFIRE-1.csv",
+          "id": "6792c46eb7b6ff8e65037f3e",
+          "version": 1,
+          "bytes_size": 469,
+          "restricted": false,
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "accession": "PSI-99",
+      "study_version": 5,
+      "request_url": "https://psi.nasa.gov/geode-py/ws/files/v2",
+      "request_method": "POST",
+      "request_purpose": "read-only file listing used by public PSI website",
+      "request_json": {
+        "folder": "PSI-99/",
+        "fileType": "study",
+        "studyId": "PSI-99",
+        "version": 5,
+        "obfuscationcode": ""
+      },
+      "response_sha256": "52b0163717606e61583ff31ce658b61c11feed97be72c9b9e78ea74dc82fa07b",
+      "listed_file_count": 222,
+      "file_extension_counts": {
+        ".zip": 190,
+        ".csv": 1,
+        ".pdf": 10,
+        ".xlsx": 11,
+        ".docx": 10
+      },
+      "selected_files": [
+        {
+          "key": "psi-data/PSI-99/Experimental table/PSI-99_Experimental table_SAFFIRE-2.csv",
+          "id": "6792d000b7b6ff8e650380fc",
+          "version": 1,
+          "bytes_size": 1973,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-99/Raw Data/PSI-99_Raw Data_Saffire-II Sample 1 TM Graphs.docx",
+          "id": "6840cdca4a0e24d624cebcfc",
+          "version": 1,
+          "bytes_size": 851902.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-99/Raw Data/PSI-99_Raw Data_Saffire-II Sample 9 TM Graphs.docx",
+          "id": "6840cdcc4a0e24d624cebd0e",
+          "version": 1,
+          "bytes_size": 922363.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-99/Raw Data/PSI-99_Raw Data_Saffire-II Sample 2 TM Graphs.docx",
+          "id": "6840cdcb4a0e24d624cebcff",
+          "version": 1,
+          "bytes_size": 764185.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-99/Raw Data/PSI-99_Raw Data_Saffire-II Sample 3 TM Graphs.docx",
+          "id": "6840cdcb4a0e24d624cebd01",
+          "version": 1,
+          "bytes_size": 822973.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-99/Raw Data/PSI-99_Raw Data_Saffire-II Sample 4 TM Graphs.docx",
+          "id": "6840cdcb4a0e24d624cebd04",
+          "version": 1,
+          "bytes_size": 848668.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-99/Raw Data/PSI-99_Raw Data_Saffire-II Sample 5 TM Graphs.docx",
+          "id": "6840cdcb4a0e24d624cebd06",
+          "version": 1,
+          "bytes_size": 781199.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-99/Raw Data/PSI-99_Raw Data_Saffire-II Sample 6 TM Graphs.docx",
+          "id": "6840cdcb4a0e24d624cebd08",
+          "version": 1,
+          "bytes_size": 821109.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-99/Raw Data/PSI-99_Raw Data_Saffire-II Sample 7 TM Graphs.docx",
+          "id": "6840cdcc4a0e24d624cebd0a",
+          "version": 1,
+          "bytes_size": 929310.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-99/Raw Data/PSI-99_Raw Data_Saffire-II Sample 8 TM Graphs.docx",
+          "id": "6840cdcc4a0e24d624cebd0c",
+          "version": 1,
+          "bytes_size": 837314.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-99/Science Documents/PSI-99_Science Documents_SAFFIRE-II Readme.docx",
+          "id": "6840cdd84a0e24d624cebd95",
+          "version": 1,
+          "bytes_size": 134425.0,
+          "restricted": false,
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "accession": "PSI-102",
+      "study_version": 4,
+      "request_url": "https://psi.nasa.gov/geode-py/ws/files/v2",
+      "request_method": "POST",
+      "request_purpose": "read-only file listing used by public PSI website",
+      "request_json": {
+        "folder": "PSI-102/",
+        "fileType": "study",
+        "studyId": "PSI-102",
+        "version": 4,
+        "obfuscationcode": ""
+      },
+      "response_sha256": "024fe4f66d5d84428347160193c6df416f6d501527b1b358efb172021213ce6b",
+      "listed_file_count": 105,
+      "file_extension_counts": {
+        ".zip": 4,
+        ".pdf": 27,
+        ".mp4": 2,
+        ".xls": 55,
+        ".xml": 4,
+        ".xlsx": 6,
+        ".doc": 1,
+        ".pptx": 2,
+        ".ppt": 3,
+        ".csv": 1
+      },
+      "selected_files": [
+        {
+          "key": "psi-data/PSI-102/Experimental table/PSI-102_Experimental table_SAME.csv",
+          "id": "6797d223b7b6ff8e65038de3",
+          "version": 1,
+          "bytes_size": 331,
+          "restricted": false,
+          "status": "active"
+        }
+      ]
+    },
+    {
+      "accession": "PSI-21",
+      "study_version": 4,
+      "request_url": "https://psi.nasa.gov/geode-py/ws/files/v2",
+      "request_method": "POST",
+      "request_purpose": "read-only file listing used by public PSI website",
+      "request_json": {
+        "folder": "PSI-21/",
+        "fileType": "study",
+        "studyId": "PSI-21",
+        "version": 4,
+        "obfuscationcode": ""
+      },
+      "response_sha256": "2b575846af0a8d294edca8eeb7b54ed39f90fb8d111129f848f27a6c46a4bcbf",
+      "listed_file_count": 4883,
+      "file_extension_counts": {
+        ".zip": 1793,
+        ".csv": 793,
+        ".pdf": 114,
+        ".mp4": 399,
+        ".txt": 1327,
+        ".xlsx": 3,
+        ".mdipsug": 79,
+        ".log": 358,
+        ".log ": 10,
+        ".next": 7
+      },
+      "selected_files": [
+        {
+          "key": "psi-data/PSI-21/Experimental table/PSI-21_Experimental table_CLD Flame.csv",
+          "id": "67903877b7b6ff8e6502a3e2",
+          "version": 1,
+          "bytes_size": 2454,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-21/Raw Data/Final ACME Chamber Calculator - 2018-05-22 to 2018-09-19.xlsx",
+          "id": "66eb9297c6ad4bdc12fa0a3e",
+          "version": 1,
+          "bytes_size": 641069.0,
+          "restricted": false,
+          "status": "active"
+        },
+        {
+          "key": "psi-data/PSI-21/Raw Data/Final ACME Chamber Calculator - 2021-02-03 to 2021-03-09.xlsx",
+          "id": "66eb9297c6ad4bdc12fa0a3f",
+          "version": 1,
+          "bytes_size": 426012.0,
+          "restricted": false,
+          "status": "active"
+        }
+      ]
+    }
+  ]
+}

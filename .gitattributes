@@ -1,0 +1,3 @@
+# Preserve original bytes: NASA raw artifacts are verified by SHA-256.
+# Never let core.autocrlf alter scientific inputs.
+integrations/nasa_data/research/** -text

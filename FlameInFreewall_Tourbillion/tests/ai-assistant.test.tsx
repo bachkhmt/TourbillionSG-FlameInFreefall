@@ -1,18 +1,18 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { FloatingAiDock, AiDrawer } from '@/features/ai';
 import { useAiAssistantStore } from '@/store/useAiAssistantStore';
+import { renderWithQuery } from './test-utils';
 
-expect.extend({
-  toBeInTheDocument(received) {
-    const pass = Boolean(received);
-    return {
-      pass,
-      message: () => `expected element ${pass ? 'not ' : ''}to be in document`,
-    };
-  },
-});
+vi.mock('@/api/services', () => ({
+  getChatReadiness: vi.fn().mockResolvedValue({ state: 'not_ready', mode: 'none', reasons: [] }),
+  createChatSession: vi.fn(),
+  getChatSession: vi.fn(),
+  listChatMessages: vi.fn(),
+  sendChatMessage: vi.fn(),
+  getChatSource: vi.fn(),
+}));
 
 describe('AI Assistant Light Theme', () => {
   it('renders floating dock and light drawer with crisp white styling and dark text', () => {
@@ -27,8 +27,8 @@ describe('AI Assistant Light Theme', () => {
   });
 
   it('renders drawer with light theme classes when open', () => {
-    useAiAssistantStore.setState({ isOpen: true, messages: [] });
-    render(
+    useAiAssistantStore.setState({ isOpen: true, messages: [], sessionId: null });
+    renderWithQuery(
       <>
         <FloatingAiDock />
         <AiDrawer />
@@ -37,7 +37,7 @@ describe('AI Assistant Light Theme', () => {
 
     const dialog = screen.getByRole('dialog', { name: /FlameGuard Grounded AI Assistant/i });
     expect(dialog).toBeInTheDocument();
-    expect(screen.getByText(/FlameGuard Grounded AI/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Ask about microgravity combustion/i)).toBeInTheDocument();
+    expect(screen.getByText('FlameGuard AI', { selector: 'h2' })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Ask about a NASA experiment/i)).toBeInTheDocument();
   });
 });
