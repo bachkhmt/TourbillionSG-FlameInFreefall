@@ -12,7 +12,7 @@ import {
   ArrowUpRight,
   ShieldAlert,
 } from 'lucide-react';
-import { useDashboardSummaryQuery } from '@/hooks/api';
+import { useDashboardSummaryQuery } from '../hooks/useDashboardQueries';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import type { MappedDashboardSummary } from '@/types/api';
 

@@ -1,13 +1,13 @@
 import React, { act } from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
-import { KpiStatCards } from '../src/components/dashboard/KpiStatCards';
-import { CuratedStudiesGrid } from '../src/components/dashboard/CuratedStudiesGrid';
-import { DomainBreakdown } from '../src/components/dashboard/DomainBreakdown';
 import {
+  KpiStatCards,
+  CuratedStudiesGrid,
+  DomainBreakdown,
   QuickScenarioTrigger,
   QUICK_SCENARIOS,
-} from '../src/components/dashboard/QuickScenarioTrigger';
+} from '@/features/dashboard';
 import DashboardPage from '../src/app/(dashboard)/dashboard/page';
 import { useWorkspaceStore } from '../src/store/useWorkspaceStore';
 import { toastStore } from '../src/components/toast/toast-store';

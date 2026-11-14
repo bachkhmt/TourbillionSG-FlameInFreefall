@@ -33,6 +33,16 @@ export function shouldFallback(enableFallback?: boolean): boolean {
   return true;
 }
 
+const UUID_V1_TO_5_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Returns `true` when `value` matches a strict RFC-4122 UUID v1-5 string.
+ */
+export function isUuid(value: string): boolean {
+  return UUID_V1_TO_5_REGEX.test(value);
+}
+
 /**
  * Trims an optional identifier string to `""` when nullish or whitespace-only.
  */

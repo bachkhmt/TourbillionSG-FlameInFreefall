@@ -1,10 +1,12 @@
 import React, { act } from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ScenarioConfigForm } from '../src/components/mission/ScenarioConfigForm';
-import { ConditionGapMatrix } from '../src/components/mission/ConditionGapMatrix';
-import { RankedEvidenceList } from '../src/components/mission/RankedEvidenceList';
-import { PredictiveLabPanel } from '../src/components/mission/PredictiveLabPanel';
+import {
+  ScenarioConfigForm,
+  ConditionGapMatrix,
+  RankedEvidenceList,
+  PredictiveLabPanel,
+} from '@/features/mission';
 import MissionPage from '../src/app/(dashboard)/mission/page';
 import { useWorkspaceStore, DEFAULT_SCENARIO } from '../src/store/useWorkspaceStore';
 import { toastStore } from '../src/components/toast/toast-store';

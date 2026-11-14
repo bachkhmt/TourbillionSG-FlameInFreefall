@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, ArrowRight, Columns3, Flame, Table2, LayoutGrid } from 'lucide-react';
-import { useComparisonQuery } from '@/hooks/api';
+import { useComparisonQuery } from '../hooks/useComparisonQueries';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { buildComparisonCsv, triggerFileDownload } from '@/lib/exportUtils';
 import { toast } from '@/components/toast/toast-store';

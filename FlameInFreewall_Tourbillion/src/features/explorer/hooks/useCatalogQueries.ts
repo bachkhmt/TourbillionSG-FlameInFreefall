@@ -29,21 +29,14 @@ import type {
 } from '@/types/api';
 import {
   type ApiQueryOptions,
+  isUuid,
   normalizeNonEmptyId,
   shouldFallback,
   useScopedPaginatedQuery,
 } from '@/hooks/api/queryHelpers';
 import { apiQueryKeys } from '@/hooks/api/queryKeys';
 
-const UUID_V1_TO_5_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-/**
- * Returns `true` when `value` matches a strict RFC-4122 UUID v1-5 string.
- */
-export function isUuid(value: string): boolean {
-  return UUID_V1_TO_5_REGEX.test(value);
-}
+export { isUuid };
 
 /**
  * Queries backend catalog filter/sort capabilities (`GET /catalog/capabilities`).

@@ -7,7 +7,7 @@ import type {
   MappedObservation,
   MappedRun,
 } from '@/types/api';
-import { useRunConditionsQuery, useRunMeasurementsQuery } from '@/hooks/api';
+import { useRunConditionsQuery, useRunMeasurementsQuery } from '../../hooks/useRunQueries';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 
 export interface TelemetryPaneProps {

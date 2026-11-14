@@ -7,9 +7,7 @@ import {
   buildCitation,
   QUICK_PROMPTS,
 } from '../src/lib/ragKnowledgeEngine';
-import { CitationBadge } from '../src/components/ai/CitationBadge';
-import { FloatingAiDock } from '../src/components/ai/FloatingAiDock';
-import { AiDrawer } from '../src/components/ai/AiDrawer';
+import { CitationBadge, FloatingAiDock, AiDrawer } from '@/features/ai';
 import { AppShell } from '../src/components/layout/AppShell';
 import { useAiAssistantStore } from '../src/store/useAiAssistantStore';
 import type { AiCitation } from '../src/types';

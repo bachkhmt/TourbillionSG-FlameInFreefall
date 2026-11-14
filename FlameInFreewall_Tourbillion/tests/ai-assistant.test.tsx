@@ -1,8 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { FloatingAiDock } from '@/components/ai/FloatingAiDock';
-import { AiDrawer } from '@/components/ai/AiDrawer';
+import { FloatingAiDock, AiDrawer } from '@/features/ai';
 import { useAiAssistantStore } from '@/store/useAiAssistantStore';
 
 expect.extend({

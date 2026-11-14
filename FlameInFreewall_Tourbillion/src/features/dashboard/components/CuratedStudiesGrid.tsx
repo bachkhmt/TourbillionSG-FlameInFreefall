@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Check, Plus, Sparkles, Tag } from 'lucide-react';
-import { useDashboardSummaryQuery } from '@/hooks/api';
+import { useDashboardSummaryQuery } from '../hooks/useDashboardQueries';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { toast } from '@/components/toast/toast-store';

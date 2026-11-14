@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Flame, Box, AlertTriangle, ArrowRight, Orbit, Layers, Info } from 'lucide-react';
-import { useDashboardSummaryQuery } from '@/hooks/api';
+import { useDashboardSummaryQuery } from '../hooks/useDashboardQueries';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import type { MappedDashboardSummary } from '@/types/api';
 

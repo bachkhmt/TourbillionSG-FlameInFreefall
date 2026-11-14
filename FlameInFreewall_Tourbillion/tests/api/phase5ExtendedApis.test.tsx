@@ -17,10 +17,12 @@ import {
   useChatSessionQuery,
   useChatMessagesQuery,
   useSendChatMessageMutation,
+} from '@/features/ai';
+import {
   useScenarioEvaluationQuery,
   usePredictionReadinessQuery,
   usePredictionMutation,
-} from '@/hooks/api';
+} from '@/features/mission';
 import {
   getMockChatExchange,
   getMockChatSession,
