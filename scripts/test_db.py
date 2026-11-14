@@ -36,7 +36,32 @@ def create() -> None:
         raise SystemExit(f"{SETTINGS.name} already exists; container was created before.")
     DEMO.mkdir(exist_ok=True)
     password = secrets.token_hex(24)
+    ENV_FILE.unlink(missing_ok=True)  # only a leftover of an earlier failed attempt
     private_write(ENV_FILE, f"POSTGRES_PASSWORD={password}\nPOSTGRES_DB={ADMIN_DB}\n")
+    started = subprocess.run(
+        [
+            "docker", "run", "-d", "--name", CONTAINER,
+            "--env-file", str(ENV_FILE),
+            "-p", f"127.0.0.1:{PORT}:5432",
+            "--label", "purpose=test-only",
+            IMAGE,
+        ],
+        check=False,
+        stdout=subprocess.DEVNULL,
+    )  # fmt: skip
+    if started.returncode != 0:
+        ENV_FILE.unlink(missing_ok=True)
+        raise SystemExit(f"docker run failed; nothing was recorded (is '{CONTAINER}' taken?)")
+    for _ in range(60):
+        ready = subprocess.run(
+            ["docker", "exec", CONTAINER, "pg_isready", "-U", "postgres", "-q"], check=False
+        )
+        if ready.returncode == 0:
+            break
+        time.sleep(1)
+    else:
+        raise SystemExit(f"{CONTAINER} did not become ready; inspect it with docker logs")
+    # Settings are written only once the container is usable, so a failed attempt can rerun.
     url = f"postgresql+asyncpg://postgres:{password}@127.0.0.1:{PORT}/{ADMIN_DB}"
     private_write(
         SETTINGS,
@@ -50,26 +75,7 @@ def create() -> None:
             }
         ),
     )
-    subprocess.run(
-        [
-            "docker", "run", "-d", "--name", CONTAINER,
-            "--env-file", str(ENV_FILE),
-            "-p", f"127.0.0.1:{PORT}:5432",
-            "--label", "purpose=test-only",
-            IMAGE,
-        ],
-        check=True,
-        stdout=subprocess.DEVNULL,
-    )  # fmt: skip
-    for _ in range(60):
-        ready = subprocess.run(
-            ["docker", "exec", CONTAINER, "pg_isready", "-U", "postgres", "-q"], check=False
-        )
-        if ready.returncode == 0:
-            print(f"{CONTAINER} ready on 127.0.0.1:{PORT}")
-            return
-        time.sleep(1)
-    raise SystemExit(f"{CONTAINER} did not become ready")
+    print(f"{CONTAINER} ready on 127.0.0.1:{PORT}")
 
 
 def run(command: list[str]) -> None:

@@ -86,7 +86,7 @@ export const CitationBadge: React.FC<CitationBadgeProps> = ({ citation, index, c
           ) : (
             <span className="font-semibold break-all">{source.data.filename}</span>
           )}
-          <p>{`${source.data.license} · original NASA file`}</p>
+          <p>{`${source.data.license} · original source file`}</p>
           <details>
             <summary className="cursor-pointer">File fingerprint</summary>
             <code className="block break-all text-[10px] text-zinc-600">SHA-256 {source.data.sha256}</code>
