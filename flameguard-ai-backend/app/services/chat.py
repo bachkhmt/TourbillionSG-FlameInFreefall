@@ -38,7 +38,9 @@ from app.services.unit_of_work import read_unit_of_work
 ENVELOPE = "flameguard_chat_v1"
 MAX_ALLOWED_SOURCES = 50
 # Standalone numbers (not parts of identifiers such as D0 or 20CAL13) and citation markers.
-NUMBER = re.compile(r"(?<![\w.,])\d+(?:[.,]\d+)*(?!\w)")
+# Standalone signed numbers. Digits inside identifiers (FLEX-007, D0, 20CAL13) are not values.
+NUMBER = re.compile(r"(?<![\w.,-])-?\d+(?:[.,]\d+)*(?!\w)")
+CORPUS_POLICY_UNAVAILABLE = "Source corpus policy unavailable"
 CITATION_MARKER = re.compile(r"\[\d+\]")
 
 
@@ -122,12 +124,16 @@ def verify_hits(hits, passages) -> tuple[Citation, ...]:
 
 
 def validate_real_answer(answer, corpus_version):
-    """Grounding rule for real-origin answers: same corpus, named provider, quoted numbers."""
-    if answer.origin != "real":
-        return
-    if answer.corpus_version != corpus_version or not (answer.provider_version or "").strip():
+    """Grounding on a real corpus (ADR-0005), for answers of any origin.
+
+    Every standalone number in the text must equal a whole number token of a cited
+    excerpt; real-origin answers must also match the corpus and name their provider.
+    """
+    if answer.origin == "real" and (
+        answer.corpus_version != corpus_version or not (answer.provider_version or "").strip()
+    ):
         raise HTTPException(502, "Invalid provider provenance")
-    evidence = " ".join(c.source_excerpt or "" for c in answer.citations)
+    evidence = {token for c in answer.citations for token in NUMBER.findall(c.source_excerpt or "")}
     for number in NUMBER.findall(CITATION_MARKER.sub(" ", answer.text)):
         if number not in evidence:
             raise HTTPException(502, "Answer contains unsupported values")
@@ -210,7 +216,7 @@ class ChatService:
                 return None
             passages = admit_passages(await chunk_rows(session, investigation), policy)
         except CorpusPolicyError:
-            raise HTTPException(503, "Source corpus policy unavailable") from None
+            raise HTTPException(503, CORPUS_POLICY_UNAVAILABLE) from None
         return ChatCorpus(
             passages=passages,
             fingerprint=fingerprint(

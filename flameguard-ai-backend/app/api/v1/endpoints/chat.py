@@ -19,7 +19,7 @@ from app.schemas.api.chat import (
 )
 from app.schemas.api.scenarios import PILLARS, EvaluationRequest
 from app.services.advisor import evidence_gaps, require_evaluation_scope
-from app.services.chat import ChatService, validate_citations
+from app.services.chat import CORPUS_POLICY_UNAVAILABLE, ChatService, validate_citations
 from app.services.scenarios import ScenarioService
 
 
@@ -77,6 +77,11 @@ async def readiness(chat: Annotated[ChatService, Depends(service)]):
         snapshot = await chat.snapshot(corpus=retrieval)
         async with chat.runtime.session_factory() as session, session.begin():
             await chat.writer(session, snapshot.oid)
+    except HTTPException as exc:
+        corpus_policy = exc.detail == CORPUS_POLICY_UNAVAILABLE
+        return not_ready(
+            "CORPUS_POLICY_UNAVAILABLE" if corpus_policy else "CHAT_CONFIGURATION_UNAVAILABLE"
+        )
     except Exception:
         return not_ready("CHAT_CONFIGURATION_UNAVAILABLE")
     version = getattr(chat.provider, "version", None)

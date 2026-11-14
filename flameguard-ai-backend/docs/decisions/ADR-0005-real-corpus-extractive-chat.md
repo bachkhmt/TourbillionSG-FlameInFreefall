@@ -26,8 +26,10 @@ send logic.
 3. The backend owns grounding:
    - only backend-verified retrieval hits become `allowed_sources`;
    - a `real` answer must match the request corpus version, name its provider
-     version, cite only allowed sources, and contain no number that is absent from
-     its cited excerpts.
+     version and cite only allowed sources;
+   - on a real corpus, every standalone (signed) number in **any** answer must equal
+     a whole number token of its cited excerpts. Digits inside identifiers such as
+     `FLEX-007` or `D0` do not count. Registry sources must use https links.
 4. Answers stay `review_status=unreviewed`. This is research navigation, not
    scientific validation or safety certification. T018's scientific evaluation
    remains open.

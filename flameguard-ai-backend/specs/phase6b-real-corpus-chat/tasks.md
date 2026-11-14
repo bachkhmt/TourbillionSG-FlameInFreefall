@@ -13,7 +13,7 @@
 - [x] T006 Docs: contracts, team ownership, project status. Frontend consumes the new
       routes (owner-authorized for this scope).
 
-Verification 2026-11-14: backend suite 676 passed on isolated PostgreSQL; root
-`integration_tests` 40 passed (0 skipped) through `app.main.create_app`; frontend vitest,
+Verification 2026-11-14: backend suite 679 passed on isolated PostgreSQL; root
+`integration_tests` 41 passed (0 skipped) through `app.main.create_app`; frontend vitest,
 `tsc` and `next build` pass; browser smoke on `uvicorn app.main:app` + Next proxy.
 External acceptance (T018 scientific evaluation, backend-upstream owner review) remains open.

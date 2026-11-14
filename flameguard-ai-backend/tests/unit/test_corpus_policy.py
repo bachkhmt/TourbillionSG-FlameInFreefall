@@ -139,6 +139,14 @@ def test_conflicts_between_registry_and_admitted_rows_are_refused(tmp_path, bad_
         admit_passages([bad_row], policy)
 
 
+def test_non_https_source_links_are_refused(tmp_path):
+    value = registry()
+    value["sources"][str(SOURCE)]["sourceUrl"] = "http://psi.nasa.gov/example.csv"
+    policy = load_corpus_policy(*write(tmp_path, value))
+    with pytest.raises(CorpusPolicyError):
+        admit_passages([row(source_url="http://psi.nasa.gov/example.csv")], policy)
+
+
 def test_non_cc0_registry_entries_are_refused(tmp_path):
     value = registry()
     value["sources"][str(SOURCE)]["license"] = "unknown"

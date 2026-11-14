@@ -79,6 +79,7 @@ def admit_passages(rows, policy: CorpusPolicy) -> tuple[CorpusPassage, ...]:
                 or source.ingestion_status != "source_checked"
                 or source.version != registered["version"]
                 or not source.version.endswith(f"/sha256:{registered['sha256']}")
+                or not registered["sourceUrl"].startswith("https://")
                 or source.source_url != registered["sourceUrl"]
                 or str(source.investigation_id) != registered["investigationId"]
                 or not expected

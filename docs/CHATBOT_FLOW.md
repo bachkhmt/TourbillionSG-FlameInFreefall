@@ -32,7 +32,7 @@ citation gắn với một phiên bản corpus. Không có LLM và không có pr
    - ngoài phạm vi;
    - trộn nhiều run.
 5. **Backend kiểm câu trả lời `real`**: đúng `corpus_version`, có `provider_version`,
-   citation nằm trong tập đã kiểm, và mọi số trong text đều có trong excerpt. Sau đó
+   citation nằm trong tập đã kiểm, và mọi số (token nguyên vẹn) trong text đều có trong excerpt. Sau đó
    backend kiểm lại fingerprint rồi ghi user + assistant + citations trong một
    transaction. Lỗi trả 502/409 và không lưu gì.
 6. **Hiển thị.** "View source n" gọi
@@ -144,8 +144,8 @@ Kết quả ngày 2026-11-14:
 
 | Phần | Kết quả |
 | --- | --- |
-| Backend (PostgreSQL) | 676 passed: 650 test cũ không phải sửa + 26 test mới (policy, grounding, provider) |
-| `integration_tests` (PostgreSQL, dữ liệu NASA thật) | 40 passed, 0 skip |
+| Backend (PostgreSQL) | 679 passed: 650 test cũ không phải sửa + 29 test mới (policy, grounding, provider) |
+| `integration_tests` (PostgreSQL, dữ liệu NASA thật) | 41 passed, 0 skip |
 | FE | vitest 279 passed; `tsc` và `next build` pass |
 | Smoke trên trình duyệt (`app.main:app` + FE qua proxy) | FLEX-007 ra 1.87/1.82 mm có citation; mở được CSV gốc (CC0-1.0); reload vẫn còn history; Enter gửi câu nối tiếp; Refresh history ra 2 cặp tin |
 

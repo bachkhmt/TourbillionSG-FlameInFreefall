@@ -164,6 +164,18 @@ async def test_corpus_drift_during_provider_rejects_and_rolls_back(client, targe
     assert await history(client, identity) == []
 
 
+async def test_tampered_registry_reports_corpus_policy_unavailable(client, target):
+    client, _app = client
+    registry = target["collection"].parent / "corpus-registry.json"
+    before = registry.read_bytes()
+    registry.write_bytes(before + b" ")  # declared hash no longer matches
+    try:
+        ready = (await client.get("/api/v1/chat/readiness")).json()
+        assert (ready["state"], ready["reasons"]) == ("not_ready", ["CORPUS_POLICY_UNAVAILABLE"])
+    finally:
+        registry.write_bytes(before)
+
+
 async def test_concurrent_sends_keep_complete_pairs(client):
     client, app = client
     identity = await new_session(client)

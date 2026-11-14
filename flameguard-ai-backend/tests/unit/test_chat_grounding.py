@@ -71,9 +71,29 @@ def test_real_origin_requires_an_admitted_real_corpus_and_unreviewed_label():
 def test_real_answers_only_state_numbers_found_in_cited_excerpts():
     validate_real_answer(real("Bảng CSV của FLEX-007 ghi 1.87 mm [1]."), CORPUS)
     validate_real_answer(real("Không tìm thấy bằng chứng phù hợp.", citations=()), CORPUS)
-    for text in ("FLEX-007 ghi 1.82 mm [1].", "Khoảng 2 lần [1].", "13:26:11 và 99 [1]"):
+    for text in (
+        "FLEX-007 ghi 1.82 mm [1].",
+        "Khoảng 2 lần [1].",
+        "13:26:11 và 99 [1]",
+        # Whole numbers only: substrings of excerpt values are not evidence.
+        "D0 là 1.8 mm [1].",
+        "Đường kính 7 mm [1].",
+        "Giá trị -1.87 mm [1].",
+    ):
         with pytest.raises(HTTPException):
             validate_real_answer(real(text), CORPUS)
+
+
+def test_numbers_inside_identifiers_are_not_values():
+    # FLEX-007 and D0 name a run/variable; they are not numeric claims.
+    validate_real_answer(real("FLEX-007 D0 ghi 1.87 mm [1]."), CORPUS)
+
+
+def test_any_origin_on_a_real_corpus_cannot_state_unsupported_numbers():
+    unknown = Answer(state="abstained", text="Có lẽ khoảng 42 mm.", origin="unknown")
+    with pytest.raises(HTTPException):
+        validate_real_answer(unknown, CORPUS)
+    validate_real_answer(Answer(state="timeout", text="Provider deadline exceeded."), CORPUS)
 
 
 def test_real_answers_must_match_corpus_and_name_their_provider():
