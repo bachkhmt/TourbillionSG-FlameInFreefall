@@ -258,6 +258,8 @@ describe('Grounded AI assistant backed by the NASA chat API', () => {
       await ask('Mars?');
       expect(await screen.findByText('Không tìm thấy số đo phù hợp.')).toBeDefined();
       expect(screen.getByText(/No matching evidence/i)).toBeDefined();
+      // Provenance is only claimed for answers that actually cite a source.
+      expect(screen.queryByText(/Real NASA source/i)).toBeNull();
       await ask('Slow?');
       expect(await screen.findByText(/Provider timed out/i)).toBeDefined();
       expect(screen.queryByText(/\[1\]/)).toBeNull();

@@ -49,7 +49,7 @@ export const AiMessageItem: React.FC<AiMessageItemProps> = ({ message }) => {
           </div>
         )}
 
-        {isAssistant && (
+        {isAssistant && answer.citations.length > 0 && (
           <p className="text-[10px] font-semibold text-zinc-500 tracking-wide">
             {provenanceLabel(answer.origin, answer.reviewStatus)}
           </p>
