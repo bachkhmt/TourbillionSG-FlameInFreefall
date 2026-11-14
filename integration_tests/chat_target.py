@@ -19,7 +19,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from tests.integration.phase4_fixtures import provision_phase4
 from tests.postgres_fixtures import validate_test_url
 
-from integrations.nasa_chat.policy import write_policy
+from integrations.nasa_data.corpus_registry import write_corpus_policy
 from integrations.nasa_data.export import export_bundle
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,7 +35,7 @@ def settings_for(target):
         database_url=target["reader_url"].render_as_string(hide_password=False),
         runtime_database_url=target["writer_url"].render_as_string(hide_password=False),
         catalog_collection_manifest=str(target["collection"]),
-        chat_provider="unavailable",
+        chat_provider="extractive",
         prediction_provider="unavailable",
         scenario_test_providers=False,
     )
@@ -67,7 +67,9 @@ async def prepare_target(raw):
         slugs=str(bundle / "slugs.json"),
     )
     target["collection"].write_text(json.dumps(config), encoding="utf-8")
-    write_policy(target["collection"], json.loads((bundle / "release.json").read_text("utf-8")))
+    write_corpus_policy(
+        target["collection"], json.loads((bundle / "release.json").read_text("utf-8"))
+    )
     writer = "fg_nchat_" + uuid4().hex[:12]
     password = secrets.token_hex(24)
     connection = await asyncpg.connect(
@@ -118,7 +120,7 @@ def persist_preview(target):
                 "DATABASE_URL": settings.database_url.get_secret_value(),
                 "RUNTIME_DATABASE_URL": settings.runtime_database_url.get_secret_value(),
                 "CATALOG_COLLECTION_MANIFEST": str(target["collection"]),
-                "NASA_CHAT_INTEGRATION": "1",
+                "CHAT_PROVIDER": "extractive",
             },
             file,
         )
