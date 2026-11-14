@@ -3,9 +3,10 @@
 import hashlib
 import json
 
-# Official-resource release (PSI files + PSI metadata only); see docs/DATA_HANDOFF.md.
-UNIFIED_PARSER = "nasa-challenge-v2"
-UNIFIED = {"studies": 24, "runs": 1535, "sources": 68, "chunks": 1811}
+# Default "unified" release: official resources only (PSI files + PSI metadata).
+# See docs/DATA_HANDOFF.md.
+UNIFIED_PARSER = "nasa-unified-v1"
+UNIFIED = {"studies": 24, "runs": 1926, "sources": 71, "chunks": 2508}
 
 
 def test_real_snapshot_preserves_sources_and_originals(tmp_path):
