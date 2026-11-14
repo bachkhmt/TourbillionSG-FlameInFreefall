@@ -51,7 +51,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
   return (
     <article
       data-testid={`resource-card-${resource.resource_id}`}
-      className="flex flex-col justify-between rounded-3xl border-2 border-gray-200/90 bg-white p-5 sm:p-6 shadow-2xs hover:shadow-md hover:border-gray-300 transition-all group"
+      className="flex flex-col justify-between rounded-[36px] bg-gray-200/50 p-5 sm:p-6 shadow-2xs hover:shadow-md hover:border-gray-300 transition-all group"
     >
       <div className="space-y-3">
         {/* Category & Status Badges */}
