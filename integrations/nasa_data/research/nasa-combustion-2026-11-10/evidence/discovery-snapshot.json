@@ -1,0 +1,206 @@
+{
+  "url": "https://psi.nasa.gov/geode-py/ws/repo/search?term=combustion&source=psi&type=investigation&size=100",
+  "reported_total": 26,
+  "records": [
+    {
+      "Accession": "PSI-22",
+      "Acronym": "ACME E-FIELD Flames",
+      "Title": "Advanced Combustion via Microgravity Experiments Electric-Field Effects on Laminar Diffusion Flames",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-10",
+      "Acronym": "ACME/Flame Design",
+      "Title": "Advanced Combustion via Microgravity Experiments / Flame Design",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-159",
+      "Acronym": "ACME CFI-G",
+      "Title": "Advanced Combustion via Microgravity Experiments / Cool Flames Investigation with Gases",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-107",
+      "Acronym": "SPICE",
+      "Title": "Smoke Point In Co-flow Experiment",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-106",
+      "Acronym": "SLICE",
+      "Title": "Structure and Liftoff In Combustion Experiment",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-100",
+      "Acronym": "SAFFIRE-III",
+      "Title": "Spacecraft Fire Experiment-III",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-102",
+      "Acronym": "SAME",
+      "Title": "Smoke and Aerosol Measurement Experiment",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-69",
+      "Acronym": "FLEX",
+      "Title": "Flame Extinguishment Experiment",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-39",
+      "Acronym": "CFI",
+      "Title": "Cool Flames Investigation",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-21",
+      "Acronym": "ACME CLD Flame",
+      "Title": "Advanced Combustion via Microgravity Experiments / Coflow Laminar Diffusion Flame",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-68",
+      "Acronym": "FLEX-2",
+      "Title": "Flame Extinguishment Experiment - 2",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-26",
+      "Acronym": "BASS",
+      "Title": "Burning and Suppression of Solids",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-117",
+      "Acronym": "",
+      "Title": "Effect of External Thermo-Convective Perturbation on Cool Flame Dynamics: A Multidimensional Multi-Physics CFD Analysis",
+      "Research Area": "Combustion Science",
+      "Project Type": "Ground Investigation"
+    },
+    {
+      "Accession": "PSI-23",
+      "Acronym": "ACME s-Flame",
+      "Title": "Advanced Combustion via Microgravity Experiments-Structure and Response of Spherical Diffusion Flames",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-20",
+      "Acronym": "ACME BRE",
+      "Title": "Advanced Combustion via Microgravity Experiments - Burning Rate Emulator",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-142",
+      "Acronym": "",
+      "Title": "Quantitative Studies of Cool Flame Transitions at Radiation / Stretch Extinction Using Counterflow Flames",
+      "Research Area": "Combustion Science",
+      "Project Type": "Ground Investigation"
+    },
+    {
+      "Accession": "PSI-60",
+      "Acronym": "",
+      "Title": "Computational and Experimental Analysis of SPICE Data Sets",
+      "Research Area": "Combustion Science",
+      "Project Type": "Ground Investigation"
+    },
+    {
+      "Accession": "PSI-62",
+      "Acronym": "",
+      "Title": "Concurrent Flame Spread Modeling using Flamelet Generated Manifolds in Microgravity with Comparison to BASS Experiments using Two-Color Tomography",
+      "Research Area": "Combustion Science",
+      "Project Type": "Ground Investigation"
+    },
+    {
+      "Accession": "PSI-99",
+      "Acronym": "SAFFIRE-II",
+      "Title": "Spacecraft Fire Experiment-II",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-25",
+      "Acronym": "BASS-II",
+      "Title": "Burning and Suppression of Solids - II",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-115",
+      "Acronym": "",
+      "Title": "Utilization of the Smoke Aerosol Measurement Experiment Data for Advanced Modeling and Simulation of Smoke Generation in Micro-Gravity",
+      "Research Area": "Combustion Science",
+      "Project Type": "Ground Investigation"
+    },
+    {
+      "Accession": "PSI-47",
+      "Acronym": "DAFT / DAFT-2",
+      "Title": "Dust and Aerosol Measurement Feasibility Test / Dust and Aerosol Measurement Feasibility Test-2",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-98",
+      "Acronym": "SAFFIRE-I",
+      "Title": "Spacecraft Fire Safety Experiment-I",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-181",
+      "Acronym": "",
+      "Title": "Structure and Properties of Pb-Sn and Pb-free Sn-Ag-Cu Solders Produced in Terrestrial vs. Microgravity Environments under Extremes of Elevated and Cryo Temperatures",
+      "Research Area": "Materials Science",
+      "Project Type": "Ground Investigation"
+    },
+    {
+      "Accession": "PSI-108",
+      "Acronym": "STDCE-1",
+      "Title": "Surface Tension Driven Convection Experiment-1",
+      "Research Area": "Fluid Physics",
+      "Project Type": "Microgravity Investigation"
+    },
+    {
+      "Accession": "PSI-101",
+      "Acronym": "SAME-R",
+      "Title": "Smoke Aerosol Measurement Experiment-Reflight",
+      "Research Area": "Combustion Science",
+      "Project Type": "Microgravity Investigation"
+    }
+  ],
+  "additional_queries": [
+    {
+      "term": "Saffire",
+      "reported_total": 3,
+      "accessions": [
+        "PSI-100",
+        "PSI-98",
+        "PSI-99"
+      ]
+    },
+    {
+      "term": "SoFIE",
+      "reported_total": 1,
+      "accessions": [
+        "PSI-25"
+      ]
+    }
+  ]
+}
