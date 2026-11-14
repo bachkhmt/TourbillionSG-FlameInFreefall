@@ -1,0 +1,13 @@
+# Deployment-local state and credentials
+/deploy/.env
+/deploy/azure/config.local.ps1
+/deploy/.local/
+/deploy/backups/
+*.tar
+*.tar.gz
+*.dump
+/-C
+**/pytest-cache-files-*/
+**/__pycache__/
+**/.pytest_cache/
+**/.ruff_cache/

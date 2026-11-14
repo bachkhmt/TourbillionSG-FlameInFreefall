@@ -65,3 +65,12 @@ scientific validation remain separate evidence gates.
 The sibling frontend has old HTML diagrams and `docs/superpowers/` implementation
 plans. Read them when necessary for UI compatibility, but explicitly label
 them as **frontend historical/design references** in backend tasks.
+
+## Monorepo deployment preparation — 2026-11-14
+
+- [Azure/local deployment guide](../../docs/deployment/azure-deployment-guide.md):
+  containers, manual Azure preflight/rollout, local and VM fallback, secrets,
+  PostgreSQL TLS and artifact recovery. Preparation only; no cloud deployment claim.
+- [Deployment verification](../../docs/deployment/deployment-verification.md):
+  executed checks and explicit environment/external-integration blockers.
+- Reusable files live under monorepo `deploy/`; no models/migrations changed.
