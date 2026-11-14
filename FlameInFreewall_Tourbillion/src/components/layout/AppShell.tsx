@@ -5,9 +5,8 @@ import { usePathname } from 'next/navigation';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import { Toaster } from '@/components/DynamicIslandToast';
-import { FloatingAiDock } from '@/components/ai/FloatingAiDock';
-import { AiDrawer } from '@/components/ai/AiDrawer';
-import { ComparisonModal } from '@/components/explorer/ComparisonModal';
+import { FloatingAiDock, AiDrawer } from '@/features/ai';
+import { ComparisonModal } from '@/features/explorer';
 
 export interface AppShellProps {
   children: React.ReactNode;

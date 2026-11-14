@@ -3,13 +3,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { Compass, Rocket, ArrowRight, RotateCcw, Info } from 'lucide-react';
-import { useDashboardSummaryQuery } from '@/hooks/api';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
-import { DashboardShimmer } from '@/components/dashboard/DashboardShimmer';
-import { KpiStatCards } from '@/components/dashboard/KpiStatCards';
-import { QuickScenarioTrigger } from '@/components/dashboard/QuickScenarioTrigger';
-import { CuratedStudiesGrid } from '@/components/dashboard/CuratedStudiesGrid';
-import { DomainBreakdown } from '@/components/dashboard/DomainBreakdown';
+import {
+  useDashboardSummaryQuery,
+  DashboardShimmer,
+  KpiStatCards,
+  QuickScenarioTrigger,
+  CuratedStudiesGrid,
+  DomainBreakdown,
+} from '@/features/dashboard';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 
 export default function DashboardPage() {

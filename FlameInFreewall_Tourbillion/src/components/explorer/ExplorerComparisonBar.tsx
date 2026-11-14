@@ -1,6 +1,2 @@
-'use client';
+﻿export * from '@/features/explorer/components/ExplorerComparisonBar';
 
-export {
-  ComparisonBar as ExplorerComparisonBar,
-  type ComparisonBarProps as ExplorerComparisonBarProps,
-} from './ComparisonBar';

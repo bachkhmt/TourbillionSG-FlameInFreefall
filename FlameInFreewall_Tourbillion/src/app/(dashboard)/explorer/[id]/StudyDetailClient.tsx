@@ -13,25 +13,25 @@ import {
   Gauge,
 } from 'lucide-react';
 import { ApiClientError } from '@/api/client';
+import type { MappedInvestigationDetail } from '@/types/api';
+import { useWorkspaceStore } from '@/store/useWorkspaceStore';
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import {
   useInvestigationClaimsQuery,
   useInvestigationDetailQuery,
   useInvestigationMeasurementsQuery,
   useInvestigationRunsQuery,
   useInvestigationSourcesQuery,
-} from '@/hooks/api';
-import type { MappedInvestigationDetail } from '@/types/api';
-import { useWorkspaceStore } from '@/store/useWorkspaceStore';
-import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
-import { StudyDetailShimmer } from '@/components/explorer/detail/StudyDetailShimmer';
-import { StudyHeader } from '@/components/explorer/detail/StudyHeader';
-import { ChamberOverviewTab } from '@/components/explorer/detail/ChamberOverviewTab';
-import { TestRunsTable } from '@/components/explorer/detail/TestRunsTable';
-import { TelemetryPane } from '@/components/explorer/detail/TelemetryPane';
-import { ClaimsList } from '@/components/explorer/detail/ClaimsList';
-import { PsiExportTab } from '@/components/explorer/detail/PsiExportTab';
-import { ComparisonBar } from '@/components/explorer/ComparisonBar';
-import { ComparisonModal } from '@/components/explorer/ComparisonModal';
+  StudyDetailShimmer,
+  StudyHeader,
+  ChamberOverviewTab,
+  TestRunsTable,
+  TelemetryPane,
+  ClaimsList,
+  PsiExportTab,
+  ComparisonBar,
+  ComparisonModal,
+} from '@/features/explorer';
 
 export type StudyDetailTab = 'overview' | 'runs' | 'telemetry' | 'claims' | 'psi-export';
 

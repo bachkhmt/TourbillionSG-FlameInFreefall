@@ -7,11 +7,13 @@ import {
   Layers,
   Sparkles,
 } from 'lucide-react';
-import { ScenarioConfigForm } from '@/components/mission/ScenarioConfigForm';
-import { ConditionGapMatrix } from '@/components/mission/ConditionGapMatrix';
-import { RankedEvidenceList } from '@/components/mission/RankedEvidenceList';
-import { PredictiveLabPanel } from '@/components/mission/PredictiveLabPanel';
 import { EndOfListIndicator } from '@/components/ui/EndOfListIndicator';
+import {
+  ScenarioConfigForm,
+  ConditionGapMatrix,
+  RankedEvidenceList,
+  PredictiveLabPanel,
+} from '@/features/mission';
 
 type MissionView = 'evidence' | 'prediction';
 

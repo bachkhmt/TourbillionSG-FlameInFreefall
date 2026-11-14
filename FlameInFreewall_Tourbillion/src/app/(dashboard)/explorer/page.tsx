@@ -3,22 +3,24 @@
 import React, { useMemo, useState } from 'react';
 import { Compass, AlertCircle, RotateCcw, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import type { InvestigationListParamsDto } from '@/api/dto';
-import { useCatalogCapabilitiesQuery, useInvestigationsQuery } from '@/hooks/api';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
+import { EndOfListIndicator } from '@/components/ui/EndOfListIndicator';
 import {
+  useCatalogCapabilitiesQuery,
+  useInvestigationsQuery,
   ExplorerFiltersBar,
   type PlatformFilterValue,
   type GravityFilterValue,
   type ExplorerSortOption,
   type ViewMode,
-} from '@/components/explorer/ExplorerFiltersBar';
-import { InvestigationCard } from '@/components/explorer/InvestigationCard';
-import { InvestigationTable } from '@/components/explorer/InvestigationTable';
-import { ComparisonBar, type ComparisonStudySummary } from '@/components/explorer/ComparisonBar';
-import { ComparisonModal } from '@/components/explorer/ComparisonModal';
-import { EndOfListIndicator } from '@/components/ui/EndOfListIndicator';
-import { InvestigationCardShimmer } from '@/components/explorer/InvestigationCardShimmer';
+  InvestigationCard,
+  InvestigationTable,
+  ComparisonBar,
+  type ComparisonStudySummary,
+  ComparisonModal,
+  InvestigationCardShimmer,
+} from '@/features/explorer';
 
 const PAGE_LIMIT = 20;
 
