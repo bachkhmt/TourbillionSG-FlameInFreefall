@@ -1,367 +1,501 @@
 import React from 'react';
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
-import {
-  queryRagKnowledgeEngine,
-  isPropulsionOutOfScope,
-  buildCitation,
-  QUICK_PROMPTS,
-} from '../src/lib/ragKnowledgeEngine';
-import { CitationBadge, FloatingAiDock, AiDrawer } from '@/features/ai';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { AiDrawer, FloatingAiDock } from '@/features/ai';
 import { AppShell } from '../src/components/layout/AppShell';
 import { useAiAssistantStore } from '../src/store/useAiAssistantStore';
-import type { AiCitation } from '../src/types';
+import { CHAT_SESSION_KEY } from '../src/lib/chatSession';
+import { ApiClientError } from '../src/api/client';
+import * as apiServices from '@/api/services';
+import type { ChatAnswerDto, ChatMessageDto, ChatReadinessDto } from '@/api/dto';
+import type { MappedChatMessage } from '../src/types/api';
+import { renderWithQuery } from './test-utils';
 
-// Mock next/navigation
 vi.mock('next/navigation', () => ({
   usePathname: () => '/dashboard',
-  useRouter: () => ({
-    push: vi.fn(),
-    replace: vi.fn(),
-    prefetch: vi.fn(),
-  }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), prefetch: vi.fn() }),
 }));
 
-describe('Grounded AI Assistant & RAG Engine (Task 10)', () => {
+vi.mock('@/api/services', () => ({
+  getChatReadiness: vi.fn(),
+  createChatSession: vi.fn(),
+  getChatSession: vi.fn(),
+  listChatMessages: vi.fn(),
+  sendChatMessage: vi.fn(),
+  getChatSource: vi.fn(),
+}));
+
+const services = vi.mocked(apiServices);
+const SESSION_ID = '11111111-1111-4111-8111-111111111111';
+const SOURCE_ID = '22222222-2222-4222-8222-222222222222';
+const CORPUS = 'a'.repeat(64);
+const EXCERPT = 'FLEX-007 [row 8]; Droplet initial diameter; mm: 1.87';
+
+function answer(overrides: Partial<ChatAnswerDto> = {}): ChatAnswerDto {
+  return {
+    state: 'answered',
+    text: 'Hai nguồn ghi đường kính ban đầu (D0) của FLEX-007 khác nhau.',
+    origin: 'real',
+    review_status: 'unreviewed',
+    provider_version: 'nasa-extractive-v2',
+    model_version: null,
+    corpus_version: CORPUS,
+    citations: [
+      {
+        source_document_id: SOURCE_ID,
+        source_locator: 'CSV row 8',
+        source_excerpt: EXCERPT,
+        test_run_id: null,
+      },
+    ],
+    ...overrides,
+  };
+}
+
+function message(role: 'user' | 'assistant', id: string, body: ChatAnswerDto): ChatMessageDto {
+  return { id, role, created_at: '2026-11-14T00:00:00Z', answer: body };
+}
+
+function userAnswer(text: string): ChatAnswerDto {
+  return answer({ text, citations: [], origin: 'unknown', review_status: 'unknown' });
+}
+
+function readyDto(): ChatReadinessDto {
+  return {
+    state: 'ready',
+    mode: 'retrieval_only',
+    provider_version: 'nasa-extractive-v2',
+    corpus_version: CORPUS,
+    source_revision: 'rev',
+    passages: 1045,
+    review_status: 'unreviewed',
+    reasons: [],
+  };
+}
+
+function sessionDto(id = SESSION_ID) {
+  return {
+    id,
+    investigation_id: null,
+    title: null,
+    created_at: '2026-11-14T00:00:00Z',
+    expires_at: '2026-11-15T00:00:00Z',
+    privacy: 'Public research demo. Session ID holders can access history for 24 hours.',
+  };
+}
+
+function exchange(question: string, body: ChatAnswerDto = answer(), suffix = '1') {
+  return {
+    user: message('user', `u-${suffix}`, userAnswer(question)),
+    assistant: message('assistant', `a-${suffix}`, body),
+  };
+}
+
+function page(items: ChatMessageDto[], offset = 0, limit = 50) {
+  return { items, offset, limit };
+}
+
+function openDrawer() {
+  useAiAssistantStore.setState({ isOpen: true });
+  return renderWithQuery(<AiDrawer />);
+}
+
+async function ask(question: string) {
+  const input = await screen.findByPlaceholderText(/Ask about a NASA experiment/i);
+  fireEvent.change(input, { target: { value: question } });
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: 'Send message' }).hasAttribute('disabled')).toBe(
+      false
+    )
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+}
+
+function openHistoryControls() {
+  fireEvent.click(screen.getByText('Conversation history'));
+}
+
+function mappedAssistant(id: string): MappedChatMessage {
+  return {
+    id,
+    role: 'assistant',
+    createdAt: '2026-11-14T00:00:00Z',
+    answer: {
+      state: 'answered',
+      text: 'Answer',
+      origin: 'real',
+      reviewStatus: 'unreviewed',
+      providerVersion: 'nasa-extractive-v2',
+      corpusVersion: CORPUS,
+      citations: [],
+    },
+  };
+}
+
+describe('Grounded AI assistant (NASA chat style) backed by the backend chat API', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
-    useAiAssistantStore.setState({
-      isOpen: false,
-      activeContextStudyId: null,
-      messages: [],
-      isStreaming: false,
-    });
+    vi.clearAllMocks();
+    sessionStorage.clear();
+    useAiAssistantStore.getState().resetConversation();
+    useAiAssistantStore.setState({ isOpen: false, activeContextStudyId: null });
+    services.getChatReadiness.mockResolvedValue(readyDto());
+    services.createChatSession.mockResolvedValue(sessionDto());
+    services.getChatSession.mockResolvedValue(sessionDto());
+    services.listChatMessages.mockResolvedValue(page([]));
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  // =========================================================================
-  // 1. ragKnowledgeEngine Retrieval Tests
-  // =========================================================================
-  describe('ragKnowledgeEngine Retrieval', () => {
-    it('retrieves Lunar 0.16g flammability with citations and evidence gap warning', () => {
-      const result = queryRagKnowledgeEngine('How does Lunar 0.16g partial gravity affect flame spread?');
-      expect(result.answer).toContain('Lunar partial gravity (0.16g)');
-      expect(result.answer).toContain('12–20 cm/s');
-      expect(result.citations.length).toBeGreaterThan(0);
-      expect(result.evidenceGapWarning).toBeDefined();
-      expect(result.evidenceGapWarning).toContain('NASA PSI Evidence Gap Warning');
-      expect(result.isOutOfScope).toBeFalsy();
-    });
-
-    it('retrieves microgravity flame sphericity and buoyant extinction findings', () => {
-      const result = queryRagKnowledgeEngine('Why do flames become spherical in microgravity?');
-      expect(result.answer).toContain('spherical');
-      expect(result.answer).toContain('buoyancy vanishes');
-      expect(result.citations.some((c) => c.code.includes('SPICE') || c.code.includes('SLICE'))).toBe(true);
-      expect(result.evidenceGapWarning).toBeUndefined();
-    });
-
-    it('retrieves cool flame phenomena from FLEX investigations', () => {
-      const result = queryRagKnowledgeEngine('What are cool flames and why are they dangerous in spacecraft?');
-      expect(result.answer).toContain('Cool flames');
-      expect(result.answer).toContain('500–800 K');
-      expect(result.answer).toContain('FLEX');
-      expect(result.citations.some((c) => c.code.includes('FLEX'))).toBe(true);
-    });
-
-    it('retrieves Nomex and PMMA flammability in enriched 34% O2 exploration atmospheres', () => {
-      const result = queryRagKnowledgeEngine('Does Nomex burn in 34% enriched oxygen exploration atmospheres?');
-      expect(result.answer).toContain('Nomex');
-      expect(result.answer).toContain('30–34% O₂');
-      expect(result.citations.some((c) => c.code.includes('BASS-II') || c.code.includes('SoFIE'))).toBe(true);
-    });
-
-    it('compares BASS and SoFIE experiments with platform distinction', () => {
-      const result = queryRagKnowledgeEngine('What is the difference between BASS and SoFIE?');
-      expect(result.answer).toContain('BASS / BASS-II');
-      expect(result.answer).toContain('Microgravity Science Glovebox (MSG)');
-      expect(result.answer).toContain('SoFIE');
-      expect(result.answer).toContain('Combustion Integrated Rack (CIR)');
-      expect(result.citations.length).toBeGreaterThanOrEqual(2);
-    });
-
-    it('retrieves large-scale Cygnus Saffire vehicle fire test data', () => {
-      const result = queryRagKnowledgeEngine('What did Saffire discover about large scale spacecraft fires?');
-      expect(result.answer).toContain('SAFFIRE');
-      expect(result.answer).toContain('Cygnus');
-      expect(result.answer).toContain('0.4 m × 1.0 m');
-      expect(result.citations.some((c) => c.code.includes('SAFFIRE'))).toBe(true);
-    });
-
-    it('retrieves fire suppression and smoke detection facts', () => {
-      const result = queryRagKnowledgeEngine('How effective is fine water mist compared to nitrogen suppression?');
-      expect(result.answer).toContain('Fine Water Mist');
-      expect(result.answer).toContain('70% less water');
-      expect(result.answer).toContain('Nitrogen Jet');
-      expect(result.citations.some((c) => c.code.includes('FINE-WATER-MIST') || c.code.includes('BASS'))).toBe(true);
-    });
-
-    it('triggers out-of-scope guardrail for liquid rocket engines and propulsion thrusters', () => {
-      const result = queryRagKnowledgeEngine('How does the RS-25 liquid rocket engine turbopump inject propellant?');
-      expect(result.isOutOfScope).toBe(true);
-      expect(result.answer).toContain('FlameGuard AI Scope Advisory: Rocket Propulsion Out of Scope');
-      expect(result.answer).toContain('spacecraft cabin fire safety');
-      expect(result.citations).toHaveLength(0);
-      expect(isPropulsionOutOfScope('Merlin rocket engine bipropellant nozzle')).toBe(true);
-    });
-
-    it('dynamically queries arbitrary matching studies and claims', () => {
-      const result = queryRagKnowledgeEngine('electric field chemi-ions in microgravity');
-      expect(result.citations.length).toBeGreaterThan(0);
-      expect(result.citations.some((c) => c.code.includes('ACME') || c.code.includes('E-FIELD'))).toBe(true);
-    });
-
-    it('prioritizes active study context when specified', () => {
-      const result = queryRagKnowledgeEngine('What fuel materials were tested?', 'bass');
-      expect(result.citations.some((c) => c.investigationId === 'bass' || c.code === 'BASS')).toBe(true);
-    });
-
-    it('handles empty query gracefully', () => {
-      const result = queryRagKnowledgeEngine('   ');
-      expect(result.answer).toContain('Please enter a combustion research question');
-      expect(result.citations).toHaveLength(0);
-    });
-
-    it('buildCitation extracts all required citation provenance metadata', () => {
-      const mockClaim = {
-        id: 'TEST-CLAIM-01',
-        investigationId: 'bass',
-        investigationCode: 'BASS',
-        category: 'forced_flow' as const,
-        claimText: 'Test claim text for verification',
-        scientificContext: 'Test context',
-        evidenceStatus: 'Measured' as const,
-        reviewStatus: 'Peer-Reviewed' as const,
-        doi: '10.1016/j.combustflame.test',
-        authors: 'Tester et al.',
-        year: 2024,
-      };
-
-      const citation = buildCitation(mockClaim);
-      expect(citation.code).toBe('BASS');
-      expect(citation.claimId).toBe('TEST-CLAIM-01');
-      expect(citation.badge).toBe('Measured');
-      expect(citation.doi).toBe('10.1016/j.combustflame.test');
-      expect(citation.facility).toContain('Glovebox');
-    });
-  });
-
-  // =========================================================================
-  // 2. CitationBadge Component Tests
-  // =========================================================================
-  describe('CitationBadge Component', () => {
-    const sampleCitation: AiCitation = {
-      investigationId: 'bass',
-      code: 'BASS',
-      title: 'Burning and Suppression of Solids',
-      claimId: 'CLAIM-BASS-01',
-      claimText: 'Airflow velocity between 0.5 and 50 cm/s dictates solid flame spread in 0g.',
-      badge: 'Measured',
-      doi: '10.1016/j.test.2024',
-      facility: 'ISS - Microgravity Science Glovebox (MSG)',
-    };
-
-    it('renders citation badge with code and claim ID', () => {
-      render(<CitationBadge citation={sampleCitation} />);
-      const button = screen.getByRole('button', { name: /Citation provenance: BASS/i });
-      expect(button).toBeDefined();
-      expect(button.textContent).toContain('[BASS • CLAIM-BASS-01]');
-    });
-
-    it('opens provenance popover on click with study details and explorer link', () => {
-      render(<CitationBadge citation={sampleCitation} />);
-      const button = screen.getByRole('button', { name: /Citation provenance: BASS/i });
-
-      // Click to toggle popover
-      fireEvent.click(button);
-
-      const popover = screen.getByRole('dialog', { name: /Evidence details for BASS/i });
-      expect(popover).toBeDefined();
-      expect(popover.textContent).toContain('Burning and Suppression of Solids');
-      expect(popover.textContent).toContain('Measured');
-      expect(popover.textContent).toContain('Airflow velocity between 0.5 and 50 cm/s');
-      expect(popover.textContent).toContain('ISS - Microgravity Science Glovebox');
-
-      // Check inspection link
-      const explorerLink = screen.getByRole('link', { name: /Inspect Investigation/i });
-      expect(explorerLink.getAttribute('href')).toBe('/explorer/bass');
-    });
-
-    it('closes popover on escape key', () => {
-      render(<CitationBadge citation={sampleCitation} />);
-      const button = screen.getByRole('button', { name: /Citation provenance: BASS/i });
-      fireEvent.click(button);
-      expect(screen.queryByRole('dialog')).toBeDefined();
-
-      fireEvent.keyDown(document, { key: 'Escape' });
+  describe('panel and backdrop', () => {
+    it('does not render or call the API when closed', () => {
+      renderWithQuery(<AiDrawer />);
       expect(screen.queryByRole('dialog')).toBeNull();
+      expect(services.getChatReadiness).not.toHaveBeenCalled();
+    });
+
+    it('keeps the blurred backdrop and closes when it is clicked', async () => {
+      openDrawer();
+      const backdrop = await screen.findByTestId('ai-drawer-backdrop');
+      expect(backdrop.className).toContain('backdrop-blur-xs');
+      expect(backdrop.className).toContain('bg-black/40');
+      fireEvent.click(backdrop);
+      expect(useAiAssistantStore.getState().isOpen).toBe(false);
+    });
+
+    it('closes on Escape and with the Close button', async () => {
+      openDrawer();
+      await screen.findByRole('dialog');
+      fireEvent.keyDown(window, { key: 'Escape' });
+      expect(useAiAssistantStore.getState().isOpen).toBe(false);
+    });
+
+    it('locks sending while the chat is not ready and retries the connection', async () => {
+      services.getChatReadiness.mockResolvedValueOnce({
+        state: 'not_ready',
+        mode: 'none',
+        reasons: ['CHAT_CONFIGURATION_UNAVAILABLE'],
+      });
+      openDrawer();
+      expect(await screen.findByText(/Chat is not ready in this preview/i)).toBeDefined();
+      fireEvent.change(screen.getByPlaceholderText(/Ask about a NASA experiment/i), {
+        target: { value: 'FLEX-007 D0?' },
+      });
+      expect(screen.getByRole('button', { name: 'Send message' }).hasAttribute('disabled')).toBe(
+        true
+      );
+      fireEvent.click(screen.getByRole('button', { name: /Retry connection/i }));
+      expect(await screen.findByText(/1045 source passages/i)).toBeDefined();
+      expect(services.getChatReadiness).toHaveBeenCalledTimes(2);
     });
   });
 
-  // =========================================================================
-  // 3. FloatingAiDock Component Tests
-  // =========================================================================
-  describe('FloatingAiDock Component', () => {
-    it('renders floating dock button at bottom right', () => {
-      render(<FloatingAiDock />);
-      const button = screen.getByRole('button', { name: /Open Grounded AI Assistant/i });
-      expect(button).toBeDefined();
-      expect(button.getAttribute('aria-expanded')).toBe('false');
+  describe('sending', () => {
+    it('creates a session, stores the tab token and renders the cited answer', async () => {
+      services.sendChatMessage.mockResolvedValue(exchange('FLEX-007 D0?'));
+      openDrawer();
+      await ask('FLEX-007 D0?');
+
+      expect(await screen.findByText(/D0\) của FLEX-007 khác nhau/)).toBeDefined();
+      expect(services.createChatSession).toHaveBeenCalledWith({});
+      expect(services.sendChatMessage).toHaveBeenCalledWith(SESSION_ID, 'FLEX-007 D0?');
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(SESSION_ID);
+      expect(screen.getByText('You')).toBeDefined();
+      expect(screen.getByText('FlameGuard AI', { selector: 'strong' })).toBeDefined();
+      expect(screen.getByText('[1] CSV row 8')).toBeDefined();
+      expect(screen.getByText(/Scientific review has not been documented/)).toBeDefined();
+      expect(useAiAssistantStore.getState().recent).toHaveLength(2);
+      expect(screen.getByText(/Session ID holders can access history/)).toBeDefined();
     });
 
-    it('toggles assistant drawer open on click', () => {
+    it('scopes a new session to the active study when its id is a UUID', async () => {
+      const study = '33333333-3333-4333-8333-333333333333';
+      useAiAssistantStore.setState({ activeContextStudyId: study });
+      services.sendChatMessage.mockResolvedValue(exchange('Objective?'));
+      openDrawer();
+      await ask('Objective?');
+      await screen.findByText(/D0\) của FLEX-007 khác nhau/);
+      expect(services.createChatSession).toHaveBeenCalledWith({ investigation_id: study });
+    });
+
+    it('starts a fresh session once when the stored session expired before sending', async () => {
+      const fresh = '44444444-4444-4444-8444-444444444444';
+      useAiAssistantStore.setState({ sessionId: SESSION_ID });
+      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
+      services.createChatSession.mockResolvedValue(sessionDto(fresh));
+      services.sendChatMessage
+        .mockRejectedValueOnce(
+          new ApiClientError({ message: 'Session unavailable', status: 404, code: 'HTTP_ERROR' })
+        )
+        .mockResolvedValueOnce(exchange('FLEX-007 D0?'));
+      openDrawer();
+      await ask('FLEX-007 D0?');
+
+      await screen.findByText(/D0\) của FLEX-007 khác nhau/);
+      expect(services.sendChatMessage).toHaveBeenNthCalledWith(1, SESSION_ID, 'FLEX-007 D0?');
+      expect(services.sendChatMessage).toHaveBeenNthCalledWith(2, fresh, 'FLEX-007 D0?');
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(fresh);
+    });
+
+    it('shows abstained and timeout states without inventing citations or provenance', async () => {
+      services.sendChatMessage
+        .mockResolvedValueOnce(
+          exchange(
+            'Mars?',
+            answer({ state: 'abstained', text: 'Không tìm thấy số đo phù hợp.', citations: [] }),
+            '1'
+          )
+        )
+        .mockResolvedValueOnce(
+          exchange(
+            'Slow?',
+            answer({ state: 'timeout', text: 'Provider deadline exceeded.', citations: [] }),
+            '2'
+          )
+        );
+      openDrawer();
+      await ask('Mars?');
+      expect(await screen.findByText('Không tìm thấy số đo phù hợp.')).toBeDefined();
+      expect(screen.getByText(/No matching evidence/i)).toBeDefined();
+      expect(screen.queryByText(/Research source excerpts/i)).toBeNull();
+      await ask('Slow?');
+      expect(await screen.findByText(/Provider timed out/i)).toBeDefined();
+      expect(screen.queryByText(/\[1\]/)).toBeNull();
+    });
+
+    it('reports an evidence revision conflict and keeps the question for resending', async () => {
+      services.sendChatMessage.mockRejectedValue(
+        new ApiClientError({ message: 'Evidence changed', status: 409, code: 'HTTP_ERROR' })
+      );
+      openDrawer();
+      await ask('FLEX-007 D0?');
+      expect(await screen.findByText(/evidence changed while answering/i)).toBeDefined();
+      expect(useAiAssistantStore.getState().recent).toHaveLength(0);
+      expect(
+        (screen.getByPlaceholderText(/Ask about a NASA experiment/i) as HTMLTextAreaElement).value
+      ).toBe('FLEX-007 D0?');
+    });
+  });
+
+  describe('history (stored on the server)', () => {
+    it('restores the tab session history page on open', async () => {
+      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
+      services.listChatMessages.mockResolvedValue(
+        page([
+          message('user', 'u-0', userAnswer('Earlier question')),
+          message('assistant', 'a-0', answer({ text: 'Earlier answer' })),
+        ])
+      );
+      services.sendChatMessage.mockResolvedValue(exchange('Next?'));
+      openDrawer();
+
+      expect(await screen.findByText('Earlier answer')).toBeDefined();
+      expect(services.listChatMessages).toHaveBeenCalledWith(
+        SESSION_ID,
+        { offset: 0, limit: 50 },
+        expect.anything()
+      );
+      await ask('Next?');
+      await waitFor(() => expect(services.sendChatMessage).toHaveBeenCalled());
+      expect(services.createChatSession).not.toHaveBeenCalled();
+      // New exchanges are kept apart from the stored page, never spliced into it.
+      await waitFor(() => expect(useAiAssistantStore.getState().recent).toHaveLength(2));
+      expect(useAiAssistantStore.getState().messages).toHaveLength(2);
+    });
+
+    it('pages through stored history and folds recent exchanges in on refresh', async () => {
+      const full = Array.from({ length: 50 }, (_, i) =>
+        message(i % 2 ? 'assistant' : 'user', `m-${i}`, userAnswer(`stored ${i}`))
+      );
+      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
+      services.listChatMessages.mockImplementation(async (_id, pagination) =>
+        pagination?.offset === 50
+          ? page([message('user', 'm-50', userAnswer('stored 50'))], 50)
+          : page(full, 0)
+      );
+      openDrawer();
+      expect(await screen.findByText('stored 0')).toBeDefined();
+
+      openHistoryControls();
+      expect(screen.getByRole('button', { name: 'Previous' }).hasAttribute('disabled')).toBe(true);
+      fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+      expect(await screen.findByText('stored 50')).toBeDefined();
+      expect(screen.queryByText('stored 0')).toBeNull();
+      expect(useAiAssistantStore.getState().historyOffset).toBe(50);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Previous' }));
+      expect(await screen.findByText('stored 0')).toBeDefined();
+      fireEvent.click(screen.getByRole('button', { name: 'Refresh history' }));
+      await waitFor(() =>
+        expect(services.listChatMessages).toHaveBeenLastCalledWith(
+          SESSION_ID,
+          { offset: 0, limit: 50 },
+          expect.anything()
+        )
+      );
+    });
+
+    it('forgets an expired stored session without sending anything', async () => {
+      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
+      services.getChatSession.mockRejectedValue(
+        new ApiClientError({ message: 'Session unavailable', status: 404, code: 'HTTP_ERROR' })
+      );
+      openDrawer();
+      expect(await screen.findByText(/Session expired or unavailable/i)).toBeDefined();
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBeNull();
+      expect(services.sendChatMessage).not.toHaveBeenCalled();
+    });
+
+    it('starts a new session by forgetting the tab token and local messages', async () => {
+      services.sendChatMessage.mockResolvedValue(exchange('FLEX-007 D0?'));
+      openDrawer();
+      await ask('FLEX-007 D0?');
+      await screen.findByText(/D0\) của FLEX-007 khác nhau/);
+      openHistoryControls();
+      fireEvent.click(screen.getByRole('button', { name: 'Start new session' }));
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBeNull();
+      expect(useAiAssistantStore.getState().recent).toHaveLength(0);
+      expect(useAiAssistantStore.getState().sessionId).toBeNull();
+    });
+  });
+
+  describe('races and unknown outcomes', () => {
+    it('keeps a stored exchange and its new session when the panel closes mid-send', async () => {
+      let resolve: (value: ReturnType<typeof exchange>) => void = () => {};
+      services.sendChatMessage.mockReturnValue(new Promise((r) => (resolve = r)));
+      const view = openDrawer();
+      await ask('FLEX-007 D0?');
+      await waitFor(() => expect(services.sendChatMessage).toHaveBeenCalled());
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(SESSION_ID);
+
+      useAiAssistantStore.setState({ isOpen: false });
+      view.unmount();
+      resolve(exchange('FLEX-007 D0?'));
+      await waitFor(() => expect(useAiAssistantStore.getState().recent).toHaveLength(2));
+      expect(useAiAssistantStore.getState().sessionId).toBe(SESSION_ID);
+    });
+
+    it('reloads history after a client timeout instead of inviting a duplicate resend', async () => {
+      services.sendChatMessage.mockRejectedValue(
+        new ApiClientError({ message: 'Request timed out', status: 0, code: 'REQUEST_TIMEOUT' })
+      );
+      services.listChatMessages.mockResolvedValue(
+        page([message('user', 'u-1', userAnswer('FLEX-007 D0?')), message('assistant', 'a-1', answer())])
+      );
+      openDrawer();
+      await ask('FLEX-007 D0?');
+
+      expect(await screen.findByText(/D0\) của FLEX-007 khác nhau/)).toBeDefined();
+      expect(services.listChatMessages).toHaveBeenCalledWith(
+        SESSION_ID,
+        { offset: 0, limit: 50 },
+        expect.anything()
+      );
+      expect(
+        (screen.getByPlaceholderText(/Ask about a NASA experiment/i) as HTMLTextAreaElement).value
+      ).toBe('');
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(SESSION_ID);
+    });
+
+    it('ignores a late answer after the user started a new session', async () => {
+      let resolve: (value: ReturnType<typeof exchange>) => void = () => {};
+      useAiAssistantStore.setState({ sessionId: SESSION_ID });
+      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
+      services.sendChatMessage.mockReturnValue(new Promise((r) => (resolve = r)));
+      openDrawer();
+      await ask('FLEX-007 D0?');
+      await waitFor(() => expect(services.sendChatMessage).toHaveBeenCalled());
+      openHistoryControls();
+      expect(
+        screen.getByRole('button', { name: 'Start new session' }).hasAttribute('disabled')
+      ).toBe(true);
+
+      useAiAssistantStore.getState().resetConversation();
+      resolve(exchange('FLEX-007 D0?'));
+      await new Promise((r) => setTimeout(r, 20));
+      expect(useAiAssistantStore.getState().recent).toHaveLength(0);
+      expect(useAiAssistantStore.getState().sessionId).toBeNull();
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBeNull();
+    });
+  });
+
+  describe('citation sources', () => {
+    async function sendAndOpenSource() {
+      services.sendChatMessage.mockResolvedValue(exchange('FLEX-007 D0?'));
+      openDrawer();
+      await ask('FLEX-007 D0?');
+      fireEvent.click(await screen.findByRole('button', { name: 'View source 1' }));
+    }
+
+    it('opens revision-pinned source metadata for a citation', async () => {
+      services.getChatSource.mockResolvedValue({
+        source_document_id: SOURCE_ID,
+        locator: 'CSV row 8',
+        corpus_version: CORPUS,
+        filename: 'PSI-69_Experimental table_FLEX.csv',
+        source_url: 'https://psi.nasa.gov/example.csv',
+        sha256: 'b'.repeat(64),
+        license: 'CC0-1.0',
+        title: 'FLEX',
+        review_status: 'unreviewed',
+      });
+      await sendAndOpenSource();
+      const link = await screen.findByRole('link', { name: /PSI-69_Experimental table_FLEX.csv/ });
+      expect(link.getAttribute('href')).toBe('https://psi.nasa.gov/example.csv');
+      expect(services.getChatSource).toHaveBeenCalledWith(
+        SOURCE_ID,
+        'CSV row 8',
+        CORPUS,
+        expect.anything()
+      );
+      expect(screen.getByText('CC0-1.0 · Original source')).toBeDefined();
+    });
+
+    it('explains when a citation belongs to an older corpus revision', async () => {
+      services.getChatSource.mockRejectedValue(
+        new ApiClientError({ message: 'Other revision', status: 409, code: 'HTTP_ERROR' })
+      );
+      await sendAndOpenSource();
+      expect(await screen.findByText(/older corpus revision/i)).toBeDefined();
+    });
+
+    it('reports an unavailable citation source', async () => {
+      services.getChatSource.mockRejectedValue(
+        new ApiClientError({ message: 'Citation source unavailable', status: 404, code: 'HTTP_ERROR' })
+      );
+      await sendAndOpenSource();
+      expect(await screen.findByText(/Source unavailable/i)).toBeDefined();
+    });
+  });
+
+  describe('FloatingAiDock and AppShell', () => {
+    it('toggles the assistant open', () => {
       render(<FloatingAiDock />);
-      const button = screen.getByRole('button', { name: /Open Grounded AI Assistant/i });
-      fireEvent.click(button);
+      fireEvent.click(screen.getByRole('button', { name: /Open Grounded AI Assistant/i }));
       expect(useAiAssistantStore.getState().isOpen).toBe(true);
     });
 
-    it('renders message badge count when closed and messages exist', () => {
+    it('counts assistant messages from the history page and recent exchanges', () => {
       useAiAssistantStore.setState({
-        isOpen: false,
-        messages: [
-          { id: '1', role: 'user', content: 'Hello', timestamp: 1 },
-          { id: '2', role: 'assistant', content: 'Answer 1', timestamp: 2 },
-          { id: '3', role: 'assistant', content: 'Answer 2', timestamp: 3 },
-        ],
+        messages: [mappedAssistant('a-0')],
+        recent: [mappedAssistant('a-1')],
       });
-
       render(<FloatingAiDock />);
-      const badge = screen.getByLabelText('2 assistant messages');
-      expect(badge).toBeDefined();
-      expect(badge.textContent).toBe('2');
+      expect(screen.getByLabelText('2 assistant messages').textContent).toBe('2');
     });
 
-    it('renders active context indicator when activeContextStudyId is present', () => {
-      useAiAssistantStore.setState({
-        isOpen: false,
-        activeContextStudyId: 'sofie-gel',
-      });
-
+    it('renders the active study context indicator', () => {
+      useAiAssistantStore.setState({ activeContextStudyId: 'flex' });
       render(<FloatingAiDock />);
-      const indicator = screen.getByTitle('Active Context: SOFIE-GEL');
-      expect(indicator).toBeDefined();
-    });
-  });
-
-  // =========================================================================
-  // 4. AiDrawer Component Tests
-  // =========================================================================
-  describe('AiDrawer Component', () => {
-    it('does not render when store isOpen is false', () => {
-      useAiAssistantStore.setState({ isOpen: false });
-      render(<AiDrawer />);
-      expect(screen.queryByRole('dialog', { name: /FlameGuard Grounded AI Assistant/i })).toBeNull();
+      expect(screen.getByTitle('Active Context: FLEX')).toBeDefined();
     });
 
-    it('renders drawer with welcome card and quick prompts when opened with no messages', () => {
-      useAiAssistantStore.setState({ isOpen: true, messages: [] });
-      render(<AiDrawer />);
-      expect(screen.getByRole('dialog', { name: /FlameGuard Grounded AI Assistant/i })).toBeDefined();
-      expect(screen.getByText('Offline-First Grounded Architecture')).toBeDefined();
-      expect(screen.getByText('Lunar 0.16g Flammability')).toBeDefined();
-      expect(screen.getByText('Microgravity Sphericity')).toBeDefined();
-      expect(screen.getByText('Cool Flame Hazards')).toBeDefined();
-    });
-
-    it('clicking a quick prompt submits question and retrieves grounded response with citations', async () => {
-      useAiAssistantStore.setState({ isOpen: true, messages: [] });
-      render(<AiDrawer />);
-
-      const lunarPrompt = screen.getByText('Lunar 0.16g Flammability');
-      fireEvent.click(lunarPrompt);
-
-      // Verify user message was added
-      expect(useAiAssistantStore.getState().messages[0].content).toContain('Lunar partial gravity (0.16g)');
-
-      // Advance simulated thinking timer
-      act(() => {
-        vi.advanceTimersByTime(350);
-      });
-
-      // Verify assistant message was added with citations and gap warning
-      const messages = useAiAssistantStore.getState().messages;
-      expect(messages.length).toBe(2);
-      expect(messages[1].role).toBe('assistant');
-      expect(messages[1].citations?.length).toBeGreaterThan(0);
-      expect(messages[1].evidenceGapWarning).toBeDefined();
-    });
-
-    it('submits manual query through text input and renders answer card', () => {
-      useAiAssistantStore.setState({ isOpen: true, messages: [] });
-      render(<AiDrawer />);
-
-      const input = screen.getByPlaceholderText(/Ask about microgravity combustion/i);
-      fireEvent.change(input, { target: { value: 'Why do flames become spherical in microgravity?' } });
-
-      const sendButton = screen.getByRole('button', { name: /Send message/i });
-      fireEvent.click(sendButton);
-
-      act(() => {
-        vi.advanceTimersByTime(350);
-      });
-
-      const messages = useAiAssistantStore.getState().messages;
-      expect(messages.length).toBe(2);
-      expect(messages[0].content).toBe('Why do flames become spherical in microgravity?');
-      expect(messages[1].content).toContain('spherical');
-    });
-
-    it('displays active study context and allows clearing it', () => {
-      useAiAssistantStore.setState({ isOpen: true, activeContextStudyId: 'flex' });
-      render(<AiDrawer />);
-
-      expect(screen.getByText(/Active Study Context: FLEX/i)).toBeDefined();
-      const clearButton = screen.getByRole('button', { name: /Clear Context/i });
-      fireEvent.click(clearButton);
-      expect(useAiAssistantStore.getState().activeContextStudyId).toBeNull();
-    });
-
-    it('clears conversation history when clear button is clicked', () => {
-      useAiAssistantStore.setState({
-        isOpen: true,
-        messages: [
-          { id: '1', role: 'user', content: 'Test question', timestamp: 1 },
-          { id: '2', role: 'assistant', content: 'Test answer', timestamp: 2 },
-        ],
-      });
-
-      render(<AiDrawer />);
-      const clearHistoryButton = screen.getByRole('button', { name: /Clear chat messages/i });
-      fireEvent.click(clearHistoryButton);
-      expect(useAiAssistantStore.getState().messages).toHaveLength(0);
-    });
-
-    it('closes drawer when close button or Escape key is triggered', () => {
-      useAiAssistantStore.setState({ isOpen: true });
-      render(<AiDrawer />);
-
-      const closeButton = screen.getByRole('button', { name: /Close assistant drawer/i });
-      fireEvent.click(closeButton);
-      expect(useAiAssistantStore.getState().isOpen).toBe(false);
-    });
-  });
-
-  // =========================================================================
-  // 5. AppShell Integration Tests
-  // =========================================================================
-  describe('AppShell Integration', () => {
-    it('globally mounts FloatingAiDock and AiDrawer in the layout', () => {
+    it('mounts the dock without requiring the chat API while closed', () => {
       render(
         <AppShell>
           <div data-testid="page-content">Dashboard View</div>
         </AppShell>
       );
-
-      // Verify content is rendered
       expect(screen.getByTestId('page-content')).toBeDefined();
-
-      // Verify floating dock button is globally present
       expect(screen.getByTestId('floating-ai-dock')).toBeDefined();
-      expect(screen.getByRole('button', { name: /Open Grounded AI Assistant/i })).toBeDefined();
+      expect(services.getChatReadiness).not.toHaveBeenCalled();
     });
   });
 });

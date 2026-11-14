@@ -1,0 +1,76 @@
+{
+  "checked_at": "2026-11-13T18:54:26.959921+07:00",
+  "method": "Downloaded public PSI metadata and table download response; followed NASA-generated HTTPS object-store URLs; signed URLs not retained",
+  "checks": [
+    {
+      "accession": "PSI-26",
+      "study_version": 4,
+      "snapshot_version": 4,
+      "license": "CC0-1.0",
+      "table_version": 1,
+      "bytes": 4726,
+      "sha256": "ccfc3c54d948b64a1c5d2596a63c7c8019e51df0c91a1d62f039f48fa28c300f",
+      "matches_snapshot": true
+    },
+    {
+      "accession": "PSI-99",
+      "study_version": 5,
+      "snapshot_version": 5,
+      "license": "CC0-1.0",
+      "table_version": 1,
+      "bytes": 1973,
+      "sha256": "3c24390b9ef86f3d1ebaab911a1a3cc95a8759aebf42062371370e6d4b31b8ac",
+      "matches_snapshot": true
+    },
+    {
+      "accession": "PSI-100",
+      "study_version": 4,
+      "snapshot_version": 4,
+      "license": "CC0-1.0",
+      "table_version": 1,
+      "bytes": 239,
+      "sha256": "4d3c717ec20dd0247db670b2784a9fd7d746788bc54a936f80693e48eb8cd117",
+      "matches_snapshot": true
+    },
+    {
+      "accession": "PSI-20",
+      "study_version": 4,
+      "snapshot_version": 4,
+      "license": "CC0-1.0",
+      "table_version": 1,
+      "bytes": 1113,
+      "sha256": "4aa5d3f98708ceacced5c620d46858b9965f8d4d941b203229f46467d53e5ab7",
+      "matches_snapshot": true
+    },
+    {
+      "accession": "PSI-39",
+      "study_version": 4,
+      "snapshot_version": 4,
+      "license": "CC0-1.0",
+      "table_version": 1,
+      "bytes": 7792,
+      "sha256": "fb898e28762353aa132c16b886dbd207a024b1dd3c9bed5928d70d8036d2ec7e",
+      "matches_snapshot": true
+    },
+    {
+      "accession": "PSI-102",
+      "study_version": 4,
+      "snapshot_version": 4,
+      "license": "CC0-1.0",
+      "table_version": 1,
+      "bytes": 331,
+      "sha256": "268d1e121d2f211b124407dd32b9475617bd269ede2c2d1749441da3e949a2af",
+      "matches_snapshot": true
+    },
+    {
+      "accession": "PSI-101",
+      "study_version": 4,
+      "snapshot_version": 4,
+      "license": "CC0-1.0",
+      "table_version": 1,
+      "bytes": 5674,
+      "sha256": "87164b7dc9168a4273c159f7a9f23699afbd06ad97b77974377e79b9bf8a3bef",
+      "matches_snapshot": true
+    }
+  ]
+}

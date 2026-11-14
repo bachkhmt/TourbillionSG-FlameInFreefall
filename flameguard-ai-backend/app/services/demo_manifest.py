@@ -63,6 +63,19 @@ def _manifest_rows(path, *, synthetic):
     )
     for table in Base.metadata.sorted_tables:
         for row in tables[table.name]:
+            if table.name == "source_document":
+                # Pre-option-A snapshots contain only investigation-owned source rows.
+                if manifest.get("version", 1) == 1:
+                    row.setdefault("source_scope", "investigation")
+                if "source_scope" not in row:
+                    raise Phase4Error("DATASET_CONFLICT")
+                if (
+                    not isinstance(row["source_scope"], str)
+                    or (row["source_scope"] == "investigation")
+                    != (row.get("investigation_id") is not None)
+                    or row["source_scope"] not in {"investigation", "challenge"}
+                ):
+                    raise Phase4Error("DATASET_CONFLICT")
             if set(row) != set(table.columns.keys()):
                 raise Phase4Error("DATASET_CONFLICT")
             for col in table.columns:

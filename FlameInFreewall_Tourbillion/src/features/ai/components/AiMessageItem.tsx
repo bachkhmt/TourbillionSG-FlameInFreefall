@@ -1,66 +1,64 @@
 'use client';
 
 import React from 'react';
-import { Bot, User, AlertTriangle } from 'lucide-react';
 import { CitationBadge } from './CitationBadge';
-import type { ChatMessage } from '@/types';
+import type { ChatAnswerState, MappedChatMessage } from '@/types/api';
 
 export interface AiMessageItemProps {
-  message: ChatMessage;
+  message: MappedChatMessage;
 }
 
+const STATE_NOTICES: Partial<Record<ChatAnswerState, string>> = {
+  abstained: 'No matching evidence in the connected corpus — nothing was inferred.',
+  timeout: 'Provider timed out — no answer was invented.',
+  unavailable: 'Evidence provider unavailable.',
+};
+
+function provenance(origin: string, reviewStatus: string): string | null {
+  if (reviewStatus !== 'unreviewed') return null;
+  if (origin === 'real') return 'Research source excerpts. Scientific review has not been documented.';
+  if (origin === 'synthetic') return 'Synthetic test data.';
+  return 'Scientific review has not been documented.';
+}
+
+/** One stored chat message, rendered like the NASA research chat. */
 export const AiMessageItem: React.FC<AiMessageItemProps> = ({ message }) => {
-  const isAssistant = message.role === 'assistant';
+  const isUser = message.role === 'user';
+  const { answer } = message;
+  const notice = isUser ? undefined : STATE_NOTICES[answer.state];
+  // Provenance is only claimed for answers that actually cite a source.
+  const note = !isUser && answer.citations.length > 0
+    ? provenance(answer.origin, answer.reviewStatus)
+    : null;
 
   return (
-    <div className={`flex gap-2.5 ${isAssistant ? 'justify-start' : 'justify-end'}`}>
-      {isAssistant && (
-        <div className="w-7 h-7 rounded-lg bg-[#0B2374]/10 border border-[#0B2374]/20 flex items-center justify-center shrink-0 mt-0.5 text-[#0B2374]">
-          <Bot className="w-4 h-4" />
-        </div>
+    <article
+      className={
+        isUser
+          ? 'ml-auto w-fit max-w-[85%] rounded-2xl rounded-tr-sm bg-[#0B2374] p-3 text-sm text-white'
+          : 'mr-auto w-fit max-w-[95%] rounded-2xl rounded-tl-sm border border-slate-200 bg-white p-3 text-sm text-slate-900'
+      }
+    >
+      <strong className="text-xs">{isUser ? 'You' : 'FlameGuard AI'}</strong>
+      <p className="mt-1 whitespace-pre-wrap break-words">{answer.text}</p>
+      {notice && (
+        <p className="mt-2 rounded-lg border border-amber-300 bg-amber-50 px-2 py-1 text-xs text-amber-900">
+          {notice}
+        </p>
       )}
-
-      <div
-        className={`max-w-[85%] text-xs leading-relaxed space-y-2.5 ${
-          isAssistant
-            ? 'bg-white border border-gray-200 text-zinc-900 shadow-xs rounded-2xl rounded-tl-xs p-3.5'
-            : 'bg-gray-100 text-zinc-900 rounded-2xl rounded-tr-xs p-3.5'
-        }`}
-      >
-        {/* Message Text */}
-        <div className="whitespace-pre-wrap space-y-1.5">{message.content}</div>
-
-        {/* Evidence Gap Warning Banner */}
-        {message.evidenceGapWarning && (
-          <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-[11px] flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
-            <span>{message.evidenceGapWarning}</span>
-          </div>
-        )}
-
-        {/* Grounding Citations List */}
-        {message.citations && message.citations.length > 0 && (
-          <div className="pt-2 border-t border-gray-200 space-y-1.5">
-            <span className="text-[10px] font-bold text-zinc-500 block tracking-wider uppercase">
-              Grounding Citations ({message.citations.length}):
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {message.citations.map((citation, idx) => (
-                <CitationBadge
-                  key={`${citation.investigationId}-${citation.claimId || idx}`}
-                  citation={citation}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {!isAssistant && (
-        <div className="w-7 h-7 rounded-lg bg-gray-200 border border-gray-300 flex items-center justify-center shrink-0 mt-0.5 text-zinc-700">
-          <User className="w-4 h-4" />
-        </div>
-      )}
-    </div>
+      {note && <p className="mt-2 text-xs text-slate-500">{note}</p>}
+      {!isUser &&
+        answer.citations.map((citation, idx) => (
+          <CitationBadge
+            key={`${message.id}:${idx}:${answer.corpusVersion ?? 'legacy'}`}
+            citation={citation}
+            index={idx + 1}
+            corpusVersion={answer.corpusVersion}
+            showExcerpt={Boolean(
+              citation.sourceExcerpt && !answer.text.includes(citation.sourceExcerpt)
+            )}
+          />
+        ))}
+    </article>
   );
 };

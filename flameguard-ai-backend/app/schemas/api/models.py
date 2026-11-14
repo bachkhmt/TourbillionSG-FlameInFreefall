@@ -218,7 +218,8 @@ class ClaimSource(ApiModel):
 
 class Source(ApiModel):
     id: UUID
-    investigation_id: UUID
+    investigation_id: UUID | None
+    source_scope: Literal["investigation", "challenge"] = "investigation"
     source_url: str
     doi: str | None
     document_type: str

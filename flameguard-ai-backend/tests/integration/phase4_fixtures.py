@@ -19,7 +19,7 @@ from app.services.demo_seed import seed
 ROOT = Path(__file__).resolve().parents[2]
 
 
-async def provision_phase4(admin_raw, *, populate=True):
+async def provision_phase4(admin_raw, *, populate=True, migration_revision="head"):
     admin = make_url(admin_raw)
     suffix = uuid4().hex[:10]
     database, owner, reader = (
@@ -55,7 +55,7 @@ async def provision_phase4(admin_raw, *, populate=True):
     }
     result = await asyncio.to_thread(
         subprocess.run,
-        [sys.executable, "-m", "alembic", "upgrade", "head"],
+        [sys.executable, "-m", "alembic", "upgrade", migration_revision],
         cwd=ROOT,
         env=env,
         capture_output=True,

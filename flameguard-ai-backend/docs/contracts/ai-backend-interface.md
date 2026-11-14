@@ -47,6 +47,24 @@ Define before implementation:
 - Monitoring/evaluation: groundedness, citation accuracy, abstention quality,
   offline/failed-provider behavior, and regression prompts.
 
+## Implemented: real-corpus extractive boundary (ADR-0005)
+
+Agreed and implemented 2026-11-14 (Phase 6b). A provider may implement the optional
+`CorpusRetriever.retrieve(question, passages, prior_questions, study_slugs)` in addition to
+`RagProvider.answer`. When `CHAT_PROVIDER=extractive` (or a trusted factory) and the admitted
+real/unreviewed v2 collection declares `corpusPolicy`, the backend:
+
+1. admits `document_chunk` passages that match the CC0 registry in the same read snapshot;
+2. runs `retrieve` on detached passages under the chat deadline and accepts only hits whose
+   source/locator belong to the corpus and whose excerpt is a verbatim slice of the chunk;
+3. passes only those hits as `allowed_sources`; a `real` answer must carry the request
+   `corpus_version`, a `provider_version`, cite only allowed sources and contain no number
+   absent from its cited excerpts;
+4. exposes `GET /chat/readiness` and `GET /chat/sources/{source_document_id}` (snake_case).
+
+Unavailable/mock providers and collections without `corpusPolicy` behave as in Phase 6.
+Scientific evaluation (groundedness, abstention quality, expert-reviewed prompts) remains open.
+
 ## Session persistence is a backend responsibility
 
 The current ERD contains:

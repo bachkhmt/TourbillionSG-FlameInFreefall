@@ -79,3 +79,49 @@ class AdvisorOutput(BaseModel):
     pillars: dict[str, Answer]
     gaps: dict[str, tuple[str, ...]]
     context: dict
+
+
+class ChatReadiness(BaseModel):
+    """Whether sending can currently succeed, without exposing configuration details."""
+
+    state: Literal["ready", "not_ready"]
+    mode: Literal["retrieval_only", "provider", "none"]
+    provider_version: str | None = None
+    corpus_version: str | None = None
+    source_revision: str | None = None
+    passages: int | None = None
+    review_status: Literal["unreviewed", "unknown"] = "unknown"
+    reasons: tuple[str, ...] = ()
+
+
+class ChatSourceOutput(BaseModel):
+    """Registry metadata of an admitted cited passage, pinned to one corpus version."""
+
+    source_document_id: UUID
+    locator: str
+    corpus_version: str
+    filename: str
+    source_url: str | None = Field(description="Original file link; only https URLs are returned")
+    sha256: str
+    license: str
+    title: str
+    investigation_id: UUID | None = None
+    source_scope: Literal["investigation", "challenge"] = "investigation"
+    review_status: Literal["unreviewed"] = "unreviewed"
+
+
+class ChallengeResourceOutput(BaseModel):
+    source_document_id: UUID
+    resource_id: str
+    title: str
+    source_url: str
+    source_scope: Literal["challenge"] = "challenge"
+    investigation_id: None = None
+    license: str
+    status: str
+    indexed: bool
+
+
+class ChallengeResourcePage(BaseModel):
+    corpus_version: str
+    items: list[ChallengeResourceOutput]

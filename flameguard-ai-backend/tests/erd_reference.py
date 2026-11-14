@@ -20,6 +20,8 @@ def erd_tables() -> dict[str, dict[str, tuple[str, str]]]:
                 parts = line.strip().split()
                 columns[parts[1]] = (parts[0], parts[2] if len(parts) > 2 else "")
             tables[table.lower()] = columns
+    # Approved option-A additive delta; the historical ERD remains unchanged.
+    tables["source_document"]["source_scope"] = ("string", "")
     return tables
 
 
@@ -35,4 +37,5 @@ def approved_nullables() -> dict[str, set[str]]:
                 if columns.strip() == "None"
                 else {name.strip() for name in columns.split(",")}
             )
+    result["source_document"].add("investigation_id")
     return result

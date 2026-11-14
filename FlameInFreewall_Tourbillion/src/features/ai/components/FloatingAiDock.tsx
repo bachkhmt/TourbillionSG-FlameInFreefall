@@ -12,9 +12,12 @@ export const FloatingAiDock: React.FC<FloatingAiDockProps> = ({ className = '' }
   const isOpen = useAiAssistantStore((s) => s.isOpen);
   const toggleOpen = useAiAssistantStore((s) => s.toggleOpen);
   const messages = useAiAssistantStore((s) => s.messages);
+  const recent = useAiAssistantStore((s) => s.recent);
   const activeContextStudyId = useAiAssistantStore((s) => s.activeContextStudyId);
 
-  const assistantMessageCount = messages.filter((m) => m.role === 'assistant').length;
+  const assistantMessageCount = [...messages, ...recent].filter(
+    (m) => m.role === 'assistant'
+  ).length;
 
   return (
     <div

@@ -22,17 +22,13 @@ import type {
 import type {
   EvaluationDto,
   EvaluationRequestDto,
-  ExchangeDto,
   InvestigationFilterParamsDto,
   InvestigationListParamsDto,
-  MessageOutputDto,
   PaginationParamsDto,
   PredictionRequestDto,
   PredictionResponseDto,
   ReadinessDto,
-  SessionOutputDto,
 } from '@/api/dto';
-import { queryRagKnowledgeEngine } from '@/lib/ragKnowledgeEngine';
 import type { Investigation, TestRun } from '@/types';
 
 export const FALLBACK_CONTEXT: ApiContextMeta = {
@@ -685,67 +681,6 @@ export function getMockComparisonResult(investigationIds: string[]): MappedCompa
     comparability: 'NASA PSI Archive Comparative Assessment',
     unavailableFields: {},
     context: FALLBACK_CONTEXT,
-  };
-}
-
-/**
- * Fallback chat session output.
- */
-export function getMockChatSession(investigationId?: string | null): SessionOutputDto {
-  const id = 'session-fallback-' + Math.random().toString(36).substring(2, 9);
-  const now = new Date();
-  const expires = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  return {
-    id,
-    investigationId: investigationId ?? null,
-    title: investigationId ? `Session for ${investigationId}` : 'Research Exploration Session',
-    createdAt: now.toISOString(),
-    expiresAt: expires.toISOString(),
-    privacy: 'Local mock session (Offline fallback mode)',
-  };
-}
-
-/**
- * Fallback chat exchange output powered by NASA PSI RAG knowledge engine.
- */
-export function getMockChatExchange(
-  question: string,
-  investigationId?: string | null
-): ExchangeDto {
-  const ragResult = queryRagKnowledgeEngine(question, investigationId);
-  const now = new Date().toISOString();
-
-  const userMsg: MessageOutputDto = {
-    id: 'msg-user-' + Math.random().toString(36).substring(2, 9),
-    role: 'user',
-    createdAt: now,
-    answer: {
-      state: 'answered',
-      text: question,
-      citations: [],
-    },
-  };
-
-  const assistantMsg: MessageOutputDto = {
-    id: 'msg-asst-' + Math.random().toString(36).substring(2, 9),
-    role: 'assistant',
-    createdAt: now,
-    answer: {
-      state: 'answered',
-      text: ragResult.answer,
-      origin: 'real',
-      reviewStatus: 'unreviewed',
-      citations: (ragResult.citations ?? []).map((c, idx) => ({
-        sourceDocumentId: `doc-${idx}`,
-        sourceLocator: `${c.code} - ${c.title}`,
-        sourceExcerpt: c.claimText,
-      })),
-    },
-  };
-
-  return {
-    user: userMsg,
-    assistant: assistantMsg,
   };
 }
 

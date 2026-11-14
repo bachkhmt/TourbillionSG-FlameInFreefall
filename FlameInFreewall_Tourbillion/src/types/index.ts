@@ -252,26 +252,7 @@ export interface PredictiveLabAudit {
 // ---------------------------------------------------------------------------
 // 8. Grounded AI Assistant (RAG Dock)
 // ---------------------------------------------------------------------------
-
-export interface AiCitation {
-  investigationId: string;
-  code: string;
-  title: string;
-  claimId?: string;
-  claimText: string;
-  badge: EvidenceBadgeType;
-  doi?: string;
-  facility?: string;
-}
-
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: number;
-  citations?: AiCitation[];
-  evidenceGapWarning?: string;
-}
+// Chat types come from the backend contract: see MappedChat* in ./api.ts.
 
 // ---------------------------------------------------------------------------
 // 9. Toast Notification System

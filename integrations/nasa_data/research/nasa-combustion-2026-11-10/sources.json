@@ -1,0 +1,291 @@
+{
+  "research_date": "2026-11-10",
+  "sources": [
+    {
+      "id": "PSI-69",
+      "title": "Flame Extinguishment Experiment",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-69",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-69",
+      "doi": "10.60555/mbq8-0451",
+      "observed_version": 5,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-68",
+      "title": "Flame Extinguishment Experiment - 2",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-68",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-68",
+      "doi": "10.60555/byp8-h018",
+      "observed_version": 6,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-26",
+      "title": "Burning and Suppression of Solids",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-26",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-26",
+      "doi": "10.60555/58h4-dy80",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-25",
+      "title": "Burning and Suppression of Solids - II",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-25",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-25",
+      "doi": "10.60555/4qc4-de67",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-98",
+      "title": "Spacecraft Fire Safety Experiment-I",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-98",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-98",
+      "doi": "10.60555/0t15-1z43",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-99",
+      "title": "Spacecraft Fire Experiment-II",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-99",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-99",
+      "doi": "10.60555/2chp-m469",
+      "observed_version": 5,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-100",
+      "title": "Spacecraft Fire Experiment-III",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-100",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-100",
+      "doi": "10.60555/040q-4h36",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-20",
+      "title": "Advanced Combustion via Microgravity Experiments - Burning Rate Emulator",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-20",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-20",
+      "doi": "10.60555/vb93-3y72",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-21",
+      "title": "Advanced Combustion via Microgravity Experiments / Coflow Laminar Diffusion Flame",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-21",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-21",
+      "doi": "10.60555/23e1-9950",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-22",
+      "title": "Advanced Combustion via Microgravity Experiments Electric-Field Effects on Laminar Diffusion Flames",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-22",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-22",
+      "doi": "10.60555/se5a-8c73",
+      "observed_version": 7,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-23",
+      "title": "Advanced Combustion via Microgravity Experiments-Structure and Response of Spherical Diffusion Flames",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-23",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-23",
+      "doi": "10.60555/k57n-p030",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-10",
+      "title": "Advanced Combustion via Microgravity Experiments / Flame Design",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-10",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-10",
+      "doi": "10.60555/w4zy-bt45",
+      "observed_version": 1,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-159",
+      "title": "Advanced Combustion via Microgravity Experiments / Cool Flames Investigation with Gases",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-159",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-159",
+      "doi": "10.60555/cyt1-kh64",
+      "observed_version": 1,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-39",
+      "title": "Cool Flames Investigation",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-39",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-39",
+      "doi": "10.60555/m6pj-a914",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-106",
+      "title": "Structure and Liftoff In Combustion Experiment",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-106",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-106",
+      "doi": "10.60555/pm12-rg61",
+      "observed_version": 3,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-107",
+      "title": "Smoke Point In Co-flow Experiment",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-107",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-107",
+      "doi": "10.60555/9kbh-e962",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-102",
+      "title": "Smoke and Aerosol Measurement Experiment",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-102",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-102",
+      "doi": "10.60555/gd4k-8h62",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "PSI-101",
+      "title": "Smoke Aerosol Measurement Experiment-Reflight",
+      "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-101",
+      "metadata_url": "https://psi.nasa.gov/geode-py/ws/repo/investigations/PSI-101",
+      "doi": "10.60555/2np7-jv14",
+      "observed_version": 4,
+      "access": "Unauthenticated HTTP 200 JSON metadata; selected experimental tables downloaded and hashed",
+      "evidence": "evidence/catalog-snapshot.json"
+    },
+    {
+      "id": "NTRS-20150023456",
+      "title": "Detailed Results from the Flame Extinguishment Experiment (FLEX) March 2009 to December 2011",
+      "url": "https://ntrs.nasa.gov/citations/20150023456",
+      "metadata_url": "https://ntrs.nasa.gov/api/citations/20150023456",
+      "fulltext_url": "https://ntrs.nasa.gov/api/citations/20150023456/downloads/20150023456.txt",
+      "access": "Unauthenticated metadata and fulltext HTTP fetch succeeded; relevant sections inspected, not a complete paper or figure review",
+      "copyright_determination": "PUBLIC_USE_PERMITTED",
+      "fulltext_response_sha256": "60b5c4bbfbd48464cd07f17ec3e619c329aa7e098206899c270a9b1a7335b16c"
+    },
+    {
+      "id": "NTRS-20210011385",
+      "title": "Burning and Suppression of Solids–II  (BASS-II) Summary Report",
+      "url": "https://ntrs.nasa.gov/citations/20210011385",
+      "metadata_url": "https://ntrs.nasa.gov/api/citations/20210011385",
+      "fulltext_url": "https://ntrs.nasa.gov/api/citations/20210011385/downloads/TM-20210011385.pdf.txt",
+      "access": "Unauthenticated metadata and fulltext HTTP fetch succeeded; relevant sections inspected, not a complete paper or figure review",
+      "copyright_determination": "GOV_PERMITTED",
+      "fulltext_response_sha256": "56ee5bd7702b5c8235f9934468bb9d6e4ea143c4570d7eaa1da11d904b42ea3f"
+    },
+    {
+      "id": "NTRS-20240008602",
+      "title": "Vehicle Modeling During the Burning of Thermally Thick Samples in the Saffire V Experiments",
+      "url": "https://ntrs.nasa.gov/citations/20240008602",
+      "metadata_url": "https://ntrs.nasa.gov/api/citations/20240008602",
+      "fulltext_url": "https://ntrs.nasa.gov/api/citations/20240008602/downloads/ICES-2024-310.pdf.txt",
+      "access": "Unauthenticated metadata and fulltext HTTP fetch succeeded; relevant sections inspected, not a complete paper or figure review",
+      "copyright_determination": "GOV_PUBLIC_USE_PERMITTED",
+      "fulltext_response_sha256": "f17f0150f3112353233c55715e525c5172f9912593ed634f881d4165bf54066a"
+    },
+    {
+      "id": "NTRS-20220005205",
+      "title": "Laminar Non-Premixed Flames of Gaseous Fuel Aboard the International Space Station",
+      "url": "https://ntrs.nasa.gov/citations/20220005205",
+      "metadata_url": "https://ntrs.nasa.gov/api/citations/20220005205",
+      "fulltext_url": "https://ntrs.nasa.gov/api/citations/20220005205/downloads/ACME%20CSSCI%20paper%2020220402.pdf.txt",
+      "access": "Unauthenticated metadata and fulltext HTTP fetch succeeded; relevant sections inspected, not a complete paper or figure review",
+      "copyright_determination": "GOV_PUBLIC_USE_PERMITTED",
+      "fulltext_response_sha256": "39fd7906ba2886f93726fdbf78c735afe00ec4f199157683f78681c82c41337a"
+    },
+    {
+      "id": "PSI-GUIDE",
+      "title": "PSI Database Guide",
+      "url": "https://assets.science.nasa.gov/content/dam/science/bps/bps-general/bps-data_osdr_psi/Complete_PSI_Database_Guide.pdf",
+      "access": "NASA guide; web text extraction read, 11 pages; file/download/version sections"
+    },
+    {
+      "id": "NTRS-HARVEST",
+      "title": "Harvesting Data from the NASA STI Repository",
+      "url": "https://www.sti.nasa.gov/harvesting-data-from-ntrs/",
+      "access": "Official harvesting guidance opened"
+    },
+    {
+      "id": "NTRS-API",
+      "title": "NASA STI OpenAPI Documentation, 2022-11-22",
+      "url": "https://www.sti.nasa.gov/docs/20221122_OpenAPI_Documentation.pdf",
+      "access": "Web text extraction read; pages 2-5: limits, redistribution, endpoints"
+    },
+    {
+      "id": "NASA-DOWNLOAD",
+      "title": "New File Download Process for PSI Large Requests",
+      "url": "https://science.nasa.gov/uncategorized/new-file-download-process-for-large-requestspsi-new-file-download-process/",
+      "access": "NASA announcement opened in search result; >1GB bulk workflow, not used"
+    },
+    {
+      "id": "NASA-COMBUSTION",
+      "title": "Combustion Science",
+      "url": "https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/",
+      "access": "Opened; experiment family context"
+    },
+    {
+      "id": "NASA-SOFIE",
+      "title": "Solid Fuel Ignition and Extinction",
+      "url": "https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/solid-fuel-ignition-and-extinction-sofie/",
+      "access": "Opened through official Combustion Science link; research descriptions, not verified raw dataset availability"
+    },
+    {
+      "id": "NASA-SOFIE-MISSION",
+      "title": "SoFIE",
+      "url": "https://science.nasa.gov/mission/sofie/",
+      "access": "Opened; active mission description, not proof of raw dataset availability"
+    },
+    {
+      "id": "AWS-REGISTRY",
+      "title": "NASA PSI on Registry of Open Data",
+      "url": "https://registry.opendata.aws/nasa-psi/",
+      "access": "Opened; anonymous bucket documented; root listing separately verified"
+    },
+    {
+      "id": "AWS-LIST",
+      "title": "nasa-psi S3 root listing",
+      "url": "https://nasa-psi.s3.us-west-2.amazonaws.com/?list-type=2&delimiter=/&max-keys=100",
+      "access": "HTTP 200 XML; prefixes DSI/, OASIS/, pk4/ and index.html; not a combustion mirror"
+    },
+    {
+      "id": "ACME-OPS",
+      "title": "ACME operations overview",
+      "url": "https://gipoc.grc.nasa.gov/wp/fcf-cir/acme/",
+      "access": "Opened; suite of independent gaseous flame experiments"
+    },
+    {
+      "id": "PSI-RESEARCH",
+      "title": "NASA PSI Research Opportunity",
+      "url": "https://science.nasa.gov/physical-sciences-informatics-psi/nasa-psi-research-opportunity/",
+      "access": "Opened; eligible investigations are a discovery guide, not a completeness or access guarantee"
+    }
+  ]
+}
