@@ -28,8 +28,8 @@ import type {
 import type { ApiQueryOptions } from './queryHelpers';
 import { apiQueryKeys } from './queryKeys';
 
-/** The backend caps a history page at 100 messages. */
-export const CHAT_HISTORY_LIMIT = 100;
+/** Conversation history page size (backend allows up to 100). */
+export const CHAT_HISTORY_LIMIT = 50;
 
 export function isNotFound(error: unknown): boolean {
   return error instanceof ApiClientError && error.status === 404;
@@ -51,12 +51,16 @@ export function useChatReadinessQuery(
 
 export interface ChatHistory {
   session: MappedChatSession;
+  offset: number;
   messages: MappedChatMessage[];
+  /** A full page suggests more stored messages after this one. */
+  hasMore: boolean;
 }
 
-/** Restores a stored session and its server history (latest page up to the API cap). */
+/** One stored history page of a session (oldest first), plus the session itself (404 = expired). */
 export function useChatHistoryQuery(
   sessionId: string | null,
+  offset: number,
   options?: ApiQueryOptions<ChatHistory>
 ): UseQueryResult<ChatHistory, Error> {
   return useQuery<ChatHistory, Error>({
@@ -64,14 +68,19 @@ export function useChatHistoryQuery(
     staleTime: 0,
     gcTime: 0,
     ...options,
-    queryKey: apiQueryKeys.chatHistory(sessionId ?? ''),
+    queryKey: apiQueryKeys.chatHistory(sessionId ?? '', offset),
     queryFn: async ({ signal }) => {
       const id = sessionId as string;
       const [session, page] = await Promise.all([
         getChatSession(id, signal),
-        listChatMessages(id, { offset: 0, limit: CHAT_HISTORY_LIMIT }, signal),
+        listChatMessages(id, { offset, limit: CHAT_HISTORY_LIMIT }, signal),
       ]);
-      return { session: mapChatSessionDto(session), messages: page.items.map(mapChatMessageDto) };
+      return {
+        session: mapChatSessionDto(session),
+        offset: page.offset,
+        messages: page.items.map(mapChatMessageDto),
+        hasMore: page.items.length === page.limit,
+      };
     },
     enabled: Boolean(sessionId) && (options?.enabled ?? true),
   });
@@ -124,7 +133,7 @@ export interface SendChatVariables {
    * Lifecycle hooks run inside the mutation itself, so they still fire when the calling
    * component unmounts mid-request (unlike `mutate(..., { onSuccess })`).
    */
-  onSessionCreated?: (sessionId: string) => void;
+  onSessionCreated?: (session: MappedChatSession) => void;
   onExchange?: (result: SendChatResult) => void;
   /** The request may or may not have been stored (client timeout / network loss). */
   onOutcomeUnknown?: (sessionId: string) => void;
@@ -143,11 +152,10 @@ export interface SendChatResult {
   messages: [MappedChatMessage, MappedChatMessage];
 }
 
-async function newSession(investigationId?: string | null): Promise<string> {
-  const session = await createChatSession(
-    investigationId ? { investigation_id: investigationId } : {}
+async function newSession(investigationId?: string | null): Promise<MappedChatSession> {
+  return mapChatSessionDto(
+    await createChatSession(investigationId ? { investigation_id: investigationId } : {})
   );
-  return session.id;
 }
 
 /**
@@ -165,9 +173,9 @@ export function useSendChatMessageMutation(): UseMutationResult<
       const { question, sessionId, investigationId } = variables;
       const create = async () => {
         const created = await newSession(investigationId);
-        // Record the id before sending so a lost response never orphans the session.
+        // Record the session before sending so a lost response never orphans it.
         variables.onSessionCreated?.(created);
-        return created;
+        return created.id;
       };
       let id = sessionId ?? (await create());
       let exchange;

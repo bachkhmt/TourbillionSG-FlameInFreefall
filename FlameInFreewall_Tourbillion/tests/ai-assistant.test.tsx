@@ -7,7 +7,7 @@ import { useAiAssistantStore } from '@/store/useAiAssistantStore';
 import { renderWithQuery } from './test-utils';
 
 vi.mock('@/api/services', () => ({
-  getChatReadiness: vi.fn().mockResolvedValue({ state: 'not_ready', mode: 'retrieval_only', reasons: [] }),
+  getChatReadiness: vi.fn().mockResolvedValue({ state: 'not_ready', mode: 'none', reasons: [] }),
   createChatSession: vi.fn(),
   getChatSession: vi.fn(),
   listChatMessages: vi.fn(),
@@ -38,7 +38,7 @@ describe('AI Assistant Light Theme', () => {
 
     const dialog = screen.getByRole('dialog', { name: /FlameGuard Grounded AI Assistant/i });
     expect(dialog).toBeInTheDocument();
-    expect(screen.getByText(/FlameGuard Grounded AI/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Ask about NASA combustion/i)).toBeInTheDocument();
+    expect(screen.getByText('FlameGuard AI', { selector: 'h2' })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Ask about a NASA experiment/i)).toBeInTheDocument();
   });
 });

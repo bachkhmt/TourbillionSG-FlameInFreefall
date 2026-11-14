@@ -8,7 +8,7 @@ import { useAiAssistantStore } from '../src/store/useAiAssistantStore';
 import { CHAT_SESSION_KEY } from '../src/lib/chatSession';
 import { ApiClientError } from '../src/api/client';
 import * as apiServices from '@/api/services';
-import type { ChatAnswerDto, ChatMessageDto } from '@/api/dto';
+import type { ChatAnswerDto, ChatMessageDto, ChatReadinessDto } from '@/api/dto';
 import type { MappedChatMessage } from '../src/types/api';
 import { renderWithQuery } from './test-utils';
 
@@ -30,6 +30,7 @@ const services = vi.mocked(apiServices);
 const SESSION_ID = '11111111-1111-4111-8111-111111111111';
 const SOURCE_ID = '22222222-2222-4222-8222-222222222222';
 const CORPUS = 'a'.repeat(64);
+const EXCERPT = 'FLEX-007 [row 8]; Droplet initial diameter; mm: 1.87';
 
 function answer(overrides: Partial<ChatAnswerDto> = {}): ChatAnswerDto {
   return {
@@ -44,7 +45,7 @@ function answer(overrides: Partial<ChatAnswerDto> = {}): ChatAnswerDto {
       {
         source_document_id: SOURCE_ID,
         source_locator: 'CSV row 8',
-        source_excerpt: 'FLEX-007 [row 8]; Droplet initial diameter; mm: 1.87',
+        source_excerpt: EXCERPT,
         test_run_id: null,
       },
     ],
@@ -60,15 +61,15 @@ function userAnswer(text: string): ChatAnswerDto {
   return answer({ text, citations: [], origin: 'unknown', review_status: 'unknown' });
 }
 
-function readyDto() {
+function readyDto(): ChatReadinessDto {
   return {
-    state: 'ready' as const,
+    state: 'ready',
     mode: 'retrieval_only',
-    providerVersion: 'nasa-extractive-v2',
-    corpusVersion: CORPUS,
-    sourceRevision: 'rev',
+    provider_version: 'nasa-extractive-v2',
+    corpus_version: CORPUS,
+    source_revision: 'rev',
     passages: 1045,
-    reviewStatus: 'unreviewed',
+    review_status: 'unreviewed',
     reasons: [],
   };
 }
@@ -80,15 +81,19 @@ function sessionDto(id = SESSION_ID) {
     title: null,
     created_at: '2026-11-14T00:00:00Z',
     expires_at: '2026-11-15T00:00:00Z',
-    privacy: 'Public research demo.',
+    privacy: 'Public research demo. Session ID holders can access history for 24 hours.',
   };
 }
 
-function exchange(question: string, body: ChatAnswerDto = answer()) {
+function exchange(question: string, body: ChatAnswerDto = answer(), suffix = '1') {
   return {
-    user: message('user', 'u-1', userAnswer(question)),
-    assistant: message('assistant', 'a-1', body),
+    user: message('user', `u-${suffix}`, userAnswer(question)),
+    assistant: message('assistant', `a-${suffix}`, body),
   };
+}
+
+function page(items: ChatMessageDto[], offset = 0, limit = 50) {
+  return { items, offset, limit };
 }
 
 function openDrawer() {
@@ -97,7 +102,7 @@ function openDrawer() {
 }
 
 async function ask(question: string) {
-  const input = await screen.findByPlaceholderText(/Ask about NASA combustion/i);
+  const input = await screen.findByPlaceholderText(/Ask about a NASA experiment/i);
   fireEvent.change(input, { target: { value: question } });
   await waitFor(() =>
     expect(screen.getByRole('button', { name: 'Send message' }).hasAttribute('disabled')).toBe(
@@ -107,9 +112,13 @@ async function ask(question: string) {
   fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
 }
 
-function assistantMessage(): MappedChatMessage {
+function openHistoryControls() {
+  fireEvent.click(screen.getByText('Conversation history'));
+}
+
+function mappedAssistant(id: string): MappedChatMessage {
   return {
-    id: 'a-0',
+    id,
     role: 'assistant',
     createdAt: '2026-11-14T00:00:00Z',
     answer: {
@@ -124,50 +133,63 @@ function assistantMessage(): MappedChatMessage {
   };
 }
 
-describe('Grounded AI assistant backed by the NASA chat API', () => {
+describe('Grounded AI assistant (NASA chat style) backed by the backend chat API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     sessionStorage.clear();
-    useAiAssistantStore.setState({
-      isOpen: false,
-      activeContextStudyId: null,
-      sessionId: null,
-      messages: [],
-    });
+    useAiAssistantStore.getState().resetConversation();
+    useAiAssistantStore.setState({ isOpen: false, activeContextStudyId: null });
     services.getChatReadiness.mockResolvedValue(readyDto());
     services.createChatSession.mockResolvedValue(sessionDto());
     services.getChatSession.mockResolvedValue(sessionDto());
-    services.listChatMessages.mockResolvedValue({ items: [], offset: 0, limit: 100 });
+    services.listChatMessages.mockResolvedValue(page([]));
   });
 
-  describe('AiDrawer', () => {
+  describe('panel and backdrop', () => {
     it('does not render or call the API when closed', () => {
       renderWithQuery(<AiDrawer />);
       expect(screen.queryByRole('dialog')).toBeNull();
       expect(services.getChatReadiness).not.toHaveBeenCalled();
     });
 
-    it('locks sending while the corpus is not ready and retries readiness', async () => {
+    it('keeps the blurred backdrop and closes when it is clicked', async () => {
+      openDrawer();
+      const backdrop = await screen.findByTestId('ai-drawer-backdrop');
+      expect(backdrop.className).toContain('backdrop-blur-xs');
+      expect(backdrop.className).toContain('bg-black/40');
+      fireEvent.click(backdrop);
+      expect(useAiAssistantStore.getState().isOpen).toBe(false);
+    });
+
+    it('closes on Escape and with the Close button', async () => {
+      openDrawer();
+      await screen.findByRole('dialog');
+      fireEvent.keyDown(window, { key: 'Escape' });
+      expect(useAiAssistantStore.getState().isOpen).toBe(false);
+    });
+
+    it('locks sending while the chat is not ready and retries the connection', async () => {
       services.getChatReadiness.mockResolvedValueOnce({
         state: 'not_ready',
-        mode: 'retrieval_only',
+        mode: 'none',
         reasons: ['CHAT_CONFIGURATION_UNAVAILABLE'],
       });
       openDrawer();
-      expect(await screen.findByRole('alert')).toBeDefined();
-      expect(screen.getByText(/Evidence corpus unavailable/i)).toBeDefined();
-      const input = screen.getByPlaceholderText(/Ask about NASA combustion/i);
-      fireEvent.change(input, { target: { value: 'FLEX-007 D0?' } });
+      expect(await screen.findByText(/Chat is not ready in this preview/i)).toBeDefined();
+      fireEvent.change(screen.getByPlaceholderText(/Ask about a NASA experiment/i), {
+        target: { value: 'FLEX-007 D0?' },
+      });
       expect(screen.getByRole('button', { name: 'Send message' }).hasAttribute('disabled')).toBe(
         true
       );
-
       fireEvent.click(screen.getByRole('button', { name: /Retry connection/i }));
-      await waitFor(() => expect(services.getChatReadiness).toHaveBeenCalledTimes(2));
       expect(await screen.findByText(/1045 source passages/i)).toBeDefined();
+      expect(services.getChatReadiness).toHaveBeenCalledTimes(2);
     });
+  });
 
-    it('creates a session on first send, stores the token and renders the cited answer', async () => {
+  describe('sending', () => {
+    it('creates a session, stores the tab token and renders the cited answer', async () => {
       services.sendChatMessage.mockResolvedValue(exchange('FLEX-007 D0?'));
       openDrawer();
       await ask('FLEX-007 D0?');
@@ -176,9 +198,12 @@ describe('Grounded AI assistant backed by the NASA chat API', () => {
       expect(services.createChatSession).toHaveBeenCalledWith({});
       expect(services.sendChatMessage).toHaveBeenCalledWith(SESSION_ID, 'FLEX-007 D0?');
       expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(SESSION_ID);
+      expect(screen.getByText('You')).toBeDefined();
+      expect(screen.getByText('FlameGuard AI', { selector: 'strong' })).toBeDefined();
       expect(screen.getByText('[1] CSV row 8')).toBeDefined();
-      expect(screen.getByText(/Unreviewed/i)).toBeDefined();
-      expect(useAiAssistantStore.getState().messages).toHaveLength(2);
+      expect(screen.getByText(/Scientific review has not been documented/)).toBeDefined();
+      expect(useAiAssistantStore.getState().recent).toHaveLength(2);
+      expect(screen.getByText(/Session ID holders can access history/)).toBeDefined();
     });
 
     it('scopes a new session to the active study when its id is a UUID', async () => {
@@ -189,36 +214,6 @@ describe('Grounded AI assistant backed by the NASA chat API', () => {
       await ask('Objective?');
       await screen.findByText(/D0\) của FLEX-007 khác nhau/);
       expect(services.createChatSession).toHaveBeenCalledWith({ investigation_id: study });
-    });
-
-    it('reuses a stored session and restores its server history', async () => {
-      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
-      services.listChatMessages.mockResolvedValue({
-        items: [
-          message('user', 'u-0', userAnswer('Earlier question')),
-          message('assistant', 'a-0', answer({ text: 'Earlier answer' })),
-        ],
-        offset: 0,
-        limit: 100,
-      });
-      services.sendChatMessage.mockResolvedValue(exchange('Next?'));
-      openDrawer();
-
-      expect(await screen.findByText('Earlier answer')).toBeDefined();
-      expect(services.getChatSession).toHaveBeenCalledWith(SESSION_ID, expect.anything());
-      await ask('Next?');
-      await waitFor(() => expect(services.sendChatMessage).toHaveBeenCalled());
-      expect(services.createChatSession).not.toHaveBeenCalled();
-    });
-
-    it('forgets an expired stored session without sending anything', async () => {
-      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
-      services.getChatSession.mockRejectedValue(
-        new ApiClientError({ message: 'Session unavailable', status: 404, code: 'HTTP_ERROR' })
-      );
-      openDrawer();
-      await waitFor(() => expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBeNull());
-      expect(services.sendChatMessage).not.toHaveBeenCalled();
     });
 
     it('starts a fresh session once when the stored session expired before sending', async () => {
@@ -240,92 +235,113 @@ describe('Grounded AI assistant backed by the NASA chat API', () => {
       expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(fresh);
     });
 
-    it('shows abstained and timeout states without inventing citations', async () => {
+    it('shows abstained and timeout states without inventing citations or provenance', async () => {
       services.sendChatMessage
         .mockResolvedValueOnce(
           exchange(
             'Mars?',
-            answer({ state: 'abstained', text: 'Không tìm thấy số đo phù hợp.', citations: [] })
+            answer({ state: 'abstained', text: 'Không tìm thấy số đo phù hợp.', citations: [] }),
+            '1'
           )
         )
         .mockResolvedValueOnce(
           exchange(
             'Slow?',
-            answer({ state: 'timeout', text: 'Provider deadline exceeded.', citations: [] })
+            answer({ state: 'timeout', text: 'Provider deadline exceeded.', citations: [] }),
+            '2'
           )
         );
       openDrawer();
       await ask('Mars?');
       expect(await screen.findByText('Không tìm thấy số đo phù hợp.')).toBeDefined();
       expect(screen.getByText(/No matching evidence/i)).toBeDefined();
-      // Provenance is only claimed for answers that actually cite a source.
-      expect(screen.queryByText(/Real NASA source/i)).toBeNull();
+      expect(screen.queryByText(/Research source excerpts/i)).toBeNull();
       await ask('Slow?');
       expect(await screen.findByText(/Provider timed out/i)).toBeDefined();
       expect(screen.queryByText(/\[1\]/)).toBeNull();
     });
 
-    it('reports an evidence revision conflict and keeps the conversation unchanged', async () => {
+    it('reports an evidence revision conflict and keeps the question for resending', async () => {
       services.sendChatMessage.mockRejectedValue(
         new ApiClientError({ message: 'Evidence changed', status: 409, code: 'HTTP_ERROR' })
       );
       openDrawer();
       await ask('FLEX-007 D0?');
       expect(await screen.findByText(/evidence changed while answering/i)).toBeDefined();
-      expect(useAiAssistantStore.getState().messages).toHaveLength(0);
+      expect(useAiAssistantStore.getState().recent).toHaveLength(0);
+      expect(
+        (screen.getByPlaceholderText(/Ask about a NASA experiment/i) as HTMLTextAreaElement).value
+      ).toBe('FLEX-007 D0?');
     });
+  });
 
-    it('opens revision-pinned source metadata for a citation', async () => {
-      services.sendChatMessage.mockResolvedValue(exchange('FLEX-007 D0?'));
-      services.getChatSource.mockResolvedValue({
-        sourceId: SOURCE_ID,
-        locator: 'CSV row 8',
-        corpusVersion: CORPUS,
-        filename: 'PSI-69_Experimental table_FLEX.csv',
-        sourceUrl: 'https://psi.nasa.gov/example.csv',
-        sha256: 'b'.repeat(64),
-        license: 'CC0-1.0',
-        title: 'FLEX',
-        slug: 'flex',
-        investigationId: 'inv',
-        version: 'v',
-        reviewStatus: 'unreviewed',
-      });
+  describe('history (stored on the server)', () => {
+    it('restores the tab session history page on open', async () => {
+      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
+      services.listChatMessages.mockResolvedValue(
+        page([
+          message('user', 'u-0', userAnswer('Earlier question')),
+          message('assistant', 'a-0', answer({ text: 'Earlier answer' })),
+        ])
+      );
+      services.sendChatMessage.mockResolvedValue(exchange('Next?'));
       openDrawer();
-      await ask('FLEX-007 D0?');
-      fireEvent.click(await screen.findByRole('button', { name: 'View source 1' }));
 
-      const link = await screen.findByRole('link', { name: /PSI-69_Experimental table_FLEX.csv/ });
-      expect(link.getAttribute('href')).toBe('https://psi.nasa.gov/example.csv');
-      expect(services.getChatSource).toHaveBeenCalledWith(
-        SOURCE_ID,
-        'CSV row 8',
-        CORPUS,
+      expect(await screen.findByText('Earlier answer')).toBeDefined();
+      expect(services.listChatMessages).toHaveBeenCalledWith(
+        SESSION_ID,
+        { offset: 0, limit: 50 },
         expect.anything()
       );
-      expect(screen.getByText(/CC0-1.0/)).toBeDefined();
+      await ask('Next?');
+      await waitFor(() => expect(services.sendChatMessage).toHaveBeenCalled());
+      expect(services.createChatSession).not.toHaveBeenCalled();
+      // New exchanges are kept apart from the stored page, never spliced into it.
+      await waitFor(() => expect(useAiAssistantStore.getState().recent).toHaveLength(2));
+      expect(useAiAssistantStore.getState().messages).toHaveLength(2);
     });
 
-    it('explains when a citation belongs to an older corpus revision', async () => {
-      services.sendChatMessage.mockResolvedValue(exchange('FLEX-007 D0?'));
-      services.getChatSource.mockRejectedValue(
-        new ApiClientError({ message: 'Other revision', status: 409, code: 'HTTP_ERROR' })
+    it('pages through stored history and folds recent exchanges in on refresh', async () => {
+      const full = Array.from({ length: 50 }, (_, i) =>
+        message(i % 2 ? 'assistant' : 'user', `m-${i}`, userAnswer(`stored ${i}`))
+      );
+      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
+      services.listChatMessages.mockImplementation(async (_id, pagination) =>
+        pagination?.offset === 50
+          ? page([message('user', 'm-50', userAnswer('stored 50'))], 50)
+          : page(full, 0)
       );
       openDrawer();
-      await ask('FLEX-007 D0?');
-      fireEvent.click(await screen.findByRole('button', { name: 'View source 1' }));
-      expect(await screen.findByText(/older corpus revision/i)).toBeDefined();
+      expect(await screen.findByText('stored 0')).toBeDefined();
+
+      openHistoryControls();
+      expect(screen.getByRole('button', { name: 'Previous' }).hasAttribute('disabled')).toBe(true);
+      fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+      expect(await screen.findByText('stored 50')).toBeDefined();
+      expect(screen.queryByText('stored 0')).toBeNull();
+      expect(useAiAssistantStore.getState().historyOffset).toBe(50);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Previous' }));
+      expect(await screen.findByText('stored 0')).toBeDefined();
+      fireEvent.click(screen.getByRole('button', { name: 'Refresh history' }));
+      await waitFor(() =>
+        expect(services.listChatMessages).toHaveBeenLastCalledWith(
+          SESSION_ID,
+          { offset: 0, limit: 50 },
+          expect.anything()
+        )
+      );
     });
 
-    it('reports an unavailable citation source', async () => {
-      services.sendChatMessage.mockResolvedValue(exchange('FLEX-007 D0?'));
-      services.getChatSource.mockRejectedValue(
-        new ApiClientError({ message: 'Citation source unavailable', status: 404, code: 'HTTP_ERROR' })
+    it('forgets an expired stored session without sending anything', async () => {
+      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
+      services.getChatSession.mockRejectedValue(
+        new ApiClientError({ message: 'Session unavailable', status: 404, code: 'HTTP_ERROR' })
       );
       openDrawer();
-      await ask('FLEX-007 D0?');
-      fireEvent.click(await screen.findByRole('button', { name: 'View source 1' }));
-      expect(await screen.findByText(/Source unavailable/i)).toBeDefined();
+      expect(await screen.findByText(/Session expired or unavailable/i)).toBeDefined();
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBeNull();
+      expect(services.sendChatMessage).not.toHaveBeenCalled();
     });
 
     it('starts a new session by forgetting the tab token and local messages', async () => {
@@ -333,13 +349,16 @@ describe('Grounded AI assistant backed by the NASA chat API', () => {
       openDrawer();
       await ask('FLEX-007 D0?');
       await screen.findByText(/D0\) của FLEX-007 khác nhau/);
-      fireEvent.click(screen.getByRole('button', { name: /Start new session/i }));
+      openHistoryControls();
+      fireEvent.click(screen.getByRole('button', { name: 'Start new session' }));
       expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBeNull();
-      expect(useAiAssistantStore.getState().messages).toHaveLength(0);
+      expect(useAiAssistantStore.getState().recent).toHaveLength(0);
       expect(useAiAssistantStore.getState().sessionId).toBeNull();
     });
+  });
 
-    it('keeps a stored exchange and its new session when the drawer closes mid-send', async () => {
+  describe('races and unknown outcomes', () => {
+    it('keeps a stored exchange and its new session when the panel closes mid-send', async () => {
       let resolve: (value: ReturnType<typeof exchange>) => void = () => {};
       services.sendChatMessage.mockReturnValue(new Promise((r) => (resolve = r)));
       const view = openDrawer();
@@ -350,7 +369,7 @@ describe('Grounded AI assistant backed by the NASA chat API', () => {
       useAiAssistantStore.setState({ isOpen: false });
       view.unmount();
       resolve(exchange('FLEX-007 D0?'));
-      await waitFor(() => expect(useAiAssistantStore.getState().messages).toHaveLength(2));
+      await waitFor(() => expect(useAiAssistantStore.getState().recent).toHaveLength(2));
       expect(useAiAssistantStore.getState().sessionId).toBe(SESSION_ID);
     });
 
@@ -358,25 +377,20 @@ describe('Grounded AI assistant backed by the NASA chat API', () => {
       services.sendChatMessage.mockRejectedValue(
         new ApiClientError({ message: 'Request timed out', status: 0, code: 'REQUEST_TIMEOUT' })
       );
-      services.listChatMessages.mockResolvedValue({
-        items: [
-          message('user', 'u-1', userAnswer('FLEX-007 D0?')),
-          message('assistant', 'a-1', answer()),
-        ],
-        offset: 0,
-        limit: 100,
-      });
+      services.listChatMessages.mockResolvedValue(
+        page([message('user', 'u-1', userAnswer('FLEX-007 D0?')), message('assistant', 'a-1', answer())])
+      );
       openDrawer();
       await ask('FLEX-007 D0?');
 
       expect(await screen.findByText(/D0\) của FLEX-007 khác nhau/)).toBeDefined();
       expect(services.listChatMessages).toHaveBeenCalledWith(
         SESSION_ID,
-        { offset: 0, limit: 100 },
+        { offset: 0, limit: 50 },
         expect.anything()
       );
       expect(
-        (screen.getByPlaceholderText(/Ask about NASA combustion/i) as HTMLInputElement).value
+        (screen.getByPlaceholderText(/Ask about a NASA experiment/i) as HTMLTextAreaElement).value
       ).toBe('');
       expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(SESSION_ID);
     });
@@ -389,36 +403,80 @@ describe('Grounded AI assistant backed by the NASA chat API', () => {
       openDrawer();
       await ask('FLEX-007 D0?');
       await waitFor(() => expect(services.sendChatMessage).toHaveBeenCalled());
+      openHistoryControls();
       expect(
-        screen.getByRole('button', { name: /Start new session/i }).hasAttribute('disabled')
+        screen.getByRole('button', { name: 'Start new session' }).hasAttribute('disabled')
       ).toBe(true);
 
       useAiAssistantStore.getState().resetConversation();
       resolve(exchange('FLEX-007 D0?'));
       await new Promise((r) => setTimeout(r, 20));
-      expect(useAiAssistantStore.getState().messages).toHaveLength(0);
+      expect(useAiAssistantStore.getState().recent).toHaveLength(0);
       expect(useAiAssistantStore.getState().sessionId).toBeNull();
       expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBeNull();
     });
+  });
 
-    it('closes on Escape and via the close button', async () => {
+  describe('citation sources', () => {
+    async function sendAndOpenSource() {
+      services.sendChatMessage.mockResolvedValue(exchange('FLEX-007 D0?'));
       openDrawer();
-      await screen.findByRole('dialog');
-      fireEvent.keyDown(window, { key: 'Escape' });
-      expect(useAiAssistantStore.getState().isOpen).toBe(false);
+      await ask('FLEX-007 D0?');
+      fireEvent.click(await screen.findByRole('button', { name: 'View source 1' }));
+    }
+
+    it('opens revision-pinned source metadata for a citation', async () => {
+      services.getChatSource.mockResolvedValue({
+        source_document_id: SOURCE_ID,
+        locator: 'CSV row 8',
+        corpus_version: CORPUS,
+        filename: 'PSI-69_Experimental table_FLEX.csv',
+        source_url: 'https://psi.nasa.gov/example.csv',
+        sha256: 'b'.repeat(64),
+        license: 'CC0-1.0',
+        title: 'FLEX',
+        review_status: 'unreviewed',
+      });
+      await sendAndOpenSource();
+      const link = await screen.findByRole('link', { name: /PSI-69_Experimental table_FLEX.csv/ });
+      expect(link.getAttribute('href')).toBe('https://psi.nasa.gov/example.csv');
+      expect(services.getChatSource).toHaveBeenCalledWith(
+        SOURCE_ID,
+        'CSV row 8',
+        CORPUS,
+        expect.anything()
+      );
+      expect(screen.getByText('CC0-1.0 · Original source')).toBeDefined();
+    });
+
+    it('explains when a citation belongs to an older corpus revision', async () => {
+      services.getChatSource.mockRejectedValue(
+        new ApiClientError({ message: 'Other revision', status: 409, code: 'HTTP_ERROR' })
+      );
+      await sendAndOpenSource();
+      expect(await screen.findByText(/older corpus revision/i)).toBeDefined();
+    });
+
+    it('reports an unavailable citation source', async () => {
+      services.getChatSource.mockRejectedValue(
+        new ApiClientError({ message: 'Citation source unavailable', status: 404, code: 'HTTP_ERROR' })
+      );
+      await sendAndOpenSource();
+      expect(await screen.findByText(/Source unavailable/i)).toBeDefined();
     });
   });
 
-  describe('FloatingAiDock', () => {
-    it('toggles the drawer open', () => {
+  describe('FloatingAiDock and AppShell', () => {
+    it('toggles the assistant open', () => {
       render(<FloatingAiDock />);
       fireEvent.click(screen.getByRole('button', { name: /Open Grounded AI Assistant/i }));
       expect(useAiAssistantStore.getState().isOpen).toBe(true);
     });
 
-    it('counts assistant messages while closed', () => {
+    it('counts assistant messages from the history page and recent exchanges', () => {
       useAiAssistantStore.setState({
-        messages: [assistantMessage(), { ...assistantMessage(), id: 'a-1' }],
+        messages: [mappedAssistant('a-0')],
+        recent: [mappedAssistant('a-1')],
       });
       render(<FloatingAiDock />);
       expect(screen.getByLabelText('2 assistant messages').textContent).toBe('2');
@@ -429,10 +487,8 @@ describe('Grounded AI assistant backed by the NASA chat API', () => {
       render(<FloatingAiDock />);
       expect(screen.getByTitle('Active Context: FLEX')).toBeDefined();
     });
-  });
 
-  describe('AppShell', () => {
-    it('mounts the floating dock without requiring the chat API while closed', () => {
+    it('mounts the dock without requiring the chat API while closed', () => {
       render(
         <AppShell>
           <div data-testid="page-content">Dashboard View</div>
