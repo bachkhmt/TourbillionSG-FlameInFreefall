@@ -9,6 +9,7 @@ import {
 import {
   FALLBACK_CONTEXT,
   getMockClaimsPage,
+  getMockClaimSourcesPage,
   getMockSourcesPage,
 } from '@/api/mockFallback';
 import type {
@@ -73,14 +74,6 @@ export function useClaimSourcesQuery(
     getQueryKey: apiQueryKeys.claimSources,
     fetcher: listClaimSources,
     mapItem: mapClaimSourceDto,
-    fallbackFetcher: () => ({
-      items: [],
-      total: 0,
-      offset: 0,
-      limit: 20,
-      hasMore: false,
-      next: null,
-      context: FALLBACK_CONTEXT,
-    }),
+    fallbackFetcher: getMockClaimSourcesPage,
   });
 }

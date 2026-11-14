@@ -9,7 +9,7 @@ import type { EvaluationDto, EvaluationRequestDto } from '@/api/dto';
 import { evaluateMissionScenario } from '@/api/services';
 import { getMockScenarioEvaluation } from '@/api/mockFallback';
 import type { ApiQueryOptions } from '@/hooks/api/queryHelpers';
-import { shouldFallback } from '@/hooks/api/queryHelpers';
+import { handleTimeoutFallback, shouldFallback } from '@/hooks/api/queryHelpers';
 import { apiQueryKeys } from '@/hooks/api/queryKeys';
 
 function computeScenarioKey(request: EvaluationRequestDto): string {
@@ -35,6 +35,7 @@ export function useScenarioEvaluationQuery(
         return await evaluateMissionScenario(request, signal);
       } catch (err) {
         if (shouldFallback(options?.enableFallback)) {
+          handleTimeoutFallback(err);
           return getMockScenarioEvaluation(request);
         }
         throw err;

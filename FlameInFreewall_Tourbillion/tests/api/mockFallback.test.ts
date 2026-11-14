@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   getMockCatalogCapabilities,
   getMockClaimsPage,
+  getMockClaimSourcesPage,
   getMockComparisonResult,
   getMockConditions,
   getMockDashboardSummary,
@@ -119,6 +120,11 @@ describe('Offline Mock Fallback System', () => {
 
       const claims = getMockClaimsPage('bass');
       expect(claims.items.length).toBeGreaterThan(0);
+
+      const claimSources = getMockClaimSourcesPage(claims.items[0].id);
+      expect(claimSources.items.length).toBe(3);
+      expect(claimSources.total).toBe(3);
+      expect(claimSources.items[0].sourceLocator).toBeDefined();
     });
   });
 });

@@ -3,6 +3,13 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getApiBaseUrl, getApiTimeoutMs, getBackendInternalUrl } from '@/api/config';
+import { ApiClientError } from '@/api/client';
+import { toastStore } from '@/components/toast/toast-store';
+import {
+  isTimeoutError,
+  handleTimeoutFallback,
+  resetTimeoutToastThrottle,
+} from '@/hooks/api/queryHelpers';
 import { QueryProvider, createAppQueryClient } from '@/providers/QueryProvider';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import { createTestQueryClient, renderWithQuery } from '../test-utils';
@@ -68,13 +75,14 @@ describe('Task 1: TanStack Query Foundation, Config, Error Banner & Test Harness
     });
 
     it('returns default timeout when NEXT_PUBLIC_API_TIMEOUT_MS is missing or invalid', () => {
-      expect(getApiTimeoutMs()).toBe(10000);
+      delete process.env.NEXT_PUBLIC_API_TIMEOUT_MS;
+      expect(getApiTimeoutMs()).toBe(40000);
       process.env.NEXT_PUBLIC_API_TIMEOUT_MS = 'not-a-number';
-      expect(getApiTimeoutMs()).toBe(10000);
+      expect(getApiTimeoutMs()).toBe(40000);
       process.env.NEXT_PUBLIC_API_TIMEOUT_MS = '0';
-      expect(getApiTimeoutMs()).toBe(10000);
+      expect(getApiTimeoutMs()).toBe(40000);
       process.env.NEXT_PUBLIC_API_TIMEOUT_MS = '-250';
-      expect(getApiTimeoutMs()).toBe(10000);
+      expect(getApiTimeoutMs()).toBe(40000);
     });
 
     it('parses valid positive NEXT_PUBLIC_API_TIMEOUT_MS', () => {
@@ -192,6 +200,42 @@ describe('Task 1: TanStack Query Foundation, Config, Error Banner & Test Harness
       expect((screen.getByRole('button', { name: /retrying/i }) as HTMLButtonElement).disabled).toBe(
         true
       );
+    });
+  });
+
+  describe('Server Timeout Fallback & Toast Notification', () => {
+    it('detects timeout errors accurately across ApiClientError and transport errors', () => {
+      const apiTimeout = new ApiClientError({ message: 'Request timed out', status: 0, code: 'REQUEST_TIMEOUT' });
+      expect(isTimeoutError(apiTimeout)).toBe(true);
+
+      const gatewayTimeout = new ApiClientError({ message: 'Gateway Timeout', status: 504, code: 'HTTP_ERROR' });
+      expect(isTimeoutError(gatewayTimeout)).toBe(true);
+
+      const server500 = new ApiClientError({ message: 'Internal Server Error', status: 500, code: 'HTTP_ERROR' });
+      expect(isTimeoutError(server500)).toBe(true);
+
+      const socketHangup = new Error('socket hang up');
+      expect(isTimeoutError(socketHangup)).toBe(true);
+
+      const regularError = new Error('Validation failed');
+      expect(isTimeoutError(regularError)).toBe(false);
+    });
+
+    it('emits a toast warning and throttles concurrent duplicate toasts', () => {
+      resetTimeoutToastThrottle();
+      toastStore.clear();
+
+      const timeoutErr = new ApiClientError({ message: 'Request timed out', status: 0, code: 'REQUEST_TIMEOUT' });
+      handleTimeoutFallback(timeoutErr);
+
+      const toasts = toastStore.getToasts();
+      expect(toasts.length).toBe(1);
+      expect(toasts[0].type).toBe('warning');
+      expect(toasts[0].title).toBe('Quá thời gian phản hồi server');
+
+      // Second immediate call within throttle window should not emit another toast
+      handleTimeoutFallback(timeoutErr);
+      expect(toastStore.getToasts().length).toBe(1);
     });
   });
 });

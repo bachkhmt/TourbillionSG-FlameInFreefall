@@ -5,7 +5,7 @@ import { getDashboardSummary } from '@/api/services';
 import { getMockDashboardSummary } from '@/api/mockFallback';
 import type { MappedDashboardSummary } from '@/types/api';
 import type { ApiQueryOptions } from '@/hooks/api/queryHelpers';
-import { shouldFallback } from '@/hooks/api/queryHelpers';
+import { handleTimeoutFallback, shouldFallback } from '@/hooks/api/queryHelpers';
 import { apiQueryKeys } from '@/hooks/api/queryKeys';
 
 /**
@@ -25,6 +25,7 @@ export function useDashboardSummaryQuery(
         return mapDashboardSummaryDto(dto);
       } catch (err) {
         if (shouldFallback(options?.enableFallback)) {
+          handleTimeoutFallback(err);
           return getMockDashboardSummary(filters);
         }
         throw err;

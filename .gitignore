@@ -38,3 +38,5 @@ coverage/
 # Agent local state; durable plans are kept
 .claude/*
 !.claude/plans/
+
+.unified-bundle/

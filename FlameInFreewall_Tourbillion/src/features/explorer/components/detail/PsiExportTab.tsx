@@ -7,6 +7,11 @@ import {
   FileSpreadsheet,
   FileCode,
   ShieldAlert,
+  AlertTriangle,
+  CheckCircle2,
+  DownloadCloud,
+  Loader2,
+  Info,
 } from 'lucide-react';
 import type {
   MappedClaim,
@@ -24,6 +29,10 @@ export interface PsiExportTabProps {
   observations: MappedObservation[];
   sources: MappedSource[];
   claims: MappedClaim[];
+  totalRuns?: number;
+  totalObservations?: number;
+  onFetchAllData?: () => Promise<void>;
+  isFetchingAll?: boolean;
 }
 
 export const PsiExportTab: React.FC<PsiExportTabProps> = ({
@@ -32,10 +41,29 @@ export const PsiExportTab: React.FC<PsiExportTabProps> = ({
   observations,
   sources,
   claims,
+  totalRuns,
+  totalObservations,
+  onFetchAllData,
+  isFetchingAll = false,
 }) => {
+  const effectiveTotalRuns = totalRuns ?? study.runsMeta?.total ?? runs.length;
+  const isRunsComplete = effectiveTotalRuns === 0 || runs.length >= effectiveTotalRuns;
+
   const handleExportJson = () => {
     const payload = {
       investigation: study,
+      exportMetadata: {
+        isComplete: isRunsComplete,
+        exportedRunsCount: runs.length,
+        totalAvailableRuns: effectiveTotalRuns,
+        exportedObservationsCount: observations.length,
+        exportedSourcesCount: sources.length,
+        exportedClaimsCount: claims.length,
+        exportedAt: new Date().toISOString(),
+        disclaimer: isRunsComplete
+          ? 'Full NASA PSI dataset bundle for this investigation.'
+          : `Partial export: contains ${runs.length} of ${effectiveTotalRuns} recorded runs. Fetch full dataset before exporting for complete catalog analysis.`,
+      },
       runs,
       observations,
       sources,
@@ -44,10 +72,18 @@ export const PsiExportTab: React.FC<PsiExportTabProps> = ({
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     triggerFileDownload(blob, `flameguard-${study.psiId.toLowerCase()}-psi-export.json`);
-    toast.success(
-      `Exported ${study.psiId} JSON bundle`,
-      `Included ${runs.length} runs, ${observations.length} observations, and ${claims.length} claims.`
-    );
+
+    if (isRunsComplete) {
+      toast.success(
+        `Exported complete ${study.psiId} JSON bundle`,
+        `Included all ${runs.length} runs, ${observations.length} observations, and ${claims.length} claims.`
+      );
+    } else {
+      toast.warning(
+        `Exported partial ${study.psiId} JSON bundle`,
+        `Included ${runs.length} of ${effectiveTotalRuns} runs currently loaded. Use Fetch Full Dataset to export all.`
+      );
+    }
   };
 
   const handleExportCsv = () => {
@@ -103,17 +139,26 @@ export const PsiExportTab: React.FC<PsiExportTabProps> = ({
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     triggerFileDownload(blob, `flameguard-${study.psiId.toLowerCase()}-observations.csv`);
-    toast.success(
-      `Exported ${rows.length} rows to CSV`,
-      'Tabular study dataset ready for offline scientific analysis.'
-    );
+
+    if (isRunsComplete) {
+      toast.success(
+        `Exported complete ${rows.length} rows to CSV`,
+        'Full tabular study dataset ready for scientific analysis.'
+      );
+    } else {
+      toast.warning(
+        `Exported partial ${rows.length} rows to CSV`,
+        `Contains ${runs.length} of ${effectiveTotalRuns} runs. Fetch complete dataset to export all.`
+      );
+    }
   };
 
   const portalUrl = sources[0]?.sourceUrl ?? 'https://psi.nasa.gov/';
 
   return (
     <div data-testid="psi-export-tab" className="space-y-6">
-      <div className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-4">
+      <div className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-5">
+        {/* Header Title & Completeness Status */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-bold text-[#1A1A1A] flex items-center gap-2">
@@ -125,11 +170,31 @@ export const PsiExportTab: React.FC<PsiExportTabProps> = ({
             </p>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 border border-gray-200 text-zinc-800 text-xs font-bold uppercase">
-            {study.context.origin} · {study.context.reviewState}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            {isRunsComplete ? (
+              <span
+                data-testid="dataset-completeness-badge"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-lime-50 border border-lime-300 text-lime-950 text-[11px] font-extrabold"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-lime-700" />
+                <span>Complete Dataset ({runs.length} runs)</span>
+              </span>
+            ) : (
+              <span
+                data-testid="dataset-completeness-badge"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-extrabold"
+              >
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                <span>Partial Dataset ({runs.length} / {effectiveTotalRuns} runs loaded)</span>
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gray-100 border border-gray-200 text-zinc-800 text-[11px] font-bold uppercase">
+              {study.context.origin} · {study.context.reviewState}
+            </span>
+          </div>
         </div>
 
+        {/* Loaded Counts Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-100 text-xs">
           <div>
             <span className="text-zinc-500 text-[10px] uppercase font-semibold">PSI Identifier</span>
@@ -138,7 +203,8 @@ export const PsiExportTab: React.FC<PsiExportTabProps> = ({
           <div>
             <span className="text-zinc-500 text-[10px] uppercase font-semibold">Loaded Runs &amp; Observations</span>
             <div className="font-bold text-zinc-900 mt-0.5">
-              {runs.length} runs · {observations.length} observations
+              {runs.length} {runs.length === 1 ? 'run' : 'runs'}
+              {effectiveTotalRuns > runs.length && ` (of ${effectiveTotalRuns})`} · {observations.length} obs
             </div>
           </div>
           <div>
@@ -149,7 +215,43 @@ export const PsiExportTab: React.FC<PsiExportTabProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 pt-2">
+        {/* Partial Dataset Action Banner */}
+        {!isRunsComplete && (
+          <div
+            data-testid="partial-export-warning"
+            className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950"
+          >
+            <div className="flex items-start gap-2.5">
+              <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+              <div>
+                <div className="font-bold">Partial Export Notice</div>
+                <p className="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
+                  Exporting now will only include the <strong>{runs.length}</strong> runs and <strong>{observations.length}</strong> observations currently loaded in memory.
+                  To ensure complete scientific integrity, fetch all {effectiveTotalRuns} records from NASA PSI before exporting.
+                </p>
+              </div>
+            </div>
+            {onFetchAllData && (
+              <button
+                type="button"
+                data-testid="fetch-all-export-btn"
+                onClick={onFetchAllData}
+                disabled={isFetchingAll}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold text-xs shrink-0 cursor-pointer shadow-xs transition-colors self-start sm:self-auto"
+              >
+                {isFetchingAll ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <DownloadCloud className="w-3.5 h-3.5" />
+                )}
+                <span>Fetch Full Investigation ({effectiveTotalRuns} runs)</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-3 pt-1">
           <button
             type="button"
             data-testid="export-json-btn"
@@ -157,7 +259,9 @@ export const PsiExportTab: React.FC<PsiExportTabProps> = ({
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0B2374] hover:bg-[#081b59] text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
           >
             <FileCode className="w-4 h-4" />
-            <span>Export Investigation (JSON)</span>
+            <span>
+              {isRunsComplete ? 'Export Investigation (JSON)' : `Export Loaded Subset (${runs.length} runs, JSON)`}
+            </span>
           </button>
 
           <button
@@ -167,7 +271,9 @@ export const PsiExportTab: React.FC<PsiExportTabProps> = ({
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 text-zinc-800 font-bold text-xs transition-colors cursor-pointer"
           >
             <FileSpreadsheet className="w-4 h-4 text-amber-600" />
-            <span>Export Observations (CSV)</span>
+            <span>
+              {isRunsComplete ? 'Export Observations (CSV)' : `Export Loaded Observations (CSV)`}
+            </span>
           </button>
 
           <a
