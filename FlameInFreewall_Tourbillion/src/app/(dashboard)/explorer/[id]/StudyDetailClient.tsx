@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import {
   AlertCircle,
   ArrowLeft,
@@ -424,28 +424,55 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
     { id: 'psi-export', label: 'PSI Raw Export', icon: Download },
   ];
 
+  const pageContainerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.35,
+        ease: [0.16, 1, 0.3, 1],
+        staggerChildren: 0.08,
+        delayChildren: 0.04,
+      },
+    },
+  };
+
+  const columnVariants: Variants = {
+    hidden: { opacity: 0, y: 14 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.45,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  };
+
   return (
     <motion.div
       data-testid="study-detail-page"
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      variants={pageContainerVariants}
+      initial="hidden"
+      animate="visible"
       className="w-full max-w-[1600px] mx-auto space-y-6 py-2 pb-24"
     >
-      <StudyHeader
-        study={study}
-        sources={sources}
-        isComparing={isCompared}
-        onToggleCompare={(sid) => toggleCompare(sid)}
-      />
+      <motion.div variants={columnVariants}>
+        <StudyHeader
+          study={study}
+          sources={sources}
+          isComparing={isCompared}
+          onToggleCompare={(sid) => toggleCompare(sid)}
+        />
+      </motion.div>
 
       {/* 2-Column Responsive Split Layout (StructPaper Extracted Content Style) */}
       <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] xl:grid-cols-[400px_1fr] gap-6 items-start">
         {/* LEFT COLUMN: Study Overview & Physical Science Profile */}
-        <div className="space-y-4 lg:sticky lg:top-4">
+        <motion.div variants={columnVariants} className="space-y-4 lg:sticky lg:top-4">
           {/* Quick Summary Metrics (2x2 Grid, exact StructPaper pattern) */}
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
               <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
                 <Activity className="w-3 h-3 text-[#0B2374]" /> Test Runs
               </span>
@@ -453,7 +480,7 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
                 {study.runsMeta?.total ?? effectiveRuns.length} Runs
               </span>
             </div>
-            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
               <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
                 <BookOpen className="w-3 h-3 text-[#0B2374]" /> Sources
               </span>
@@ -461,7 +488,7 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
                 {sources.length || study.sourcesMeta?.total || 0} Records
               </span>
             </div>
-            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
               <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
                 <FileText className="w-3 h-3 text-[#0B2374]" /> Claims
               </span>
@@ -469,7 +496,7 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
                 {claims.length || study.claimsMeta?.total || 0} Verified
               </span>
             </div>
-            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
               <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
                 <Gauge className="w-3 h-3 text-[#0B2374]" /> Observations
               </span>
@@ -480,7 +507,7 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
           </div>
 
           {/* Physical Science & Platform Parameters Card */}
-          <div className="p-4 sm:p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3">
+          <div className="p-4 sm:p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3 transition-all duration-200 hover:shadow-sm">
             <div className="flex items-center gap-2 text-zinc-900">
               <Layers className="w-4 h-4 text-[#0B2374]" />
               <h3 className="font-bold text-xs uppercase tracking-wider text-zinc-900">
@@ -514,7 +541,7 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
 
           {/* Catalog Taxonomy Tags */}
           {study.tags.length > 0 && (
-            <div className="p-4 sm:p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-2.5">
+            <div className="p-4 sm:p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-2.5 transition-all duration-200 hover:shadow-sm">
               <span className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider flex items-center gap-1.5">
                 <Tag className="w-3.5 h-3.5 text-[#0B2374]" /> Catalog Tags ({study.tags.length})
               </span>
@@ -533,10 +560,10 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* RIGHT COLUMN: Segmented Tabs & Active Tab Data Explorer */}
-        <div className="space-y-4 min-w-0">
+        <motion.div variants={columnVariants} className="space-y-4 min-w-0">
           {/* Segmented Filter Control Navigation Bar */}
           <div
             role="tablist"
@@ -553,25 +580,34 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
                   aria-selected={isActive}
                   data-testid={`tab-${tab.id}`}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-colors shrink-0 cursor-pointer ${
                     isActive
-                      ? 'bg-[#0B2374] text-white shadow-xs'
-                      : 'text-zinc-600 hover:text-zinc-950 hover:bg-gray-100'
+                      ? 'text-white'
+                      : 'text-zinc-600 hover:text-zinc-950 hover:bg-gray-100/70'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{tab.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-detail-tab-pill"
+                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                      className="absolute inset-0 bg-[#0B2374] rounded-xl shadow-xs"
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{tab.label}</span>
+                  </span>
                 </button>
               );
             })}
           </div>
 
-          {/* Active Tab View */}
+          {/* Active Tab View with smooth transition */}
           <motion.section
             key={activeTab}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.28, ease: 'easeOut' }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             aria-label="Tab Content"
             className="min-w-0"
           >
@@ -635,7 +671,7 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
               />
             )}
           </motion.section>
-        </div>
+        </motion.div>
       </div>
 
       <ComparisonBar

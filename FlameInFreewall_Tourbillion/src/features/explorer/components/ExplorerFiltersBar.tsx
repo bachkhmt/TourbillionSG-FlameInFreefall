@@ -173,11 +173,16 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
         </div>
       </div>
 
-      {/* Row 2: Material Input & Backend-Supported Select Filters */}
+      {/* Row 2: Filters Strip (Material, Platform, Gravity) & Sort */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-1">
-        <div className="flex flex-wrap items-center gap-2 flex-1">
-          <div className="relative w-full sm:w-56">
-            <FlaskConical className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="flex flex-wrap items-center gap-2.5 flex-1">
+          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider hidden sm:inline-block mr-0.5">
+            Filters:
+          </span>
+
+          {/* Material Filter Pill Input */}
+          <div className="relative w-full sm:w-56 group">
+            <FlaskConical className="w-3.5 h-3.5 text-zinc-400 group-focus-within:text-[#0B2374] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none transition-colors" />
             <input
               type="text"
               data-testid="material-filter-input"
@@ -185,21 +190,20 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
               onChange={(e) => onMaterialFilterChange(e.target.value)}
               placeholder="Material (e.g. PMMA)..."
               aria-label="Filter by Material"
-              className="w-full rounded-2xl bg-white border border-gray-200/80 pl-8 pr-3 py-2 text-xs font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#D4FC02]/40"
+              className="w-full rounded-2xl bg-white border border-gray-200/80 hover:border-gray-300 focus:border-[#0B2374] pl-8.5 pr-7 py-2 text-xs font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#D4FC02]/30 shadow-2xs transition-all"
             />
+            {materialFilter && (
+              <button
+                type="button"
+                onClick={() => onMaterialFilterChange('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-zinc-200 hover:bg-zinc-300 flex items-center justify-center text-zinc-600 transition-colors cursor-pointer"
+                title="Clear material filter"
+              >
+                <X className="w-2.5 h-2.5" />
+              </button>
+            )}
           </div>
 
-          {capabilities && (
-            <span
-              data-testid="catalog-capabilities-hint"
-              className="text-[11px] font-medium text-zinc-500 px-2.5 py-1 rounded-full bg-white/80 border border-gray-200/60"
-            >
-              Filters: {capabilities.supportedFilters.join(', ')} · Max {capabilities.maxPageSize}/page
-            </span>
-          )}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
           <div className="w-44">
             <CustomSelect
               options={PLATFORM_OPTIONS}
@@ -221,6 +225,17 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
               leadingIcon={<SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" />}
             />
           </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-end lg:self-auto shrink-0">
+          {capabilities && (
+            <span
+              data-testid="catalog-capabilities-hint"
+              className="hidden xl:inline-flex text-[11px] font-medium text-zinc-500 px-2.5 py-1 rounded-full bg-white/80 border border-gray-200/60"
+            >
+              Filters: {capabilities.supportedFilters.join(', ')} · Max {capabilities.maxPageSize}/page
+            </span>
+          )}
 
           <div className="w-52">
             <CustomSelect
