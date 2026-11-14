@@ -57,6 +57,28 @@ S7. Docs: `docs/CHATBOT_FLOW.md`, cập nhật root README (cách chạy RAG).
 S8. Reviewer (focus: concurrency, data integrity, security của writer role/CORS),
     full gate, push branch, mở PR.
 
+## Chỉnh sửa sau plan-critic (REVISE → đã xử lý)
+1. HTTP chat tests đọc `PHASE4_ADMIN_URL`; BE suite đọc `TEST_DATABASE_URL`. AC S4 yêu cầu
+   cả hai và **0 skip** cho `integration_tests`.
+2. Admin của container: superuser `postgres` (container chỉ dùng test), URL trỏ DB
+   `flameguard_test_admin` (khớp `flameguard_test_[a-z0-9_]{1,35}`); fixture tự tạo DB/role con.
+3. Cổng 55433 → 55435 ở `chat_target.py` (guard + thông điệp lỗi) và
+   `scripts/prepare_chat_preview.py` (assert, URL, help text); container name đổi tương ứng.
+4. `/chat/sources/{id}` cần cả `corpus_version` và `locator`; FE test cả 404 và 409.
+5. Readiness/sources trả camelCase, phần chat lõi snake_case → DTO FE khai báo đúng từng shape.
+6. POST message dùng timeout riêng 30s (BE chat 10s + lock_timeout 5s).
+7. `.gitattributes` cho `integrations/nasa_data/research/** -text` (đã làm ở S2).
+8. Chỉ port test export của `test_remote_authority.py` (bỏ source-lock/rebuild-kit).
+9. Lệnh chạy root: `flameguard-ai-backend/.venv/bin/python -m pytest` (venv có pytest-asyncio);
+   `ruff check integrations integration_tests` bằng ruff của venv.
+10. Preview S6: nạp JSON settings vào env (`DATABASE_URL`, `RUNTIME_DATABASE_URL`,
+    `CATALOG_COLLECTION_MANIFEST`) rồi chạy factory; tài liệu hóa trong CHATBOT_FLOW.
+11. FE đi qua `/api/proxy` nên không cần CORS cho 3311; `persist_preview` tạo file bằng
+    `os.open(..., 0o600)` ngay từ đầu.
+12. S5 viết vitest trước khi sửa AiDrawer; cover 409/timeout/not_ready. QUICK_PROMPTS chuyển
+    sang file FE riêng (`src/lib/chatPrompts.ts`); `ragKnowledgeEngine`/`ragSyntheses` bỏ khỏi
+    runtime, xóa nếu không còn import (cập nhật test liên quan).
+
 ## Ngoài phạm vi / rủi ro
 - Không đụng Mission/Predictive Lab giả lập (task khác). Không source-lock BE,
   rebuild-kit, playbook-rag, launcher Windows.
