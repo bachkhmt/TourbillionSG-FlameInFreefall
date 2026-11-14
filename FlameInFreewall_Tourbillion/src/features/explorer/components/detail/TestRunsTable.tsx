@@ -1,7 +1,15 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Search, AlertCircle, ChevronRight } from 'lucide-react';
+import {
+  Search,
+  AlertCircle,
+  ChevronRight,
+  ArrowDown,
+  Layers,
+  Info,
+  Loader2,
+} from 'lucide-react';
 import type { MappedInvestigationDetail, MappedRun } from '@/types/api';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import { EndOfListIndicator } from '@/components/ui/EndOfListIndicator';
@@ -10,26 +18,45 @@ import { RunDetailPanel } from './RunDetailPanel';
 export interface TestRunsTableProps {
   study: MappedInvestigationDetail;
   runs: MappedRun[];
+  totalRuns?: number;
   isLoading?: boolean;
   error?: unknown;
   onRetry?: () => void;
+  onLoadMore?: () => void;
+  onLoadAll?: () => void;
+  isLoadingMore?: boolean;
+  hasMore?: boolean;
 }
 
 export const TestRunsTable: React.FC<TestRunsTableProps> = ({
   study,
   runs,
+  totalRuns,
   isLoading = false,
   error,
   onRetry,
+  onLoadMore,
+  onLoadAll,
+  isLoadingMore = false,
+  hasMore,
 }) => {
   const [filterQuery, setFilterQuery] = useState('');
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
+
+  const effectiveTotal = totalRuns ?? study.runsMeta?.total ?? runs.length;
+  const isAllLoaded = hasMore === false || runs.length >= effectiveTotal;
 
   const filteredRuns = useMemo(() => {
     const q = filterQuery.toLowerCase().trim();
     if (!q) return runs;
     return runs.filter((run) =>
-      [run.id, run.externalRunKey ?? '', run.materialType ?? '', run.sampleGeometry ?? '', run.gravity ?? '']
+      [
+        run.id,
+        run.externalRunKey ?? '',
+        run.materialType ?? '',
+        run.sampleGeometry ?? '',
+        run.gravity ?? '',
+      ]
         .join(' ')
         .toLowerCase()
         .includes(q)
@@ -41,12 +68,13 @@ export const TestRunsTable: React.FC<TestRunsTableProps> = ({
     const gravities = new Set(runs.map((r) => r.gravity).filter(Boolean));
     const verifiedCount = runs.filter((r) => r.verification === 'verified').length;
     return {
-      total: runs.length,
+      loaded: runs.length,
+      total: effectiveTotal,
       materialsCount: materials.size,
       gravitiesLabel: gravities.size > 0 ? Array.from(gravities).join(', ') : 'Unmapped',
       verificationSummary: verifiedCount > 0 ? `${verifiedCount} Verified` : 'Not established',
     };
-  }, [runs]);
+  }, [runs, effectiveTotal]);
 
   if (isLoading) {
     return (
@@ -65,11 +93,12 @@ export const TestRunsTable: React.FC<TestRunsTableProps> = ({
 
   return (
     <div data-testid="test-runs-table-container" className="space-y-4">
+      {/* Header Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-3xl bg-white border border-gray-100 shadow-xs">
         <div>
           <div className="text-[10px] uppercase text-zinc-500 font-semibold">Loaded Runs</div>
           <div className="text-lg font-black text-[#0B2374] mt-0.5">
-            {stats.total} / {study.runsMeta.total}
+            {stats.loaded} / {stats.total}
           </div>
         </div>
         <div>
@@ -78,15 +107,18 @@ export const TestRunsTable: React.FC<TestRunsTableProps> = ({
         </div>
         <div>
           <div className="text-[10px] uppercase text-zinc-500 font-semibold">Gravity Regimes</div>
-          <div className="text-sm font-bold text-zinc-900 mt-1 truncate">{stats.gravitiesLabel}</div>
+          <div className="text-xs font-bold text-zinc-700 mt-1 truncate" title={stats.gravitiesLabel}>
+            {stats.gravitiesLabel}
+          </div>
         </div>
         <div>
-          <div className="text-[10px] uppercase text-zinc-500 font-semibold">Verification</div>
-          <div className="text-sm font-bold text-amber-800 mt-1">{stats.verificationSummary}</div>
+          <div className="text-[10px] uppercase text-zinc-500 font-semibold">Data Verification</div>
+          <div className="text-xs font-bold text-amber-900 mt-1">{stats.verificationSummary}</div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3">
+      {/* Search Input & Count Summary */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400" />
           <input
@@ -99,10 +131,38 @@ export const TestRunsTable: React.FC<TestRunsTableProps> = ({
           />
         </div>
         <div className="text-xs font-semibold text-zinc-500">
-          Showing {filteredRuns.length} of {runs.length} Runs
+          Showing {filteredRuns.length} of {runs.length} loaded runs
+          {effectiveTotal > runs.length && ` (Total ${effectiveTotal} in PSI)`}
         </div>
       </div>
 
+      {/* Honest Search Scope Notice */}
+      {filterQuery.trim() !== '' && !isAllLoaded && (
+        <div
+          data-testid="runs-search-scope-notice"
+          className="p-3 rounded-2xl bg-blue-50/80 border border-blue-200/70 text-xs text-[#0B2374] flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs"
+        >
+          <div className="flex items-center gap-2">
+            <Info className="w-4 h-4 text-[#0B2374] shrink-0" />
+            <span>
+              Search is currently filtering within the <strong>{runs.length}</strong> loaded runs ({effectiveTotal} total exist in this study).
+            </span>
+          </div>
+          {onLoadAll && (
+            <button
+              type="button"
+              data-testid="load-all-search-btn"
+              onClick={onLoadAll}
+              disabled={isLoadingMore}
+              className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B2374] hover:underline underline-offset-2 shrink-0 cursor-pointer self-start sm:self-auto"
+            >
+              <span>Load all {effectiveTotal} runs to search complete catalog</span>
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Table Data */}
       {filteredRuns.length === 0 ? (
         <div
           data-testid="no-runs-message"
@@ -187,7 +247,58 @@ export const TestRunsTable: React.FC<TestRunsTableProps> = ({
 
       {selectedRun && <RunDetailPanel run={selectedRun} onClose={() => setSelectedRunId(null)} />}
 
-      {filteredRuns.length > 0 && <EndOfListIndicator text="End of recorded test runs" />}
+      {/* Pagination & Load Controls or End-of-List Indicator */}
+      {!isAllLoaded ? (
+        <div
+          data-testid="runs-pagination-controls"
+          className="p-4 sm:p-5 rounded-3xl bg-white border border-gray-100 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <div className="text-xs text-zinc-600 text-center sm:text-left">
+            <div>
+              Showing <strong>{runs.length}</strong> of <strong>{effectiveTotal}</strong> test runs recorded for <strong>{study.psiId}</strong>.
+            </div>
+            <div className="text-[11px] text-zinc-400 mt-0.5">
+              {effectiveTotal - runs.length} more runs available from NASA PSI catalog.
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
+            {onLoadMore && (
+              <button
+                type="button"
+                data-testid="load-more-runs-btn"
+                onClick={onLoadMore}
+                disabled={isLoadingMore}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0B2374] hover:bg-[#081b59] disabled:opacity-50 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
+              >
+                {isLoadingMore ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <ArrowDown className="w-3.5 h-3.5" />
+                )}
+                <span>Load Next 100 Runs</span>
+              </button>
+            )}
+
+            {onLoadAll && (
+              <button
+                type="button"
+                data-testid="load-all-runs-btn"
+                onClick={onLoadAll}
+                disabled={isLoadingMore}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-zinc-800 text-xs font-bold transition-colors cursor-pointer"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Load All Remaining ({effectiveTotal - runs.length})</span>
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        filteredRuns.length > 0 && (
+          <EndOfListIndicator text={`You've reached the end of all ${runs.length} recorded test runs for ${study.psiId}`} />
+        )
+      )}
     </div>
   );
 };

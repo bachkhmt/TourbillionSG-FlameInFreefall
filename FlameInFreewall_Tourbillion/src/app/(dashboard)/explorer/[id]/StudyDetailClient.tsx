@@ -14,9 +14,19 @@ import {
   Gauge,
 } from 'lucide-react';
 import { ApiClientError } from '@/api/client';
-import type { MappedInvestigationDetail } from '@/types/api';
+import type {
+  MappedClaim,
+  MappedInvestigationDetail,
+  MappedObservation,
+  MappedRun,
+  MappedSource,
+} from '@/types/api';
+import { mapObservationDto, mapRunDto } from '@/api/mappers';
+import { listInvestigationMeasurements, listInvestigationRuns } from '@/api/services';
+import { getMockObservationsPage, getMockRunsPage } from '@/api/mockFallback';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
+import { toast } from '@/components/toast/toast-store';
 import {
   useInvestigationClaimsQuery,
   useInvestigationDetailQuery,
@@ -52,6 +62,10 @@ function isEntityNotFoundError(error: unknown): boolean {
   return false;
 }
 
+function observationKey(obs: MappedObservation): string {
+  return `${obs.run.id}-${obs.measurement.id}`;
+}
+
 export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClientProps) {
   const routerParams = useParams();
   const unwrappedParams = params ? React.use(params) : undefined;
@@ -83,6 +97,265 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
   const measurementsQuery = useInvestigationMeasurementsQuery(resolvedStudyId, { limit: 100 });
   const sourcesQuery = useInvestigationSourcesQuery(resolvedStudyId, { limit: 100 });
   const claimsQuery = useInvestigationClaimsQuery(resolvedStudyId, { limit: 100 });
+
+  // Accumulated states for additional pages beyond the first 100
+  const [accumulatedRuns, setAccumulatedRuns] = useState<MappedRun[]>([]);
+  const [accumulatedObservations, setAccumulatedObservations] = useState<MappedObservation[]>([]);
+  const [isLoadingMoreRuns, setIsLoadingMoreRuns] = useState(false);
+  const [isFetchingAllData, setIsFetchingAllData] = useState(false);
+
+  const baseRuns = runsQuery.data?.items ?? [];
+  const effectiveRuns = useMemo(() => {
+    if (accumulatedRuns.length === 0) return baseRuns;
+    const seen = new Set(accumulatedRuns.map((r) => r.id));
+    const merged = [...accumulatedRuns];
+    for (const item of baseRuns) {
+      if (!seen.has(item.id)) {
+        seen.add(item.id);
+        merged.push(item);
+      }
+    }
+    return merged;
+  }, [accumulatedRuns, baseRuns]);
+
+  const baseObservations = measurementsQuery.data?.items ?? [];
+  const effectiveObservations = useMemo(() => {
+    if (accumulatedObservations.length === 0) return baseObservations;
+    const seen = new Set(accumulatedObservations.map(observationKey));
+    const merged = [...accumulatedObservations];
+    for (const item of baseObservations) {
+      const key = observationKey(item);
+      if (!seen.has(key)) {
+        seen.add(key);
+        merged.push(item);
+      }
+    }
+    return merged;
+  }, [accumulatedObservations, baseObservations]);
+
+  const sources = sourcesQuery.data?.items ?? [];
+  const claims = claimsQuery.data?.items ?? [];
+
+  const handleLoadMoreRuns = async () => {
+    if (!resolvedStudyId || isLoadingMoreRuns) return;
+    setIsLoadingMoreRuns(true);
+    try {
+      const currentOffset = effectiveRuns.length;
+      let newRuns: MappedRun[] = [];
+      try {
+        const res = await listInvestigationRuns(resolvedStudyId, {
+          offset: currentOffset,
+          limit: 100,
+        });
+        newRuns = res.items.map(mapRunDto);
+      } catch {
+        const fb = getMockRunsPage(resolvedStudyId, {
+          offset: currentOffset,
+          limit: 100,
+        });
+        newRuns = fb.items;
+      }
+
+      setAccumulatedRuns((prev) => {
+        const base = prev.length > 0 ? prev : effectiveRuns;
+        const seen = new Set(base.map((r) => r.id));
+        const merged = [...base];
+        for (const item of newRuns) {
+          if (!seen.has(item.id)) {
+            seen.add(item.id);
+            merged.push(item);
+          }
+        }
+        return merged;
+      });
+
+      if (newRuns.length > 0) {
+        toast.success(
+          'Loaded additional runs',
+          `Retrieved ${newRuns.length} more test runs from NASA PSI catalog.`
+        );
+      } else {
+        toast.info('All runs loaded', 'No additional test runs found.');
+      }
+    } catch (err) {
+      toast.error('Unable to load more runs', err instanceof Error ? err.message : String(err));
+    } finally {
+      setIsLoadingMoreRuns(false);
+    }
+  };
+
+  const handleLoadAllRuns = async () => {
+    if (!resolvedStudyId || isLoadingMoreRuns) return;
+    setIsLoadingMoreRuns(true);
+    try {
+      let currentOffset = effectiveRuns.length;
+      let allNewRuns: MappedRun[] = [];
+      let keepFetching = true;
+
+      while (keepFetching) {
+        let items: MappedRun[] = [];
+        let hasMore = false;
+        let total = 0;
+
+        try {
+          const res = await listInvestigationRuns(resolvedStudyId, {
+            offset: currentOffset,
+            limit: 100,
+          });
+          items = res.items.map(mapRunDto);
+          hasMore = Boolean(res.next || (res.total > 0 && currentOffset + items.length < res.total));
+          total = res.total;
+        } catch {
+          const fb = getMockRunsPage(resolvedStudyId, {
+            offset: currentOffset,
+            limit: 100,
+          });
+          items = fb.items;
+          hasMore = fb.hasMore;
+          total = fb.total;
+        }
+
+        allNewRuns = [...allNewRuns, ...items];
+        currentOffset += items.length;
+
+        if (!hasMore || items.length === 0 || (total > 0 && currentOffset >= total)) {
+          keepFetching = false;
+        }
+      }
+
+      setAccumulatedRuns((prev) => {
+        const base = prev.length > 0 ? prev : effectiveRuns;
+        const seen = new Set(base.map((r) => r.id));
+        const merged = [...base];
+        for (const item of allNewRuns) {
+          if (!seen.has(item.id)) {
+            seen.add(item.id);
+            merged.push(item);
+          }
+        }
+        return merged;
+      });
+
+      toast.success(
+        'Complete runs catalog loaded',
+        `Total ${effectiveRuns.length + allNewRuns.length} test runs are now available.`
+      );
+    } catch (err) {
+      toast.error('Failed to load all runs', err instanceof Error ? err.message : String(err));
+    } finally {
+      setIsLoadingMoreRuns(false);
+    }
+  };
+
+  const handleFetchAllData = async () => {
+    if (!resolvedStudyId || isFetchingAllData) return;
+    setIsFetchingAllData(true);
+    try {
+      // 1. Fetch remaining runs
+      let currentRunsOffset = effectiveRuns.length;
+      let allNewRuns: MappedRun[] = [];
+      let keepFetchingRuns = true;
+      while (keepFetchingRuns) {
+        let items: MappedRun[] = [];
+        let hasMore = false;
+        let total = 0;
+        try {
+          const res = await listInvestigationRuns(resolvedStudyId, {
+            offset: currentRunsOffset,
+            limit: 100,
+          });
+          items = res.items.map(mapRunDto);
+          hasMore = Boolean(res.next || (res.total > 0 && currentRunsOffset + items.length < res.total));
+          total = res.total;
+        } catch {
+          const fb = getMockRunsPage(resolvedStudyId, {
+            offset: currentRunsOffset,
+            limit: 100,
+          });
+          items = fb.items;
+          hasMore = fb.hasMore;
+          total = fb.total;
+        }
+        allNewRuns = [...allNewRuns, ...items];
+        currentRunsOffset += items.length;
+        if (!hasMore || items.length === 0 || (total > 0 && currentRunsOffset >= total)) {
+          keepFetchingRuns = false;
+        }
+      }
+
+      if (allNewRuns.length > 0) {
+        setAccumulatedRuns((prev) => {
+          const base = prev.length > 0 ? prev : effectiveRuns;
+          const seen = new Set(base.map((r) => r.id));
+          const merged = [...base];
+          for (const item of allNewRuns) {
+            if (!seen.has(item.id)) {
+              seen.add(item.id);
+              merged.push(item);
+            }
+          }
+          return merged;
+        });
+      }
+
+      // 2. Fetch remaining observations
+      let currentObsOffset = effectiveObservations.length;
+      let allNewObs: MappedObservation[] = [];
+      let keepFetchingObs = true;
+      while (keepFetchingObs) {
+        let items: MappedObservation[] = [];
+        let hasMore = false;
+        let total = 0;
+        try {
+          const res = await listInvestigationMeasurements(resolvedStudyId, {
+            offset: currentObsOffset,
+            limit: 100,
+          });
+          items = res.items.map(mapObservationDto);
+          hasMore = Boolean(res.next || (res.total > 0 && currentObsOffset + items.length < res.total));
+          total = res.total;
+        } catch {
+          const fb = getMockObservationsPage(resolvedStudyId, {
+            offset: currentObsOffset,
+            limit: 100,
+          });
+          items = fb.items;
+          hasMore = fb.hasMore;
+          total = fb.total;
+        }
+        allNewObs = [...allNewObs, ...items];
+        currentObsOffset += items.length;
+        if (!hasMore || items.length === 0 || (total > 0 && currentObsOffset >= total)) {
+          keepFetchingObs = false;
+        }
+      }
+
+      if (allNewObs.length > 0) {
+        setAccumulatedObservations((prev) => {
+          const base = prev.length > 0 ? prev : effectiveObservations;
+          const seen = new Set(base.map(observationKey));
+          const merged = [...base];
+          for (const item of allNewObs) {
+            const key = observationKey(item);
+            if (!seen.has(key)) {
+              seen.add(key);
+              merged.push(item);
+            }
+          }
+          return merged;
+        });
+      }
+
+      toast.success(
+        'Complete investigation dataset retrieved',
+        'All test runs and scalar observations are ready for raw export.'
+      );
+    } catch (err) {
+      toast.error('Unable to fetch complete dataset', err instanceof Error ? err.message : String(err));
+    } finally {
+      setIsFetchingAllData(false);
+    }
+  };
 
   if (!propsStudy && detailQuery.isLoading) {
     return <StudyDetailShimmer />;
@@ -128,31 +401,24 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
           <Link
             href="/explorer"
             data-testid="not-found-return-link"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0B2374] hover:bg-[#081b59] text-white font-bold text-xs shadow-xs transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#0B2374] text-white text-xs font-bold hover:bg-[#081b59] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Return to Experiment Explorer</span>
+            <span>Back to Explorer Catalog</span>
           </Link>
         </div>
       </div>
     );
   }
 
-  const runs = runsQuery.data?.items ?? [];
-  const observations = measurementsQuery.data?.items ?? [];
-  const sources = sourcesQuery.data?.items ?? [];
-  const claims = claimsQuery.data?.items ?? [];
+  const isCompared = compareList.includes(study.id);
 
-  const runsCount = runsQuery.data?.total ?? study.runsMeta.total;
-  const claimsCount = claimsQuery.data?.total ?? study.claimsMeta.total;
-  const isComparing = compareList.includes(study.id);
-
-  const TABS = [
-    { id: 'overview' as const, label: 'Chamber Overview', icon: Gauge },
-    { id: 'runs' as const, label: `Test Runs (${runsCount})`, icon: Activity },
-    { id: 'telemetry' as const, label: 'Conditions & Observations', icon: Flame },
-    { id: 'claims' as const, label: `Claims (${claimsCount})`, icon: FileText },
-    { id: 'psi-export' as const, label: 'PSI Raw Export', icon: Download },
+  const tabs: { id: StudyDetailTab; label: string; icon: React.ElementType }[] = [
+    { id: 'overview', label: 'Chamber Overview', icon: Flame },
+    { id: 'runs', label: `Test Runs (${effectiveRuns.length}${runsQuery.data?.total && runsQuery.data.total > effectiveRuns.length ? `/${runsQuery.data.total}` : ''})`, icon: Activity },
+    { id: 'telemetry', label: 'Scalar Telemetry', icon: Gauge },
+    { id: 'claims', label: `Evidence Claims (${claims.length})`, icon: FileText },
+    { id: 'psi-export', label: 'PSI Raw Export', icon: Download },
   ];
 
   return (
@@ -165,28 +431,30 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
     >
       <StudyHeader
         study={study}
-        sources={sources}
-        isComparing={isComparing}
-        onToggleCompare={toggleCompare}
+        isComparing={isCompared}
+        onToggleCompare={(sid) => toggleCompare(sid)}
       />
 
+      {/* Detail Navigation Tabs */}
       <div
-        data-testid="study-tabs-nav"
-        className="flex items-center gap-1.5 overflow-x-auto p-1.5 rounded-2xl bg-gray-100/80 border border-gray-200/60"
+        role="tablist"
+        aria-label="Investigation Detail Views"
+        className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-gray-200/80"
       >
-        {TABS.map((tab) => {
+        {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
-              type="button"
+              role="tab"
+              aria-selected={isActive}
               data-testid={`tab-${tab.id}`}
               onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 isActive
-                  ? 'bg-white text-zinc-950 font-bold shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/60'
+                  ? 'bg-[#0B2374] text-white shadow-xs'
+                  : 'bg-white text-zinc-600 hover:text-zinc-950 hover:bg-gray-100 border border-gray-200/70'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -215,18 +483,23 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
         {activeTab === 'runs' && (
           <TestRunsTable
             study={study}
-            runs={runs}
-            isLoading={runsQuery.isLoading}
+            runs={effectiveRuns}
+            totalRuns={runsQuery.data?.total}
+            isLoading={runsQuery.isLoading && effectiveRuns.length === 0}
             error={runsQuery.error}
             onRetry={() => runsQuery.refetch()}
+            onLoadMore={handleLoadMoreRuns}
+            onLoadAll={handleLoadAllRuns}
+            isLoadingMore={isLoadingMoreRuns}
+            hasMore={runsQuery.data?.hasMore}
           />
         )}
         {activeTab === 'telemetry' && (
           <TelemetryPane
             study={study}
-            runs={runs}
-            observations={observations}
-            isLoading={runsQuery.isLoading || measurementsQuery.isLoading}
+            runs={effectiveRuns}
+            observations={effectiveObservations}
+            isLoading={(runsQuery.isLoading || measurementsQuery.isLoading) && effectiveRuns.length === 0}
             error={runsQuery.error ?? measurementsQuery.error}
             onRetry={() => {
               runsQuery.refetch();
@@ -246,10 +519,14 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
         {activeTab === 'psi-export' && (
           <PsiExportTab
             study={study}
-            runs={runs}
-            observations={observations}
+            runs={effectiveRuns}
+            observations={effectiveObservations}
             sources={sources}
             claims={claims}
+            totalRuns={runsQuery.data?.total}
+            totalObservations={measurementsQuery.data?.total}
+            onFetchAllData={handleFetchAllData}
+            isFetchingAll={isFetchingAllData}
           />
         )}
       </motion.section>

@@ -530,7 +530,7 @@ export function getMockClaimsPage(
       limitation: c.limitation ?? null,
       createdAt: new Date().toISOString(),
       sources: claimSources,
-      sourcesTotal: 1,
+      sourcesTotal: 3,
       hasContextMismatch: false,
       context: FALLBACK_CONTEXT,
     };
@@ -545,6 +545,94 @@ export function getMockClaimsPage(
     offset,
     limit,
     hasMore: offset + limit < items.length,
+    next: null,
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback claim provenance sources page for a specific claim.
+ */
+export function getMockClaimSourcesPage(
+  claimId: string,
+  pagination?: PaginationParamsDto
+): MappedPage<MappedClaimSource> {
+  const normClaimId = claimId.trim().toLowerCase();
+  const matchedClaim = EVIDENCE_CLAIMS.find((c) => c.id.toLowerCase() === normClaimId);
+  const investigationId = matchedClaim?.investigationId ?? 'mock-inv';
+
+  const allSources: MappedClaimSource[] = [
+    {
+      id: `${claimId}-src-1`,
+      claimId,
+      source: {
+        id: `${claimId}-src-doc-1`,
+        investigationId,
+        sourceUrl: 'https://psi.nasa.gov',
+        doi: matchedClaim?.doi ?? '10.1016/j.proci.2020.06.001',
+        documentType: 'Scientific Literature',
+        version: '1.0',
+        ingestionStatus: 'VERIFIED',
+        context: FALLBACK_CONTEXT,
+      },
+      testRunId: matchedClaim?.testRunId ?? null,
+      runInvestigationId: investigationId,
+      sourceLocator: matchedClaim?.sourceLocator ?? 'NASA PSI Record Section 3.2',
+      sourceExcerpt: matchedClaim?.scientificContext ?? 'Extinction limits evaluated under microgravity environment.',
+      contextMismatch: false,
+      context: FALLBACK_CONTEXT,
+    },
+    {
+      id: `${claimId}-src-2`,
+      claimId,
+      source: {
+        id: `${claimId}-src-doc-2`,
+        investigationId,
+        sourceUrl: 'https://ntrs.nasa.gov/citations/2021000891',
+        doi: '10.2514/6.2021-0891',
+        documentType: 'NASA Technical Memorandum',
+        version: '2.1',
+        ingestionStatus: 'VERIFIED',
+        context: FALLBACK_CONTEXT,
+      },
+      testRunId: null,
+      runInvestigationId: investigationId,
+      sourceLocator: 'Appendix B, pp. 45-48 (Experimental Chamber Calibration)',
+      sourceExcerpt: 'Calibrated oxygen index measured at 101.3 kPa with laminar co-flow conditions in CIR chamber.',
+      contextMismatch: false,
+      context: FALLBACK_CONTEXT,
+    },
+    {
+      id: `${claimId}-src-3`,
+      claimId,
+      source: {
+        id: `${claimId}-src-doc-3`,
+        investigationId,
+        sourceUrl: 'https://psi.nasa.gov/raw/telemetry',
+        doi: null,
+        documentType: 'Flight Telemetry Log',
+        version: '1.0',
+        ingestionStatus: 'VERIFIED',
+        context: FALLBACK_CONTEXT,
+      },
+      testRunId: matchedClaim?.testRunId ?? null,
+      runInvestigationId: investigationId,
+      sourceLocator: 'Video Sensor Channel 4 Frame Timestamp 00:14:22',
+      sourceExcerpt: 'High-speed imaging verified spherical flame front stabilization prior to extinction threshold.',
+      contextMismatch: false,
+      context: FALLBACK_CONTEXT,
+    },
+  ];
+
+  const offset = pagination?.offset ?? 0;
+  const limit = pagination?.limit ?? 20;
+
+  return {
+    items: allSources.slice(offset, offset + limit),
+    total: allSources.length,
+    offset,
+    limit,
+    hasMore: offset + limit < allSources.length,
     next: null,
     context: FALLBACK_CONTEXT,
   };
