@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Compass, AlertCircle, RotateCcw, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import type { InvestigationListParamsDto } from '@/api/dto';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
@@ -76,7 +77,13 @@ export default function ExplorerPage() {
   };
 
   return (
-    <div data-testid="explorer-catalog-page" className="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 py-2 pb-24">
+    <motion.div
+      data-testid="explorer-catalog-page"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 py-2 pb-24"
+    >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2 pb-1">
         <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
           <Compass className="w-6 h-6 text-[#0B2374]" strokeWidth={2.5} />
@@ -227,6 +234,6 @@ export default function ExplorerPage() {
         compareList={compareList}
         onRemove={removeFromCompare}
       />
-    </div>
+    </motion.div>
   );
 }

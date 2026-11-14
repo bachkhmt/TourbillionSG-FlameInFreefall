@@ -401,7 +401,7 @@ describe('Mission Scenario, Evidence Gap Matrix & Predictive Lab (/mission)', ()
 
       const indicator = screen.getByTestId('end-of-list-indicator');
       expect(indicator).toBeInTheDocument();
-      expect(indicator.textContent).toContain('Bạn đã xem hết danh sách dữ liệu kịch bản');
+      expect(indicator.textContent).toContain('You have reached the end of the mission scenario evidence list');
     });
   });
 });

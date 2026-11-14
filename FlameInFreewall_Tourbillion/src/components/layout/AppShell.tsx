@@ -15,6 +15,11 @@ export interface AppShellProps {
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const pathname = usePathname();
 
+  // Hide the sidebar on explorer study detail pages (/explorer/[id])
+  const isExplorerDetail = Boolean(
+    pathname && /^\/explorer\/[^/]+/.test(pathname)
+  );
+
   return (
     <div className="min-h-screen flex flex-col sm:flex-row bg-[#F8F9FA] text-[#1A1A1A] relative selection:bg-[#D4FC02]/30 selection:text-[#0B2374]">
       {/* Background Subtle Gradient Grid Overlay */}
@@ -26,14 +31,16 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       {/* Global Dynamic Island Toaster */}
       <Toaster />
 
-      {/* Persistent StructPaper DockPill Sidebar (Desktop & Tablet) */}
-      <Sidebar />
+      {/* Persistent StructPaper DockPill Sidebar (Desktop & Tablet) - Hidden on Study Detail pages */}
+      {!isExplorerDetail && <Sidebar />}
 
       {/* Main Application Flow Area */}
       <div className="w-full flex-1 flex flex-col min-w-0 min-h-screen relative">
         {/* Dashboard Content Container */}
         <main
-          className="w-full flex-1 px-3 sm:px-6 lg:px-8 py-5 pb-24 sm:pb-8 flex flex-col min-w-0 min-h-0"
+          className={`w-full flex-1 px-3 sm:px-6 lg:px-8 py-5 pb-24 sm:pb-8 flex flex-col min-w-0 min-h-0 ${
+            isExplorerDetail ? 'max-w-7xl mx-auto' : ''
+          }`}
           id="main-content"
           role="main"
         >
