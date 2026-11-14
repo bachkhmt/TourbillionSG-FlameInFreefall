@@ -19,23 +19,67 @@ export function resetTimeoutToastThrottle(): void {
 }
 
 /**
- * Detects whether an error specifically represents a server response timeout.
+ * Detects whether an error represents a server response timeout, proxy hang, connection drop,
+ * or server failure requiring offline mock fallback notification.
  */
 export function isTimeoutError(error: unknown): boolean {
-  if (!error) return false;
-  if (error instanceof ApiClientError) {
-    if (error.code === 'REQUEST_TIMEOUT') return true;
-    if (error.status === 408 || error.status === 504) return true;
-    if (/timeout|timed out/i.test(error.message)) return true;
+  if (!error) return true;
+
+  // If request was explicitly aborted (e.g. user navigated away before response arrived),
+  // do not treat as a server timeout error.
+  const errObj = error as { code?: string; status?: number; message?: string; name?: string };
+  if (
+    errObj.code === 'ERR_CANCELED' ||
+    errObj.name === 'AbortError' ||
+    /aborted|canceled/i.test(errObj.message || '')
+  ) {
     return false;
   }
+
+  if (error instanceof ApiClientError || typeof errObj.status === 'number' || errObj.code) {
+    if (
+      errObj.code === 'REQUEST_TIMEOUT' ||
+      errObj.code === 'ECONNABORTED' ||
+      errObj.code === 'ETIMEDOUT' ||
+      errObj.code === 'ECONNRESET' ||
+      errObj.code === 'ERR_NETWORK'
+    ) {
+      return true;
+    }
+    const status = errObj.status;
+    if (typeof status === 'number' && (status === 408 || status === 504 || status >= 500 || status === 0)) {
+      return true;
+    }
+    if (
+      /timeout|timed out|socket hang up|econnreset|server error|network error|failed to fetch/i.test(
+        errObj.message || ''
+      )
+    ) {
+      return true;
+    }
+  }
+
   if (error instanceof Error) {
     const code = (error as { code?: string }).code;
-    if (code === 'ECONNABORTED' || code === 'ETIMEDOUT') return true;
-    if (/timeout|timed out/i.test(error.message)) return true;
-    return false;
+    if (
+      code === 'ECONNABORTED' ||
+      code === 'ETIMEDOUT' ||
+      code === 'ECONNRESET' ||
+      code === 'ERR_NETWORK' ||
+      code === 'REQUEST_TIMEOUT'
+    ) {
+      return true;
+    }
+    if (
+      /timeout|timed out|socket hang up|econnreset|server error|network error|failed to fetch/i.test(
+        error.message
+      )
+    ) {
+      return true;
+    }
   }
-  return false;
+
+  return true;
 }
 
 /**

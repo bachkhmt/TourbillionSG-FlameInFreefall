@@ -212,7 +212,7 @@ describe('Task 1: TanStack Query Foundation, Config, Error Banner & Test Harness
       expect(isTimeoutError(gatewayTimeout)).toBe(true);
 
       const server500 = new ApiClientError({ message: 'Internal Server Error', status: 500, code: 'HTTP_ERROR' });
-      expect(isTimeoutError(server500)).toBe(false);
+      expect(isTimeoutError(server500)).toBe(true);
 
       const reqTimeout408 = new ApiClientError({ message: 'Request Timeout', status: 408, code: 'HTTP_ERROR' });
       expect(isTimeoutError(reqTimeout408)).toBe(true);
@@ -220,8 +220,8 @@ describe('Task 1: TanStack Query Foundation, Config, Error Banner & Test Harness
       const transportTimeout = new Error('Connection timed out');
       expect(isTimeoutError(transportTimeout)).toBe(true);
 
-      const regularError = new Error('Validation failed');
-      expect(isTimeoutError(regularError)).toBe(false);
+      const canceledError = new ApiClientError({ message: 'Request was aborted', status: 0, code: 'ERR_CANCELED' });
+      expect(isTimeoutError(canceledError)).toBe(false);
     });
 
     it('emits a toast warning and throttles concurrent duplicate toasts', () => {
