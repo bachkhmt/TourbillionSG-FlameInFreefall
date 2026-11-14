@@ -1,17 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  X,
-  Send,
-  RotateCcw,
-  Sparkles,
-  Bot,
-  Compass,
-  ArrowRight,
-  ShieldCheck,
-  AlertTriangle,
-} from 'lucide-react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { Compass } from 'lucide-react';
 import { ApiClientError } from '@/api/client';
 import {
   isNotFound,
@@ -20,15 +10,23 @@ import {
   useChatReadinessQuery,
   useSendChatMessageMutation,
 } from '@/hooks/api';
+import { CHAT_HISTORY_LIMIT } from '@/hooks/api/useChatQueries';
 import { CHAT_QUICK_PROMPTS } from '@/lib/chatPrompts';
-import {
-  clearChatSessionId,
-  isUuidLike,
-  readChatSessionId,
-  writeChatSessionId,
-} from '@/lib/chatSession';
+import { isUuidLike, readChatSessionId, writeChatSessionId } from '@/lib/chatSession';
 import { useAiAssistantStore } from '@/store/useAiAssistantStore';
 import { AiMessageItem } from './AiMessageItem';
+import { chatButton, chatField } from './chatStyles';
+
+const DEFAULT_PRIVACY = 'Anyone with the session ID can view the chat for 24 hours.';
+
+interface HistoryRequest {
+  sessionId: string;
+  offset: number;
+  /** Conversation epoch when requested; results for an abandoned conversation are dropped. */
+  epoch: number;
+  /** Restoring the tab's stored session (no live session yet). */
+  restore: boolean;
+}
 
 function sendErrorMessage(error: unknown): string {
   if (error instanceof ApiClientError) {
@@ -53,66 +51,83 @@ export const AiDrawer: React.FC = () => {
 
 const AiDrawerPanel: React.FC = () => {
   const setOpen = useAiAssistantStore((s) => s.setOpen);
-  const messages = useAiAssistantStore((s) => s.messages);
   const sessionId = useAiAssistantStore((s) => s.sessionId);
+  const privacy = useAiAssistantStore((s) => s.privacy);
+  const messages = useAiAssistantStore((s) => s.messages);
+  const recent = useAiAssistantStore((s) => s.recent);
+  const historyOffset = useAiAssistantStore((s) => s.historyOffset);
+  const historyHasMore = useAiAssistantStore((s) => s.historyHasMore);
+  const historyStale = useAiAssistantStore((s) => s.historyStale);
   const activeContextStudyId = useAiAssistantStore((s) => s.activeContextStudyId);
   const setActiveContextStudyId = useAiAssistantStore((s) => s.setActiveContextStudyId);
-  const historyStale = useAiAssistantStore((s) => s.historyStale);
   const setSession = useAiAssistantStore((s) => s.setSession);
-  const setConversation = useAiAssistantStore((s) => s.setConversation);
-  const appendMessages = useAiAssistantStore((s) => s.appendMessages);
+  const setHistoryPage = useAiAssistantStore((s) => s.setHistoryPage);
+  const appendRecent = useAiAssistantStore((s) => s.appendRecent);
   const markHistoryStale = useAiAssistantStore((s) => s.markHistoryStale);
   const resetConversation = useAiAssistantStore((s) => s.resetConversation);
 
-  const [input, setInput] = useState('');
+  const [question, setQuestion] = useState('');
   const [error, setError] = useState<string | null>(null);
-  // Restore only when this page has no live conversation yet.
-  const [storedSessionId, setStoredSessionId] = useState<string | null>(() =>
-    useAiAssistantStore.getState().sessionId ? null : readChatSessionId()
-  );
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  // Restore the tab's stored session only when this page has no live conversation yet.
+  const [historyRequest, setHistoryRequest] = useState<HistoryRequest | null>(() => {
+    const state = useAiAssistantStore.getState();
+    const stored = state.sessionId ? null : readChatSessionId();
+    return stored ? { sessionId: stored, offset: 0, epoch: state.epoch, restore: true } : null;
+  });
+  const conversationEnd = useRef<HTMLDivElement>(null);
 
   const readiness = useChatReadinessQuery();
   const ready = readiness.data?.state === 'ready';
   const send = useSendChatMessageMutation();
-  // Sync from the server when restoring a tab session, or after a send with unknown outcome.
-  const syncSessionId = storedSessionId ?? (historyStale ? sessionId : null);
-  const history = useChatHistoryQuery(syncSessionId, { enabled: ready && !send.isPending });
+  const history = useChatHistoryQuery(historyRequest?.sessionId ?? null, historyRequest?.offset ?? 0, {
+    enabled: ready && !send.isPending && historyRequest !== null,
+  });
   const busy = send.isPending || history.isFetching;
 
+  // A send with unknown outcome (client timeout/network) is resolved by reloading history.
   useEffect(() => {
-    if (!history.data) return;
+    if (historyStale && sessionId && !historyRequest) {
+      setHistoryRequest({
+        sessionId,
+        offset: historyOffset,
+        epoch: useAiAssistantStore.getState().epoch,
+        restore: false,
+      });
+    }
+  }, [historyStale, sessionId, historyOffset, historyRequest]);
+
+  useEffect(() => {
+    if (!history.data || !historyRequest) return;
     const state = useAiAssistantStore.getState();
-    if (!state.sessionId || (state.historyStale && state.sessionId === history.data.session.id)) {
-      setConversation(history.data.session.id, history.data.messages);
+    const current =
+      state.epoch === historyRequest.epoch &&
+      (historyRequest.restore ? !state.sessionId : state.sessionId === history.data.session.id);
+    if (current) {
+      const { session, offset, messages: items, hasMore } = history.data;
+      setHistoryPage(session.id, { offset, messages: items, hasMore }, session.privacy);
       setError(null);
     }
-    setStoredSessionId(null);
-  }, [history.data, setConversation]);
+    setHistoryRequest(null);
+  }, [history.data, historyRequest, setHistoryPage]);
 
   useEffect(() => {
-    if (!history.error || !syncSessionId) return;
+    if (!history.error || !historyRequest) return;
     if (isNotFound(history.error)) {
-      clearChatSessionId();
       resetConversation();
-      setError('Your previous session expired. Send a question to start a new one.');
+      setError('Session expired or unavailable. Send a message to start a new session.');
     } else {
       // A transient failure does not revoke the existing server session.
-      if (!useAiAssistantStore.getState().sessionId) setConversation(syncSessionId, []);
-      setError('Earlier messages could not be loaded right now.');
+      if (historyRequest.restore && !useAiAssistantStore.getState().sessionId) {
+        setSession(historyRequest.sessionId);
+      }
+      setError('Chat history unavailable right now.');
     }
-    setStoredSessionId(null);
-  }, [history.error, syncSessionId, setConversation, resetConversation]);
+    setHistoryRequest(null);
+  }, [history.error, historyRequest, resetConversation, setSession]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView?.({ behavior: 'smooth' });
-  }, [messages, send.isPending]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => inputRef.current?.focus(), 150);
-    return () => clearTimeout(timer);
-  }, []);
+    conversationEnd.current?.scrollIntoView?.({ block: 'nearest' });
+  }, [recent, send.isPending]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -122,35 +137,34 @@ const AiDrawerPanel: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [setOpen]);
 
-  const handleSend = (textToSend?: string) => {
-    const question = (textToSend ?? input).trim();
-    if (!question || busy || !ready) return;
+  const handleSend = (text: string) => {
+    const query = text.trim();
+    if (!query || busy || !ready) return;
     setError(null);
-    setInput('');
+    setQuestion('');
     // Results from a conversation the user abandoned (New session / Clear Context) are dropped.
     const epoch = useAiAssistantStore.getState().epoch;
     const isCurrent = () => useAiAssistantStore.getState().epoch === epoch;
-    const adopt = (id: string) => {
-      writeChatSessionId(id);
-      setSession(id);
-    };
     send.mutate(
       {
-        question,
+        question: query,
         sessionId,
         investigationId: isUuidLike(activeContextStudyId) ? activeContextStudyId : null,
         // These run inside the mutation, so they still apply if the drawer is closed meanwhile.
-        onSessionCreated: (id) => {
-          if (isCurrent()) adopt(id);
+        onSessionCreated: (session) => {
+          if (!isCurrent()) return;
+          writeChatSessionId(session.id);
+          setSession(session.id, session.privacy);
         },
         onExchange: (result) => {
           if (!isCurrent()) return;
           writeChatSessionId(result.sessionId);
-          appendMessages(result.sessionId, result.messages);
+          appendRecent(result.sessionId, result.messages);
         },
         onOutcomeUnknown: (id) => {
           if (!isCurrent()) return;
-          adopt(id);
+          writeChatSessionId(id);
+          setSession(id);
           markHistoryStale();
         },
       },
@@ -162,23 +176,37 @@ const AiDrawerPanel: React.FC = () => {
             setError('The request did not finish in time. Reloading history to check whether it was saved…');
             return;
           }
-          setInput(question);
+          setQuestion(query);
           setError(sendErrorMessage(failure));
         },
       }
     );
   };
 
-  const handleNewSession = () => {
+  const loadPage = (offset: number) => {
+    if (!sessionId || busy) return;
+    setError(null);
+    setHistoryRequest({
+      sessionId,
+      offset: Math.max(0, offset),
+      epoch: useAiAssistantStore.getState().epoch,
+      restore: false,
+    });
+  };
+
+  const startNewSession = () => {
     resetConversation();
+    setHistoryRequest(null);
     setError(null);
   };
 
-  const handleClearContext = () => {
+  const clearContext = () => {
     // A scoped session only searches that study, so a new context needs a new session.
     setActiveContextStudyId(null);
-    handleNewSession();
+    startNewSession();
   };
+
+  const connection = readiness.isPending ? 'checking' : ready ? 'ready' : 'not_ready';
 
   return (
     <div
@@ -187,202 +215,195 @@ const AiDrawerPanel: React.FC = () => {
       aria-modal="true"
       aria-label="FlameGuard Grounded AI Assistant"
     >
+      {/* Blurred backdrop of this app; clicking it closes the assistant. */}
       <div
+        data-testid="ai-drawer-backdrop"
         className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
         onClick={() => setOpen(false)}
         aria-hidden="true"
       />
 
-      <div className="absolute inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
-        <div className="w-[420px] max-w-full bg-white/95 backdrop-blur-xl border-l border-gray-200 shadow-2xl flex flex-col justify-between text-[#1A1A1A] relative h-full">
-          <div className="p-4 bg-[#0B2374] flex items-center justify-between gap-3 shrink-0 shadow-sm text-white">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-white/10 border border-[#D4FC02]/40 flex items-center justify-center shrink-0">
-                <Bot className="w-5 h-5 text-[#D4FC02]" />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <h2 className="text-sm font-bold text-[#D4FC02] tracking-wide truncate">
-                    FlameGuard Grounded AI
-                  </h2>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-[#D4FC02] text-[#0B2374]">
-                    RAG
-                  </span>
-                </div>
-                <p className="text-[11px] text-gray-200/90 truncate font-medium">
-                  NASA PSI source passages • Cited excerpts only
-                </p>
-              </div>
-            </div>
+      <aside className="absolute inset-y-4 right-4 flex w-[calc(100%_-_2rem)] max-w-lg flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
+        <header className="flex shrink-0 items-center justify-between gap-3 bg-[#0B2374] px-5 py-4 text-white">
+          <h2 className="font-bold text-[#D4FC02]">FlameGuard AI</h2>
+          <button
+            type="button"
+            className="rounded-lg border border-white/30 px-3 py-1.5 text-sm hover:bg-white/10 cursor-pointer"
+            onClick={() => setOpen(false)}
+            aria-label="Close assistant drawer"
+          >
+            Close
+          </button>
+        </header>
 
-            <div className="flex items-center gap-1 shrink-0">
-              {(sessionId || messages.length > 0) && (
-                <button
-                  type="button"
-                  onClick={handleNewSession}
-                  disabled={busy}
-                  className="p-1.5 rounded-lg text-gray-300 hover:text-[#D4FC02] hover:bg-white/10 disabled:opacity-40 transition-colors"
-                  title="Start a new session (server history is kept)"
-                  aria-label="Start new session"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="p-1.5 rounded-lg text-[#D4FC02] hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                aria-label="Close assistant drawer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+        <details className="mx-5 my-2 text-xs text-slate-600">
+          <summary className="cursor-pointer">Chat privacy · Do not share private information</summary>
+          <p className="mt-1">{privacy ?? DEFAULT_PRIVACY}</p>
+          <p className="mt-1">
+            Starting a new session clears the chat from this tab. Saved messages stay on the server
+            until cleanup.
+          </p>
+        </details>
+
+        {activeContextStudyId && (
+          <div className="mx-5 mb-2 flex items-center justify-between gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium text-[#0B2374]">
+            <span className="flex min-w-0 items-center gap-1.5 truncate">
+              <Compass className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">Active Study Context: {activeContextStudyId.toUpperCase()}</span>
+            </span>
+            <button
+              type="button"
+              onClick={clearContext}
+              disabled={busy}
+              className="shrink-0 text-blue-700 hover:underline disabled:opacity-40 cursor-pointer"
+            >
+              Clear Context
+            </button>
           </div>
+        )}
 
-          {activeContextStudyId && (
-            <div className="px-4 py-2 bg-blue-50 border-b border-blue-200 flex items-center justify-between text-xs text-[#0B2374] shrink-0 font-medium">
-              <div className="flex items-center gap-1.5 truncate">
-                <Compass className="w-3.5 h-3.5 shrink-0 text-[#0B2374]" />
-                <span className="truncate font-semibold">
-                  Active Study Context: {activeContextStudyId.toUpperCase()}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={handleClearContext}
-                disabled={busy}
-                className="hover:underline text-[11px] text-blue-700 ml-2 shrink-0 font-medium cursor-pointer disabled:opacity-40"
-              >
-                Clear Context
-              </button>
+        <div
+          className="flex items-center justify-between gap-2 border-b border-slate-200 px-5 py-2 text-xs text-slate-600"
+          role="status"
+        >
+          <span>
+            {connection === 'ready'
+              ? readiness.data?.passages != null
+                ? `Ready to search the NASA collection · ${readiness.data.passages} source passages`
+                : 'Ready to search the NASA collection'
+              : connection === 'checking'
+                ? 'Checking research chat connection…'
+                : 'Chat is not ready in this preview. Check the connection before sending.'}
+          </span>
+          {connection === 'not_ready' && (
+            <button
+              type="button"
+              className={`${chatButton} px-3 py-1.5 text-xs`}
+              disabled={readiness.isFetching}
+              onClick={() => void readiness.refetch()}
+            >
+              Retry connection
+            </button>
+          )}
+        </div>
+
+        <div
+          className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 px-5 py-4"
+          aria-live="polite"
+        >
+          {messages.map((message) => (
+            <AiMessageItem key={message.id} message={message} />
+          ))}
+          {historyHasMore && recent.length > 0 && (
+            <p className="text-center text-xs text-slate-500">
+              More messages are available in Conversation history.
+            </p>
+          )}
+          {recent.map((message) => (
+            <Fragment key={message.id}>
+              <AiMessageItem message={message} />
+            </Fragment>
+          ))}
+          {!messages.length && !recent.length && connection === 'ready' && (
+            <div className="space-y-2">
+              <p className="mb-3 text-sm text-slate-600">
+                Ask about a NASA experiment or try one of these questions. Answers quote stored
+                source passages; this is a research aid, not a fire-safety certification.
+              </p>
+              {CHAT_QUICK_PROMPTS.map((prompt) => (
+                <button
+                  key={prompt.id}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => handleSend(prompt.query)}
+                  className="block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-left text-sm text-[#0B2374] hover:border-[#0B2374] disabled:opacity-50 cursor-pointer"
+                >
+                  {prompt.label}
+                </button>
+              ))}
             </div>
           )}
-
-          <div className="px-4 py-2 border-b border-gray-200 text-[11px] shrink-0 bg-white">
-            {readiness.isPending ? (
-              <span className="text-zinc-500">Checking evidence corpus…</span>
-            ) : ready ? (
-              <span className="text-zinc-600 font-medium">
-                {readiness.data?.passages != null
-                  ? `${readiness.data.passages} source passages · extractive retrieval`
-                  : 'Evidence corpus ready · extractive retrieval'}
-              </span>
-            ) : (
-              <div role="alert" className="flex items-center justify-between gap-2 text-amber-900">
-                <span className="flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                  Evidence corpus unavailable. Sending is disabled.
-                </span>
-                <button
-                  type="button"
-                  onClick={() => void readiness.refetch()}
-                  className="font-semibold text-[#0B2374] hover:underline shrink-0 cursor-pointer"
-                >
-                  Retry connection
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 bg-[#FBFBFC]">
-            {messages.length === 0 ? (
-              <div className="space-y-4 py-2">
-                <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-xs space-y-2.5">
-                  <div className="flex items-center gap-2 text-[#0B2374]">
-                    <ShieldCheck className="w-4 h-4 text-lime-600" />
-                    <span className="font-bold text-xs tracking-wider uppercase text-[#0B2374]">
-                      Source-backed answers
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-600 leading-relaxed">
-                    Answers quote stored NASA PSI source passages verbatim, with a citation for every
-                    excerpt. When the corpus has no matching evidence the assistant says so. This is
-                    a research aid, not a fire-safety certification.
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="text-xs font-bold text-zinc-500 mb-2 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-[#0B2374]" />
-                    <span>Quick Scientific Prompts</span>
-                  </h3>
-                  <div className="flex flex-col gap-1.5">
-                    {CHAT_QUICK_PROMPTS.map((prompt) => (
-                      <button
-                        key={prompt.id}
-                        type="button"
-                        disabled={busy || !ready}
-                        onClick={() => handleSend(prompt.query)}
-                        className="w-full text-left p-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 disabled:opacity-40 disabled:pointer-events-none text-xs text-zinc-800 transition-all flex items-center justify-between group cursor-pointer shadow-xs"
-                      >
-                        <span className="line-clamp-1 font-medium">{prompt.label}</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#0B2374] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              messages.map((message) => <AiMessageItem key={message.id} message={message} />)
-            )}
-
-            {send.isPending && (
-              <div className="flex items-center gap-2.5 text-xs text-zinc-600 py-1 font-medium">
-                <div className="w-7 h-7 rounded-lg bg-[#0B2374]/10 border border-[#0B2374]/20 flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-[#0B2374] animate-pulse" />
-                </div>
-                <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white border border-gray-200 shadow-xs">
-                  <span>Searching NASA source passages</span>
-                  <span className="inline-flex gap-1 ml-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0B2374] animate-bounce" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0B2374] animate-bounce [animation-delay:0.2s]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0B2374] animate-bounce [animation-delay:0.4s]" />
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <p className="p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-[11px]">
-                {error}
-              </p>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          <div className="p-3 border-t border-gray-200 bg-white/90 backdrop-blur-md space-y-2 shrink-0">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSend();
-              }}
-              className="flex items-center gap-2"
-            >
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                maxLength={4000}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about NASA combustion runs, e.g. FLEX-007 D0…"
-                className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl text-zinc-900 placeholder:text-zinc-400 focus:border-[#0B2374] focus:ring-1 focus:ring-[#0B2374] px-3.5 py-2.5 text-xs outline-none transition-all"
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || busy || !ready}
-                aria-label="Send message"
-                className="w-9 h-9 rounded-2xl bg-[#0B2374] hover:bg-[#152E85] active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-[#D4FC02] flex items-center justify-center font-bold transition-all cursor-pointer shrink-0 shadow-sm"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </form>
-
-            <p className="text-[10px] text-zinc-500 text-center font-medium tracking-tight">
-              Public demo session • Only ask about public research content
-            </p>
-          </div>
+          {send.isPending && (
+            <p className="text-xs text-slate-500">Searching NASA source passages…</p>
+          )}
+          <div ref={conversationEnd} />
         </div>
-      </div>
+
+        {error && (
+          <p role="alert" className="mx-5 my-2 text-sm text-red-800">
+            {error}
+          </p>
+        )}
+
+        {sessionId && (
+          <details className="mx-5 my-2 text-xs text-slate-600">
+            <summary className="cursor-pointer">Conversation history</summary>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                className={chatButton}
+                disabled={busy}
+                onClick={() => loadPage(historyOffset)}
+              >
+                Refresh history
+              </button>
+              <button
+                type="button"
+                className={chatButton}
+                disabled={busy || historyOffset === 0}
+                onClick={() => loadPage(historyOffset - CHAT_HISTORY_LIMIT)}
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                className={chatButton}
+                disabled={busy || !historyHasMore}
+                onClick={() => loadPage(historyOffset + CHAT_HISTORY_LIMIT)}
+              >
+                Next
+              </button>
+              <button type="button" className={chatButton} disabled={busy} onClick={startNewSession}>
+                Start new session
+              </button>
+            </div>
+          </details>
+        )}
+
+        <form
+          className="flex shrink-0 gap-2 px-5 pb-4 pt-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend(question);
+          }}
+        >
+          <label className="flex-1">
+            <span className="sr-only">Research question</span>
+            <textarea
+              className={chatField}
+              rows={2}
+              maxLength={4000}
+              placeholder="Ask about a NASA experiment"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                  e.preventDefault();
+                  handleSend(question);
+                }
+              }}
+            />
+          </label>
+          <button
+            type="submit"
+            className={chatButton}
+            aria-label="Send message"
+            disabled={busy || !question.trim() || connection !== 'ready'}
+          >
+            {send.isPending ? 'Sending…' : 'Send'}
+          </button>
+        </form>
+      </aside>
     </div>
   );
 };

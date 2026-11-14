@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ExternalLink, FileText } from 'lucide-react';
 import { ApiClientError } from '@/api/client';
 import { useChatSourceQuery } from '@/hooks/api';
 import type { MappedChatCitation } from '@/types/api';
+import { chatButton } from './chatStyles';
 
 export interface CitationBadgeProps {
   citation: MappedChatCitation;
@@ -12,11 +12,13 @@ export interface CitationBadgeProps {
   index: number;
   /** Corpus revision the answer was produced from; pins the source lookup. */
   corpusVersion: string | null;
+  /** Show the excerpt only when the answer text does not already quote it. */
+  showExcerpt: boolean;
 }
 
 function sourceError(error: unknown): string {
   if (error instanceof ApiClientError && error.status === 409) {
-    return 'This citation belongs to an older corpus revision. The original excerpt above is unchanged.';
+    return 'This citation belongs to an older corpus revision. The original excerpt is retained above.';
   }
   if (error instanceof ApiClientError && error.status === 404) {
     return 'Source unavailable in the current corpus.';
@@ -24,18 +26,17 @@ function sourceError(error: unknown): string {
   return 'Source unavailable right now. Try again later.';
 }
 
-/**
- * One cited source passage: verbatim excerpt plus revision-pinned file metadata on demand.
- */
-export const CitationBadge: React.FC<CitationBadgeProps> = ({ citation, index, corpusVersion }) => {
+/** One cited source passage: verbatim excerpt plus revision-pinned file metadata on demand. */
+export const CitationBadge: React.FC<CitationBadgeProps> = ({
+  citation,
+  index,
+  corpusVersion,
+  showExcerpt,
+}) => {
   const [requested, setRequested] = useState(false);
   const source = useChatSourceQuery(
     requested && corpusVersion
-      ? {
-          sourceId: citation.sourceDocumentId,
-          locator: citation.sourceLocator,
-          corpusVersion,
-        }
+      ? { sourceId: citation.sourceDocumentId, locator: citation.sourceLocator, corpusVersion }
       : null
   );
 
@@ -45,57 +46,47 @@ export const CitationBadge: React.FC<CitationBadgeProps> = ({ citation, index, c
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-gray-50/70 p-2.5 space-y-1.5">
-      <p className="text-[11px] font-bold text-[#0B2374] flex items-center gap-1.5 break-all">
-        <FileText className="w-3.5 h-3.5 shrink-0" />
-        <span>{`[${index}] ${citation.sourceLocator}`}</span>
-      </p>
-
-      {citation.sourceExcerpt && (
-        <details className="text-[11px] text-zinc-700">
-          <summary className="cursor-pointer font-medium text-zinc-600 hover:text-zinc-900">
-            Read source excerpt
-          </summary>
-          <blockquote className="mt-1.5 whitespace-pre-wrap border-l-2 border-[#0B2374]/30 pl-2 text-zinc-800">
+    <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
+      <p className="font-semibold break-all">{`[${index}] ${citation.sourceLocator}`}</p>
+      {showExcerpt && citation.sourceExcerpt && (
+        <details className="mt-2">
+          <summary className="cursor-pointer">Read source excerpt</summary>
+          <blockquote className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap break-words border-l-2 border-slate-300 pl-2">
             {citation.sourceExcerpt}
           </blockquote>
         </details>
       )}
-
       <button
         type="button"
-        onClick={handleView}
+        className={`${chatButton} mt-2 px-3 py-1.5 text-xs`}
         disabled={!corpusVersion || source.isFetching}
-        className="text-[11px] font-semibold text-[#0B2374] hover:underline disabled:opacity-40 disabled:no-underline cursor-pointer"
+        onClick={handleView}
       >
         {source.isFetching ? 'Loading source…' : `View source ${index}`}
       </button>
-
       {source.data && (
-        <div className="text-[11px] text-zinc-700 space-y-1 pt-1 border-t border-gray-200">
+        <div className="mt-2 space-y-1 break-words">
           {source.data.sourceUrl ? (
             <a
+              className="font-semibold text-[#0B2374] underline"
               href={source.data.sourceUrl}
               target="_blank"
               rel="noreferrer"
-              className="font-semibold text-[#0B2374] hover:underline inline-flex items-center gap-1 break-all"
             >
-              {source.data.filename}
-              <ExternalLink className="w-3 h-3 shrink-0" />
+              {source.data.filename} ↗
             </a>
           ) : (
-            <span className="font-semibold break-all">{source.data.filename}</span>
+            <span className="font-semibold">{source.data.filename}</span>
           )}
-          <p>{`${source.data.license} · original source file`}</p>
+          <p>{`${source.data.license} · Original source`}</p>
           <details>
             <summary className="cursor-pointer">File fingerprint</summary>
-            <code className="block break-all text-[10px] text-zinc-600">SHA-256 {source.data.sha256}</code>
+            <code className="block break-all text-[10px]">SHA-256 {source.data.sha256}</code>
           </details>
         </div>
       )}
-
       {source.error && (
-        <p role="alert" className="text-[11px] text-amber-800">
+        <p role="alert" className="mt-2 text-red-800">
           {sourceError(source.error)}
         </p>
       )}

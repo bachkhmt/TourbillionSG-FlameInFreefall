@@ -1,17 +1,23 @@
+"""Real NASA corpus chat over HTTP through the backend's own app (ADR-0005), on PostgreSQL."""
+
 import asyncio
+import hashlib
 import json
 import os
+import time
 from urllib.parse import urlencode
 from uuid import uuid4
 
 import pytest
-from app.repositories.chat import ChatRepository
+from app.integrations.chat import MockProvider
+from app.integrations.rag.provider import VERSION, ExtractiveProvider
+from app.main import create_app
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from integration_tests.chat_target import prepare_target, settings_for
-from integrations.nasa_chat.app import create_app
-from integrations.nasa_chat.provider import ExtractiveProvider
+
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture(scope="module")
@@ -38,75 +44,75 @@ async def new_session(client):
     return response.json()["id"]
 
 
+async def ask(client, identity, question):
+    return await client.post(
+        f"/api/v1/chat/sessions/{identity}/messages", json={"question": question}
+    )
+
+
+async def history(client, identity):
+    return (await client.get(f"/api/v1/chat/sessions/{identity}/messages")).json()["items"]
+
+
 async def test_real_answer_history_source_binding_and_scientific_regression(client):
     client, _app = client
     readiness = await client.get("/api/v1/chat/readiness")
     assert readiness.headers["cache-control"] == "no-store"
     ready = readiness.json()
-    assert ready["state"] == "ready" and ready["mode"] == "retrieval_only"
-    assert ready["providerVersion"] == "nasa-extractive-v2"
+    assert (ready["state"], ready["mode"]) == ("ready", "retrieval_only")
+    assert ready["provider_version"] == VERSION and ready["passages"] == 1045
+    assert ready["review_status"] == "unreviewed"
     identity = await new_session(client)
-    response = await client.post(
-        f"/api/v1/chat/sessions/{identity}/messages",
-        json={"question": "FLEX-007 D0 đường kính mâu thuẫn?"},
-    )
+    response = await ask(client, identity, "FLEX-007 D0 đường kính mâu thuẫn?")
     assert response.status_code == 201, response.text
     answer = response.json()["assistant"]["answer"]
-    assert (
-        answer["state"] == "answered"
-        and answer["origin"] == "real"
-        and answer["review_status"] == "unreviewed"
+    assert (answer["state"], answer["origin"], answer["review_status"]) == (
+        "answered",
+        "real",
+        "unreviewed",
     )
     assert "1.87 mm [1]" in answer["text"] and "1.82 mm [2]" in answer["text"]
-    assert answer["provider_version"] == ready["providerVersion"]
+    assert answer["provider_version"] == ready["provider_version"]
+    assert answer["corpus_version"] == ready["corpus_version"]
     assert len({c["source_document_id"] for c in answer["citations"]}) >= 2
     for citation in answer["citations"]:
         source = await client.get(
             f"/api/v1/chat/sources/{citation['source_document_id']}?"
             + urlencode(
-                {
-                    "locator": citation["source_locator"],
-                    "corpus_version": answer["corpus_version"],
-                }
+                {"locator": citation["source_locator"], "corpus_version": answer["corpus_version"]}
             )
         )
-        assert source.status_code == 200 and source.json()["sourceUrl"].startswith(
-            "https://psi.nasa.gov/"
-        )
+        assert source.status_code == 200, source.text
+        assert source.json()["source_url"].startswith("https://psi.nasa.gov/")
+        assert source.json()["license"] == "CC0-1.0"
         assert source.headers["cache-control"] == "no-store"
-    history = (await client.get(f"/api/v1/chat/sessions/{identity}/messages")).json()
-    assert [m["role"] for m in history["items"]] == ["user", "assistant"]
-    assert history["items"][1]["answer"] == answer
-    follow = await client.post(
-        f"/api/v1/chat/sessions/{identity}/messages",
-        json={"question": "còn áp suất thì sao?"},
-    )
+    stored = await history(client, identity)
+    assert [m["role"] for m in stored] == ["user", "assistant"]
+    assert stored[1]["answer"] == answer
+    follow = await ask(client, identity, "còn áp suất thì sao?")
     assert follow.status_code == 201 and follow.json()["assistant"]["answer"]["citations"]
-    mars = await client.post(
-        f"/api/v1/chat/sessions/{identity}/messages",
-        json={"question": "Dữ liệu cháy ở trọng lực Sao Hỏa 0.38g?"},
-    )
+    mars = await ask(client, identity, "Dữ liệu cháy ở trọng lực Sao Hỏa 0.38g?")
     assert mars.status_code == 201
     gap = mars.json()["assistant"]["answer"]
     assert gap["state"] == "abstained" and not gap["citations"]
     summary = (await client.get("/api/v1/dashboard/summary")).json()
-    assert (
-        summary["investigationCount"],
-        summary["runCount"],
-        summary["claimCount"],
-    ) == (
+    assert (summary["investigationCount"], summary["runCount"], summary["claimCount"]) == (
         18,
         910,
         0,
     )
     assert summary["context"]["reviewState"] == "unreviewed"
+
+
+async def test_advisor_gets_no_corpus_and_reports_provider_unavailable(client):
+    client, _app = client
     advisor = await client.post(
         "/api/v1/advisor/assessments", json={"scenario": {}, "pages": {"limit": 20}}
     )
     assert advisor.status_code == 200, advisor.text
-    assert all(
-        a["state"] in {"unavailable", "abstained"} for a in advisor.json()["pillars"].values()
-    )
+    body = advisor.json()
+    assert all(a["state"] == "unavailable" and not a["citations"] for a in body["pillars"].values())
+    assert all("PROVIDER_UNAVAILABLE" in gaps for gaps in body["gaps"].values())
 
 
 async def test_provider_cannot_invent_citations_or_partial_pairs(client):
@@ -116,99 +122,116 @@ async def test_provider_cannot_invent_citations_or_partial_pairs(client):
     class Forged(ExtractiveProvider):
         async def answer(self, request):
             answer = await super().answer(request)
-            return answer.model_copy(
-                update={
-                    "citations": (
-                        answer.citations[0].model_copy(update={"source_document_id": uuid4()}),
-                    )
-                }
-            )
+            forged = answer.citations[0].model_copy(update={"source_document_id": uuid4()})
+            return answer.model_copy(update={"citations": (forged,)})
 
-    app.state.nasa_chat_provider_factory = Forged
-    response = await client.post(
-        f"/api/v1/chat/sessions/{identity}/messages", json={"question": "FLEX-007"}
-    )
-    assert response.status_code == 502
-    assert (await client.get(f"/api/v1/chat/sessions/{identity}/messages")).json()["items"] == []
+    class Inflated(ExtractiveProvider):
+        async def answer(self, request):
+            answer = await super().answer(request)
+            return answer.model_copy(update={"text": answer.text + "\nGiá trị đúng là 9.99 mm."})
+
+    for factory in (Forged, Inflated):
+        app.state.chat_provider_factory = factory
+        response = await ask(client, identity, "FLEX-007 D0 đường kính mâu thuẫn?")
+        assert response.status_code == 502, response.text
+    assert await history(client, identity) == []
 
 
-async def test_policy_change_during_provider_rejects_and_rolls_back(client, target):
+async def test_corpus_drift_during_provider_rejects_and_rolls_back(client, target):
     client, app = client
     identity = await new_session(client)
-    registry = target["collection"].parent / "nasa-chat-registry.json"
-    before = registry.read_bytes()
+    manifest = target["collection"]
+    registry = manifest.parent / "corpus-registry.json"
+    before_registry, before_manifest = registry.read_bytes(), manifest.read_bytes()
 
     class Drift(ExtractiveProvider):
         async def answer(self, request):
-            registry.write_bytes(before + b" ")
+            # A valid new registry revision: the declared hash is updated consistently.
+            changed = before_registry + b" "
+            registry.write_bytes(changed)
+            config = json.loads(before_manifest)
+            config["corpusPolicy"]["registrySha256"] = hashlib.sha256(changed).hexdigest()
+            manifest.write_text(json.dumps(config))
             return await super().answer(request)
 
-    app.state.nasa_chat_provider_factory = Drift
+    app.state.chat_provider_factory = Drift
     try:
-        response = await client.post(
-            f"/api/v1/chat/sessions/{identity}/messages", json={"question": "FLEX-007"}
-        )
+        response = await ask(client, identity, "FLEX-007")
         assert response.status_code == 409, response.text
-        advisor = await client.post("/api/v1/advisor/assessments", json={"scenario": {}})
-        assert advisor.status_code == 200, advisor.text
-        assert all(a["state"] == "unavailable" for a in advisor.json()["pillars"].values())
+    finally:
+        registry.write_bytes(before_registry)
+        manifest.write_bytes(before_manifest)
+    assert await history(client, identity) == []
+
+
+async def test_tampered_registry_reports_corpus_policy_unavailable(client, target):
+    client, _app = client
+    registry = target["collection"].parent / "corpus-registry.json"
+    before = registry.read_bytes()
+    registry.write_bytes(before + b" ")  # declared hash no longer matches
+    try:
+        ready = (await client.get("/api/v1/chat/readiness")).json()
+        assert (ready["state"], ready["reasons"]) == ("not_ready", ["CORPUS_POLICY_UNAVAILABLE"])
     finally:
         registry.write_bytes(before)
-    assert (await client.get(f"/api/v1/chat/sessions/{identity}/messages")).json()["items"] == []
 
 
-async def test_full_turn_lock_includes_previous_committed_turn(client, monkeypatch):
+async def test_concurrent_sends_keep_complete_pairs(client):
     client, app = client
     identity = await new_session(client)
-    entered = asyncio.Event()
-    release = asyncio.Event()
-    second_waiting = asyncio.Event()
-    seen = []
-    lock = ChatRepository.lock
-    attempts = 0
-
-    async def observed_lock(repo, identity):
-        nonlocal attempts
-        attempts += 1
-        if attempts == 2:
-            second_waiting.set()
-        await lock(repo, identity)
-
-    monkeypatch.setattr(ChatRepository, "lock", observed_lock)
+    entered, release = asyncio.Event(), asyncio.Event()
+    calls = []
 
     class Delayed(ExtractiveProvider):
         async def answer(self, request):
-            seen.append(request)
-            if len(seen) == 1:
+            calls.append(request.question)
+            if len(calls) == 1:
                 entered.set()
                 await release.wait()
             return await super().answer(request)
 
-    app.state.nasa_chat_provider_factory = Delayed
-    first = asyncio.create_task(
-        client.post(f"/api/v1/chat/sessions/{identity}/messages", json={"question": "FLEX-007"})
-    )
+    app.state.chat_provider_factory = Delayed
+    first = asyncio.create_task(ask(client, identity, "FLEX-007"))
     await asyncio.wait_for(entered.wait(), 10)
-    second = asyncio.create_task(
-        client.post(
-            f"/api/v1/chat/sessions/{identity}/messages",
-            json={"question": "còn áp suất thì sao?"},
-        )
-    )
-    await asyncio.wait_for(second_waiting.wait(), 10)
-    assert len(seen) == 1
+    second = await ask(client, identity, "FLEX-007 D0?")
+    assert second.status_code == 201, second.text
     release.set()
-    results = await asyncio.gather(first, second)
-    assert [r.status_code for r in results] == [201, 201]
-    assert any(m.role == "user" and m.text == "FLEX-007" for m in seen[1].history)
+    assert (await first).status_code == 201
+    stored = await history(client, identity)
+    assert [m["role"] for m in stored] == ["user", "assistant"] * 2
+    assert [m["answer"]["text"] for m in stored[::2]] == ["FLEX-007 D0?", "FLEX-007"]
 
 
-async def test_missing_runtime_and_unknown_source_are_explicit(target):
+async def test_provider_without_retrieval_abstains_on_real_corpus(client):
+    client, app = client
+    app.state.chat_provider_factory = MockProvider
+    ready = (await client.get("/api/v1/chat/readiness")).json()
+    assert (ready["state"], ready["mode"]) == ("ready", "provider")
+    identity = await new_session(client)
+    response = await ask(client, identity, "FLEX-007 D0?")
+    assert response.status_code == 201, response.text
+    answer = response.json()["assistant"]["answer"]
+    assert answer["state"] == "abstained" and answer["citations"] == []
+
+
+async def test_missing_runtime_and_unknown_source_are_explicit(target, client):
+    client, _app = client
+    corpus = (await client.get("/api/v1/chat/readiness")).json()["corpus_version"]
+    unknown = await client.get(
+        f"/api/v1/chat/sources/{uuid4()}?"
+        + urlencode({"locator": "CSV row 8", "corpus_version": corpus})
+    )
+    assert unknown.status_code == 404
     app = create_app(settings_for(target).model_copy(update={"runtime_database_url": None}))
     async with app.router.lifespan_context(app):
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            assert (await client.get("/api/v1/chat/readiness")).json()["state"] == "not_ready"
-            assert (await client.post("/api/v1/chat/sessions", json={})).status_code == 503
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as other:
+            ready = (await other.get("/api/v1/chat/readiness")).json()
+            assert ready == {
+                **ready,
+                "state": "not_ready",
+                "reasons": ["RUNTIME_STORAGE_UNAVAILABLE"],
+            }
+            assert (await other.post("/api/v1/chat/sessions", json={})).status_code == 503
 
 
 async def test_writer_cannot_change_science(target):
@@ -224,7 +247,7 @@ async def test_writer_cannot_change_science(target):
         await engine.dispose()
 
 
-async def test_cancelled_turn_rolls_back_and_releases_lock(client):
+async def test_cancelled_turn_stores_nothing(client):
     client, app = client
     identity = await new_session(client)
     entered = asyncio.Event()
@@ -234,21 +257,15 @@ async def test_cancelled_turn_rolls_back_and_releases_lock(client):
             entered.set()
             await asyncio.sleep(20)
 
-    app.state.nasa_chat_provider_factory = Blocked
-    task = asyncio.create_task(
-        client.post(f"/api/v1/chat/sessions/{identity}/messages", json={"question": "FLEX-007"})
-    )
+    app.state.chat_provider_factory = Blocked
+    task = asyncio.create_task(ask(client, identity, "FLEX-007"))
     await asyncio.wait_for(entered.wait(), 10)
     task.cancel()
     with pytest.raises(asyncio.CancelledError):
         await task
-    del app.state.nasa_chat_provider_factory
-    assert (await client.get(f"/api/v1/chat/sessions/{identity}/messages")).json()["items"] == []
-    assert (
-        await client.post(
-            f"/api/v1/chat/sessions/{identity}/messages", json={"question": "FLEX-007"}
-        )
-    ).status_code == 201
+    del app.state.chat_provider_factory
+    assert await history(client, identity) == []
+    assert (await ask(client, identity, "FLEX-007")).status_code == 201
 
 
 async def test_expiry_and_revision_pinned_lookup(client, target):
@@ -259,13 +276,8 @@ async def test_expiry_and_revision_pinned_lookup(client, target):
 
     client, _app = client
     identity = await new_session(client)
-    source = next(
-        iter(
-            json.loads((target["collection"].parent / "nasa-chat-registry.json").read_text())[
-                "sources"
-            ]
-        )
-    )
+    registry = json.loads((target["collection"].parent / "corpus-registry.json").read_text())
+    source = next(iter(registry["sources"]))
     stale = await client.get(
         f"/api/v1/chat/sources/{source}?"
         + urlencode({"locator": "CSV row 8", "corpus_version": "0" * 64})
@@ -284,20 +296,27 @@ async def test_expiry_and_revision_pinned_lookup(client, target):
     assert (await client.get(f"/api/v1/chat/sessions/{identity}")).status_code == 404
 
 
-async def test_timeout_is_visible_without_fabricated_citations(client):
+async def test_provider_and_retrieval_timeouts_are_visible_without_citations(client):
     client, app = client
     identity = await new_session(client)
-    app.state.settings.chat_timeout_seconds = 0.01
+    app.state.settings.chat_timeout_seconds = 0.05
 
-    class Slow(ExtractiveProvider):
+    class SlowAnswer(ExtractiveProvider):
         async def answer(self, request):
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.2)
             return await super().answer(request)
 
-    app.state.nasa_chat_provider_factory = Slow
-    response = await client.post(
-        f"/api/v1/chat/sessions/{identity}/messages", json={"question": "FLEX-007"}
-    )
-    assert response.status_code == 201, response.text
-    answer = response.json()["assistant"]["answer"]
-    assert answer["state"] == "timeout" and answer["citations"] == []
+    class SlowRetrieval(ExtractiveProvider):
+        def retrieve(self, *args):
+            time.sleep(0.2)
+            return super().retrieve(*args)
+
+    try:
+        for factory in (SlowAnswer, SlowRetrieval):
+            app.state.chat_provider_factory = factory
+            response = await ask(client, identity, "FLEX-007")
+            assert response.status_code == 201, response.text
+            answer = response.json()["assistant"]["answer"]
+            assert answer["state"] == "timeout" and answer["citations"] == []
+    finally:
+        app.state.settings.chat_timeout_seconds = 10

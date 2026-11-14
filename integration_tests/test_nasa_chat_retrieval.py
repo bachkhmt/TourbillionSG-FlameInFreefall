@@ -1,10 +1,10 @@
 from uuid import UUID
 
 import pytest
-from app.integrations.chat import RagRequest
+from app.integrations.chat import CorpusPassage, RagRequest
+from app.integrations.rag.provider import ExtractiveProvider
+from app.integrations.rag.retrieval import refusal, select_passages, terms
 
-from integrations.nasa_chat.provider import ExtractiveProvider
-from integrations.nasa_chat.retrieval import Passage, refusal, select_passages, terms
 from integrations.nasa_data.unified import build_unified_release
 
 
@@ -14,14 +14,14 @@ def passages():
     sources = {s["id"]: s for s in release["sources"]}
     studies = {s["id"]: s for s in release["investigations"]}
     return tuple(
-        Passage(
-            UUID(c["id"]),
-            UUID(c["sourceId"]),
-            UUID(studies[c["investigationId"]]["uuid"]),
-            c["investigationId"],
-            studies[c["investigationId"]]["title"],
-            c["locator"],
-            c["text"],
+        CorpusPassage(
+            chunk_id=UUID(c["id"]),
+            source_document_id=UUID(c["sourceId"]),
+            investigation_id=UUID(studies[c["investigationId"]]["uuid"]),
+            slug=c["investigationId"],
+            title=studies[c["investigationId"]]["title"],
+            locator=c["locator"],
+            text=c["text"],
         )
         for c in release["chunks"]
         if sources[c["sourceId"]]["license"] == "CC0-1.0"
@@ -30,7 +30,7 @@ def passages():
 
 def test_flex_conflicts_preserve_both_original_sources(passages):
     hits = select_passages("FLEX-007 D0 đường kính mâu thuẫn?", passages)
-    assert len({h.passage.source_id for h in hits}) >= 2
+    assert len({h.passage.source_document_id for h in hits}) >= 2
     assert "1.87" in " ".join(h.excerpt for h in hits)
     assert "1.82" in " ".join(h.excerpt for h in hits)
     assert all(h.excerpt in h.passage.text for h in hits)

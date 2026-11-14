@@ -34,7 +34,9 @@ class Settings(BaseSettings):
     catalog_collection_manifest: str | None = None
     scenario_test_providers: bool = False
     runtime_database_url: SecretStr | None = None
-    chat_provider: Literal["unavailable", "mock"] = "unavailable"
+    # "extractive" quotes the admitted real corpus only when its manifest declares a
+    # corpusPolicy (ADR-0005); otherwise it behaves like an evidence-less provider.
+    chat_provider: Literal["unavailable", "mock", "extractive"] = "unavailable"
     chat_timeout_seconds: float = Field(default=10, gt=0, le=30)
     prediction_provider: Literal["unavailable", "mock"] = "unavailable"
     prediction_timeout_seconds: float = Field(default=10, gt=0, le=30)

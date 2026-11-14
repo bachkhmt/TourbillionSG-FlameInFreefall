@@ -143,16 +143,23 @@ describe('useAiAssistantStore', () => {
       },
     });
     sessionStorage.setItem('flameguard.chat.session.v1', '11111111-1111-4111-8111-111111111111');
-    store.appendMessages('s-1', [message('u1', 'user'), message('a1', 'assistant')]);
-    store.appendMessages('s-1', [message('u2', 'user'), message('a2', 'assistant')]);
-    expect(useAiAssistantStore.getState().messages.map((m) => m.id)).toEqual(['u1', 'a1', 'u2', 'a2']);
+    store.setSession('s-1');
+    store.appendRecent('s-1', [message('u1', 'user'), message('a1', 'assistant')]);
+    store.appendRecent('s-1', [message('u2', 'user'), message('a2', 'assistant')]);
+    expect(useAiAssistantStore.getState().recent.map((m) => m.id)).toEqual(['u1', 'a1', 'u2', 'a2']);
 
     // A different session never splices into the previous conversation.
-    store.appendMessages('s-2', [message('u3', 'user')]);
+    store.appendRecent('s-2', [message('u3', 'user')]);
+    expect(useAiAssistantStore.getState().recent.map((m) => m.id)).toEqual(['u3']);
+
+    // A refreshed history page replaces the view and folds in recent exchanges.
+    store.setHistoryPage('s-2', { offset: 0, messages: [message('u3', 'user')], hasMore: false });
+    expect(useAiAssistantStore.getState().recent).toEqual([]);
     expect(useAiAssistantStore.getState().messages.map((m) => m.id)).toEqual(['u3']);
 
     store.resetConversation();
     expect(useAiAssistantStore.getState().messages).toEqual([]);
+    expect(useAiAssistantStore.getState().recent).toEqual([]);
     expect(useAiAssistantStore.getState().sessionId).toBeNull();
     expect(sessionStorage.getItem('flameguard.chat.session.v1')).toBeNull();
   });

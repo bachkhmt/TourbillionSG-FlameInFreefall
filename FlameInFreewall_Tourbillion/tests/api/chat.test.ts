@@ -8,7 +8,7 @@ import {
   listChatMessages,
   sendChatMessage,
 } from '@/api/services/chatService';
-import { mapChatMessageDto, mapChatReadinessDto } from '@/api/mappers';
+import { mapChatMessageDto, mapChatReadinessDto, mapChatSourceDto } from '@/api/mappers';
 import {
   clearChatSessionId,
   CHAT_SESSION_KEY,
@@ -26,6 +26,26 @@ const ID = '11111111-1111-4111-8111-111111111111';
 
 describe('chat service', () => {
   beforeEach(() => request.mockClear());
+
+  it('maps source metadata and drops non-https links', () => {
+    const dto = {
+      source_document_id: 's',
+      locator: 'CSV row 8',
+      corpus_version: 'v',
+      filename: 'f.csv',
+      source_url: 'http://insecure.example/f.csv',
+      sha256: 'a'.repeat(64),
+      license: 'CC0-1.0',
+      title: 'FLEX',
+      review_status: 'unreviewed',
+    };
+    expect(mapChatSourceDto(dto).sourceUrl).toBeNull();
+    expect(mapChatSourceDto({ ...dto, source_url: 'https://psi.nasa.gov/f.csv' })).toMatchObject({
+      sourceId: 's',
+      corpusVersion: 'v',
+      sourceUrl: 'https://psi.nasa.gov/f.csv',
+    });
+  });
 
   it('targets the backend chat routes', async () => {
     await getChatReadiness();
@@ -96,10 +116,10 @@ describe('chat mappers', () => {
     });
   });
 
-  it('maps camelCase readiness with safe defaults', () => {
-    expect(mapChatReadinessDto({ state: 'not_ready', mode: 'retrieval_only', reasons: ['X'] })).toEqual({
+  it('maps snake_case readiness with safe defaults', () => {
+    expect(mapChatReadinessDto({ state: 'not_ready', mode: 'none', reasons: ['X'] })).toEqual({
       state: 'not_ready',
-      mode: 'retrieval_only',
+      mode: 'none',
       providerVersion: null,
       corpusVersion: null,
       passages: null,

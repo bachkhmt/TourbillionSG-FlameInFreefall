@@ -199,7 +199,7 @@ export interface MappedComparisonResult {
 }
 
 // ---------------------------------------------------------------------------
-// NASA chat (integrations/nasa_chat): extractive, cited, unreviewed answers
+// Chat (backend Phase 6 + ADR-0005): extractive, cited, unreviewed answers
 // ---------------------------------------------------------------------------
 
 export type ChatAnswerState = 'answered' | 'abstained' | 'unavailable' | 'timeout';

@@ -1,19 +1,18 @@
 /**
- * NASA chat DTOs. Core chat schemas from the backend are snake_case; the
- * integration-only `/chat/readiness` and `/chat/sources/{id}` routes are camelCase.
+ * Chat DTOs, snake_case exactly as the backend chat contract (Phase 6 + ADR-0005).
  */
 
 export type ChatAnswerStateDto = 'answered' | 'abstained' | 'unavailable' | 'timeout';
 
-/** `GET /chat/readiness` (camelCase, integrations/nasa_chat). */
+/** `GET /chat/readiness`: whether sending can succeed, with reason codes. */
 export interface ChatReadinessDto {
   state: 'ready' | 'not_ready';
-  mode: string;
-  providerVersion?: string;
-  corpusVersion?: string;
-  sourceRevision?: string;
-  passages?: number;
-  reviewStatus?: string;
+  mode: 'retrieval_only' | 'provider' | 'none' | string;
+  provider_version?: string | null;
+  corpus_version?: string | null;
+  source_revision?: string | null;
+  passages?: number | null;
+  review_status?: string;
   reasons: string[];
 }
 
@@ -67,18 +66,16 @@ export interface ChatExchangeDto {
   assistant: ChatMessageDto;
 }
 
-/** `GET /chat/sources/{id}` (camelCase, revision-pinned registry entry). */
+/** `GET /chat/sources/{source_document_id}`: registry metadata pinned to a corpus version. */
 export interface ChatSourceDto {
-  sourceId: string;
+  source_document_id: string;
   locator: string;
-  corpusVersion: string;
+  corpus_version: string;
   filename: string;
-  sourceUrl: string;
+  /** Only https URLs are returned; otherwise null. */
+  source_url: string | null;
   sha256: string;
   license: string;
   title: string;
-  slug: string;
-  investigationId: string;
-  version: string;
-  reviewStatus: string;
+  review_status: string;
 }

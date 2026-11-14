@@ -37,8 +37,37 @@ class RagRequest(BaseModel):
         return self
 
 
+class CorpusPassage(BaseModel):
+    """One admitted, registry-checked document chunk, detached from the DB session."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+    chunk_id: UUID
+    source_document_id: UUID
+    investigation_id: UUID
+    slug: str
+    title: str
+    locator: str
+    text: str
+
+
 class RagProvider(Protocol):
     async def answer(self, request: RagRequest) -> Answer: ...
+
+
+class CorpusRetriever(Protocol):
+    """Optional provider capability for real admitted corpora.
+
+    Runs synchronously on detached passages; the backend verifies every returned
+    citation against those passages before it becomes an allowed source.
+    """
+
+    def retrieve(
+        self,
+        question: str,
+        passages: tuple[CorpusPassage, ...],
+        prior_questions: tuple[str, ...],
+        study_slugs: tuple[str, ...],
+    ) -> tuple[Citation, ...]: ...
 
 
 class AdvisorProvider(Protocol):
@@ -92,7 +121,12 @@ def select_provider(app):
     """A trusted application factory may register an adapter per app instance."""
     factory = getattr(app.state, "chat_provider_factory", None)
     if factory is None:
-        factory = {"mock": MockProvider, "unavailable": UnavailableProvider}[
-            app.state.settings.chat_provider
-        ]
+        # Imported lazily: the AI-owned package depends on this protocol module.
+        from app.integrations.rag.provider import ExtractiveProvider
+
+        factory = {
+            "mock": MockProvider,
+            "unavailable": UnavailableProvider,
+            "extractive": ExtractiveProvider,
+        }[app.state.settings.chat_provider]
     return factory()

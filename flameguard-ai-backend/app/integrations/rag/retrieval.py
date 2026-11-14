@@ -1,11 +1,12 @@
+"""Lexical retrieval over admitted NASA chunks (AI-team owned algorithm)."""
+
 import re
 import unicodedata
 from dataclasses import dataclass
-from uuid import UUID
 
+from app.integrations.chat import CorpusPassage
+from app.integrations.rag.bm25 import BM25
 from app.schemas.api.chat import Citation
-
-from .bm25 import BM25
 
 STOP = set(
     (
@@ -87,25 +88,14 @@ def refusal(question):
 
 
 @dataclass(frozen=True)
-class Passage:
-    chunk_id: UUID
-    source_id: UUID
-    investigation_id: UUID
-    slug: str
-    title: str
-    locator: str
-    text: str
-
-
-@dataclass(frozen=True)
 class Hit:
-    passage: Passage
+    passage: CorpusPassage
     excerpt: str
 
     @property
     def citation(self):
         return Citation(
-            source_document_id=self.passage.source_id,
+            source_document_id=self.passage.source_document_id,
             source_locator=self.passage.locator,
             source_excerpt=self.excerpt,
         )
@@ -213,9 +203,9 @@ def select_passages(question, passages, history=(), study_slugs=()):
     seen = set()
     for index, _score in ranking:
         p = candidates[index]
-        if (p.source_id, p.locator) in seen:
+        if (p.source_document_id, p.locator) in seen:
             continue
-        seen.add((p.source_id, p.locator))
+        seen.add((p.source_document_id, p.locator))
         # A citation excerpt is an unchanged contiguous slice of its original chunk.
         start = 0
         if len(p.text) > 1800:

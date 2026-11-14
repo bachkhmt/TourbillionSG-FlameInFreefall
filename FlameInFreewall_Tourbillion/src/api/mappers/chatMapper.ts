@@ -50,8 +50,8 @@ export function mapChatReadinessDto(dto: ChatReadinessDto): MappedChatReadiness 
   return {
     state: dto.state === 'ready' ? 'ready' : 'not_ready',
     mode: dto.mode,
-    providerVersion: dto.providerVersion ?? null,
-    corpusVersion: dto.corpusVersion ?? null,
+    providerVersion: dto.provider_version ?? null,
+    corpusVersion: dto.corpus_version ?? null,
     passages: typeof dto.passages === 'number' ? dto.passages : null,
     reasons: dto.reasons ?? [],
   };
@@ -68,15 +68,15 @@ export function mapChatSessionDto(dto: ChatSessionDto): MappedChatSession {
 
 export function mapChatSourceDto(dto: ChatSourceDto): MappedChatSource {
   return {
-    sourceId: dto.sourceId,
+    sourceId: dto.source_document_id,
     locator: dto.locator,
-    corpusVersion: dto.corpusVersion,
+    corpusVersion: dto.corpus_version,
     filename: dto.filename,
     // Only https links are rendered as clickable; anything else stays plain text.
-    sourceUrl: /^https:\/\//i.test(dto.sourceUrl) ? dto.sourceUrl : null,
+    sourceUrl: dto.source_url && /^https:\/\//i.test(dto.source_url) ? dto.source_url : null,
     sha256: dto.sha256,
     license: dto.license,
     title: dto.title,
-    reviewStatus: dto.reviewStatus,
+    reviewStatus: dto.review_status,
   };
 }
