@@ -1,7 +1,7 @@
 const DEFAULT_API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
 const DEFAULT_PROXY_API_BASE_URL = '/api/proxy/api/v1';
 const DEFAULT_BACKEND_INTERNAL_URL = 'http://127.0.0.1:8000';
-const DEFAULT_API_TIMEOUT_MS = 40000;
+const DEFAULT_API_TIMEOUT_MS = 60000;
 
 /**
  * Returns the normalized backend API base URL without trailing slashes.

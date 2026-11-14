@@ -103,6 +103,10 @@ export function useInvestigationDetailQuery(
   const trimmed = normalizeNonEmptyId(idOrSlug);
 
   return useQuery<MappedInvestigationDetail, Error>({
+    placeholderData:
+      shouldFallback(options?.enableFallback) && trimmed
+        ? () => getMockInvestigationDetail(trimmed)
+        : undefined,
     ...options,
     queryKey: apiQueryKeys.investigationDetail(trimmed),
     queryFn: async ({ signal }) => {

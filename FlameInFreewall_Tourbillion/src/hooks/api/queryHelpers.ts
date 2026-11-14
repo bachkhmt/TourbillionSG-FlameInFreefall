@@ -121,6 +121,10 @@ export function useScopedPaginatedQuery<TDto, TMapped>(
   const trimmedId = normalizeNonEmptyId(id);
 
   return useQuery<MappedPage<TMapped>, Error>({
+    placeholderData:
+      fallbackFetcher && shouldFallback(options?.enableFallback) && trimmedId
+        ? () => fallbackFetcher(trimmedId, pagination)
+        : undefined,
     ...options,
     queryKey: getQueryKey(trimmedId, pagination),
     queryFn: async ({ signal }) => {

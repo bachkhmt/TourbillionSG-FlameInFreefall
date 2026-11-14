@@ -76,13 +76,13 @@ describe('Task 1: TanStack Query Foundation, Config, Error Banner & Test Harness
 
     it('returns default timeout when NEXT_PUBLIC_API_TIMEOUT_MS is missing or invalid', () => {
       delete process.env.NEXT_PUBLIC_API_TIMEOUT_MS;
-      expect(getApiTimeoutMs()).toBe(40000);
+      expect(getApiTimeoutMs()).toBe(60000);
       process.env.NEXT_PUBLIC_API_TIMEOUT_MS = 'not-a-number';
-      expect(getApiTimeoutMs()).toBe(40000);
+      expect(getApiTimeoutMs()).toBe(60000);
       process.env.NEXT_PUBLIC_API_TIMEOUT_MS = '0';
-      expect(getApiTimeoutMs()).toBe(40000);
+      expect(getApiTimeoutMs()).toBe(60000);
       process.env.NEXT_PUBLIC_API_TIMEOUT_MS = '-250';
-      expect(getApiTimeoutMs()).toBe(40000);
+      expect(getApiTimeoutMs()).toBe(60000);
     });
 
     it('parses valid positive NEXT_PUBLIC_API_TIMEOUT_MS', () => {
