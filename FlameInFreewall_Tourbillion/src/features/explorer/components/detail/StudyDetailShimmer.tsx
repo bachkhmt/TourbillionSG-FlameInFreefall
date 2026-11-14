@@ -35,55 +35,87 @@ function ShimmerBar({ className }: { className: string }) {
 }
 
 /**
- * StructPaper loading skeleton for the study detail header, tab bar, and overview pane.
+ * StructPaper loading skeleton for the study detail header, 2-column layout, and tab pane.
  */
 export const StudyDetailShimmer: React.FC = () => {
   return (
     <div
       data-testid="study-detail-shimmer"
-      className="w-full max-w-7xl mx-auto space-y-6 py-2 pb-24 select-none"
+      className="w-full max-w-[1600px] mx-auto space-y-6 py-2 pb-24 select-none"
     >
       {/* Header Shimmer */}
-      <div className="w-full bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xs">
+      <div className="w-full bg-white border border-gray-100 rounded-3xl p-5 sm:p-6 space-y-4 shadow-xs">
         <div className="flex items-center justify-between gap-3">
           <ShimmerBar className="h-4 w-36 rounded-full" />
-          <ShimmerBar className="h-8 w-36 rounded-xl" />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <ShimmerBar className="h-6 w-24 rounded-xl" />
-          <ShimmerBar className="h-6 w-28 rounded-xl" />
-          <ShimmerBar className="h-6 w-32 rounded-xl" />
-        </div>
-        <ShimmerBar className="h-9 w-3/4 rounded-xl" />
-        <ShimmerBar className="h-4 w-2/3 rounded-md" />
-        <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-          <ShimmerBar className="h-4 w-56 rounded-md" />
-          <ShimmerBar className="h-9 w-32 rounded-xl" />
-        </div>
-      </div>
-
-      {/* Tabs Nav Shimmer */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-gray-100/80 border border-gray-200/60">
-        {Array.from({ length: 5 }, (_, index) => (
-          <ShimmerBar key={`tab-shimmer-${index}`} className="h-9 w-32 rounded-xl shrink-0" />
-        ))}
-      </div>
-
-      {/* Overview Pane Shimmer */}
-      <div className="space-y-5">
-        <div className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3">
-          <ShimmerBar className="h-5 w-60 rounded-md" />
-          <ShimmerBar className="h-4 w-full rounded-md" />
-          <ShimmerBar className="h-4 w-5/6 rounded-md" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3 min-h-[160px]">
-            <ShimmerBar className="h-4 w-44 rounded-md" />
-            <ShimmerBar className="h-16 w-full rounded-2xl" />
+          <div className="flex items-center gap-2">
+            <ShimmerBar className="h-8 w-32 rounded-xl" />
+            <ShimmerBar className="h-8 w-28 rounded-xl" />
           </div>
-          <div className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3 min-h-[160px]">
-            <ShimmerBar className="h-4 w-44 rounded-md" />
-            <ShimmerBar className="h-16 w-full rounded-2xl" />
+        </div>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <ShimmerBar className="h-6 w-20 rounded-xl" />
+          <ShimmerBar className="h-6 w-32 rounded-xl" />
+          <ShimmerBar className="h-6 w-28 rounded-xl" />
+        </div>
+        <ShimmerBar className="h-8 w-3/4 rounded-xl" />
+        <ShimmerBar className="h-4 w-2/3 rounded-md" />
+      </div>
+
+      {/* 2-Column Layout Shimmer */}
+      <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] xl:grid-cols-[400px_1fr] gap-6 items-start">
+        {/* Left Column Shimmer */}
+        <div className="space-y-4">
+          {/* 2x2 Grid Shimmer */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs space-y-2">
+              <ShimmerBar className="h-3 w-16 rounded-md" />
+              <ShimmerBar className="h-5 w-20 rounded-md" />
+            </div>
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs space-y-2">
+              <ShimmerBar className="h-3 w-16 rounded-md" />
+              <ShimmerBar className="h-5 w-20 rounded-md" />
+            </div>
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs space-y-2">
+              <ShimmerBar className="h-3 w-16 rounded-md" />
+              <ShimmerBar className="h-5 w-20 rounded-md" />
+            </div>
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs space-y-2">
+              <ShimmerBar className="h-3 w-16 rounded-md" />
+              <ShimmerBar className="h-5 w-20 rounded-md" />
+            </div>
+          </div>
+
+          {/* Physical Profile Card Shimmer */}
+          <div className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3">
+            <ShimmerBar className="h-4 w-32 rounded-md" />
+            <div className="space-y-2">
+              <ShimmerBar className="h-8 w-full rounded-xl" />
+              <ShimmerBar className="h-8 w-full rounded-xl" />
+              <ShimmerBar className="h-8 w-full rounded-xl" />
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column Shimmer */}
+        <div className="space-y-4 min-w-0">
+          {/* Tabs Nav Shimmer */}
+          <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-gray-200/80 shadow-2xs">
+            {Array.from({ length: 5 }, (_, index) => (
+              <ShimmerBar key={`tab-shimmer-${index}`} className="h-8 w-28 rounded-xl shrink-0" />
+            ))}
+          </div>
+
+          {/* Overview Pane Shimmer */}
+          <div className="space-y-4">
+            <div className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3">
+              <ShimmerBar className="h-5 w-60 rounded-md" />
+              <ShimmerBar className="h-4 w-full rounded-md" />
+              <ShimmerBar className="h-4 w-5/6 rounded-md" />
+            </div>
+            <div className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3 min-h-[160px]">
+              <ShimmerBar className="h-4 w-44 rounded-md" />
+              <ShimmerBar className="h-16 w-full rounded-2xl" />
+            </div>
           </div>
         </div>
       </div>

@@ -49,6 +49,32 @@ export default function DashboardPage() {
               <Rocket className="w-6 h-6 text-[#0B2374]" strokeWidth={2.5} />
               <span>Microgravity Combustion Science &amp; Fire Safety Intelligence</span>
             </h1>
+
+            {summary && summary.context.caveats.length > 0 && (
+              <div
+                data-testid="dashboard-caveats-banner"
+                className="relative group inline-flex items-center"
+              >
+                <button
+                  type="button"
+                  aria-label="Offline Fallback & Caveats"
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 text-[11px] font-bold transition-colors cursor-pointer shadow-2xs"
+                >
+                  <Info className="w-3 h-3 text-amber-800" />
+                  <span>Offline Fallback</span>
+                </button>
+
+                <div className="absolute left-0 top-full mt-2 hidden group-hover:block group-focus-within:block z-50 w-72 sm:w-80 p-3.5 rounded-2xl bg-[#0B2374] text-white text-xs shadow-2xl border border-[#D4FC02]/30 pointer-events-none">
+                  <div className="font-extrabold text-[#D4FC02] text-xs mb-1.5 flex items-center gap-1.5">
+                    <Info className="w-4 h-4 text-[#D4FC02] shrink-0" />
+                    <span>{summary.context.origin} · {summary.context.reviewState}</span>
+                  </div>
+                  <p className="leading-relaxed text-zinc-200 text-[11.5px] font-medium">
+                    {summary.context.caveats.join(' · ')}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2.5 shrink-0">
@@ -73,21 +99,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Collection Context & Caveats Pill Banner */}
-      {summary && summary.context.caveats.length > 0 && (
-        <div
-          data-testid="dashboard-caveats-banner"
-          className="flex flex-wrap items-center gap-2.5 px-4 py-3 rounded-3xl bg-amber-50/90 border border-amber-200/90 text-xs text-amber-900 -mt-4"
-        >
-          <Info className="w-4 h-4 text-amber-700 shrink-0" />
-          <span className="px-2 py-0.5 rounded-full bg-white border border-amber-200 font-bold text-[11px] uppercase text-amber-900">
-            {summary.context.origin} · {summary.context.reviewState}
-          </span>
-          <span className="font-medium leading-relaxed">
-            {summary.context.caveats.join(' · ')}
-          </span>
-        </div>
-      )}
 
       {/* Comparison floating quick-action pill if items are selected */}
       {compareList.length > 0 && (

@@ -83,6 +83,33 @@ export const StudyHeader: React.FC<StudyHeaderProps> = ({
               {unavailableCount} unmapped field{unavailableCount === 1 ? '' : 's'}
             </span>
           )}
+
+          {/* Context Caveats Tooltip Icon - Replaces big amber notice banner */}
+          {study.context.caveats.length > 0 && (
+            <div
+              data-testid="study-caveats-notice"
+              className="relative group inline-flex items-center"
+            >
+              <button
+                type="button"
+                aria-label="Provenance & Context Caveats"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 transition-colors cursor-pointer shadow-2xs"
+              >
+                <Info className="w-3.5 h-3.5 stroke-[2.5] text-amber-800" />
+                <span>Caveats</span>
+              </button>
+
+              <div className="absolute left-0 top-full mt-2 hidden group-hover:block group-focus-within:block z-50 w-72 sm:w-80 p-3.5 rounded-2xl bg-[#0B2374] text-white text-xs shadow-2xl border border-[#D4FC02]/30 pointer-events-none">
+                <div className="font-extrabold text-[#D4FC02] text-xs mb-1.5 flex items-center gap-1.5">
+                  <Info className="w-4 h-4 text-[#D4FC02] shrink-0" />
+                  <span>Provenance &amp; Context Caveats</span>
+                </div>
+                <p className="leading-relaxed text-zinc-200 text-[11.5px] font-medium">
+                  {study.context.caveats.join(' · ')}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-950 tracking-tight">
@@ -107,20 +134,6 @@ export const StudyHeader: React.FC<StudyHeaderProps> = ({
           </div>
         )}
       </div>
-
-      {/* Context Caveats Notice */}
-      {study.context.caveats.length > 0 && (
-        <div
-          data-testid="study-caveats-notice"
-          className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200 text-xs text-amber-900"
-        >
-          <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-          <div className="space-y-0.5">
-            <span className="font-bold">Provenance &amp; Context Caveats</span>
-            <p className="leading-relaxed">{study.context.caveats.join(' · ')}</p>
-          </div>
-        </div>
-      )}
 
       {/* Collection Totals & Compare Button */}
       <div className="pt-4 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">

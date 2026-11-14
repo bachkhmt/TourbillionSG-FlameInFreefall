@@ -39,7 +39,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         {/* Dashboard Content Container */}
         <main
           className={`w-full flex-1 px-3 sm:px-6 lg:px-8 py-5 pb-24 sm:pb-8 flex flex-col min-w-0 min-h-0 ${
-            isExplorerDetail ? 'max-w-7xl mx-auto' : ''
+            isExplorerDetail ? 'max-w-[1600px] mx-auto' : ''
           }`}
           id="main-content"
           role="main"
@@ -48,9 +48,13 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         </main>
       </div>
 
-      {/* Floating Grounded AI Assistant Dock & Slide-Over Drawer */}
-      <FloatingAiDock />
-      <AiDrawer />
+      {/* Floating Grounded AI Assistant Dock & Slide-Over Drawer - Hidden on Study Detail pages */}
+      {!isExplorerDetail && (
+        <>
+          <FloatingAiDock />
+          <AiDrawer />
+        </>
+      )}
 
       {/* Global Multi-Study Comparison Modal (active on dashboard/mission) */}
       {!pathname?.includes('/explorer') && <ComparisonModal />}

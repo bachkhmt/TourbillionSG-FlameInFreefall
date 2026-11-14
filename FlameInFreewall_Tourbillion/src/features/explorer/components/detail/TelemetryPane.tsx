@@ -87,6 +87,27 @@ export const TelemetryPane: React.FC<TelemetryPaneProps> = ({
                 <Activity className="w-4 h-4" />
               </span>
               <span className="truncate">Run Conditions &amp; Measured Observations</span>
+
+              {/* Provenance Notice Tooltip Icon */}
+              <div className="relative group inline-flex items-center">
+                <button
+                  type="button"
+                  data-testid="telemetry-provenance-notice"
+                  aria-label="Scalar Telemetry Provenance Notice"
+                  className="w-5 h-5 rounded-full bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+                >
+                  <Info className="w-3 h-3 stroke-[2.5]" />
+                </button>
+                <div className="absolute left-0 top-full mt-2 hidden group-hover:block group-focus-within:block z-50 w-72 sm:w-80 p-3.5 rounded-2xl bg-[#0B2374] text-white text-xs shadow-2xl border border-[#D4FC02]/30 pointer-events-none">
+                  <div className="font-extrabold text-[#D4FC02] text-xs mb-1.5 flex items-center gap-1.5">
+                    <Info className="w-4 h-4 text-[#D4FC02] shrink-0" />
+                    <span>Scalar Telemetry Provenance</span>
+                  </div>
+                  <p className="leading-relaxed text-zinc-200 text-[11.5px] font-medium">
+                    Displaying discrete experimental conditions and scalar measurements from the backend. Time-series waveforms are not synthesized when continuous sensor traces are unavailable.
+                  </p>
+                </div>
+              </div>
             </h3>
             <p className="text-xs text-zinc-500 mt-1 pl-9">
               <span className="font-semibold text-zinc-800">{study.psiId}</span> · {observations.length} investigation observations loaded
@@ -136,16 +157,6 @@ export const TelemetryPane: React.FC<TelemetryPaneProps> = ({
         )}
       </div>
 
-      {/* Honest No-Synthetic-Curve Notice */}
-      <div
-        data-testid="telemetry-provenance-notice"
-        className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 flex items-start gap-3 text-xs text-amber-900"
-      >
-        <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-        <p className="leading-relaxed">
-          Displaying discrete experimental conditions and scalar measurements from the backend. Time-series waveforms are not synthesized when continuous sensor traces are unavailable.
-        </p>
-      </div>
 
       {/* Conditions & Measurements Panels */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

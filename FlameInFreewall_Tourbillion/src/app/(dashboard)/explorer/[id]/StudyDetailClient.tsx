@@ -12,6 +12,9 @@ import {
   FileText,
   Download,
   Gauge,
+  BookOpen,
+  Layers,
+  Tag,
 } from 'lucide-react';
 import { ApiClientError } from '@/api/client';
 import type {
@@ -427,109 +430,213 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full max-w-7xl mx-auto space-y-6 py-2 pb-24"
+      className="w-full max-w-[1600px] mx-auto space-y-6 py-2 pb-24"
     >
       <StudyHeader
         study={study}
+        sources={sources}
         isComparing={isCompared}
         onToggleCompare={(sid) => toggleCompare(sid)}
       />
 
-      {/* Detail Navigation Tabs */}
-      <div
-        role="tablist"
-        aria-label="Investigation Detail Views"
-        className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-gray-200/80"
-      >
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              role="tab"
-              aria-selected={isActive}
-              data-testid={`tab-${tab.id}`}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
-                isActive
-                  ? 'bg-[#0B2374] text-white shadow-xs'
-                  : 'bg-white text-zinc-600 hover:text-zinc-950 hover:bg-gray-100 border border-gray-200/70'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* 2-Column Responsive Split Layout (StructPaper Extracted Content Style) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] xl:grid-cols-[400px_1fr] gap-6 items-start">
+        {/* LEFT COLUMN: Study Overview & Physical Science Profile */}
+        <div className="space-y-4 lg:sticky lg:top-4">
+          {/* Quick Summary Metrics (2x2 Grid, exact StructPaper pattern) */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
+              <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
+                <Activity className="w-3 h-3 text-[#0B2374]" /> Test Runs
+              </span>
+              <span className="text-base font-extrabold text-[#0B2374] mt-0.5 block">
+                {study.runsMeta?.total ?? effectiveRuns.length} Runs
+              </span>
+            </div>
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
+              <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
+                <BookOpen className="w-3 h-3 text-[#0B2374]" /> Sources
+              </span>
+              <span className="text-base font-extrabold text-zinc-900 mt-0.5 block">
+                {sources.length || study.sourcesMeta?.total || 0} Records
+              </span>
+            </div>
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
+              <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
+                <FileText className="w-3 h-3 text-[#0B2374]" /> Claims
+              </span>
+              <span className="text-base font-extrabold text-zinc-900 mt-0.5 block">
+                {claims.length || study.claimsMeta?.total || 0} Verified
+              </span>
+            </div>
+            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs">
+              <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
+                <Gauge className="w-3 h-3 text-[#0B2374]" /> Observations
+              </span>
+              <span className="text-base font-extrabold text-zinc-900 mt-0.5 block">
+                {effectiveObservations.length} Points
+              </span>
+            </div>
+          </div>
 
-      <motion.section
-        key={activeTab}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.28, ease: 'easeOut' }}
-        aria-label="Tab Content"
-      >
-        {activeTab === 'overview' && (
-          <ChamberOverviewTab
-            study={study}
-            sources={sources}
-            isSourcesLoading={sourcesQuery.isLoading}
-            sourcesError={sourcesQuery.error}
-            onRetrySources={() => sourcesQuery.refetch()}
-          />
-        )}
-        {activeTab === 'runs' && (
-          <TestRunsTable
-            study={study}
-            runs={effectiveRuns}
-            totalRuns={runsQuery.data?.total}
-            isLoading={runsQuery.isLoading && effectiveRuns.length === 0}
-            error={runsQuery.error}
-            onRetry={() => runsQuery.refetch()}
-            onLoadMore={handleLoadMoreRuns}
-            onLoadAll={handleLoadAllRuns}
-            isLoadingMore={isLoadingMoreRuns}
-            hasMore={runsQuery.data?.hasMore}
-          />
-        )}
-        {activeTab === 'telemetry' && (
-          <TelemetryPane
-            study={study}
-            runs={effectiveRuns}
-            observations={effectiveObservations}
-            isLoading={(runsQuery.isLoading || measurementsQuery.isLoading) && effectiveRuns.length === 0}
-            error={runsQuery.error ?? measurementsQuery.error}
-            onRetry={() => {
-              runsQuery.refetch();
-              measurementsQuery.refetch();
-            }}
-          />
-        )}
-        {activeTab === 'claims' && (
-          <ClaimsList
-            study={study}
-            claims={claims}
-            isLoading={claimsQuery.isLoading}
-            error={claimsQuery.error}
-            onRetry={() => claimsQuery.refetch()}
-          />
-        )}
-        {activeTab === 'psi-export' && (
-          <PsiExportTab
-            study={study}
-            runs={effectiveRuns}
-            observations={effectiveObservations}
-            sources={sources}
-            claims={claims}
-            totalRuns={runsQuery.data?.total}
-            totalObservations={measurementsQuery.data?.total}
-            onFetchAllData={handleFetchAllData}
-            isFetchingAll={isFetchingAllData}
-          />
-        )}
-      </motion.section>
+          {/* Physical Science & Platform Parameters Card */}
+          <div className="p-4 sm:p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3">
+            <div className="flex items-center gap-2 text-zinc-900">
+              <Layers className="w-4 h-4 text-[#0B2374]" />
+              <h3 className="font-bold text-xs uppercase tracking-wider text-zinc-900">
+                Physical Science Profile
+              </h3>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <div className="p-2.5 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between">
+                <span className="text-zinc-500 font-medium">Platform</span>
+                <span className="font-bold text-zinc-900">{study.platform ?? 'Platform unmapped'}</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between">
+                <span className="text-zinc-500 font-medium">Collection</span>
+                <span className="font-mono text-zinc-900 font-semibold">{study.context.collectionId}</span>
+              </div>
+              {study.fuelType && (
+                <div className="p-2.5 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between">
+                  <span className="text-zinc-500 font-medium">Fuel / Sample</span>
+                  <span className="font-bold text-zinc-900">{study.fuelType}</span>
+                </div>
+              )}
+              {study.gravityRaw && (
+                <div className="p-2.5 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between">
+                  <span className="text-zinc-500 font-medium">Gravity Level</span>
+                  <span className="font-bold text-zinc-900">{study.gravityRaw}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Catalog Taxonomy Tags */}
+          {study.tags.length > 0 && (
+            <div className="p-4 sm:p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-2.5">
+              <span className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider flex items-center gap-1.5">
+                <Tag className="w-3.5 h-3.5 text-[#0B2374]" /> Catalog Tags ({study.tags.length})
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {study.tags.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gray-100 border border-gray-200/80 text-[11px] font-semibold text-zinc-700"
+                  >
+                    <span>{tag.label}</span>
+                    {tag.category && (
+                      <span className="text-[10px] text-zinc-400">({tag.category})</span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT COLUMN: Segmented Tabs & Active Tab Data Explorer */}
+        <div className="space-y-4 min-w-0">
+          {/* Segmented Filter Control Navigation Bar */}
+          <div
+            role="tablist"
+            aria-label="Investigation Detail Views"
+            className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-gray-200/80 shadow-2xs overflow-x-auto scrollbar-none"
+          >
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  aria-selected={isActive}
+                  data-testid={`tab-${tab.id}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                    isActive
+                      ? 'bg-[#0B2374] text-white shadow-xs'
+                      : 'text-zinc-600 hover:text-zinc-950 hover:bg-gray-100'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Tab View */}
+          <motion.section
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.28, ease: 'easeOut' }}
+            aria-label="Tab Content"
+            className="min-w-0"
+          >
+            {activeTab === 'overview' && (
+              <ChamberOverviewTab
+                study={study}
+                sources={sources}
+                isSourcesLoading={sourcesQuery.isLoading}
+                sourcesError={sourcesQuery.error}
+                onRetrySources={() => sourcesQuery.refetch()}
+              />
+            )}
+            {activeTab === 'runs' && (
+              <TestRunsTable
+                study={study}
+                runs={effectiveRuns}
+                totalRuns={runsQuery.data?.total}
+                isLoading={runsQuery.isLoading && effectiveRuns.length === 0}
+                error={runsQuery.error}
+                onRetry={() => runsQuery.refetch()}
+                onLoadMore={handleLoadMoreRuns}
+                onLoadAll={handleLoadAllRuns}
+                isLoadingMore={isLoadingMoreRuns}
+                hasMore={runsQuery.data?.hasMore}
+              />
+            )}
+            {activeTab === 'telemetry' && (
+              <TelemetryPane
+                study={study}
+                runs={effectiveRuns}
+                observations={effectiveObservations}
+                isLoading={(runsQuery.isLoading || measurementsQuery.isLoading) && effectiveRuns.length === 0}
+                error={runsQuery.error ?? measurementsQuery.error}
+                onRetry={() => {
+                  runsQuery.refetch();
+                  measurementsQuery.refetch();
+                }}
+              />
+            )}
+            {activeTab === 'claims' && (
+              <ClaimsList
+                study={study}
+                claims={claims}
+                sources={sources}
+                isLoading={claimsQuery.isLoading}
+                error={claimsQuery.error}
+                onRetry={() => claimsQuery.refetch()}
+              />
+            )}
+            {activeTab === 'psi-export' && (
+              <PsiExportTab
+                study={study}
+                runs={effectiveRuns}
+                observations={effectiveObservations}
+                sources={sources}
+                claims={claims}
+                totalRuns={runsQuery.data?.total}
+                totalObservations={measurementsQuery.data?.total}
+                onFetchAllData={handleFetchAllData}
+                isFetchingAll={isFetchingAllData}
+              />
+            )}
+          </motion.section>
+        </div>
+      </div>
 
       <ComparisonBar
         compareList={compareList}
