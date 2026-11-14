@@ -86,3 +86,18 @@ You may (but are not required to) consider the following:
 ## Resources
 
 For data and resources related to this challenge, refer to the [Resources tab](https://www.spaceappschallenge.org/2026/challenges/flame-in-freefall/?tab=resources). More resources may be added before the hackathon begins.
+
+---
+
+## Mã nguồn trong repo
+
+| Thư mục | Nội dung |
+| --- | --- |
+| `flameguard-ai-backend/` | Backend FastAPI (catalog, evidence, scenario, chat, prediction readiness) |
+| `FlameInFreewall_Tourbillion/` | Frontend Next.js (dashboard, explorer, mission, AI assistant) |
+| `integrations/nasa_data/` | Data adapter offline: build release NASA PSI và xuất snapshot 21 bảng |
+| `integrations/nasa_chat/` | RAG extractive có citation, cắm vào backend qua app factory, không sửa backend |
+| `integration_tests/`, `scripts/` | Test cho integrations; container PostgreSQL test và launcher preview |
+
+Luồng chatbot, giới hạn và cách chạy: [docs/CHATBOT_FLOW.md](docs/CHATBOT_FLOW.md).
+Quy ước cho agent: [AGENTS.md](AGENTS.md).
