@@ -46,7 +46,7 @@ sequenceDiagram
     Proxy->>API: forward
     API->>Reader: admit snapshot + registry CC0 + policy
     API->>Writer: validate role/quyền/OID
-    API-->>FE: ready, passages=1045
+    API-->>FE: ready, passages=2508
     User->>FE: "FLEX-007 D0?"
     FE->>API: POST /chat/sessions (lần đầu)
     FE->>API: POST /chat/sessions/{id}/messages
@@ -71,7 +71,7 @@ sequenceDiagram
 | Retrieval | `integrations/nasa_chat/retrieval.py`, `bm25.py` | Chuẩn hóa, alias VI/EN, anchor study/run, BM25, cắt trích đoạn |
 | Provider | `integrations/nasa_chat/provider.py` | Ghép trích đoạn hoặc abstain; không tự tạo số liệu |
 | Policy | `integrations/nasa_chat/policy.py` | Registry CC0/hash/revision, policy version |
-| Data | `integrations/nasa_data/` | Build release NASA offline, xuất snapshot 21 bảng/slugs/artifacts |
+| Data | `integrations/nasa_data/` | Build release NASA offline (mặc định `unified`, chỉ nguồn chính thức), xuất snapshot 21 bảng/slugs/artifacts. Xem `docs/DATA_HANDOFF.md` |
 | BE nền | `flameguard-ai-backend/` | **Không sửa.** DTO chat, TTL session, repository, validator role runtime |
 
 ## Giới hạn và đảm bảo
