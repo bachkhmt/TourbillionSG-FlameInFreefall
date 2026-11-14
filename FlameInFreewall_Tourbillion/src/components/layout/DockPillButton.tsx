@@ -150,13 +150,13 @@ export const DockPillButton: React.FC<DockPillButtonProps> = ({
       {/* Liquid Glass Tooltip on Hover in Collapsed State */}
       <AnimatePresence>
         {showTooltip && !isExpanded && !active && tooltipText && (
-          <div className="absolute left-[68px] top-1/2 -translate-y-1/2 z-50 pointer-events-none whitespace-nowrap">
+          <div className="absolute left-[68px] top-1/2 -translate-y-1/2 z-[100] pointer-events-none whitespace-nowrap">
             <motion.div
               initial={{ opacity: 0, x: -8, scale: 0.95 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -8, scale: 0.95 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="h-10 px-3.5 rounded-2xl flex items-center bg-[#0B2374] backdrop-blur-md border border-[#D4FC02]/30 shadow-lg text-white font-extrabold text-xs tracking-tight whitespace-nowrap"
+              className="h-10 px-3.5 rounded-2xl flex items-center bg-[#0B2374] backdrop-blur-md border border-[#D4FC02]/30 shadow-2xl text-white font-extrabold text-xs tracking-tight whitespace-nowrap"
             >
               {tooltipText}
             </motion.div>
