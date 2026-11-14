@@ -89,3 +89,24 @@ def test_single_supported_uuid_spelling_keeps_foreign_keys(tmp_path, spelling):
     parsed = fixture_rows(path)
     assert parsed["tables"]["evidence_claim"][0]["id"] == identity
     assert any(row["claim_id"] == identity for row in parsed["tables"]["claim_source"])
+
+
+def _fixture_foreign_keys():
+    data = json.loads((DEMO_ROOT / "phase4-v1.json").read_text(encoding="utf-8"))
+    return sorted(
+        (table.name, fk.parent.name)
+        for table in Base.metadata.sorted_tables
+        for fk in table.foreign_keys
+        if data["tables"][table.name]
+    )
+
+
+@pytest.mark.parametrize(("table", "column"), _fixture_foreign_keys())
+def test_dangling_foreign_key_in_last_row_is_refused(tmp_path, table, column):
+    """Every FK is checked on every row, not only before its key set is first built."""
+    data = json.loads((DEMO_ROOT / "phase4-v1.json").read_text(encoding="utf-8"))
+    data["tables"][table][-1][column] = "00000000-0000-4000-8000-00000000dead"
+    path = tmp_path / "fixture.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(Phase4Error, match="DATASET_CONFLICT"):
+        fixture_rows(path)

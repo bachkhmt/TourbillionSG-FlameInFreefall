@@ -121,12 +121,17 @@ def _manifest_rows(path, *, synthetic):
             if not synthetic and row["id"] in known_demo_ids:
                 raise Phase4Error("DATASET_CONFLICT")
         unique_rows_by_id(tables[table.name])
+    # Build each referenced key set once; rebuilding it per row is quadratic and made
+    # real-collection admission take seconds on every chat request.
+    referenced = {}
     for table in Base.metadata.sorted_tables:
         for row in tables[table.name]:
             for fk in table.foreign_keys:
                 value = row[fk.parent.name]
-                valid = {r[fk.column.name] for r in tables[fk.column.table.name]}
-                if value is not None and value not in valid:
+                key = (fk.column.table.name, fk.column.name)
+                if key not in referenced:
+                    referenced[key] = {r[key[1]] for r in tables[key[0]]}
+                if value is not None and value not in referenced[key]:
                     raise Phase4Error("DATASET_CONFLICT")
     for table, field, prefix in [
         ("investigation", "psi_id", "SYNTHETIC-"),
