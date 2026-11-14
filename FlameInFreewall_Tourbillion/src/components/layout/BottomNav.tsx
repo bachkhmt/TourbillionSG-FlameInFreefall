@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Layers, Rocket, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Layers, Rocket } from 'lucide-react';
 
 interface MobileTab {
   path: string;
@@ -15,7 +15,6 @@ const TABS: MobileTab[] = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/explorer', label: 'Explorer', icon: Layers },
   { path: '/mission', label: 'Mission', icon: Rocket },
-  { path: '/resources', label: 'Resources', icon: BookOpen },
 ];
 
 export const BottomNav: React.FC = () => {

@@ -38,9 +38,9 @@ const MISSION_CARDS: MissionCard[] = [
     badge: 'Telemetry & Catalog',
     badgeColor: 'text-zinc-950 border-lime-300 bg-[#D4FC02]',
     description:
-      'Explore the current NASA PSI pilot release, imported run counts, original source files and explicit data limitations.',
+      'High-density telemetry overview across 20 NASA PSI investigations. Access 148+ flight test runs, peak flame spread rates, and fuel category distributions.',
     icon: Compass,
-    features: ['Versioned NASA Catalog', 'Source-Checked Pilot Rows', 'Original Telemetry Channels'],
+    features: ['20 Microgravity Flight Studies', '148+ Verified Ignition Events', 'Interactive KPI Telemetry'],
     ctaText: 'Enter Dashboard',
     ctaStyle: 'primary',
   },
@@ -51,7 +51,7 @@ const MISSION_CARDS: MissionCard[] = [
     badge: 'Cross-Study Synthesis',
     badgeColor: 'text-blue-900 border-blue-200 bg-blue-50',
     description:
-      'Search catalog metadata, inspect imported experimental rows and compare investigations without pooling incompatible outcomes.',
+      'Filter investigations across droplet, solid, and gaseous fuels. Inspect Limiting Oxygen Indexes (LOI) and launch synchronized multi-study comparison modals.',
     icon: Layers,
     features: ['Faceted Multi-Parametric Search', 'Side-by-Side Study Comparison', 'Empirical Telemetry Curves'],
     ctaText: 'Explore Studies',
@@ -64,10 +64,10 @@ const MISSION_CARDS: MissionCard[] = [
     badge: 'Fire Safety Guardrails',
     badgeColor: 'text-amber-800 border-amber-200 bg-amber-50',
     description:
-      'Compare a scenario with conditions from the same experimental run. Unknown fields remain unknown; predictions stay offline without a validated model.',
+      'Evaluate habitat risk envelopes for ISS, Artemis Moon Base, and Mars. Enforce NASA PSI safety guardrails against unverified partial-gravity extrapolations.',
     icon: ShieldAlert,
-    features: ['Explicit Condition Matching', 'Observed Evidence Map', 'Predictive Lab Readiness Audit'],
-    ctaText: 'Inspect Mission Evidence',
+    features: ['6-Dimension Condition Gap Matrix', 'NASA Safety Disclaimer Enforcement', 'Predictive Lab Readiness Audit'],
+    ctaText: 'Run Risk Evaluation',
     ctaStyle: 'secondary',
   },
 ];

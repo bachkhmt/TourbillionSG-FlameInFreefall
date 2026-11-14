@@ -34,9 +34,9 @@ export const RankedEvidenceList: React.FC = () => {
               Ranked NASA PSI Evidence Base
             </h2>
           </div>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          {/* <p className="text-xs text-zinc-500 mt-0.5">
             Ranked on empirical condition alignment with your scenario, not fire hazard risk level.
-          </p>
+          </p> */}
         </div>
 
         <Link

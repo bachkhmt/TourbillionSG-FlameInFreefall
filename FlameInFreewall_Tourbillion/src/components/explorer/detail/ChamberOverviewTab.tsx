@@ -2,210 +2,199 @@
 
 import React from 'react';
 import {
-  Flame,
-  Gauge,
   Sparkles,
   BookOpen,
-  CheckCircle2,
-  Globe,
-  Rocket,
   ExternalLink,
+  Tag,
+  AlertTriangle,
+  Building2,
+  Database,
 } from 'lucide-react';
-import type { Investigation } from '@/types';
+import type { MappedInvestigationDetail, MappedSource } from '@/types/api';
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 
 export interface ChamberOverviewTabProps {
-  study: Investigation;
+  study: MappedInvestigationDetail;
+  sources?: MappedSource[];
+  isSourcesLoading?: boolean;
+  sourcesError?: unknown;
+  onRetrySources?: () => void;
 }
 
-export const ChamberOverviewTab: React.FC<ChamberOverviewTabProps> = ({ study }) => {
+export const ChamberOverviewTab: React.FC<ChamberOverviewTabProps> = ({
+  study,
+  sources = [],
+  isSourcesLoading = false,
+  sourcesError,
+  onRetrySources,
+}) => {
+  const unavailableEntries = Object.entries(study.unavailableFields);
+
   return (
     <div data-testid="chamber-overview-tab" className="space-y-6">
-      {/* Research Purpose & Objectives Card */}
+      {/* Research Purpose & Catalog Metadata */}
       <div className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-4">
         <h3 className="text-base font-bold text-[#1A1A1A] flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-amber-500" />
-          <span>Research Purpose &amp; Scientific Objectives</span>
+          <span>Research Purpose &amp; Catalog Profile</span>
         </h3>
         <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
-          {study.researchPurpose}
+          {study.researchPurpose ?? 'Research purpose is not mapped in the current backend catalog.'}
         </p>
 
-        <div className="space-y-2 pt-2">
-          <span className="text-xs uppercase text-zinc-500 font-bold">Key Objectives:</span>
-          <ul className="space-y-2">
-            {study.objectives.map((obj, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-zinc-700">
-                <CheckCircle2 className="w-4 h-4 text-[#0B2374] shrink-0 mt-0.5" />
-                <span>{obj}</span>
-              </li>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-100 text-xs">
+          <div>
+            <div className="text-[10px] uppercase text-zinc-500 font-semibold flex items-center gap-1">
+              <Building2 className="w-3 h-3 text-[#0B2374]" />
+              <span>Platform</span>
+            </div>
+            <div className="font-bold text-zinc-900 mt-1">
+              {study.platform ?? 'Platform unmapped'}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase text-zinc-500 font-semibold flex items-center gap-1">
+              <Database className="w-3 h-3 text-[#0B2374]" />
+              <span>Collection Context</span>
+            </div>
+            <div className="font-bold text-zinc-900 mt-1">{study.context.collectionId}</div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase text-zinc-500 font-semibold">Mapped Counts</div>
+            <div className="font-bold text-zinc-900 mt-1">
+              {study.runsMeta.total} runs · {study.sourcesMeta.total} sources · {study.claimsMeta.total} claims
+            </div>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div className="space-y-2 pt-1">
+          <span className="text-xs uppercase text-zinc-500 font-bold">Catalog Tags</span>
+          {study.tags.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {study.tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 border border-gray-200 text-xs font-semibold text-zinc-800"
+                >
+                  <Tag className="w-3 h-3 text-[#0B2374]" />
+                  <span>{tag.label}</span>
+                  {tag.category && (
+                    <span className="text-[10px] text-zinc-500">({tag.category})</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-zinc-500">No catalog tags mapped for this investigation.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Unavailable Fields & Honest Provenance Disclosure */}
+      <div
+        data-testid="unavailable-fields-card"
+        className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3"
+      >
+        <h3 className="text-sm font-bold text-[#1A1A1A] flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-600" />
+          <span>Unavailable Display Fields &amp; Mapping Disclosure</span>
+        </h3>
+        {unavailableEntries.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {unavailableEntries.map(([field, reason]) => (
+              <span
+                key={field}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-xs text-amber-900"
+              >
+                <span className="font-bold">{field}</span>
+                <span className="text-amber-700">({reason})</span>
+              </span>
             ))}
-          </ul>
-        </div>
+          </div>
+        ) : (
+          <p className="text-xs text-zinc-600">
+            All catalog-level investigation fields are mapped for this record.
+          </p>
+        )}
+        <p className="text-[11px] text-zinc-500 leading-relaxed">
+          Chamber atmospheric ranges, objectives, and historical syntheses are not fabricated when absent from the backend investigation payload. Inspect Test Runs and Observations for measured experimental parameters.
+        </p>
       </div>
 
-      {/* Grid: Chamber Envelopes & Fuel Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* Chamber Variables */}
-        <div className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-4">
-          <h3 className="text-sm font-bold text-[#1A1A1A] flex items-center gap-2">
-            <Gauge className="w-4 h-4 text-[#0B2374]" />
-            <span>Chamber Atmospheric Envelope</span>
-          </h3>
-
-          <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-gray-50 border border-gray-100 text-center">
-            <div>
-              <div className="text-[10px] text-zinc-500 font-medium">Oxygen Range</div>
-              <div className="text-xs font-bold text-zinc-900 mt-0.5">
-                {study.oxygenRange[0]}–{study.oxygenRange[1]}%
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] text-zinc-500 font-medium">Pressure</div>
-              <div className="text-xs font-bold text-zinc-900 mt-0.5">
-                {study.pressureRangePsi[0]}–{study.pressureRangePsi[1]} psi
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] text-zinc-500 font-medium">Flow Velocity</div>
-              <div className="text-xs font-bold text-zinc-900 mt-0.5">
-                {study.flowRangeCmPerSec[0]}–{study.flowRangeCmPerSec[1]} cm/s
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2 text-xs">
-            <div>
-              <span className="font-semibold text-zinc-800">Held Constant:</span>
-              <ul className="list-disc list-inside text-zinc-600 mt-1 space-y-1 text-[11px]">
-                {study.variables.heldConstant.map((c, i) => (
-                  <li key={i}>{c}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="pt-2">
-              <span className="font-semibold text-zinc-800">Varied Across Runs:</span>
-              <ul className="list-disc list-inside text-zinc-600 mt-1 space-y-1 text-[11px]">
-                {study.variables.variedAcrossRuns.map((v, i) => (
-                  <li key={i}>{v}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Fuel & Sensor Details */}
-        <div className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-4">
-          <h3 className="text-sm font-bold text-[#1A1A1A] flex items-center gap-2">
-            <Flame className="w-4 h-4 text-amber-500" />
-            <span>Fuel Specifications &amp; Sensors</span>
-          </h3>
-
-          <div className="space-y-3 text-xs">
-            <div>
-              <span className="font-semibold text-zinc-800">Materials Tested:</span>
-              <div className="flex flex-wrap gap-1.5 mt-1.5">
-                {study.fuelDetails.materials.map((mat, i) => (
-                  <span
-                    key={i}
-                    className="px-2.5 py-1 rounded-lg bg-gray-100 border border-gray-200 text-zinc-700 text-[11px]"
-                  >
-                    {mat}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <span className="font-semibold text-zinc-800">Sample Geometry:</span>
-              <p className="text-zinc-600 mt-0.5 text-[11px]">
-                {study.fuelDetails.geometry}
-              </p>
-            </div>
-
-            <div>
-              <span className="font-semibold text-zinc-800">Diagnostic Sensors:</span>
-              <div className="flex flex-wrap gap-1.5 mt-1.5">
-                {study.sensors.map((sensor, i) => (
-                  <span
-                    key={i}
-                    className="px-2 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-[#0B2374] font-medium text-[10px]"
-                  >
-                    {sensor}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Findings: Spaceflight Relevance & Earth Applications */}
-      <div className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-4">
-        <h3 className="text-base font-bold text-[#1A1A1A] flex items-center gap-2">
-          <Rocket className="w-4 h-4 text-rose-500" />
-          <span>Spaceflight Relevance &amp; Earth Applications</span>
+      {/* Linked NASA PSI / DOI Sources */}
+      <div
+        data-testid="study-sources-card"
+        className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3"
+      >
+        <h3 className="text-sm font-bold text-[#1A1A1A] flex items-center gap-2">
+          <BookOpen className="w-4 h-4 text-[#0B2374]" />
+          <span>Linked Sources &amp; PSI Records ({sources.length})</span>
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-            <span className="font-bold text-[#0B2374] flex items-center gap-1.5">
-              <Rocket className="w-3.5 h-3.5" />
-              <span>Spaceflight Fire Safety Impact</span>
-            </span>
-            <p className="text-zinc-600 leading-relaxed text-[11px]">
-              {study.keyFindings.spaceflightRelevance}
-            </p>
+        {isSourcesLoading ? (
+          <div data-testid="sources-loading-shimmer" className="space-y-2">
+            <div className="h-14 rounded-2xl bg-gray-200/60" />
+            <div className="h-14 rounded-2xl bg-gray-200/60" />
           </div>
-
-          <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-2">
-            <span className="font-bold text-lime-800 flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5" />
-              <span>Terrestrial Earth Applications</span>
-            </span>
-            <ul className="list-disc list-inside text-zinc-600 space-y-1 text-[11px]">
-              {study.keyFindings.earthApplications.map((app, i) => (
-                <li key={i}>{app}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Primary Academic Citations */}
-      {study.sources.length > 0 && (
-        <div className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3">
-          <h3 className="text-sm font-bold text-[#1A1A1A] flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-purple-600" />
-            <span>Primary Academic Citations</span>
-          </h3>
+        ) : sourcesError ? (
+          <ApiErrorBanner
+            title="Unable to load linked sources"
+            error={sourcesError}
+            onRetry={onRetrySources}
+          />
+        ) : sources.length === 0 ? (
+          <p className="text-xs text-zinc-500">No linked source records returned for this study.</p>
+        ) : (
           <div className="space-y-2">
-            {study.sources.map((cit, i) => (
+            {sources.map((src) => (
               <div
-                key={i}
-                className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start justify-between gap-3 text-xs"
+                key={src.id}
+                data-testid={`source-card-${src.id}`}
+                className="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
               >
-                <div className="space-y-0.5">
-                  <div className="font-semibold text-zinc-900">{cit.title}</div>
-                  <div className="text-zinc-500 text-[11px]">
-                    {cit.authors} ({cit.year}){cit.journalOrConference && ` · ${cit.journalOrConference}`}
+                <div className="space-y-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[#0B2374] font-bold text-[10px]">
+                      {src.documentType}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-white border border-gray-200 text-zinc-700 font-semibold text-[10px]">
+                      {src.ingestionStatus}
+                    </span>
+                    {src.version && (
+                      <span className="text-[11px] text-zinc-500">v{src.version}</span>
+                    )}
                   </div>
+                  <div className="text-zinc-600 truncate text-[11px]">{src.sourceUrl}</div>
                 </div>
-                {cit.doi && (
+
+                <div className="flex items-center gap-3 shrink-0">
+                  {src.doi && (
+                    <a
+                      href={`https://doi.org/${src.doi}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[#0B2374] hover:underline text-[11px] font-bold"
+                    >
+                      <span>DOI</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
                   <a
-                    href={`https://doi.org/${cit.doi}`}
+                    href={src.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[#0B2374] hover:underline text-[11px] shrink-0 font-bold"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white border border-gray-200 text-zinc-800 hover:bg-gray-100 text-[11px] font-semibold"
                   >
-                    <span>DOI</span>
-                    <ExternalLink className="w-3 h-3" />
+                    <span>Open Source</span>
+                    <ExternalLink className="w-3 h-3 text-[#0B2374]" />
                   </a>
-                )}
+                </div>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

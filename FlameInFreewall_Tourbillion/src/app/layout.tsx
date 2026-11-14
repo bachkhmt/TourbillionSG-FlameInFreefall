@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import { QueryProvider } from '@/providers/QueryProvider';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -37,7 +38,7 @@ export default function RootLayout({
       className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <body className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] antialiased selection:bg-[#D4FC02]/30 selection:text-[#0B2374]">
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );

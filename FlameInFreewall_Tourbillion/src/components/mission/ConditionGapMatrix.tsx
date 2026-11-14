@@ -73,9 +73,9 @@ export const ConditionGapMatrix: React.FC = () => {
               Evidence Gap Matrix
             </h2>
           </div>
-          <p className="text-xs text-zinc-500">
+          {/* <p className="text-xs text-zinc-500">
             Rigorous cross-comparison of scenario parameters against 160 NASA PSI experimental runs.
-          </p>
+          </p> */}
         </div>
 
         <div className="flex items-center gap-3">

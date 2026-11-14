@@ -1,14 +1,7 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import {
-  ExplorerFiltersBar,
-  type FuelFilterValue,
-  type FacilityFilterValue,
-  type GravityFilterValue,
-  type ExplorerSortOption,
-  type ViewMode,
-} from '../src/components/explorer/ExplorerFiltersBar';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { ExplorerFiltersBar } from '../src/components/explorer/ExplorerFiltersBar';
 import { InvestigationCard } from '../src/components/explorer/InvestigationCard';
 import { InvestigationTable } from '../src/components/explorer/InvestigationTable';
 import { ExplorerComparisonBar } from '../src/components/explorer/ExplorerComparisonBar';
@@ -20,11 +13,34 @@ import { TelemetryPane } from '../src/components/explorer/detail/TelemetryPane';
 import { ClaimsList } from '../src/components/explorer/detail/ClaimsList';
 import { ChamberOverviewTab } from '../src/components/explorer/detail/ChamberOverviewTab';
 import { PsiExportTab } from '../src/components/explorer/detail/PsiExportTab';
-import { INVESTIGATIONS } from '../src/data/investigations';
-import { TEST_RUNS } from '../src/data/testRuns';
-import { EVIDENCE_CLAIMS } from '../src/data/evidenceClaims';
+import { ApiClientError } from '../src/api/client';
 import { useWorkspaceStore } from '../src/store/useWorkspaceStore';
 import { toastStore } from '../src/components/toast/toast-store';
+import {
+  mapCatalogCapabilitiesDto,
+  mapClaimDto,
+  mapInvestigationDetailDto,
+  mapInvestigationDto,
+  mapObservationDto,
+  mapRunDto,
+  mapSourceDto,
+} from '../src/api/mappers';
+import * as apiServices from '../src/api/services';
+import { renderWithQuery } from './test-utils';
+import {
+  makeCapabilitiesDto,
+  makeClaimDto,
+  makeClaimSourceDto,
+  makeComparisonDto,
+  makeConditionDto,
+  makeInvestigationDetailDto,
+  makeInvestigationDto,
+  makeMeasurementDto,
+  makeObservationDto,
+  makePageDto,
+  makeRunDto,
+  makeSourceDto,
+} from './fixtures/backendFixtures';
 
 const mockPush = vi.fn();
 let mockParams: { id?: string } = { id: 'bass' };
@@ -49,12 +65,88 @@ vi.mock('next/navigation', () => ({
   useParams: () => mockParams,
 }));
 
+vi.mock('@/api/services', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/api/services')>();
+  return {
+    ...actual,
+    getCatalogCapabilities: vi.fn(),
+    listInvestigations: vi.fn(),
+    getInvestigationById: vi.fn(),
+    getInvestigationBySlug: vi.fn(),
+    listInvestigationRuns: vi.fn(),
+    listInvestigationMeasurements: vi.fn(),
+    listInvestigationSources: vi.fn(),
+    listInvestigationClaims: vi.fn(),
+    listRunConditions: vi.fn(),
+    listRunMeasurements: vi.fn(),
+    compareInvestigations: vi.fn(),
+  };
+});
+
+const INV_1 = makeInvestigationDto({
+  id: 'e1a75331-3f1f-57b8-9042-405ff61dff51',
+  psiId: 'SYNTHETIC-PHASE4-1',
+  slug: null,
+  title: 'Synthetic Flame Spread Study',
+  platform: 'MSG',
+});
+
+const INV_2 = makeInvestigationDto({
+  id: 'afa58280-0d0c-58a3-926a-1499a1e20a96',
+  psiId: 'SYNTHETIC-PHASE4-2',
+  slug: 'saffire-synthetic',
+  title: 'Synthetic Saffire Spacecraft Fire',
+  platform: null,
+});
+
 describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useWorkspaceStore.getState().resetWorkspace();
     toastStore.clear();
     mockParams = { id: 'bass' };
+
+    vi.mocked(apiServices.getCatalogCapabilities).mockResolvedValue(makeCapabilitiesDto());
+    vi.mocked(apiServices.listInvestigations).mockResolvedValue(
+      makePageDto([INV_1, INV_2], { total: 2, offset: 0, limit: 20, next: null })
+    );
+    vi.mocked(apiServices.getInvestigationById).mockResolvedValue(makeInvestigationDetailDto());
+    vi.mocked(apiServices.getInvestigationBySlug).mockResolvedValue(
+      makeInvestigationDetailDto({
+        id: INV_2.id,
+        psiId: INV_2.psiId,
+        slug: 'saffire-synthetic',
+        title: INV_2.title,
+        platform: null,
+      })
+    );
+    vi.mocked(apiServices.listInvestigationRuns).mockResolvedValue(
+      makePageDto([
+        makeRunDto({ id: 'b8f882f6-6fde-5b18-a505-f668bdc12c42', externalRunKey: 'RUN-01' }),
+        makeRunDto({
+          id: 'f04922ad-2fbf-5afe-ba7e-bc5a01b9149f',
+          externalRunKey: 'RUN-02',
+          materialType: 'TEST_MATERIAL_B',
+          gravity: '1g',
+        }),
+      ])
+    );
+    vi.mocked(apiServices.listInvestigationMeasurements).mockResolvedValue(
+      makePageDto([makeObservationDto()])
+    );
+    vi.mocked(apiServices.listInvestigationSources).mockResolvedValue(
+      makePageDto([makeSourceDto({ doi: '10.1000/synthetic-psi' })])
+    );
+    vi.mocked(apiServices.listInvestigationClaims).mockResolvedValue(
+      makePageDto([makeClaimDto()])
+    );
+    vi.mocked(apiServices.listRunConditions).mockResolvedValue(
+      makePageDto([makeConditionDto()])
+    );
+    vi.mocked(apiServices.listRunMeasurements).mockResolvedValue(
+      makePageDto([makeMeasurementDto()])
+    );
+    vi.mocked(apiServices.compareInvestigations).mockResolvedValue(makeComparisonDto());
 
     // Mock URL for exports
     if (typeof window !== 'undefined') {
@@ -64,14 +156,35 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
   });
 
   // -------------------------------------------------------------------------
-  // 0. Explorer Page Light Theme (StructPaper Redesign)
+  // 0. Explorer Page Light Theme & API States
   // -------------------------------------------------------------------------
-  describe('Explorer Page Light Theme', () => {
-    it('renders API-backed catalog controls', () => {
-      render(<ExplorerPage />);
-      expect(screen.getByLabelText('Search investigations')).toBeDefined();
-      expect(screen.getByLabelText('Data coverage')).toBeDefined();
-      expect(screen.getByTestId('live-study-flex')).toBeDefined();
+  describe('Explorer Page Query States', () => {
+    it('renders loading shimmer while investigations query is pending', () => {
+      vi.mocked(apiServices.listInvestigations).mockReturnValue(new Promise(() => {}));
+      renderWithQuery(<ExplorerPage />);
+
+      expect(screen.getByPlaceholderText(/Search investigations/i)).toBeInTheDocument();
+      expect(screen.getByTestId('explorer-shimmer-grid')).toBeInTheDocument();
+    });
+
+    it('renders ApiErrorBanner on query error and retries when clicked', async () => {
+      vi.mocked(apiServices.listInvestigations)
+        .mockRejectedValueOnce(new Error('Catalog service unavailable'))
+        .mockResolvedValueOnce(makePageDto([INV_1, INV_2]));
+
+      renderWithQuery(<ExplorerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('api-error-banner')).toBeInTheDocument();
+      });
+      expect(screen.getByText(/Catalog service unavailable/i)).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: /Retry/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('explorer-grid-view')).toBeInTheDocument();
+      });
+      expect(apiServices.listInvestigations).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -79,78 +192,84 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
   // 1. ExplorerFiltersBar
   // -------------------------------------------------------------------------
   describe('ExplorerFiltersBar', () => {
-    it('renders all filter controls, search bar, and view toggle', () => {
-      const handleSearch = vi.fn();
-      const handleFuel = vi.fn();
-      const handleFacility = vi.fn();
-      const handleGravity = vi.fn();
-      const handleSort = vi.fn();
-      const handleView = vi.fn();
-      const handleReset = vi.fn();
-
-      render(
+    it('renders backend-supported filter controls, search bar, capabilities hint, and view toggle', () => {
+      const capabilities = mapCatalogCapabilitiesDto(makeCapabilitiesDto());
+      renderWithQuery(
         <ExplorerFiltersBar
           searchQuery=""
-          onSearchChange={handleSearch}
-          fuelFilter="all"
-          onFuelFilterChange={handleFuel}
-          facilityFilter="all"
-          onFacilityFilterChange={handleFacility}
+          onSearchChange={vi.fn()}
+          platformFilter="all"
+          onPlatformFilterChange={vi.fn()}
+          materialFilter=""
+          onMaterialFilterChange={vi.fn()}
           gravityFilter="all"
-          onGravityFilterChange={handleGravity}
-          sortBy="newest"
-          onSortChange={handleSort}
+          onGravityFilterChange={vi.fn()}
+          sortBy="title-asc"
+          onSortChange={vi.fn()}
           viewMode="grid"
-          onViewModeChange={handleView}
-          totalCount={20}
-          filteredCount={20}
-          onResetFilters={handleReset}
+          onViewModeChange={vi.fn()}
+          totalCount={2}
+          filteredCount={2}
+          onResetFilters={vi.fn()}
+          capabilities={capabilities}
         />
       );
 
-      expect(screen.getByTestId('explorer-filters-bar')).toBeDefined();
-      expect(screen.getByTestId('explorer-filters-bar').className).toContain('sticky');
+      const bar = screen.getByTestId('explorer-filters-bar');
+      expect(bar).toBeDefined();
+      expect(bar.className).toContain('sticky');
+      expect(bar.innerHTML).not.toContain('backdrop-blur-md');
+      expect(bar.innerHTML).not.toContain('font-mono');
       expect(screen.getByTestId('explorer-search-input')).toBeDefined();
-      expect(screen.getByTestId('fuel-tab-all')).toBeDefined();
-      expect(screen.getByTestId('fuel-tab-solid')).toBeDefined();
-      expect(screen.getByTestId('fuel-tab-droplet')).toBeDefined();
-      expect(screen.getByTestId('fuel-tab-gas')).toBeDefined();
-      expect(screen.getByTestId('facility-filter-select')).toBeDefined();
+      expect(screen.getByTestId('material-filter-input')).toBeDefined();
+      expect(screen.getByTestId('platform-filter-select')).toBeDefined();
       expect(screen.getByTestId('gravity-filter-select')).toBeDefined();
       expect(screen.getByTestId('sort-by-select')).toBeDefined();
-      expect(screen.getByTestId('filter-domain-select')).toBeDefined();
-      expect(screen.getByTestId('filter-fuel-select')).toBeDefined();
+      expect(screen.getByTestId('catalog-capabilities-hint')).toBeDefined();
       expect(screen.getByTestId('view-grid-btn')).toBeDefined();
       expect(screen.getByTestId('view-table-btn')).toBeDefined();
     });
 
-    it('triggers facility and sort filter changes via custom select', () => {
-      const handleFacility = vi.fn();
+    it('triggers platform, gravity, material, and sort filter changes', () => {
+      const handlePlatform = vi.fn();
+      const handleGravity = vi.fn();
+      const handleMaterial = vi.fn();
       const handleSort = vi.fn();
-      render(
+
+      renderWithQuery(
         <ExplorerFiltersBar
           searchQuery=""
           onSearchChange={vi.fn()}
-          fuelFilter="all"
-          onFuelFilterChange={vi.fn()}
-          facilityFilter="all"
-          onFacilityFilterChange={handleFacility}
+          platformFilter="all"
+          onPlatformFilterChange={handlePlatform}
+          materialFilter=""
+          onMaterialFilterChange={handleMaterial}
           gravityFilter="all"
-          onGravityFilterChange={vi.fn()}
-          sortBy="newest"
+          onGravityFilterChange={handleGravity}
+          sortBy="title-asc"
           onSortChange={handleSort}
           viewMode="grid"
           onViewModeChange={vi.fn()}
-          totalCount={20}
-          filteredCount={20}
+          totalCount={2}
+          filteredCount={2}
           onResetFilters={vi.fn()}
         />
       );
 
-      fireEvent.change(screen.getByTestId('facility-filter-select'), {
+      fireEvent.change(screen.getByTestId('platform-filter-select'), {
         target: { value: 'MSG' },
       });
-      expect(handleFacility).toHaveBeenCalledWith('MSG');
+      expect(handlePlatform).toHaveBeenCalledWith('MSG');
+
+      fireEvent.change(screen.getByTestId('gravity-filter-select'), {
+        target: { value: '0g' },
+      });
+      expect(handleGravity).toHaveBeenCalledWith('0g');
+
+      fireEvent.change(screen.getByTestId('material-filter-input'), {
+        target: { value: 'PMMA' },
+      });
+      expect(handleMaterial).toHaveBeenCalledWith('PMMA');
 
       fireEvent.change(screen.getByTestId('sort-by-select'), {
         target: { value: 'runs-desc' },
@@ -158,108 +277,55 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
       expect(handleSort).toHaveBeenCalledWith('runs-desc');
     });
 
-    it('triggers search change on input', () => {
+    it('triggers search change on input and clear button', () => {
       const handleSearch = vi.fn();
-      render(
+      renderWithQuery(
         <ExplorerFiltersBar
           searchQuery="PMMA"
           onSearchChange={handleSearch}
-          fuelFilter="all"
-          onFuelFilterChange={vi.fn()}
-          facilityFilter="all"
-          onFacilityFilterChange={vi.fn()}
+          platformFilter="all"
+          onPlatformFilterChange={vi.fn()}
+          materialFilter=""
+          onMaterialFilterChange={vi.fn()}
           gravityFilter="all"
           onGravityFilterChange={vi.fn()}
-          sortBy="newest"
+          sortBy="title-asc"
           onSortChange={vi.fn()}
           viewMode="grid"
           onViewModeChange={vi.fn()}
-          totalCount={20}
-          filteredCount={5}
+          totalCount={2}
+          filteredCount={1}
           onResetFilters={vi.fn()}
         />
       );
 
-      const input = screen.getByTestId('explorer-search-input');
-      fireEvent.change(input, { target: { value: 'Saffire' } });
+      fireEvent.change(screen.getByTestId('explorer-search-input'), {
+        target: { value: 'Saffire' },
+      });
       expect(handleSearch).toHaveBeenCalledWith('Saffire');
 
-      // Clear search button appears when query is non-empty
-      const clearBtn = screen.getByTestId('clear-search-btn');
-      fireEvent.click(clearBtn);
+      fireEvent.click(screen.getByTestId('clear-search-btn'));
       expect(handleSearch).toHaveBeenCalledWith('');
-    });
-
-    it('triggers fuel tab change when clicked', () => {
-      const handleFuel = vi.fn();
-      render(
-        <ExplorerFiltersBar
-          searchQuery=""
-          onSearchChange={vi.fn()}
-          fuelFilter="all"
-          onFuelFilterChange={handleFuel}
-          facilityFilter="all"
-          onFacilityFilterChange={vi.fn()}
-          gravityFilter="all"
-          onGravityFilterChange={vi.fn()}
-          sortBy="newest"
-          onSortChange={vi.fn()}
-          viewMode="grid"
-          onViewModeChange={vi.fn()}
-          totalCount={20}
-          filteredCount={20}
-          onResetFilters={vi.fn()}
-        />
-      );
-
-      fireEvent.click(screen.getByTestId('fuel-tab-droplet'));
-      expect(handleFuel).toHaveBeenCalledWith('droplet');
-    });
-
-    it('triggers view mode switch between grid and table', () => {
-      const handleView = vi.fn();
-      render(
-        <ExplorerFiltersBar
-          searchQuery=""
-          onSearchChange={vi.fn()}
-          fuelFilter="all"
-          onFuelFilterChange={vi.fn()}
-          facilityFilter="all"
-          onFacilityFilterChange={vi.fn()}
-          gravityFilter="all"
-          onGravityFilterChange={vi.fn()}
-          sortBy="newest"
-          onSortChange={vi.fn()}
-          viewMode="grid"
-          onViewModeChange={handleView}
-          totalCount={20}
-          filteredCount={20}
-          onResetFilters={vi.fn()}
-        />
-      );
-
-      fireEvent.click(screen.getByTestId('view-table-btn'));
-      expect(handleView).toHaveBeenCalledWith('table');
     });
 
     it('shows reset button when filtered and triggers onResetFilters', () => {
       const handleReset = vi.fn();
-      render(
+      renderWithQuery(
         <ExplorerFiltersBar
           searchQuery="PMMA"
           onSearchChange={vi.fn()}
-          fuelFilter="solid"
-          onFuelFilterChange={vi.fn()}
-          facilityFilter="MSG"
-          onFacilityFilterChange={vi.fn()}
+          platformFilter="MSG"
+          onPlatformFilterChange={vi.fn()}
+          materialFilter="Nomex"
+          onMaterialFilterChange={vi.fn()}
           gravityFilter="0g"
           onGravityFilterChange={vi.fn()}
-          sortBy="newest"
+          sortBy="runs-desc"
           onSortChange={vi.fn()}
           viewMode="grid"
           onViewModeChange={vi.fn()}
-          totalCount={20}
-          filteredCount={3}
+          totalCount={2}
+          filteredCount={1}
           onResetFilters={handleReset}
         />
       );
@@ -275,16 +341,15 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
   // 2. InvestigationCard & InvestigationTable
   // -------------------------------------------------------------------------
   describe('InvestigationCard', () => {
-    it('renders study code, title, fuel phase, and chamber envelope', () => {
-      const study = INVESTIGATIONS[0]; // BASS
+    it('renders MappedInvestigation psiId, platform, title, purpose, tags, and minimalist StructPaper style', () => {
+      const study = mapInvestigationDto(INV_1);
       const handleToggle = vi.fn();
 
-      render(
+      renderWithQuery(
         <InvestigationCard
           investigation={study}
           isComparing={false}
           onToggleCompare={handleToggle}
-          testRunsCount={8}
         />
       );
 
@@ -293,18 +358,22 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
       expect(card.className).toContain('rounded-3xl');
       expect(card.className).toContain('cursor-pointer');
       expect(card.innerHTML).not.toContain('emerald');
-      expect(screen.getByText(study.code)).toBeDefined();
+      expect(card.innerHTML).not.toContain('font-mono');
+      expect(screen.getByText(study.psiId)).toBeDefined();
+      expect(screen.getByText('MSG')).toBeDefined();
       expect(screen.getByText(study.title)).toBeDefined();
-      expect(screen.getByText(study.primaryInvestigator)).toBeDefined();
-      expect(screen.getByText('8 Runs')).toBeDefined();
-      expect(screen.getByText('Inspect Study')).toBeDefined();
+      expect(screen.getByText('TEST_ONLY exploration')).toBeDefined();
+      expect(screen.getByText('Synthetic classification')).toBeDefined();
+      expect(screen.getByText(study.title).closest('a')?.getAttribute('href')).toBe(
+        `/explorer/${study.id}`
+      );
     });
 
-    it('toggles compare state on button click', () => {
-      const study = INVESTIGATIONS[0];
+    it('renders Platform unmapped when platform is null and toggles compare state', () => {
+      const study = mapInvestigationDto(INV_2);
       const handleToggle = vi.fn();
 
-      const { rerender } = render(
+      const { rerender } = renderWithQuery(
         <InvestigationCard
           investigation={study}
           isComparing={false}
@@ -312,9 +381,12 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
         />
       );
 
-      const compareBtn = screen.getByTestId(`compare-btn-${study.id}`);
-      expect(screen.getByText('Compare')).toBeDefined();
-      fireEvent.click(compareBtn);
+      expect(screen.getByText('Platform unmapped')).toBeDefined();
+      expect(screen.getByText(study.title).closest('a')?.getAttribute('href')).toBe(
+        '/explorer/saffire-synthetic'
+      );
+
+      fireEvent.click(screen.getByTestId(`compare-btn-${study.id}`));
       expect(handleToggle).toHaveBeenCalledWith(study.id);
 
       rerender(
@@ -329,26 +401,29 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
   });
 
   describe('InvestigationTable', () => {
-    it('renders dense table view with headers and rows for investigations', () => {
+    it('renders table rows for MappedInvestigation[] with routeKey inspect links', () => {
       const handleToggle = vi.fn();
-      const testStudies = INVESTIGATIONS.slice(0, 3);
+      const testStudies = [mapInvestigationDto(INV_1), mapInvestigationDto(INV_2)];
 
-      render(
+      renderWithQuery(
         <InvestigationTable
           investigations={testStudies}
-          compareList={['bass']}
+          compareList={[INV_1.id]}
           onToggleCompare={handleToggle}
-          runsByInvestigationId={{ bass: 8 }}
         />
       );
 
       expect(screen.getByTestId('investigations-table')).toBeDefined();
-      expect(screen.getByTestId('investigation-row-bass')).toBeDefined();
-      expect(screen.getByTestId('table-compare-btn-bass')).toBeDefined();
-      expect(screen.getByTestId('table-inspect-bass')).toBeDefined();
+      expect(screen.getByTestId(`investigation-row-${INV_1.id}`)).toBeDefined();
+      expect(screen.getByTestId(`table-inspect-${INV_1.id}`).getAttribute('href')).toBe(
+        `/explorer/${INV_1.id}`
+      );
+      expect(screen.getByTestId(`table-inspect-${INV_2.id}`).getAttribute('href')).toBe(
+        '/explorer/saffire-synthetic'
+      );
 
-      fireEvent.click(screen.getByTestId('table-compare-btn-bass'));
-      expect(handleToggle).toHaveBeenCalledWith('bass');
+      fireEvent.click(screen.getByTestId(`table-compare-btn-${INV_1.id}`));
+      expect(handleToggle).toHaveBeenCalledWith(INV_1.id);
     });
   });
 
@@ -357,7 +432,7 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
   // -------------------------------------------------------------------------
   describe('ExplorerComparisonBar', () => {
     it('renders null when compareList is empty', () => {
-      const { container } = render(
+      const { container } = renderWithQuery(
         <ExplorerComparisonBar
           compareList={[]}
           onRemove={vi.fn()}
@@ -367,24 +442,29 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
       expect(container.firstChild).toBeNull();
     });
 
-    it('renders comparison dock when studies are selected', () => {
+    it('renders study labels when studies are supplied and falls back cleanly for UUIDs', () => {
       const handleRemove = vi.fn();
       const handleClear = vi.fn();
 
-      render(
+      renderWithQuery(
         <ExplorerComparisonBar
-          compareList={['bass', 'flex-2']}
+          compareList={[INV_1.id, INV_2.id]}
+          studies={[{ id: INV_1.id, label: INV_1.psiId }]}
           onRemove={handleRemove}
           onClear={handleClear}
         />
       );
 
       expect(screen.getByTestId('explorer-comparison-dock')).toBeDefined();
-      expect(screen.getByTestId('compare-chip-bass')).toBeDefined();
-      expect(screen.getByTestId('compare-chip-flex-2')).toBeDefined();
+      expect(screen.getByTestId(`compare-chip-${INV_1.id}`).textContent).toContain(
+        'SYNTHETIC-PHASE4-1'
+      );
+      expect(screen.getByTestId(`compare-chip-${INV_2.id}`).textContent).toContain(
+        INV_2.id.slice(0, 8)
+      );
 
-      fireEvent.click(screen.getByTestId('remove-compare-bass'));
-      expect(handleRemove).toHaveBeenCalledWith('bass');
+      fireEvent.click(screen.getByTestId(`remove-compare-${INV_1.id}`));
+      expect(handleRemove).toHaveBeenCalledWith(INV_1.id);
 
       fireEvent.click(screen.getByTestId('clear-all-compare-btn'));
       expect(handleClear).toHaveBeenCalledTimes(1);
@@ -395,44 +475,153 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
   // 4. ExplorerCatalogPage (/explorer)
   // -------------------------------------------------------------------------
   describe('ExplorerCatalogPage (/explorer)', () => {
-    it('renders the published catalog rather than 20 seed studies', () => {
-      render(<ExplorerPage />);
-      expect(screen.getByText('4 / 4 studies')).toBeDefined();
-      expect(screen.queryByText('20 NASA PSI Studies')).toBeNull();
+    it('renders live investigations in grid view with caveats banner and summary count', async () => {
+      renderWithQuery(<ExplorerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('explorer-grid-view')).toBeDefined();
+      });
+
+      expect(screen.getByTestId('explorer-catalog-page')).toBeDefined();
+      expect(screen.getByTestId('explorer-caveats-banner')).toBeInTheDocument();
+      expect(screen.getByTestId('explorer-summary-count').textContent).toContain(
+        'Showing 2 of 2 NASA PSI Studies'
+      );
+      expect(screen.getByTestId(`investigation-card-${INV_1.id}`)).toBeDefined();
+      expect(screen.getByTestId(`investigation-card-${INV_2.id}`)).toBeDefined();
     });
-    it('distinguishes metadata-only entries from imported pilots', () => {
-      render(<ExplorerPage />);
-      expect(screen.getByText('Metadata only')).toBeDefined();
-      expect(screen.getByTestId('live-study-flex-2')).toBeDefined();
+
+    it('switches to table view when list button is clicked', async () => {
+      renderWithQuery(<ExplorerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('explorer-grid-view')).toBeDefined();
+      });
+
+      fireEvent.click(screen.getByTestId('view-table-btn'));
+
+      expect(screen.getByTestId('investigations-table')).toBeDefined();
+      expect(screen.queryByTestId('explorer-grid-view')).toBeNull();
     });
-    it('filters investigations by keyword', () => {
-      render(<ExplorerPage />);
-      fireEvent.change(screen.getByLabelText('Search investigations'), {target: {value:'BASS-II'}});
-      expect(screen.getByTestId('live-study-bass-ii')).toBeDefined();
-      expect(screen.queryByTestId('live-study-flex')).toBeNull();
+
+    it('sends only backend-supported filter and sort params to listInvestigations', async () => {
+      renderWithQuery(<ExplorerPage />);
+
+      await waitFor(() => {
+        expect(apiServices.listInvestigations).toHaveBeenCalled();
+      });
+
+      fireEvent.change(screen.getByTestId('explorer-search-input'), {
+        target: { value: 'Saffire' },
+      });
+      fireEvent.change(screen.getByTestId('platform-filter-select'), {
+        target: { value: 'MSG' },
+      });
+      fireEvent.change(screen.getByTestId('material-filter-input'), {
+        target: { value: 'PMMA' },
+      });
+      fireEvent.change(screen.getByTestId('gravity-filter-select'), {
+        target: { value: '0g' },
+      });
+      fireEvent.change(screen.getByTestId('sort-by-select'), {
+        target: { value: 'runs-desc' },
+      });
+
+      await waitFor(() => {
+        const calls = vi.mocked(apiServices.listInvestigations).mock.calls;
+        const latestParams = calls[calls.length - 1]?.[0] as Record<string, unknown>;
+        expect(latestParams).toEqual({
+          q: 'Saffire',
+          platform: 'MSG',
+          material: 'PMMA',
+          gravityRaw: '0g',
+          sort: 'runs-desc',
+          offset: 0,
+          limit: 20,
+        });
+        expect(latestParams).not.toHaveProperty('fuel');
+        expect(latestParams).not.toHaveProperty('facility');
+        expect(latestParams).not.toHaveProperty('gravity');
+        expect(latestParams).not.toHaveProperty('category');
+      });
     });
-    it('filters by available run-level coverage', () => {
-      render(<ExplorerPage />);
-      fireEvent.change(screen.getByLabelText('Data coverage'), {target: {value:'runs'}});
-      expect(screen.queryByTestId('live-study-flex-2')).toBeNull();
-      expect(screen.getByText('3 / 4 studies')).toBeDefined();
+
+    it('shows empty state when backend returns 0 items and resets filters on button click', async () => {
+      vi.mocked(apiServices.listInvestigations).mockImplementation(async (params) => {
+        if (params?.q === 'nonexistent-string-xyz') {
+          return makePageDto([], { total: 0, offset: 0, limit: 20, next: null });
+        }
+        return makePageDto([INV_1, INV_2]);
+      });
+
+      renderWithQuery(<ExplorerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('explorer-grid-view')).toBeDefined();
+      });
+
+      fireEvent.change(screen.getByTestId('explorer-search-input'), {
+        target: { value: 'nonexistent-string-xyz' },
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('explorer-empty-state')).toBeDefined();
+      });
+      expect(screen.getByText('No investigations match your filters')).toBeDefined();
+      expect(screen.queryByTestId('end-of-list-indicator')).toBeNull();
+
+      fireEvent.click(screen.getByTestId('empty-reset-btn'));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('explorer-grid-view')).toBeDefined();
+      });
+      expect(screen.getByTestId('explorer-summary-count').textContent).toContain(
+        'Showing 2 of 2 NASA PSI Studies'
+      );
+      expect(screen.getByTestId('end-of-list-indicator')).toBeInTheDocument();
     });
-    it('shows an honest empty state and supports clearing the query', () => {
-      render(<ExplorerPage />);
-      fireEvent.change(screen.getByLabelText('Search investigations'), {target:{value:'not-present'}});
-      expect(screen.getByText('No investigations match these filters.')).toBeDefined();
-      fireEvent.change(screen.getByLabelText('Search investigations'), {target:{value:''}});
-      expect(screen.getByTestId('live-study-flex')).toBeDefined();
+
+    it('renders pagination controls when total exceeds page limit and advances offset on Next', async () => {
+      vi.mocked(apiServices.listInvestigations).mockImplementation(async (params) => {
+        const offset = params?.offset ?? 0;
+        return makePageDto(offset === 0 ? [INV_1] : [INV_2], {
+          total: 25,
+          offset,
+          limit: 20,
+          next: offset === 0 ? '/api/v1/investigations?offset=20&limit=20' : null,
+        });
+      });
+
+      renderWithQuery(<ExplorerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('explorer-pagination')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId('pagination-next-btn'));
+
+      await waitFor(() => {
+        const calls = vi.mocked(apiServices.listInvestigations).mock.calls;
+        expect(calls[calls.length - 1]?.[0]).toMatchObject({ offset: 20, limit: 20 });
+      });
     });
-    it('links the canonical PSI study slug to its detail page', () => {
-      render(<ExplorerPage />);
-      expect(screen.getAllByRole('link', {name:/View investigation/})[0].getAttribute('href')).toBe('/explorer/flex');
-    });
-    it('adds and removes comparison selections without changing imported data', () => {
-      render(<ExplorerPage />);
-      fireEvent.click(screen.getAllByRole('button', {name:'Compare'})[0]);
-      expect(useWorkspaceStore.getState().compareList).toEqual(['flex']);
-      fireEvent.click(screen.getByRole('button', {name:'Clear selection'}));
+
+    it('adds and removes studies to compare list in store and shows psiId in ComparisonBar', async () => {
+      renderWithQuery(<ExplorerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId(`compare-btn-${INV_1.id}`)).toBeDefined();
+      });
+
+      fireEvent.click(screen.getByTestId(`compare-btn-${INV_1.id}`));
+
+      expect(useWorkspaceStore.getState().compareList).toContain(INV_1.id);
+      expect(screen.getByTestId('explorer-comparison-dock')).toBeDefined();
+      expect(screen.getByTestId(`compare-chip-${INV_1.id}`).textContent).toContain(
+        'SYNTHETIC-PHASE4-1'
+      );
+
+      fireEvent.click(screen.getByTestId('clear-all-compare-btn'));
       expect(useWorkspaceStore.getState().compareList).toHaveLength(0);
     });
   });
@@ -441,13 +630,29 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
   // 5. Study Detail Components
   // -------------------------------------------------------------------------
   describe('Study Detail Components', () => {
-    const study = INVESTIGATIONS[0]; // BASS
+    const study = mapInvestigationDetailDto(
+      makeInvestigationDetailDto({ id: INV_1.id, psiId: INV_1.psiId, platform: 'MSG' })
+    );
+    const runs = [
+      mapRunDto(makeRunDto({ id: 'b8f882f6-6fde-5b18-a505-f668bdc12c42', externalRunKey: 'RUN-01' })),
+      mapRunDto(
+        makeRunDto({
+          id: 'f04922ad-2fbf-5afe-ba7e-bc5a01b9149f',
+          externalRunKey: 'RUN-02',
+          materialType: 'TEST_MATERIAL_B',
+          gravity: '1g',
+        })
+      ),
+    ];
+    const observations = [mapObservationDto(makeObservationDto())];
+    const sources = [mapSourceDto(makeSourceDto({ doi: '10.1000/synthetic-psi' }))];
 
-    it('StudyHeader renders title, PI, back link, external PSI link, and compare button', () => {
+    it('StudyHeader renders MappedInvestigationDetail, caveats, totals, and compare toggle', () => {
       const handleToggle = vi.fn();
-      render(
+      renderWithQuery(
         <StudyHeader
           study={study}
+          sources={sources}
           isComparing={false}
           onToggleCompare={handleToggle}
         />
@@ -456,76 +661,101 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
       expect(screen.getByTestId('study-header')).toBeDefined();
       expect(screen.getByTestId('back-to-explorer-link')).toBeDefined();
       expect(screen.getByTestId('study-nasa-psi-link')).toBeDefined();
-      expect(screen.getByTestId('header-compare-btn')).toBeDefined();
-      expect(screen.getAllByText(study.code).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByTestId('study-caveats-notice')).toBeInTheDocument();
+      expect(screen.getAllByText(study.psiId).length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText(study.title)).toBeDefined();
 
       fireEvent.click(screen.getByTestId('header-compare-btn'));
       expect(handleToggle).toHaveBeenCalledWith(study.id);
     });
 
-    it('TestRunsTable displays verified test runs and summary KPIs', () => {
-      render(<TestRunsTable study={study} />);
+    it('TestRunsTable displays MappedRun rows, search filter, and live run inspector', async () => {
+      renderWithQuery(<TestRunsTable study={study} runs={runs} />);
 
       expect(screen.getByTestId('test-runs-table-container')).toBeDefined();
       expect(screen.getByTestId('runs-table')).toBeDefined();
-      expect(screen.getByTestId('run-row-BASS-RUN-01')).toBeDefined();
-      expect(screen.getAllByText('PMMA Flat Sheet').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByTestId(`run-row-${runs[0].id}`)).toBeDefined();
 
-      // Verify EndOfListIndicator
-      const indicator = screen.getByTestId('end-of-list-indicator');
-      expect(indicator).toBeInTheDocument();
-      expect(indicator.textContent).toContain('Bạn đã xem hết danh sách lượt thử nghiệm');
+      fireEvent.change(screen.getByTestId('runs-search-input'), {
+        target: { value: 'RUN-02' },
+      });
+      expect(screen.queryByTestId(`run-row-${runs[0].id}`)).toBeNull();
+      expect(screen.getByTestId(`run-row-${runs[1].id}`)).toBeDefined();
 
-      // Search runs
-      const search = screen.getByTestId('runs-search-input');
-      fireEvent.change(search, { target: { value: 'BASS-RUN-01' } });
-      expect(screen.getByTestId('run-row-BASS-RUN-01')).toBeDefined();
+      fireEvent.click(screen.getByTestId(`inspect-run-btn-${runs[1].id}`));
+      await waitFor(() => {
+        expect(screen.getByTestId('selected-run-inspector')).toBeInTheDocument();
+        expect(screen.getByText('TEST_ONLY_OXYGEN')).toBeInTheDocument();
+      });
     });
 
-    it('TelemetryPane renders SVG time-series curves and run switcher', () => {
-      render(<TelemetryPane study={study} />);
+    it('TelemetryPane displays real conditions & measurements without fabricating curves', async () => {
+      renderWithQuery(
+        <TelemetryPane study={study} runs={runs} observations={observations} />
+      );
 
       expect(screen.getByTestId('telemetry-pane')).toBeDefined();
-      expect(screen.getByTestId('telemetry-svg-chart')).toBeDefined();
-      expect(screen.getByTestId('telemetry-run-btn-BASS-RUN-01')).toBeDefined();
+      expect(screen.queryByTestId('telemetry-svg-chart')).toBeNull();
+      expect(screen.getByTestId('telemetry-provenance-notice')).toBeInTheDocument();
+      expect(screen.getByTestId('run-conditions-panel')).toBeInTheDocument();
+      expect(screen.getByTestId('run-measurements-panel')).toBeInTheDocument();
 
-      // Switch to Run 2
-      const run2Btn = screen.getByTestId('telemetry-run-btn-BASS-RUN-02');
+      await waitFor(() => {
+        expect(screen.getByText('TEST_ONLY_OXYGEN')).toBeInTheDocument();
+        expect(screen.getByText('TEST_ONLY_OBSERVABLE')).toBeInTheDocument();
+      });
+
+      const run2Btn = screen.getByTestId(`telemetry-run-btn-${runs[1].id}`);
       fireEvent.click(run2Btn);
-      expect(run2Btn.className).toContain('bg-[#4CC9F0]');
+      expect(run2Btn.className).toContain('bg-[#D4FC02]');
     });
 
-    it('ClaimsList renders peer-reviewed claims with categories and DOI links', () => {
-      // Find a study with claims, e.g. spice or slice
-      const spiceStudy = INVESTIGATIONS.find((i) => i.id === 'spice') || study;
-      render(<ClaimsList study={spiceStudy} />);
+    it('ClaimsList renders claims, DOI links, and contextMismatch amber warnings', () => {
+      const claimWithMismatch = mapClaimDto(
+        makeClaimDto({
+          sources: makePageDto([
+            makeClaimSourceDto({
+              contextMismatch: true,
+              source: makeSourceDto({ doi: '10.1000/synthetic-psi' }),
+            }),
+          ]),
+        })
+      );
+
+      renderWithQuery(<ClaimsList study={study} claims={[claimWithMismatch]} />);
 
       expect(screen.getByTestId('claims-list-container')).toBeDefined();
-      expect(screen.getByTestId('claims-items-list')).toBeDefined();
-      expect(screen.getByTestId('claim-card-CLAIM-BUOY-01')).toBeDefined();
-      expect(screen.getByTestId('doi-link-CLAIM-BUOY-01')).toBeDefined();
+      expect(screen.getByTestId(`claim-card-${claimWithMismatch.id}`)).toBeDefined();
+      expect(screen.getByTestId(`claim-mismatch-badge-${claimWithMismatch.id}`)).toBeInTheDocument();
+      expect(screen.getByTestId(`claim-source-mismatch-${claimWithMismatch.sources[0].id}`)).toBeInTheDocument();
+      expect(screen.getByTestId(`doi-link-${claimWithMismatch.id}`)).toBeDefined();
     });
 
-    it('ChamberOverviewTab renders objectives, atmospheric envelope, and materials', () => {
-      render(<ChamberOverviewTab study={study} />);
+    it('ChamberOverviewTab renders researchPurpose, unavailableFields disclosure, and sources', () => {
+      renderWithQuery(<ChamberOverviewTab study={study} sources={sources} />);
 
       expect(screen.getByTestId('chamber-overview-tab')).toBeDefined();
-      expect(screen.getByText('Research Purpose & Scientific Objectives')).toBeDefined();
-      expect(screen.getByText('Chamber Atmospheric Envelope')).toBeDefined();
-      expect(screen.getByText('Spaceflight Relevance & Earth Applications')).toBeDefined();
+      expect(screen.getByTestId('unavailable-fields-card').textContent).toContain(
+        'UNSUPPORTED_MAPPING'
+      );
+      expect(screen.getByTestId('study-sources-card').textContent).toContain('TEST_ONLY');
     });
 
-    it('PsiExportTab triggers JSON and CSV exports and opens PSI portal', () => {
-      render(<PsiExportTab study={study} />);
+    it('PsiExportTab triggers JSON and CSV exports for mapped study data', () => {
+      const claims = [mapClaimDto(makeClaimDto())];
+      renderWithQuery(
+        <PsiExportTab
+          study={study}
+          runs={runs}
+          observations={observations}
+          sources={sources}
+          claims={claims}
+        />
+      );
 
       expect(screen.getByTestId('psi-export-tab')).toBeDefined();
-      expect(screen.getByTestId('export-json-btn')).toBeDefined();
-      expect(screen.getByTestId('export-csv-btn')).toBeDefined();
-      expect(screen.getByTestId('psi-portal-button')).toBeDefined();
-
       fireEvent.click(screen.getByTestId('export-json-btn'));
-      expect(window.URL.createObjectURL).toHaveBeenCalled();
+      expect(window.URL.createObjectURL).toHaveBeenCalledTimes(1);
 
       fireEvent.click(screen.getByTestId('export-csv-btn'));
       expect(window.URL.createObjectURL).toHaveBeenCalledTimes(2);
@@ -536,19 +766,45 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
   // 6. Dynamic StudyDetailPage (/explorer/[id])
   // -------------------------------------------------------------------------
   describe('StudyDetailPage (/explorer/[id])', () => {
-    it('renders live detail tabs, raw rows and the original telemetry channel', () => {
-      mockParams = {id:'flex'};
-      render(<StudyDetailPage />);
-      expect(screen.getByTestId('live-study-detail')).toBeDefined();
-      fireEvent.click(screen.getByRole('tab', {name:'Source records (1)'}));
-      expect(screen.getByText('Unknown')).toBeDefined();
-      fireEvent.click(screen.getByRole('tab', {name:'Original telemetry'}));
-      expect(screen.getByText('Original droplet diameter · FLEX-007')).toBeDefined();
+    it('renders detail page from backend hooks and switches across all 5 tabs', async () => {
+      mockParams = { id: INV_1.id };
+      renderWithQuery(<StudyDetailPage />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('study-detail-page')).toBeInTheDocument();
+      });
+
+      expect(screen.getByTestId('chamber-overview-tab')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByTestId('tab-runs'));
+      expect(screen.getByTestId('test-runs-table-container')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByTestId('tab-telemetry'));
+      expect(screen.getByTestId('telemetry-pane')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByTestId('tab-claims'));
+      expect(screen.getByTestId('claims-list-container')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByTestId('tab-psi-export'));
+      expect(screen.getByTestId('psi-export-tab')).toBeInTheDocument();
     });
-    it('renders not-found when an identifier is absent from the pinned release', () => {
-      mockParams = {id:'not-in-release'};
-      render(<StudyDetailPage />);
-      expect(screen.getByText('Investigation not found')).toBeDefined();
+
+    it('renders not found state on 404 ENTITY_NOT_FOUND', async () => {
+      vi.mocked(apiServices.getInvestigationBySlug).mockRejectedValueOnce(
+        new ApiClientError({
+          status: 404,
+          code: 'ENTITY_NOT_FOUND',
+          message: 'Investigation not found',
+        })
+      );
+      mockParams = { id: 'nonexistent-study-id' };
+      renderWithQuery(<StudyDetailPage />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('study-not-found')).toBeInTheDocument();
+      });
+      expect(screen.getByText('Investigation Not Found')).toBeInTheDocument();
+      expect(screen.getByTestId('not-found-return-link')).toBeInTheDocument();
     });
   });
 });

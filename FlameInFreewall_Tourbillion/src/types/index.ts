@@ -169,9 +169,6 @@ export interface EvidenceClaim {
 // ---------------------------------------------------------------------------
 
 export interface ScenarioState {
-  oxygenBasis?: 'volume_percent' | 'mole_percent';
-  pillar?: import('@/lib/workspace-api').Pillar | 'all';
-  missionContext?: import('@/lib/workspace-api').MissionContext;
   id?: string;
   name: string;
   environment: MissionEnvironment;
@@ -268,7 +265,6 @@ export interface AiCitation {
 }
 
 export interface ChatMessage {
-  groundedAnswer?: import('@/lib/workspace-api').Answer;
   id: string;
   role: 'user' | 'assistant';
   content: string;

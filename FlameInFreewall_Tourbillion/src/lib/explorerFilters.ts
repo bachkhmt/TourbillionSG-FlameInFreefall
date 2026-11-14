@@ -1,10 +1,9 @@
 import type { Investigation } from '@/types';
-import type {
-  FuelFilterValue,
-  FacilityFilterValue,
-  GravityFilterValue,
-  ExplorerSortOption,
-} from '@/components/explorer/ExplorerFiltersBar';
+
+export type FuelFilterValue = 'all' | 'solid' | 'droplet' | 'gas';
+export type FacilityFilterValue = 'all' | 'CIR' | 'MSG' | 'Cygnus';
+export type GravityFilterValue = 'all' | '0g' | '1g' | 'partial';
+export type ExplorerSortOption = 'newest' | 'code-asc' | 'runs-desc' | 'confidence';
 
 export interface FilterInvestigationsParams {
   investigations: Investigation[];

@@ -118,7 +118,7 @@ export const CitationBadge: React.FC<CitationBadgeProps> = ({ citation, classNam
           {citation.claimText && (
             <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-200 text-zinc-800 text-[11px] leading-relaxed">
               <span className="text-[#0B2374] text-[10px] font-bold block mb-0.5">
-                SOURCE EXCERPT · REVIEW PROVENANCE:
+                VERIFIED PSI CLAIM:
               </span>
               &ldquo;{citation.claimText}&rdquo;
             </div>

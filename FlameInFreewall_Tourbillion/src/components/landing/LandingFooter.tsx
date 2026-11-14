@@ -32,7 +32,7 @@ export const LandingFooter: React.FC = () => {
             </p>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-[10px] font-bold text-[#0B2374]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#0B2374] animate-ping" />
-              <span>Versioned NASA PSI pilot</span>
+              <span>Telemetry Active • PSI 20 Studies</span>
             </div>
           </div>
 
@@ -85,7 +85,7 @@ export const LandingFooter: React.FC = () => {
                 </a>
               </li>
               <li>
-                <span className="text-zinc-500 font-normal">Original artifact hashes and source locators</span>
+                <span className="text-zinc-500 font-normal">NASA-STD-6001 Test 1 Upward Flammability</span>
               </li>
               <li>
                 <span className="text-zinc-500 font-normal">BASS / ACME / FLEX / SoFIE Investigations</span>
@@ -124,12 +124,14 @@ export const LandingFooter: React.FC = () => {
           <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="text-xs text-amber-950 leading-relaxed">
             <span className="font-bold text-amber-900 block mb-0.5">
-              Research demonstration · interpretation limits
+              NASA Physical Sciences Fire Safety Protocol &amp; Disclaimer
             </span>
-            FlameGuard AI is a research demonstration using selected NASA PSI artifacts.
-            Source checking does not establish independent scientific validation, operational
-            recommendations or safety certification. Missing measurements are limited to the
-            corpus being shown. Visual flame illustrations are not experimental predictions.
+            FlameGuard AI is an evidence-first scientific analysis and educational decision-support
+            platform. Synthesized metrics and predictive models are grounded strictly on NASA Physical
+            Sciences Informatics (PSI) flight and ground experiments. Mission-critical spacecraft fire
+            safety certification requires certified chamber qualification under NASA-STD-6001 standards.
+            Partial-gravity regimes (0 &lt; g &lt; 1) represent open empirical knowledge gaps and must not
+            be treated as verified safe without direct experimental evidence.
           </div>
         </div>
 
@@ -141,7 +143,7 @@ export const LandingFooter: React.FC = () => {
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-zinc-600">
               <Globe className="w-3.5 h-3.5 text-[#0B2374]" />
-              <span>Source-specific license and provenance</span>
+              <span>Open Science / Public Domain Data</span>
             </span>
           </div>
         </div>

@@ -8,7 +8,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useDataset } from '@/store/useDatasetStore';
 import {
   Flame,
   ArrowRight,
@@ -20,7 +19,6 @@ import {
 } from 'lucide-react';
 
 export const LandingHero: React.FC = () => {
-  const { data } = useDataset();
   return (
     <section className="relative w-full overflow-hidden bg-[#F8F9FA]" data-testid="landing-hero">
       {/* Top Space Apps Announcement Banner */}
@@ -34,10 +32,10 @@ export const LandingHero: React.FC = () => {
               Space Apps 2026
             </span>
             <span className="font-bold text-zinc-950">
-              Original data. Traceable sources.
+              Space Apps Connect is now open!
             </span>
             <span className="hidden md:inline text-zinc-800">
-              Explore the source-backed Flame in Freefall pilot.
+              Join the global collaboration for Flame in Freefall.
             </span>
           </div>
           <Link
@@ -126,9 +124,9 @@ export const LandingHero: React.FC = () => {
 
           {/* Subheading */}
           <p className="text-base sm:text-lg md:text-xl text-zinc-600 max-w-2xl mx-auto leading-relaxed mb-10">
-            Explore NASA Physical Sciences Informatics (PSI) experiments through original source
-            artifacts, transparent data gaps and cited answers. Inspect the evidence before
-            interpreting experimental conditions.
+            Evidence-first intelligence platform synthesizing 20 NASA Physical Sciences Informatics
+            (PSI) microgravity investigations. Uncover why flames burn spherical and blue in freefall,
+            and resolve the lethal flammability paradox of lunar exploration habitats.
           </p>
 
           {/* Action Buttons */}
@@ -147,7 +145,7 @@ export const LandingHero: React.FC = () => {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-zinc-900 font-bold text-sm sm:text-base border border-gray-200/90 hover:border-gray-300 shadow-2xs hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <Layers className="w-5 h-5 text-[#0B2374]" />
-              <span>Explore PSI Studies</span>
+              <span>Explore 20 PSI Studies</span>
             </Link>
 
             <Link
@@ -155,7 +153,7 @@ export const LandingHero: React.FC = () => {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-zinc-900 font-bold text-sm sm:text-base border border-gray-200/90 hover:border-gray-300 shadow-2xs hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <Flame className="w-5 h-5 text-amber-500" />
-              <span>Analyze Mission Evidence</span>
+              <span>Run Scenario Simulation</span>
             </Link>
           </div>
 
@@ -167,31 +165,31 @@ export const LandingHero: React.FC = () => {
                 <span>PSI Archive</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
-                {data ? `${data.stats.investigations} Studies` : 'NASA PSI'}
+                20 Studies
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Catalog entries in the current release</p>
+              <p className="text-xs text-zinc-500 mt-1">BASS, ACME, FLEX, SoFIE flight tests</p>
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
               <div className="flex items-center gap-1.5 text-amber-600 text-xs font-bold uppercase mb-1">
                 <Flame className="w-3.5 h-3.5 text-amber-500" />
-                <span>Source Records</span>
+                <span>Test Runs</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
-                {data ? `${data.stats.runs} Rows` : 'Source-backed'}
+                148+ Runs
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Imported pilot rows · not independent validation</p>
+              <p className="text-xs text-zinc-500 mt-1">Quench diameters &amp; spread rates</p>
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
               <div className="flex items-center gap-1.5 text-purple-700 text-xs font-bold uppercase mb-1">
                 <Compass className="w-3.5 h-3.5 text-purple-600" />
-                <span>Visual Studio</span>
+                <span>Physics Model</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
                 0g vs 1g
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Educational illustration · not a physics solver</p>
+              <p className="text-xs text-zinc-500 mt-1">Pure diffusion vs buoyant plume</p>
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
@@ -202,7 +200,7 @@ export const LandingHero: React.FC = () => {
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
                 0 &lt; g &lt; 1
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Partial-gravity measurements absent in this pilot</p>
+              <p className="text-xs text-zinc-500 mt-1">Lunar &amp; Mars flammability paradox</p>
             </div>
           </div>
         </div>

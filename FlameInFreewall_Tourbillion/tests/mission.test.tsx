@@ -335,39 +335,71 @@ describe('Mission Scenario, Evidence Gap Matrix & Predictive Lab (/mission)', ()
   });
 
   describe('MissionPage (/mission) Full Assembly', () => {
-    it('renders source-backed mission controls and explicit search tolerances', () => {
+    it('renders workbench with NASA Evidence Analysis view by default', () => {
       render(<MissionPage />);
+
       expect(screen.getByTestId('mission-workbench')).toBeDefined();
-      expect(screen.getByLabelText('Oxygen basis')).toBeDefined();
-      expect(screen.getByRole('button',{name:'Analyze evidence'})).toBeDefined();
+      expect(screen.getByTestId('scenario-config-form')).toBeDefined();
+      expect(screen.getByTestId('evidence-view-container')).toBeDefined();
+      expect(screen.getByTestId('condition-gap-matrix')).toBeDefined();
+      expect(screen.getByTestId('ranked-evidence-list')).toBeDefined();
+      expect(screen.queryByTestId('prediction-view-container')).toBeNull();
     });
-    it('switches to readiness-only prediction without running a heuristic model', () => {
+
+    it('switches to Predictive Lab view when tab is clicked', () => {
       render(<MissionPage />);
-      fireEvent.click(screen.getByRole('button', {name:'Predictive Lab · readiness only'}));
-      expect(screen.getByText('Prediction offline')).toBeDefined();
-      expect(screen.queryByText('MODEL ONLINE')).toBeNull();
+
+      const predictionTab = screen.getByTestId('view-tab-prediction');
+      act(() => {
+        fireEvent.click(predictionTab);
+      });
+
+      expect(mockPush).toHaveBeenCalledWith('/mission?view=prediction');
     });
-    it('loads a prediction deep link', () => {
-      window.history.replaceState(null, '', '/mission?view=prediction');
+
+    it('renders Predictive Lab view when view=prediction in searchParams', () => {
+      mockSearchParams = new URLSearchParams('view=prediction');
       render(<MissionPage />);
-      expect(screen.getByText('Prediction offline')).toBeDefined();
+
+      expect(screen.getByTestId('prediction-view-container')).toBeDefined();
+      expect(screen.getByTestId('predictive-lab-panel')).toBeDefined();
+      expect(screen.queryByTestId('evidence-view-container')).toBeNull();
     });
-    it('preserves query conditions across evidence and prediction views', () => {
+
+    it('preserves scenario state changes when switching between views', () => {
       render(<MissionPage />);
-      fireEvent.click(screen.getByRole('button',{name:'Lunar illustrative scenario'}));
+
+      // Switch preset to Artemis Moon
+      const artemisBtn = screen.getByTestId('preset-artemis-lunar-base');
+      act(() => {
+        fireEvent.click(artemisBtn);
+      });
+
       expect(useWorkspaceStore.getState().activeScenario.gravity).toBe(0.16);
-      fireEvent.click(screen.getByRole('button', {name:'Predictive Lab · readiness only'}));
-      fireEvent.click(screen.getByRole('button',{name:'Inspect available evidence'}));
-      expect(useWorkspaceStore.getState().activeScenario.gravity).toBe(0.16);
+
+      // Now switch searchParams to prediction
+      mockSearchParams = new URLSearchParams('view=prediction');
+      render(<MissionPage />);
+
+      // In predictive lab, 0.16g should cause locked state
+      expect(screen.getByTestId('predictive-lab-locked-state')).toBeDefined();
+      expect(screen.getByTestId('model-status-badge').textContent).toContain('MODEL OFFLINE');
     });
   });
 
   describe('Mission Scenario Light Theme', () => {
-    it('renders original observed-map semantics with unknown flow clearly stated', () => {
+    it('renders scenario configuration and gap matrix with light white cards and badges', () => {
       render(<MissionPage />);
-      expect(screen.getByText('Observed evidence map')).toBeDefined();
-      expect(screen.getByText(/Solid O₂\/flow map is unavailable/)).toBeDefined();
-      expect(screen.getByLabelText('Absolute pressure (psia)')).toBeDefined();
+      expect(screen.getAllByText(/Mission Scenario/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Evidence Gap Matrix/i).length).toBeGreaterThan(0);
+      expect(screen.getByTestId('mission-workbench')).toBeInTheDocument();
+      expect(screen.getByTestId('scenario-config-form')).toBeInTheDocument();
+      expect(screen.getByTestId('condition-gap-matrix')).toBeInTheDocument();
+      expect(screen.getByTestId('ranked-evidence-list')).toBeInTheDocument();
+
+      const indicator = screen.getByTestId('end-of-list-indicator');
+      expect(indicator).toBeInTheDocument();
+      expect(indicator.textContent).toContain('Bạn đã xem hết danh sách dữ liệu kịch bản');
     });
   });
 });

@@ -15,7 +15,6 @@ import {
   X,
   RotateCcw,
   ExternalLink,
-  BookOpen,
 } from 'lucide-react';
 import { DockPillButton } from './DockPillButton';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
@@ -38,7 +37,7 @@ export const NAV_ITEMS: NavItemConfig[] = [
   {
     path: '/explorer',
     label: 'Experiment Explorer',
-    description: 'Source-backed catalog & comparisons',
+    description: 'Filter & compare 20 studies',
     icon: Layers,
   },
   {
@@ -46,12 +45,6 @@ export const NAV_ITEMS: NavItemConfig[] = [
     label: 'Mission Scenario',
     description: 'Gap matrix & predictive lab',
     icon: Rocket,
-  },
-  {
-    path: '/resources',
-    label: 'Official Resources',
-    description: 'NASA data, science context & case studies',
-    icon: BookOpen,
   },
 ];
 

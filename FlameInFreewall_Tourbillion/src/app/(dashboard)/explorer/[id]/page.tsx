@@ -1,7 +1,12 @@
-'use client';
+import React from 'react';
+import { StudyDetailClient } from './StudyDetailClient';
 
-import { ResearchDetail } from '@/components/research/Detail';
+export const dynamicParams = true;
 
-export default function Page() {
-  return <ResearchDetail />;
+export interface PageProps {
+  params?: Promise<{ id: string }>;
+}
+
+export default function StudyDetailPage({ params }: PageProps) {
+  return <StudyDetailClient params={params} />;
 }

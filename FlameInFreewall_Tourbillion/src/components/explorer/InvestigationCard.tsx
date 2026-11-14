@@ -3,75 +3,23 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import {
-  Flame,
-  Droplet,
-  Wind,
-  Layers,
-  ArrowRight,
-  Check,
-  Plus,
-  User,
-  Activity,
-  Building2,
-} from 'lucide-react';
-import type { Investigation, FuelCategory } from '@/types';
+import { Check, Plus, Tag, Layers } from 'lucide-react';
+import type { MappedInvestigation } from '@/types/api';
 
 export interface InvestigationCardProps {
-  investigation: Investigation;
+  investigation: MappedInvestigation;
   isComparing: boolean;
   onToggleCompare: (id: string) => void;
-  testRunsCount?: number;
-}
-
-export function getFuelBadge(fuelType: FuelCategory) {
-  switch (fuelType) {
-    case 'solid':
-    case 'fabric':
-      return {
-        label: 'Solid',
-        bg: 'bg-amber-50',
-        text: 'text-amber-800',
-        border: 'border-amber-200',
-        icon: Flame,
-      };
-    case 'liquid':
-    case 'droplet':
-      return {
-        label: 'Droplet',
-        bg: 'bg-cyan-50',
-        text: 'text-cyan-800',
-        border: 'border-cyan-200',
-        icon: Droplet,
-      };
-    case 'gas':
-      return {
-        label: 'Gas',
-        bg: 'bg-purple-50',
-        text: 'text-purple-800',
-        border: 'border-purple-200',
-        icon: Wind,
-      };
-    default:
-      return {
-        label: fuelType,
-        bg: 'bg-gray-100',
-        text: 'text-zinc-800',
-        border: 'border-gray-200',
-        icon: Layers,
-      };
-  }
 }
 
 export const InvestigationCard: React.FC<InvestigationCardProps> = ({
   investigation,
   isComparing,
   onToggleCompare,
-  testRunsCount,
 }) => {
-  const fuelBadge = getFuelBadge(investigation.fuelType);
-  const FuelIcon = fuelBadge.icon;
-  const runsCount = testRunsCount ?? investigation.dataAvailability.runCount ?? 0;
+  const visibleTags = investigation.tags.slice(0, 3);
+  const extraTagCount = Math.max(0, investigation.tagsTotal - visibleTags.length);
+  const unavailableCount = Object.keys(investigation.unavailableFields).length;
 
   return (
     <motion.div
@@ -79,32 +27,25 @@ export const InvestigationCard: React.FC<InvestigationCardProps> = ({
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className={`group relative rounded-3xl p-5 flex flex-col justify-between transition-all duration-300 cursor-pointer bg-gray-200/50 hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] select-none ${
+      className={`group relative rounded-3xl md:rounded-[36px] p-5 flex flex-col justify-between transition-all duration-300 cursor-pointer bg-gray-200/50 hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] select-none ${
         isComparing
           ? 'ring-2 ring-[#D4FC02] shadow-[0_8px_30px_rgba(212,252,2,0.3)] bg-white'
           : ''
       }`}
     >
-      {/* Top Header: Code, Badges, Compare Button */}
       <div>
+        {/* Top Header: PSI ID, Platform & Compare Toggle */}
         <div className="flex items-center justify-between gap-2 mb-3">
-          {/* Domain badge, Apparatus badge & Fuel Phase badge */}
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="bg-blue-50 text-[#0B2374] border border-blue-100 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold shadow-2xs">
-              {investigation.code}
+              {investigation.psiId}
             </span>
-            <span className="bg-lime-50 text-lime-900 border border-lime-200 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold shadow-2xs">
-              {investigation.hardware}
-            </span>
-            <span
-              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold shadow-2xs border ${fuelBadge.bg} ${fuelBadge.text} ${fuelBadge.border}`}
-            >
-              <FuelIcon className="w-3 h-3" />
-              <span>{fuelBadge.label}</span>
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold shadow-2xs border bg-white text-zinc-700 border-gray-200/80">
+              <Layers className="w-3 h-3 text-[#0B2374]" />
+              <span>{investigation.platform ?? 'Platform unmapped'}</span>
             </span>
           </div>
 
-          {/* Compare Toggle Button */}
           <button
             type="button"
             data-testid={`compare-btn-${investigation.id}`}
@@ -134,89 +75,58 @@ export const InvestigationCard: React.FC<InvestigationCardProps> = ({
           </button>
         </div>
 
-        {/* Title & Subtitle */}
-        <Link
-          href={`/explorer/${investigation.id}`}
-          className="block group/link"
-        >
-          <h3 className="text-base font-bold text-zinc-900 group-hover/link:text-[#0B2374] transition-colors line-clamp-1">
+        {/* Title Link */}
+        <Link href={`/explorer/${investigation.routeKey}`} className="block group/link">
+          <h3 className="text-base font-bold text-zinc-900 group-hover/link:text-[#0B2374] transition-colors line-clamp-2 leading-snug">
             {investigation.title}
           </h3>
-          <p className="text-xs text-zinc-500 mt-1 line-clamp-2 leading-relaxed">
-            {investigation.subtitle}
-          </p>
         </Link>
 
-        {/* Investigator & Affiliation */}
-        <div className="flex items-center gap-1.5 mt-3 text-xs text-zinc-700">
-          <User className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-          <span className="truncate font-medium">{investigation.primaryInvestigator}</span>
-          {investigation.institution && (
+        {/* Research Purpose Snippet */}
+        <p className="mt-2 text-xs text-zinc-600 line-clamp-2 leading-relaxed">
+          {investigation.researchPurpose ?? 'Research purpose not provided in PSI catalog.'}
+        </p>
+
+        {/* Minimalist Tags Strip */}
+        <div className="mt-3.5 flex flex-wrap items-center gap-1.5 py-2 px-3 rounded-2xl bg-white/70 border border-gray-100/60">
+          {visibleTags.length > 0 ? (
             <>
-              <span className="text-zinc-400">·</span>
-              <span className="text-zinc-500 truncate">{investigation.institution}</span>
+              {visibleTags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-[11px] font-semibold text-zinc-700"
+                >
+                  <Tag className="w-2.5 h-2.5 text-[#0B2374]" />
+                  <span>{tag.label}</span>
+                </span>
+              ))}
+              {extraTagCount > 0 && (
+                <span className="text-[11px] font-semibold text-zinc-500">
+                  +{extraTagCount} more
+                </span>
+              )}
             </>
+          ) : (
+            <span className="text-[11px] text-zinc-500">No catalog tags mapped</span>
           )}
-        </div>
-
-        {/* Hardware & Facility Pill */}
-        <div className="flex items-center gap-1.5 mt-1.5 text-xs text-zinc-500">
-          <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-          <span className="truncate text-zinc-600">{investigation.platform}</span>
-          <span className="text-zinc-400">({investigation.yearRange})</span>
-        </div>
-
-        {/* Chamber Conditions Spec Bar */}
-        <div className="mt-4 p-2.5 rounded-2xl bg-white/70 grid grid-cols-3 gap-2 text-center">
-          <div>
-            <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">O2 Range</div>
-            <div className="text-xs font-bold text-zinc-900 mt-0.5">
-              {investigation.oxygenRange[0]}–{investigation.oxygenRange[1]}%
-            </div>
-          </div>
-          <div className="border-x border-gray-200/50 px-1">
-            <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Pressure</div>
-            <div className="text-xs font-bold text-zinc-900 mt-0.5">
-              {investigation.pressureRangePsi[0]}–{investigation.pressureRangePsi[1]} psi
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Flow</div>
-            <div className="text-xs font-bold text-zinc-900 mt-0.5">
-              {investigation.flowRangeCmPerSec[0]}–{investigation.flowRangeCmPerSec[1]} cm/s
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* Bottom Footer: Stats, Badges & Inspect Study Link */}
-      <div className="mt-5 pt-3 border-t border-black/5 flex items-center justify-between gap-2">
-        {/* Runs Count & Confidence */}
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white text-[11px] font-bold shadow-2xs text-zinc-700">
-            <Activity className="w-3 h-3 text-[#0B2374]" />
-            <span>{runsCount} Runs</span>
+      {/* Minimalist Provenance Footer */}
+      <div className="mt-4 pt-1.5 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="px-2.5 py-0.5 rounded-full bg-white text-[11px] font-bold shadow-2xs text-zinc-700 capitalize">
+            {investigation.context.origin}
           </span>
-          <span
-            className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold shadow-2xs uppercase ${
-              investigation.confidence === 'A'
-                ? 'bg-[#D4FC02]/25 text-zinc-950'
-                : 'bg-amber-50 text-amber-800'
-            }`}
-          >
-            Tier {investigation.confidence}
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold shadow-2xs uppercase bg-[#D4FC02]/30 text-zinc-950">
+            {investigation.context.reviewState}
           </span>
+          {unavailableCount > 0 && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800">
+              {unavailableCount} unmapped
+            </span>
+          )}
         </div>
-
-        {/* Inspect Link */}
-        <Link
-          href={`/explorer/${investigation.id}`}
-          data-testid={`inspect-link-${investigation.id}`}
-          className="inline-flex items-center gap-1 text-xs font-bold text-[#0B2374] hover:text-[#081b59] transition-colors"
-        >
-          <span>Inspect Study</span>
-          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
       </div>
     </motion.div>
   );

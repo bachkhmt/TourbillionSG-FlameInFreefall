@@ -6,126 +6,149 @@ import {
   ExternalLink,
   FileSpreadsheet,
   FileCode,
-  ShieldCheck,
-  CheckCircle2,
+  ShieldAlert,
 } from 'lucide-react';
-import type { Investigation } from '@/types';
-import { TEST_RUNS } from '@/data/testRuns';
+import type {
+  MappedClaim,
+  MappedInvestigationDetail,
+  MappedObservation,
+  MappedRun,
+  MappedSource,
+} from '@/types/api';
+import { escapeCsvCell, triggerFileDownload } from '@/lib/exportUtils';
 import { toast } from '@/components/toast/toast-store';
 
 export interface PsiExportTabProps {
-  study: Investigation;
+  study: MappedInvestigationDetail;
+  runs: MappedRun[];
+  observations: MappedObservation[];
+  sources: MappedSource[];
+  claims: MappedClaim[];
 }
 
-export const PsiExportTab: React.FC<PsiExportTabProps> = ({ study }) => {
-  const studyRuns = TEST_RUNS.filter((r) => r.investigationId === study.id);
-
+export const PsiExportTab: React.FC<PsiExportTabProps> = ({
+  study,
+  runs,
+  observations,
+  sources,
+  claims,
+}) => {
   const handleExportJson = () => {
-    const exportData = {
+    const payload = {
       investigation: study,
-      testRuns: studyRuns,
+      runs,
+      observations,
+      sources,
+      claims,
       exportedAt: new Date().toISOString(),
-      source: 'NASA Physical Science Informatics (PSI) Repository / FlameGuard AI',
     };
-    const jsonStr = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `flameguard-${study.code.toLowerCase()}-psi-export.json`;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    triggerFileDownload(blob, `flameguard-${study.psiId.toLowerCase()}-psi-export.json`);
     toast.success(
-      `Exported ${study.code} JSON metadata`,
-      'Download started with full chamber conditions and test run parameters.'
+      `Exported ${study.psiId} JSON bundle`,
+      `Included ${runs.length} runs, ${observations.length} observations, and ${claims.length} claims.`
     );
   };
 
   const handleExportCsv = () => {
-    if (studyRuns.length === 0) {
-      toast.warning('No test runs available to export as CSV.');
+    if (runs.length === 0 && observations.length === 0) {
+      toast.warning('No test runs or observations available to export as CSV.');
       return;
     }
+
     const headers = [
-      'id',
+      'runId',
       'externalRunKey',
       'materialType',
-      'oxygenPct',
-      'pressurePsi',
-      'flowVelocityCmS',
-      'flameSpreadRateMmS',
-      'quenchingDiameterMm',
-      'peakTempK',
-      'burnDurationSec',
-      'status',
+      'sampleGeometry',
+      'gravity',
+      'verification',
+      'observable',
+      'measuredValue',
+      'unit',
+      'uncertainty',
     ];
-    const rows = studyRuns.map((r) => [
-      r.id,
-      r.externalRunKey,
-      `"${r.materialType}"`,
-      r.conditions.oxygenPct,
-      r.conditions.pressurePsi,
-      r.conditions.flowVelocityCmS,
-      r.measurements.flameSpreadRateMmS ?? '',
-      r.measurements.quenchingDiameterMm ?? '',
-      r.measurements.peakTempK ?? '',
-      r.measurements.burnDurationSec ?? '',
-      r.dataStatus,
-    ]);
-    const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `flameguard-${study.code.toLowerCase()}-runs.csv`;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    const rows =
+      observations.length > 0
+        ? observations.map((obs) => [
+            obs.run.id,
+            obs.run.externalRunKey,
+            obs.run.materialType,
+            obs.run.sampleGeometry,
+            obs.run.gravity,
+            obs.run.verification,
+            obs.measurement.observable,
+            obs.measurement.rawMeasuredValue,
+            obs.measurement.unit,
+            obs.measurement.rawUncertainty,
+          ])
+        : runs.map((run) => [
+            run.id,
+            run.externalRunKey,
+            run.materialType,
+            run.sampleGeometry,
+            run.gravity,
+            run.verification,
+            '',
+            '',
+            '',
+            '',
+          ]);
+
+    const csv = [
+      headers.map(escapeCsvCell).join(','),
+      ...rows.map((row) => row.map(escapeCsvCell).join(',')),
+    ].join('\r\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    triggerFileDownload(blob, `flameguard-${study.psiId.toLowerCase()}-observations.csv`);
     toast.success(
-      `Exported ${studyRuns.length} test runs to CSV`,
-      'Tabular dataset ready for numerical modeling or analysis.'
+      `Exported ${rows.length} rows to CSV`,
+      'Tabular study dataset ready for offline scientific analysis.'
     );
   };
 
+  const portalUrl = sources[0]?.sourceUrl ?? 'https://psi.nasa.gov/';
+
   return (
     <div data-testid="psi-export-tab" className="space-y-6">
-      {/* Overview Card */}
       <div className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-bold text-[#1A1A1A] flex items-center gap-2">
               <Database className="w-4 h-4 text-[#0B2374]" />
-              <span>NASA Physical Science Informatics (PSI) Open Data Export</span>
+              <span>NASA PSI Investigation Data Export</span>
             </h3>
             <p className="text-xs text-zinc-500">
-              Download calibrated flight test runs and telemetry sets formatted for space science researchers.
+              Download mapped runs, scalar observations, sources, and claims with full context provenance.
             </p>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-lime-50 border border-lime-200 text-lime-900 text-xs font-semibold">
-            <CheckCircle2 className="w-3.5 h-3.5 text-lime-700" />
-            <span>Open Access NASA License</span>
-          </div>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 border border-gray-200 text-zinc-800 text-xs font-bold uppercase">
+            {study.context.origin} · {study.context.reviewState}
+          </span>
         </div>
 
-        {/* Dataset Metadata Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-100 text-xs">
           <div>
-            <span className="text-zinc-500 text-[10px] uppercase font-semibold">PSI Dataset ID</span>
-            <div className="font-bold text-[#0B2374] mt-0.5">{study.dataAvailability.psiDatasetId}</div>
+            <span className="text-zinc-500 text-[10px] uppercase font-semibold">PSI Identifier</span>
+            <div className="font-bold text-[#0B2374] mt-0.5">{study.psiId}</div>
           </div>
           <div>
-            <span className="text-zinc-500 text-[10px] uppercase font-semibold">Verified Test Runs</span>
-            <div className="font-bold text-zinc-900 mt-0.5">{studyRuns.length} Archived</div>
+            <span className="text-zinc-500 text-[10px] uppercase font-semibold">Loaded Runs &amp; Observations</span>
+            <div className="font-bold text-zinc-900 mt-0.5">
+              {runs.length} runs · {observations.length} observations
+            </div>
           </div>
           <div>
-            <span className="text-zinc-500 text-[10px] uppercase font-semibold">Available Formats</span>
+            <span className="text-zinc-500 text-[10px] uppercase font-semibold">Sources &amp; Claims</span>
             <div className="font-bold text-zinc-700 mt-0.5">
-              {study.dataAvailability.fileTypes.join(', ')}
+              {sources.length} sources · {claims.length} claims
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <button
             type="button"
@@ -144,27 +167,28 @@ export const PsiExportTab: React.FC<PsiExportTabProps> = ({ study }) => {
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 text-zinc-800 font-bold text-xs transition-colors cursor-pointer"
           >
             <FileSpreadsheet className="w-4 h-4 text-amber-600" />
-            <span>Export Test Runs (CSV)</span>
+            <span>Export Observations (CSV)</span>
           </button>
 
           <a
-            href={study.dataAvailability.psiUrl}
+            href={portalUrl}
             target="_blank"
             rel="noopener noreferrer"
             data-testid="psi-portal-button"
             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-zinc-700 hover:text-zinc-950 text-xs transition-colors font-medium ml-auto"
           >
-            <span>Open in NASA PSI Portal</span>
+            <span>Open PSI Source</span>
             <ExternalLink className="w-3.5 h-3.5 text-[#0B2374]" />
           </a>
         </div>
       </div>
 
-      {/* Provenance & Citation Notice */}
-      <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 flex items-start gap-3 text-xs text-zinc-600">
-        <ShieldCheck className="w-4 h-4 text-lime-700 shrink-0 mt-0.5" />
+      <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 flex items-start gap-3 text-xs text-amber-900">
+        <ShieldAlert className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
         <p className="leading-relaxed text-[11px]">
-          Data courtesy of the NASA Physical Science Informatics (PSI) system. Researchers utilizing these datasets are requested to acknowledge the original Primary Investigators ({study.primaryInvestigator}) and cite the NASA PSI data archive.
+          {study.context.caveats.length > 0
+            ? study.context.caveats.join(' · ')
+            : `Collection ${study.context.collectionId} (${study.context.origin} · ${study.context.reviewState}). Verify raw NASA PSI artifacts before citing.`}
         </p>
       </div>
     </div>

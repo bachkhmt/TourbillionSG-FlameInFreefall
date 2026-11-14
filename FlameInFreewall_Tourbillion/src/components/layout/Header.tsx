@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { toast } from '@/components/toast/toast-store';
+import { BackendStatusPill } from './BackendStatusPill';
 import type { ScenarioState } from '@/types';
 
 const ROUTE_LABELS: Record<string, { title: string; section: string }> = {
@@ -207,6 +208,8 @@ export const Header: React.FC = () => {
             <Database className="w-3 h-3 text-[#0B2374]" />
             <span className="text-[11px] font-semibold">PSI 20 Studies</span>
           </div>
+
+          <BackendStatusPill />
 
           {/* Quick Scenario Preset Dropdown Launcher with Outside-Click Dismiss */}
           <div className="relative" ref={dropdownRef}>

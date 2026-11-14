@@ -29,7 +29,7 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       const banner = screen.getByTestId('announcement-banner');
       expect(banner).toBeDefined();
       expect(banner.className).toContain('bg-[#D4FC02]');
-      expect(screen.getByText(/Original data. Traceable sources./i)).toBeDefined();
+      expect(screen.getByText(/Space Apps Connect is now open!/i)).toBeDefined();
     });
 
     it('renders the Royal Navy space navigation bar with brand logo and links', () => {
@@ -47,17 +47,17 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       const workspaceLink = screen.getByRole('link', { name: /Enter Research Workspace/i });
       expect(workspaceLink.getAttribute('href')).toBe('/dashboard');
 
-      const explorerLink = screen.getByRole('link', { name: /Explore PSI Studies/i });
+      const explorerLink = screen.getByRole('link', { name: /Explore 20 PSI Studies/i });
       expect(explorerLink.getAttribute('href')).toBe('/explorer');
 
-      const scenarioLink = screen.getByRole('link', { name: /Analyze Mission Evidence/i });
+      const scenarioLink = screen.getByRole('link', { name: /Run Scenario Simulation/i });
       expect(scenarioLink.getAttribute('href')).toBe('/mission');
     });
 
     it('displays the 4 key telemetry overview badges', () => {
       render(<LandingHero />);
-      expect(screen.getByText('4 Studies')).toBeDefined();
-      expect(screen.getByText('3 Rows')).toBeDefined();
+      expect(screen.getByText('20 Studies')).toBeDefined();
+      expect(screen.getByText('148+ Runs')).toBeDefined();
       expect(screen.getByText('0g vs 1g')).toBeDefined();
       expect(screen.getByText('0 < g < 1')).toBeDefined();
     });
@@ -186,10 +186,10 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       const disclaimer = screen.getByTestId('safety-disclaimer');
       expect(disclaimer).toBeDefined();
       expect(
-        screen.getByText(/Research demonstration · interpretation limits/i)
+        screen.getByText(/NASA Physical Sciences Fire Safety Protocol & Disclaimer/i)
       ).toBeDefined();
       expect(
-        screen.getByText(/Source checking does not establish independent scientific validation/i)
+        screen.getByText(/NASA-STD-6001 standards/i)
       ).toBeDefined();
     });
   });
@@ -198,8 +198,8 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
     it('assembles all sections smoothly within the main landing route', () => {
       render(<LandingPage />);
       expect(screen.getByTestId('landing-hero')).toBeDefined();
-      expect(screen.getByText('Explore flame shapes in 3D')).toBeDefined();
-      expect(screen.getByText('Inspect the gaps before extrapolating')).toBeDefined();
+      expect(screen.getByTestId('kurzgesagt-flame-scene')).toBeDefined();
+      expect(screen.getByTestId('atmospheric-physics')).toBeDefined();
       expect(screen.getByTestId('mission-control-cta')).toBeDefined();
       expect(screen.getByTestId('landing-footer')).toBeDefined();
     });

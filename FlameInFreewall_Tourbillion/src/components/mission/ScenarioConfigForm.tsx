@@ -62,9 +62,6 @@ export const ScenarioConfigForm: React.FC = () => {
               <h2 className="text-base sm:text-lg font-black text-zinc-950 tracking-tight">
                 Mission Scenario Workbench
               </h2>
-              <p className="text-xs text-zinc-500">
-                Configure spacecraft habitat atmosphere, gravitational acceleration, and combustible materials.
-              </p>
             </div>
           </div>
 

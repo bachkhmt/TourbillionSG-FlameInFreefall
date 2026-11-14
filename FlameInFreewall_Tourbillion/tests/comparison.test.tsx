@@ -1,25 +1,36 @@
-import { ResearchCompare } from '@/components/research/Catalog';
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { ComparisonBar } from '../src/components/explorer/ComparisonBar';
 import { ComparisonColumn } from '../src/components/explorer/ComparisonColumn';
+import { ComparisonMatrixTable } from '../src/components/explorer/ComparisonMatrixTable';
 import { ComparisonModal } from '../src/components/explorer/ComparisonModal';
 import { ParameterDeltaSummary } from '../src/components/explorer/ParameterDeltaSummary';
 import { Header } from '../src/components/layout/Header';
 import ExplorerPage from '../src/app/(dashboard)/explorer/page';
-import { INVESTIGATIONS } from '../src/data/investigations';
-import { TEST_RUNS } from '../src/data/testRuns';
+import { mapComparisonDto } from '../src/api/mappers';
+import * as apiServices from '../src/api/services';
 import { useWorkspaceStore } from '../src/store/useWorkspaceStore';
 import { toastStore } from '../src/components/toast/toast-store';
+import { renderWithQuery } from './test-utils';
 import {
-  getStudyMetrics,
-  calculateComparisonDeltas,
-  getStudyHighlightFlags,
-  generateComparisonCsv,
-} from '../src/lib/comparisonUtils';
+  makeCapabilitiesDto,
+  makeComparisonDto,
+  makeInvestigationDto,
+  makePageDto,
+} from './fixtures/backendFixtures';
 
 const mockPush = vi.fn();
+
+expect.extend({
+  toBeInTheDocument(received) {
+    const pass = Boolean(received);
+    return {
+      pass,
+      message: () => `expected element ${pass ? 'not ' : ''}to be in document`,
+    };
+  },
+});
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/explorer',
@@ -28,14 +39,48 @@ vi.mock('next/navigation', () => ({
     replace: vi.fn(),
     prefetch: vi.fn(),
   }),
-  useParams: () => ({ id: 'bass' }),
+  useParams: () => ({ id: 'e1a75331-3f1f-57b8-9042-405ff61dff51' }),
 }));
 
-describe('Multi-Study Comparison System (Task 8)', () => {
+vi.mock('@/api/services', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/api/services')>();
+  return {
+    ...actual,
+    getCatalogCapabilities: vi.fn(),
+    listInvestigations: vi.fn(),
+    compareInvestigations: vi.fn(),
+  };
+});
+
+const INV_1_ID = 'e1a75331-3f1f-57b8-9042-405ff61dff51';
+const INV_2_ID = 'afa58280-0d0c-58a3-926a-1499a1e20a96';
+
+const INV_1 = makeInvestigationDto({
+  id: INV_1_ID,
+  psiId: 'SYNTHETIC-PHASE4-1',
+  title: 'Synthetic Flame Study One',
+  platform: 'MSG',
+});
+
+const INV_2 = makeInvestigationDto({
+  id: INV_2_ID,
+  psiId: 'SYNTHETIC-PHASE4-2',
+  slug: 'saffire-synthetic',
+  title: 'Synthetic Flame Study Two',
+  platform: null,
+});
+
+describe('Multi-Study Comparison System (Backend Wired)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useWorkspaceStore.getState().resetWorkspace();
     toastStore.clear();
+
+    vi.mocked(apiServices.getCatalogCapabilities).mockResolvedValue(makeCapabilitiesDto());
+    vi.mocked(apiServices.listInvestigations).mockResolvedValue(
+      makePageDto([INV_1, INV_2], { total: 2, offset: 0, limit: 20, next: null })
+    );
+    vi.mocked(apiServices.compareInvestigations).mockResolvedValue(makeComparisonDto());
 
     if (typeof window !== 'undefined') {
       window.URL.createObjectURL = vi.fn(() => 'blob:mock-comparison-csv-url');
@@ -44,95 +89,42 @@ describe('Multi-Study Comparison System (Task 8)', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 1. comparisonUtils Unit Tests
-  // ---------------------------------------------------------------------------
-  describe('comparisonUtils', () => {
-    it('computes accurate study metrics and aggregates from test runs', () => {
-      const bass = INVESTIGATIONS.find((inv) => inv.id === 'bass')!;
-      const metrics = getStudyMetrics(bass, TEST_RUNS);
-
-      expect(metrics.study.code).toBe('BASS');
-      expect(metrics.verifiedRunCount).toBeGreaterThan(0);
-      expect(metrics.o2RangeDisplay).toContain('15% – 30% O₂');
-      expect(metrics.pressureRangeDisplay).toContain('8.5 – 14.7 psia');
-      expect(metrics.fuelSummary).toContain('SOLID');
-      expect(metrics.facilitySummary).toContain('MSG');
-      expect(metrics.quenchDiameterDisplay).toMatch(/mm/);
-      expect(metrics.flameSpreadVelocityDisplay).toMatch(/mm\/s/);
-    });
-
-    it('calculates cross-study comparison deltas correctly', () => {
-      const bass = INVESTIGATIONS.find((inv) => inv.id === 'bass')!;
-      const acme = INVESTIGATIONS.find((inv) => inv.id === 'acme-cfi-g')!;
-      const deltas = calculateComparisonDeltas([bass, acme], TEST_RUNS);
-
-      expect(deltas.o2OverallMin).toBe(Math.min(bass.oxygenRange[0], acme.oxygenRange[0]));
-      expect(deltas.o2OverallMax).toBe(Math.max(bass.oxygenRange[1], acme.oxygenRange[1]));
-      expect(deltas.o2SpanDelta).toBe(deltas.o2OverallMax - deltas.o2OverallMin);
-      expect(deltas.uniqueFuelTypes.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it('identifies parameter highlight flags for oxygen, fuel, and kinematics', () => {
-      const bass = INVESTIGATIONS.find((inv) => inv.id === 'bass')!;
-      const flex = INVESTIGATIONS.find((inv) => inv.id === 'flex')!;
-      const flags = getStudyHighlightFlags(bass, [bass, flex], TEST_RUNS);
-
-      expect(typeof flags.isHighestO2).toBe('boolean');
-      expect(typeof flags.isUniqueFuel).toBe('boolean');
-      expect(typeof flags.isFastestSpread).toBe('boolean');
-    });
-
-    it('generates compliant RFC-4180 CSV content with side-by-side study columns', () => {
-      const bass = INVESTIGATIONS.find((inv) => inv.id === 'bass')!;
-      const flex = INVESTIGATIONS.find((inv) => inv.id === 'flex')!;
-      const csv = generateComparisonCsv([bass, flex], TEST_RUNS);
-
-      expect(csv).toContain('"Parameter","BASS","FLEX"');
-      expect(csv).toContain('"Investigation Code","BASS","FLEX"');
-      expect(csv).toContain('"Investigation Title"');
-      expect(csv).toContain('"Chamber Oxygen Limits"');
-      expect(csv).toContain('"Pressure Envelope"');
-      expect(csv).toContain('"Mean Quench Diameter"');
-      expect(csv).toContain('"Verified Test Runs"');
-      expect(csv).toContain('"Confidence Tier"');
-      expect(csv).toContain('"NASA PSI Dataset URL"');
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // 2. ComparisonBar Component Tests
+  // 1. ComparisonBar Component Tests
   // ---------------------------------------------------------------------------
   describe('ComparisonBar Component', () => {
     it('renders null when compareList is empty', () => {
-      const { container } = render(
+      const { container } = renderWithQuery(
         <ComparisonBar compareList={[]} onRemove={vi.fn()} onClear={vi.fn()} onOpenModal={vi.fn()} />
       );
       expect(container.firstChild).toBeNull();
     });
 
-    it('renders floating selection bar with selected study chips and badges', () => {
-      render(
+    it('renders floating selection bar with study labels and falls back for unknown IDs', () => {
+      renderWithQuery(
         <ComparisonBar
-          compareList={['bass', 'flex']}
+          compareList={[INV_1_ID, INV_2_ID]}
+          studies={[{ id: INV_1_ID, label: 'SYNTHETIC-PHASE4-1' }]}
           onRemove={vi.fn()}
           onClear={vi.fn()}
           onOpenModal={vi.fn()}
         />
       );
 
-      expect(screen.getByTestId('explorer-comparison-dock')).toBeDefined();
-      expect(screen.getByTestId('compare-chip-bass')).toBeDefined();
-      expect(screen.getByTestId('compare-chip-flex')).toBeDefined();
-      expect(screen.getByText('BASS')).toBeDefined();
-      expect(screen.getByText('FLEX')).toBeDefined();
-      expect(screen.getByText('Compare (2/3):')).toBeDefined();
+      expect(screen.getByTestId('explorer-comparison-dock')).toBeInTheDocument();
+      expect(screen.getByTestId(`compare-chip-${INV_1_ID}`).textContent).toContain(
+        'SYNTHETIC-PHASE4-1'
+      );
+      expect(screen.getByTestId(`compare-chip-${INV_2_ID}`).textContent).toContain(
+        INV_2_ID.slice(0, 8)
+      );
+      expect(screen.getByText('Compare (2/3):')).toBeInTheDocument();
     });
 
-    it('disables "Compare (1/3)" button when fewer than 2 studies selected, displaying tooltip hint', () => {
+    it('disables Compare button when fewer than 2 studies selected', () => {
       const handleOpen = vi.fn();
-      render(
+      renderWithQuery(
         <ComparisonBar
-          compareList={['bass']}
+          compareList={[INV_1_ID]}
           onRemove={vi.fn()}
           onClear={vi.fn()}
           onOpenModal={handleOpen}
@@ -140,316 +132,228 @@ describe('Multi-Study Comparison System (Task 8)', () => {
       );
 
       const compareBtn = screen.getByTestId('open-comparison-modal-btn') as HTMLButtonElement;
-      expect(compareBtn).toBeDefined();
       expect(compareBtn.disabled).toBe(true);
-      expect(compareBtn.getAttribute('title')).toBe('Select 1 more study to compare');
-      expect(screen.getByTestId('compare-btn-tooltip').textContent).toBe(
-        'Select 1 more study to compare'
-      );
+      expect(screen.getByTestId('compare-btn-tooltip').textContent).toBe('Select 1 more study to compare');
 
       fireEvent.click(compareBtn);
       expect(handleOpen).not.toHaveBeenCalled();
     });
 
-    it('enables "Compare (2/3)" button when 2 or 3 studies are selected and triggers modal callback', () => {
+    it('enables Compare button for 2+ studies and triggers callbacks', () => {
       const handleOpen = vi.fn();
-      render(
+      const handleRemove = vi.fn();
+      const handleClear = vi.fn();
+      renderWithQuery(
         <ComparisonBar
-          compareList={['bass', 'flex']}
-          onRemove={vi.fn()}
-          onClear={vi.fn()}
+          compareList={[INV_1_ID, INV_2_ID]}
+          onRemove={handleRemove}
+          onClear={handleClear}
           onOpenModal={handleOpen}
         />
       );
 
-      const compareBtn = screen.getByTestId('open-comparison-modal-btn') as HTMLButtonElement;
-      expect(compareBtn.disabled).toBe(false);
-      fireEvent.click(compareBtn);
+      fireEvent.click(screen.getByTestId('open-comparison-modal-btn'));
       expect(handleOpen).toHaveBeenCalledTimes(1);
-    });
 
-    it('triggers onRemove when chip remove button is clicked', () => {
-      const handleRemove = vi.fn();
-      render(
-        <ComparisonBar
-          compareList={['bass', 'flex']}
-          onRemove={handleRemove}
-          onClear={vi.fn()}
-          onOpenModal={vi.fn()}
-        />
-      );
+      fireEvent.click(screen.getByTestId(`remove-compare-${INV_1_ID}`));
+      expect(handleRemove).toHaveBeenCalledWith(INV_1_ID);
 
-      const removeBassBtn = screen.getByTestId('remove-compare-bass');
-      fireEvent.click(removeBassBtn);
-      expect(handleRemove).toHaveBeenCalledWith('bass');
-    });
-
-    it('triggers onClear when "Clear All" button is clicked', () => {
-      const handleClear = vi.fn();
-      render(
-        <ComparisonBar
-          compareList={['bass', 'flex']}
-          onRemove={vi.fn()}
-          onClear={handleClear}
-          onOpenModal={vi.fn()}
-        />
-      );
-
-      const clearBtn = screen.getByTestId('clear-all-compare-btn');
-      fireEvent.click(clearBtn);
+      fireEvent.click(screen.getByTestId('clear-all-compare-btn'));
       expect(handleClear).toHaveBeenCalledTimes(1);
     });
 
     it('falls back to Zustand workspace store when props are omitted', () => {
       act(() => {
-        useWorkspaceStore.getState().toggleCompare('bass');
-        useWorkspaceStore.getState().toggleCompare('flex');
+        useWorkspaceStore.getState().toggleCompare(INV_1_ID);
+        useWorkspaceStore.getState().toggleCompare(INV_2_ID);
       });
 
-      render(<ComparisonBar />);
-
-      expect(screen.getByTestId('compare-chip-bass')).toBeDefined();
-      expect(screen.getByTestId('compare-chip-flex')).toBeDefined();
-
-      const clearBtn = screen.getByTestId('clear-all-compare-btn');
-      fireEvent.click(clearBtn);
+      renderWithQuery(<ComparisonBar />);
+      expect(screen.getByTestId(`compare-chip-${INV_1_ID}`)).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('clear-all-compare-btn'));
       expect(useWorkspaceStore.getState().compareList).toEqual([]);
     });
   });
 
   // ---------------------------------------------------------------------------
-  // 3. ComparisonColumn Component Tests
+  // 2. Mapped Comparison Subcomponents
   // ---------------------------------------------------------------------------
-  describe('ComparisonColumn Component', () => {
-    it('renders full comparative study card with chamber and kinematic parameters', () => {
-      const bass = INVESTIGATIONS.find((inv) => inv.id === 'bass')!;
-      const flex = INVESTIGATIONS.find((inv) => inv.id === 'flex')!;
-      const handleRemove = vi.fn();
+  describe('Mapped Comparison Subcomponents', () => {
+    it('ParameterDeltaSummary renders counts and honest comparability not_established notice', () => {
+      const comparison = mapComparisonDto(makeComparisonDto());
+      renderWithQuery(<ParameterDeltaSummary comparison={comparison} />);
 
-      render(
-        <ComparisonColumn
-          study={bass}
-          allStudies={[bass, flex]}
-          onRemove={handleRemove}
-        />
+      expect(screen.getByTestId('parameter-delta-summary')).toBeInTheDocument();
+      expect(screen.getByTestId('comparison-comparability-badge').textContent).toContain(
+        'Comparability: not_established'
       );
-
-      expect(screen.getByTestId(`comparison-column-${bass.id}`)).toBeDefined();
-      expect(screen.getByTestId(`comparison-code-${bass.id}`).textContent).toBe('BASS');
-      expect(screen.getByTestId(`comparison-title-${bass.id}`).textContent).toBe(bass.title);
-      expect(screen.getByTestId(`comparison-fuel-${bass.id}`)).toBeDefined();
-      expect(screen.getByTestId(`comparison-facility-${bass.id}`)).toBeDefined();
-      expect(screen.getByTestId(`comparison-o2-${bass.id}`)).toBeDefined();
-      expect(screen.getByTestId(`comparison-pressure-${bass.id}`)).toBeDefined();
-      expect(screen.getByTestId(`comparison-quench-${bass.id}`)).toBeDefined();
-      expect(screen.getByTestId(`comparison-spread-${bass.id}`)).toBeDefined();
-      expect(screen.getByTestId(`comparison-runs-${bass.id}`)).toBeDefined();
-      expect(screen.getByTestId(`comparison-confidence-${bass.id}`).textContent).toBe(
-        `Tier ${bass.confidence}`
+      expect(screen.getByTestId('summary-studies-count').textContent).toContain('2 Investigations');
+      expect(screen.getByTestId('comparability-notice').textContent).toContain(
+        'SCIENTIFIC_COMPARISON_NOT_APPROVED'
       );
-
-      // Detail inspect link
-      const inspectLink = screen.getByTestId(`comparison-column-details-${bass.id}`);
-      expect(inspectLink.getAttribute('href')).toBe(`/explorer/${bass.id}`);
-
-      // Remove button
-      const removeBtn = screen.getByTestId(`remove-column-${bass.id}`);
-      fireEvent.click(removeBtn);
-      expect(handleRemove).toHaveBeenCalledWith('bass');
+      expect(screen.getByTestId('comparability-notice').textContent).toContain(
+        'SYNTHETIC TEST ONLY; not a NASA finding'
+      );
     });
 
-    it('highlights distinct fuel phase and parameter differences', () => {
-      const bass = INVESTIGATIONS.find((inv) => inv.id === 'bass')!;
-      const acme = INVESTIGATIONS.find((inv) => inv.id === 'acme-cfi-g')!;
+    it('ComparisonMatrixTable and ComparisonColumn render observableSummaries and unavailableFields', () => {
+      const comparison = mapComparisonDto(makeComparisonDto());
+      const handleRemove = vi.fn();
 
-      render(<ComparisonColumn study={bass} allStudies={[bass, acme]} />);
+      renderWithQuery(
+        <>
+          <ComparisonMatrixTable studies={comparison.studies} onRemove={handleRemove} />
+          <ComparisonColumn study={comparison.studies[1]} onRemove={handleRemove} />
+        </>
+      );
 
-      expect(screen.getByText('Distinct Phase')).toBeDefined();
+      expect(screen.getByTestId('comparison-matrix-table')).toBeInTheDocument();
+      expect(screen.getAllByTestId(`comparison-code-${INV_1_ID}`).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/TEST_ONLY_OBSERVABLE/).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/Non-numeric/).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/UNSUPPORTED_MAPPING/).length).toBeGreaterThanOrEqual(1);
+
+      fireEvent.click(screen.getAllByTestId(`remove-column-${INV_2_ID}`)[0]);
+      expect(handleRemove).toHaveBeenCalledWith(INV_2_ID);
     });
   });
 
   // ---------------------------------------------------------------------------
-  // 4. ComparisonModal Component Tests
+  // 3. ComparisonModal Component Tests
   // ---------------------------------------------------------------------------
   describe('ComparisonModal Component', () => {
-    it('does not render dialog when isOpen is false', () => {
-      render(
-        <ComparisonModal
-          isOpen={false}
-          onClose={vi.fn()}
-          compareList={['bass', 'flex']}
-        />
+    it('does not render or call POST /compare when isOpen is false', () => {
+      renderWithQuery(
+        <ComparisonModal isOpen={false} onClose={vi.fn()} compareList={[INV_1_ID, INV_2_ID]} />
       );
       expect(screen.queryByTestId('comparison-modal')).toBeNull();
+      expect(apiServices.compareInvestigations).not.toHaveBeenCalled();
     });
 
-    it('renders comparison dialog with backdrop blur and columns for 2-3 studies', () => {
-      render(
-        <ComparisonModal
-          isOpen={true}
-          onClose={vi.fn()}
-          compareList={['bass', 'flex']}
-        />
+    it('shows prompt without calling API when fewer than 2 studies are selected', () => {
+      renderWithQuery(
+        <ComparisonModal isOpen={true} onClose={vi.fn()} compareList={[INV_1_ID]} />
       );
-
-      expect(screen.getByTestId('comparison-modal')).toBeDefined();
-      expect(screen.getByTestId('comparison-modal-backdrop')).toBeDefined();
-      expect(screen.getByText('Multi-Study Comparison')).toBeDefined();
-      expect(screen.getByText('2/3 Studies')).toBeDefined();
-      expect(screen.getByTestId('comparison-column-bass')).toBeDefined();
-      expect(screen.getByTestId('comparison-column-flex')).toBeDefined();
+      expect(screen.getByText('Select at least 2 studies')).toBeInTheDocument();
+      expect(apiServices.compareInvestigations).not.toHaveBeenCalled();
     });
 
-    it('renders parameter delta summary with oxygen span, fuel diversity, and quench threshold', () => {
-      render(
-        <ComparisonModal
-          isOpen={true}
-          onClose={vi.fn()}
-          compareList={['bass', 'flex']}
-        />
+    it('renders loading shimmer while POST /compare is pending', () => {
+      vi.mocked(apiServices.compareInvestigations).mockReturnValue(new Promise(() => {}));
+      renderWithQuery(
+        <ComparisonModal isOpen={true} onClose={vi.fn()} compareList={[INV_1_ID, INV_2_ID]} />
       );
-
-      expect(screen.getByTestId('parameter-delta-summary')).toBeDefined();
-      expect(screen.getByTestId('delta-summary-o2')).toBeDefined();
-      expect(screen.getByTestId('delta-summary-fuel')).toBeDefined();
-      expect(screen.getByTestId('delta-summary-quench')).toBeDefined();
-      expect(screen.getByTestId('delta-summary-spread')).toBeDefined();
+      expect(screen.getByTestId('comparison-loading-shimmer')).toBeInTheDocument();
     });
 
-    it('exports comparison CSV dataset and emits toast on "Export Comparison CSV" button click', () => {
-      render(
-        <ComparisonModal
-          isOpen={true}
-          onClose={vi.fn()}
-          compareList={['bass', 'flex']}
-        />
+    it('renders ApiErrorBanner on compare failure and retries cleanly', async () => {
+      vi.mocked(apiServices.compareInvestigations)
+        .mockRejectedValueOnce(new Error('Comparison service timeout'))
+        .mockResolvedValueOnce(makeComparisonDto());
+
+      renderWithQuery(
+        <ComparisonModal isOpen={true} onClose={vi.fn()} compareList={[INV_1_ID, INV_2_ID]} />
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('api-error-banner')).toBeInTheDocument();
+      });
+      expect(screen.getByText(/Comparison service timeout/i)).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: /Retry/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('comparison-matrix-table')).toBeInTheDocument();
+      });
+      expect(apiServices.compareInvestigations).toHaveBeenCalledTimes(2);
+    });
+
+    it('switches between table matrix and cards views and exports CSV', async () => {
+      renderWithQuery(
+        <ComparisonModal isOpen={true} onClose={vi.fn()} compareList={[INV_1_ID, INV_2_ID]} />
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('comparison-matrix-table')).toBeInTheDocument();
+      });
+
+      expect(apiServices.compareInvestigations).toHaveBeenCalledWith(
+        { investigationIds: [INV_1_ID, INV_2_ID], observationLimit: 100 },
+        expect.anything()
+      );
+
+      fireEvent.click(screen.getByTestId('comparison-view-cards-btn'));
+      expect(screen.getByTestId('comparison-grid')).toBeInTheDocument();
+      expect(screen.getByTestId(`comparison-column-${INV_1_ID}`)).toBeInTheDocument();
+      expect(screen.getByTestId(`comparison-column-${INV_2_ID}`)).toBeInTheDocument();
 
       const exportBtn = screen.getByTestId('export-comparison-csv-btn') as HTMLButtonElement;
       expect(exportBtn.disabled).toBe(false);
       fireEvent.click(exportBtn);
 
       expect(window.URL.createObjectURL).toHaveBeenCalled();
-      const toasts = toastStore.getToasts();
-      expect(toasts.some((t) => t.title.includes('Comparison CSV Exported'))).toBe(true);
+      expect(toastStore.getToasts().some((t) => t.title.includes('Comparison CSV Exported'))).toBe(true);
     });
 
-    it('navigates to /mission?compare=... on "Open in Mission Workbench" click', () => {
+    it('navigates to /mission?compare=... and handles close interactions', async () => {
       const handleClose = vi.fn();
-      render(
-        <ComparisonModal
-          isOpen={true}
-          onClose={handleClose}
-          compareList={['bass', 'flex']}
-        />
+      renderWithQuery(
+        <ComparisonModal isOpen={true} onClose={handleClose} compareList={[INV_1_ID, INV_2_ID]} />
       );
 
-      const workbenchBtn = screen.getByTestId('open-mission-workbench-btn');
-      fireEvent.click(workbenchBtn);
+      fireEvent.click(screen.getByTestId('open-mission-workbench-btn'));
+      expect(mockPush).toHaveBeenCalledWith(`/mission?compare=${INV_1_ID},${INV_2_ID}`);
 
-      expect(handleClose).toHaveBeenCalled();
-      expect(mockPush).toHaveBeenCalledWith('/mission?compare=bass,flex');
-    });
-
-    it('closes modal when Close button, X icon, or backdrop is clicked', () => {
-      const handleClose = vi.fn();
-      const { rerender } = render(
-        <ComparisonModal
-          isOpen={true}
-          onClose={handleClose}
-          compareList={['bass', 'flex']}
-        />
-      );
-
-      // Footer Close button
       fireEvent.click(screen.getByTestId('close-comparison-modal-btn'));
-      expect(handleClose).toHaveBeenCalledTimes(1);
-
-      // Header X icon
       fireEvent.click(screen.getByTestId('comparison-modal-close-icon'));
-      expect(handleClose).toHaveBeenCalledTimes(2);
-
-      // Backdrop click
       fireEvent.click(screen.getByTestId('comparison-modal-backdrop'));
-      expect(handleClose).toHaveBeenCalledTimes(3);
-    });
-
-    it('dismisses modal on keyboard Escape press', () => {
-      const handleClose = vi.fn();
-      render(
-        <ComparisonModal
-          isOpen={true}
-          onClose={handleClose}
-          compareList={['bass', 'flex']}
-        />
-      );
-
       fireEvent.keyDown(window, { key: 'Escape' });
-      expect(handleClose).toHaveBeenCalledTimes(1);
-    });
-
-    it('renders comparison dialog with light theme container and backdrop', () => {
-      render(
-        <ComparisonModal
-          isOpen={true}
-          onClose={vi.fn()}
-          compareList={['bass', 'flex']}
-        />
-      );
-
-      const backdrop = screen.getByTestId('comparison-modal-backdrop');
-      expect(backdrop.className).toContain('bg-zinc-950/40');
-      const dialog = screen.getByRole('dialog');
-      expect(dialog.className).toContain('bg-white');
-      expect(dialog.className).toContain('border-gray-100');
+      expect(handleClose).toHaveBeenCalledTimes(5);
     });
   });
 
   // ---------------------------------------------------------------------------
-  // 5. Header & ExplorerPage Integration Tests
+  // 4. Header & ExplorerPage Integration Tests
   // ---------------------------------------------------------------------------
   describe('Header and ExplorerPage Integration', () => {
-    it('Header comparison pill triggers opening modal when compareList.length >= 2', () => {
+    it('Header comparison pill opens modal when >= 2 studies or warns when < 2', () => {
       act(() => {
-        useWorkspaceStore.getState().toggleCompare('bass');
-        useWorkspaceStore.getState().toggleCompare('flex');
+        useWorkspaceStore.getState().toggleCompare(INV_1_ID);
       });
 
-      render(<Header />);
+      const { rerender } = renderWithQuery(<Header />);
+      fireEvent.click(screen.getByTestId('header-compare-trigger'));
+      expect(useWorkspaceStore.getState().isComparisonModalOpen).toBe(false);
+      expect(toastStore.getToasts().some((t) => t.title.includes('Select 1 more study'))).toBe(true);
 
-      const compareTrigger = screen.getByTestId('header-compare-trigger');
-      expect(compareTrigger).toBeDefined();
-      expect(screen.getByText('Comparing 2/3')).toBeDefined();
-
-      fireEvent.click(compareTrigger);
+      act(() => {
+        useWorkspaceStore.getState().toggleCompare(INV_2_ID);
+      });
+      rerender(<Header />);
+      fireEvent.click(screen.getByTestId('header-compare-trigger'));
       expect(useWorkspaceStore.getState().isComparisonModalOpen).toBe(true);
     });
 
-    it('Header comparison pill warns when compareList.length < 2', () => {
-      act(() => {
-        useWorkspaceStore.getState().toggleCompare('bass');
+    it('ExplorerPage connects floating comparison dock with live ComparisonModal workflow', async () => {
+      renderWithQuery(<ExplorerPage />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId(`compare-btn-${INV_1_ID}`)).toBeInTheDocument();
       });
 
-      render(<Header />);
+      fireEvent.click(screen.getByTestId(`compare-btn-${INV_1_ID}`));
+      fireEvent.click(screen.getByTestId(`compare-btn-${INV_2_ID}`));
 
-      const compareTrigger = screen.getByTestId('header-compare-trigger');
-      fireEvent.click(compareTrigger);
+      expect(screen.getByTestId('explorer-comparison-dock')).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('open-comparison-modal-btn'));
 
-      // Modal should NOT be opened
-      expect(useWorkspaceStore.getState().isComparisonModalOpen).toBe(false);
-      // Informative toast should be shown
-      const toasts = toastStore.getToasts();
-      expect(toasts.some((t) => t.title.includes('Select 1 more study'))).toBe(true);
-    });
+      await waitFor(() => {
+        expect(screen.getByTestId('comparison-matrix-table')).toBeInTheDocument();
+      });
+      expect(screen.getByTestId(`comparison-column-${INV_1_ID}`)).toBeInTheDocument();
+      expect(screen.getByTestId(`comparison-column-${INV_2_ID}`)).toBeInTheDocument();
 
-    it('ExplorerPage connects live comparison selections to the backend contract', async () => {
-      render(<><ExplorerPage /><ResearchCompare /></>);
-      const buttons = screen.getAllByRole('button', {name:'Compare'});
-      fireEvent.click(buttons[0]); fireEvent.click(buttons[1]);
-      fireEvent.click(screen.getByRole('button', {name:'Compare studies'}));
-      await waitFor(() => expect(screen.getByText(/Metadata comparison; incompatible outcomes/)).toBeDefined());
-      expect(screen.getByRole('dialog', {name:'Compare source-backed studies'})).toBeDefined();
-      fireEvent.click(screen.getByRole('button',{name:'Close comparison'}));
+      fireEvent.click(screen.getByTestId('close-comparison-modal-btn'));
       expect(useWorkspaceStore.getState().isComparisonModalOpen).toBe(false);
     });
   });

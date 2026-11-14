@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -12,11 +12,18 @@ import {
   Download,
   Gauge,
 } from 'lucide-react';
-import type { Investigation } from '@/types';
-import { INVESTIGATIONS } from '@/data/investigations';
-import { TEST_RUNS } from '@/data/testRuns';
-import { EVIDENCE_CLAIMS } from '@/data/evidenceClaims';
+import { ApiClientError } from '@/api/client';
+import {
+  useInvestigationClaimsQuery,
+  useInvestigationDetailQuery,
+  useInvestigationMeasurementsQuery,
+  useInvestigationRunsQuery,
+  useInvestigationSourcesQuery,
+} from '@/hooks/api';
+import type { MappedInvestigationDetail } from '@/types/api';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
+import { StudyDetailShimmer } from '@/components/explorer/detail/StudyDetailShimmer';
 import { StudyHeader } from '@/components/explorer/detail/StudyHeader';
 import { ChamberOverviewTab } from '@/components/explorer/detail/ChamberOverviewTab';
 import { TestRunsTable } from '@/components/explorer/detail/TestRunsTable';
@@ -30,23 +37,31 @@ export type StudyDetailTab = 'overview' | 'runs' | 'telemetry' | 'claims' | 'psi
 
 export interface StudyDetailClientProps {
   params?: Promise<{ id: string }>;
-  investigation?: Investigation;
+  study?: MappedInvestigationDetail;
 }
 
-export function StudyDetailClient({ params, investigation: propsInvestigation }: StudyDetailClientProps) {
+function isEntityNotFoundError(error: unknown): boolean {
+  if (error instanceof ApiClientError) {
+    return error.status === 404 || error.code === 'ENTITY_NOT_FOUND';
+  }
+  if (typeof error === 'object' && error !== null) {
+    const rec = error as { status?: unknown; code?: unknown };
+    return rec.status === 404 || rec.code === 'ENTITY_NOT_FOUND';
+  }
+  return false;
+}
+
+export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClientProps) {
   const routerParams = useParams();
   const unwrappedParams = params ? React.use(params) : undefined;
 
   const id = useMemo(() => {
-    if (propsInvestigation?.id) return propsInvestigation.id;
+    if (propsStudy?.id) return propsStudy.id;
     if (routerParams?.id) {
       return Array.isArray(routerParams.id) ? routerParams.id[0] : routerParams.id;
     }
-    if (unwrappedParams?.id) {
-      return unwrappedParams.id;
-    }
-    return '';
-  }, [propsInvestigation, routerParams, unwrappedParams]);
+    return unwrappedParams?.id ?? '';
+  }, [propsStudy, routerParams, unwrappedParams]);
 
   const [activeTab, setActiveTab] = useState<StudyDetailTab>('overview');
 
@@ -57,22 +72,41 @@ export function StudyDetailClient({ params, investigation: propsInvestigation }:
   const isComparisonModalOpen = useWorkspaceStore((state) => state.isComparisonModalOpen);
   const setComparisonModalOpen = useWorkspaceStore((state) => state.setComparisonModalOpen);
 
-  const study = useMemo(() => {
-    if (propsInvestigation) return propsInvestigation;
-    return INVESTIGATIONS.find((inv) => inv.id === id);
-  }, [propsInvestigation, id]);
+  const detailQuery = useInvestigationDetailQuery(id, {
+    enabled: !propsStudy && Boolean(id),
+  });
+  const study = propsStudy ?? detailQuery.data;
+  const resolvedStudyId = study?.id ?? null;
 
-  const studyRuns = useMemo(() => {
-    if (!study) return [];
-    return TEST_RUNS.filter((r) => r.investigationId === study.id);
-  }, [study]);
+  const runsQuery = useInvestigationRunsQuery(resolvedStudyId, { limit: 100 });
+  const measurementsQuery = useInvestigationMeasurementsQuery(resolvedStudyId, { limit: 100 });
+  const sourcesQuery = useInvestigationSourcesQuery(resolvedStudyId, { limit: 100 });
+  const claimsQuery = useInvestigationClaimsQuery(resolvedStudyId, { limit: 100 });
 
-  const studyClaims = useMemo(() => {
-    if (!study) return [];
-    return EVIDENCE_CLAIMS.filter((c) => c.investigationId === study.id);
-  }, [study]);
+  if (!propsStudy && detailQuery.isLoading) {
+    return <StudyDetailShimmer />;
+  }
 
-  // Not Found State
+  if (!propsStudy && detailQuery.isError && !isEntityNotFoundError(detailQuery.error)) {
+    return (
+      <div className="w-full max-w-4xl mx-auto py-10 px-4 space-y-4">
+        <ApiErrorBanner
+          title="Unable to load investigation details"
+          error={detailQuery.error}
+          onRetry={() => detailQuery.refetch()}
+          isRetrying={detailQuery.isFetching}
+        />
+        <Link
+          href="/explorer"
+          className="inline-flex items-center gap-2 text-xs font-bold text-[#0B2374] hover:underline"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Return to Experiment Explorer</span>
+        </Link>
+      </div>
+    );
+  }
+
   if (!study) {
     return (
       <div
@@ -85,7 +119,8 @@ export function StudyDetailClient({ params, investigation: propsInvestigation }:
         <div className="space-y-2">
           <h1 className="text-2xl font-black text-zinc-950">Investigation Not Found</h1>
           <p className="text-sm text-zinc-600 max-w-md mx-auto">
-            The requested NASA PSI study identifier &ldquo;<span className="text-[#0B2374] font-bold">{id}</span>&rdquo; could not be found in the current catalog.
+            The requested NASA PSI study identifier &ldquo;
+            <span className="text-[#0B2374] font-bold">{id}</span>&rdquo; could not be found in the current catalog.
           </p>
         </div>
         <div>
@@ -102,34 +137,21 @@ export function StudyDetailClient({ params, investigation: propsInvestigation }:
     );
   }
 
+  const runs = runsQuery.data?.items ?? [];
+  const observations = measurementsQuery.data?.items ?? [];
+  const sources = sourcesQuery.data?.items ?? [];
+  const claims = claimsQuery.data?.items ?? [];
+
+  const runsCount = runsQuery.data?.total ?? study.runsMeta.total;
+  const claimsCount = claimsQuery.data?.total ?? study.claimsMeta.total;
   const isComparing = compareList.includes(study.id);
 
   const TABS = [
-    {
-      id: 'overview' as const,
-      label: 'Chamber Overview',
-      icon: Gauge,
-    },
-    {
-      id: 'runs' as const,
-      label: `Test Runs (${studyRuns.length})`,
-      icon: Activity,
-    },
-    {
-      id: 'telemetry' as const,
-      label: 'Telemetry Curves',
-      icon: Flame,
-    },
-    {
-      id: 'claims' as const,
-      label: `Claims (${studyClaims.length})`,
-      icon: FileText,
-    },
-    {
-      id: 'psi-export' as const,
-      label: 'PSI Raw Export',
-      icon: Download,
-    },
+    { id: 'overview' as const, label: 'Chamber Overview', icon: Gauge },
+    { id: 'runs' as const, label: `Test Runs (${runsCount})`, icon: Activity },
+    { id: 'telemetry' as const, label: 'Conditions & Observations', icon: Flame },
+    { id: 'claims' as const, label: `Claims (${claimsCount})`, icon: FileText },
+    { id: 'psi-export' as const, label: 'PSI Raw Export', icon: Download },
   ];
 
   return (
@@ -137,14 +159,13 @@ export function StudyDetailClient({ params, investigation: propsInvestigation }:
       data-testid="study-detail-page"
       className="w-full max-w-7xl mx-auto space-y-6 py-2 pb-24"
     >
-      {/* Study Header Banner */}
       <StudyHeader
         study={study}
+        sources={sources}
         isComparing={isComparing}
         onToggleCompare={toggleCompare}
       />
 
-      {/* StructPaper Pill Tabs Navigation Bar */}
       <div
         data-testid="study-tabs-nav"
         className="flex items-center gap-1.5 overflow-x-auto p-1.5 rounded-2xl bg-gray-100/80 border border-gray-200/60"
@@ -171,24 +192,66 @@ export function StudyDetailClient({ params, investigation: propsInvestigation }:
         })}
       </div>
 
-      {/* Active Tab Content */}
       <section aria-label="Tab Content" className="transition-all duration-200">
-        {activeTab === 'overview' && <ChamberOverviewTab study={study} />}
-        {activeTab === 'runs' && <TestRunsTable study={study} />}
-        {activeTab === 'telemetry' && <TelemetryPane study={study} />}
-        {activeTab === 'claims' && <ClaimsList study={study} />}
-        {activeTab === 'psi-export' && <PsiExportTab study={study} />}
+        {activeTab === 'overview' && (
+          <ChamberOverviewTab
+            study={study}
+            sources={sources}
+            isSourcesLoading={sourcesQuery.isLoading}
+            sourcesError={sourcesQuery.error}
+            onRetrySources={() => sourcesQuery.refetch()}
+          />
+        )}
+        {activeTab === 'runs' && (
+          <TestRunsTable
+            study={study}
+            runs={runs}
+            isLoading={runsQuery.isLoading}
+            error={runsQuery.error}
+            onRetry={() => runsQuery.refetch()}
+          />
+        )}
+        {activeTab === 'telemetry' && (
+          <TelemetryPane
+            study={study}
+            runs={runs}
+            observations={observations}
+            isLoading={runsQuery.isLoading || measurementsQuery.isLoading}
+            error={runsQuery.error ?? measurementsQuery.error}
+            onRetry={() => {
+              runsQuery.refetch();
+              measurementsQuery.refetch();
+            }}
+          />
+        )}
+        {activeTab === 'claims' && (
+          <ClaimsList
+            study={study}
+            claims={claims}
+            isLoading={claimsQuery.isLoading}
+            error={claimsQuery.error}
+            onRetry={() => claimsQuery.refetch()}
+          />
+        )}
+        {activeTab === 'psi-export' && (
+          <PsiExportTab
+            study={study}
+            runs={runs}
+            observations={observations}
+            sources={sources}
+            claims={claims}
+          />
+        )}
       </section>
 
-      {/* Floating Comparison Dock */}
       <ComparisonBar
         compareList={compareList}
+        studies={[{ id: study.id, label: study.psiId }]}
         onRemove={removeFromCompare}
         onClear={clearCompare}
         onOpenModal={() => setComparisonModalOpen(true)}
       />
 
-      {/* Multi-Study Comparison Modal */}
       <ComparisonModal
         isOpen={isComparisonModalOpen}
         onClose={() => setComparisonModalOpen(false)}

@@ -3,18 +3,35 @@
 import React from 'react';
 import Link from 'next/link';
 import { Layers, X, Trash2, ArrowRight, Columns3 } from 'lucide-react';
-import { INVESTIGATIONS } from '@/data/investigations';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
+
+export interface ComparisonStudySummary {
+  id: string;
+  label: string;
+}
 
 export interface ComparisonBarProps {
   compareList?: string[];
+  studies?: ComparisonStudySummary[];
   onRemove?: (id: string) => void;
   onClear?: () => void;
   onOpenModal?: () => void;
 }
 
+function resolveStudyLabel(
+  id: string,
+  studies?: ComparisonStudySummary[]
+): string {
+  const match = studies?.find((item) => item.id === id);
+  if (match && match.label.trim().length > 0) {
+    return match.label;
+  }
+  return id.length > 12 ? id.slice(0, 8) : id;
+}
+
 export const ComparisonBar: React.FC<ComparisonBarProps> = ({
   compareList: propCompareList,
+  studies,
   onRemove: propOnRemove,
   onClear: propOnClear,
   onOpenModal: propOnOpenModal,
@@ -31,9 +48,10 @@ export const ComparisonBar: React.FC<ComparisonBarProps> = ({
 
   if (compareList.length === 0) return null;
 
-  const comparedStudies = compareList
-    .map((id) => INVESTIGATIONS.find((inv) => inv.id === id))
-    .filter((inv): inv is (typeof INVESTIGATIONS)[0] => inv !== undefined);
+  const comparedItems = compareList.map((id) => ({
+    id,
+    label: resolveStudyLabel(id, studies),
+  }));
 
   const canCompare = compareList.length >= 2;
   const remainingCount = 2 - compareList.length;
@@ -46,7 +64,7 @@ export const ComparisonBar: React.FC<ComparisonBarProps> = ({
     <aside
       aria-label="Study Comparison Dock"
       data-testid="explorer-comparison-dock"
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-4xl bg-white/60 backdrop-blur-sm rounded-full p-2.5 sm:p-3 border-2 border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] transition-all duration-300"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-4xl bg-white/80 backdrop-blur-sm rounded-full p-2.5 sm:p-3 border-2 border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.12)] transition-all duration-300"
     >
       <div className="flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Left: Indicator & Chips */}
@@ -55,24 +73,24 @@ export const ComparisonBar: React.FC<ComparisonBarProps> = ({
             <div className="w-6 h-6 rounded-full bg-[#0B2374]/10 text-[#0B2374] flex items-center justify-center">
               <Layers className="w-3.5 h-3.5" />
             </div>
-            <span>Compare ({comparedStudies.length}/3):</span>
+            <span>Compare ({comparedItems.length}/3):</span>
           </div>
 
           <div className="flex items-center gap-1.5">
-            {comparedStudies.map((study) => (
+            {comparedItems.map((item) => (
               <span
-                key={study.id}
-                data-testid={`compare-chip-${study.id}`}
+                key={item.id}
+                data-testid={`compare-chip-${item.id}`}
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200/80 border border-slate-200/60 text-xs text-slate-800 shrink-0 shadow-2xs font-bold transition-colors"
               >
-                <span className="font-extrabold text-[#0B2374]">{study.code}</span>
+                <span className="font-extrabold text-[#0B2374]">{item.label}</span>
                 <button
                   type="button"
-                  data-testid={`remove-compare-${study.id}`}
-                  onClick={() => onRemove(study.id)}
+                  data-testid={`remove-compare-${item.id}`}
+                  onClick={() => onRemove(item.id)}
                   className="p-0.5 rounded-full hover:bg-black/10 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
-                  title={`Remove ${study.code} from comparison`}
-                  aria-label={`Remove ${study.code} from comparison`}
+                  title={`Remove ${item.label} from comparison`}
+                  aria-label={`Remove ${item.label} from comparison`}
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -83,7 +101,6 @@ export const ComparisonBar: React.FC<ComparisonBarProps> = ({
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2 shrink-0 self-end md:self-auto flex-wrap pr-1">
-          {/* Clear All button */}
           <button
             type="button"
             data-testid="clear-all-compare-btn"
@@ -94,7 +111,6 @@ export const ComparisonBar: React.FC<ComparisonBarProps> = ({
             <span>Clear All</span>
           </button>
 
-          {/* Primary Compare (N/3) Button */}
           <div className="relative group">
             <button
               type="button"
@@ -109,10 +125,9 @@ export const ComparisonBar: React.FC<ComparisonBarProps> = ({
               }`}
             >
               <Columns3 className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Compare ({comparedStudies.length}/3)</span>
+              <span>Compare ({comparedItems.length}/3)</span>
             </button>
 
-            {/* Tooltip hint when disabled */}
             {!canCompare && (
               <span
                 role="tooltip"
@@ -124,7 +139,6 @@ export const ComparisonBar: React.FC<ComparisonBarProps> = ({
             )}
           </div>
 
-          {/* Mission Lab shortcut */}
           <Link
             href={`/mission?compare=${compareList.join(',')}`}
             data-testid="launch-comparison-btn"

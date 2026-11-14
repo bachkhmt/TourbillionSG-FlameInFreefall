@@ -6,33 +6,83 @@ import { motion } from 'framer-motion';
 import {
   Database,
   Flame,
-  Activity,
+  FileCheck2,
   Award,
   AlertTriangle,
   ArrowUpRight,
   ShieldAlert,
 } from 'lucide-react';
-import { INVESTIGATIONS } from '@/data/investigations';
-import { TEST_RUNS } from '@/data/testRuns';
-import { EVIDENCE_CLAIMS } from '@/data/evidenceClaims';
+import { useDashboardSummaryQuery } from '@/hooks/api';
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
+import type { MappedDashboardSummary } from '@/types/api';
 
-export const KpiStatCards: React.FC = () => {
-  const totalStudies = INVESTIGATIONS.length;
-  const totalTestRuns = TEST_RUNS.length;
-  const totalClaims = EVIDENCE_CLAIMS.length;
+export interface KpiStatCardsProps {
+  summary?: MappedDashboardSummary;
+}
+
+export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp }) => {
+  const summaryQuery = useDashboardSummaryQuery(undefined, {
+    enabled: summaryProp === undefined,
+  });
+
+  const summary = summaryProp ?? summaryQuery.data;
+
+  if (!summaryProp && summaryQuery.isLoading) {
+    return (
+      <div
+        data-testid="kpi-stat-cards-loading"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3"
+      >
+        {Array.from({ length: 5 }, (_, index) => (
+          <div
+            key={`kpi-skeleton-${index}`}
+            className="bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 min-h-[170px] animate-pulse"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (!summaryProp && summaryQuery.isError) {
+    return (
+      <ApiErrorBanner
+        title="Unable to load telemetry KPIs"
+        error={summaryQuery.error}
+        onRetry={() => summaryQuery.refetch()}
+        isRetrying={summaryQuery.isFetching}
+      />
+    );
+  }
+
+  if (!summary) return null;
+
+  const {
+    investigationCount,
+    runCount,
+    verifiedRunCount,
+    sourceCoverage,
+    claimCount,
+    sourceCount,
+    unavailableFields,
+  } = summary;
+
+  const coveragePctLabel =
+    sourceCoverage.percentage !== null
+      ? `${Math.round(sourceCoverage.percentage)}%`
+      : 'No denominator';
+
+  const verificationNote =
+    verifiedRunCount === null
+      ? `Verification not established (${unavailableFields.verifiedRunCount ?? 'UNVERIFIED'})`
+      : `${verifiedRunCount} verified test runs established.`;
 
   return (
     <section aria-label="Research Telemetry KPIs" className="w-full space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-black tracking-tight text-[#1A1A1A] flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#D4FC02]" />
-            NASA PSI Physical Science Telemetry
-          </h2>
-          <p className="text-xs sm:text-sm text-[#64748B]">
-            Real-time catalog metrics synthesized from NASA Physical Science Informatics (PSI) repository.
-          </p>
-        </div>
+        <h2 className="text-xl sm:text-2xl font-black tracking-tight text-[#1A1A1A] flex items-center gap-2.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#D4FC02]" />
+          NASA PSI Physical Science Telemetry
+        </h2>
       </div>
 
       <div
@@ -45,7 +95,7 @@ export const KpiStatCards: React.FC = () => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all flex flex-col justify-between min-h-[170px] cursor-pointer"
+          className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 transition-all flex flex-col justify-between min-h-[170px]"
         >
           <div>
             <div className="flex items-center justify-between mb-3">
@@ -57,24 +107,24 @@ export const KpiStatCards: React.FC = () => {
               </div>
             </div>
             <div className="text-3xl sm:text-4xl font-extrabold text-zinc-950 tracking-tight">
-              {totalStudies}
+              {investigationCount}
             </div>
             <div className="text-xs sm:text-sm font-semibold text-[#1A1A1A] mt-1">
               NASA PSI Studies
             </div>
           </div>
           <p className="text-[11px] text-[#64748B] mt-2 leading-relaxed">
-            Curated microgravity experiments across MSG, CIR &amp; Cygnus platforms.
+            Indexed investigations in collection {summary.context.collectionId}.
           </p>
         </motion.div>
 
-        {/* KPI 2: Verified Test Runs */}
+        {/* KPI 2: Experimental Test Runs */}
         <motion.div
           data-testid="kpi-runs"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all flex flex-col justify-between min-h-[170px] cursor-pointer"
+          className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 transition-all flex flex-col justify-between min-h-[170px]"
         >
           <div>
             <div className="flex items-center justify-between mb-3">
@@ -86,72 +136,72 @@ export const KpiStatCards: React.FC = () => {
               </div>
             </div>
             <div className="text-3xl sm:text-4xl font-extrabold text-zinc-950 tracking-tight">
-              {totalTestRuns}
+              {runCount}
             </div>
             <div className="text-xs sm:text-sm font-semibold text-[#1A1A1A] mt-1">
-              Verified Test Runs
+              Experimental Test Runs
             </div>
           </div>
           <p className="text-[11px] text-[#64748B] mt-2 leading-relaxed">
-            Complete physical boundary sets with radiometry, pyrometry &amp; spread rates.
+            {verificationNote}
           </p>
         </motion.div>
 
-        {/* KPI 3: Microgravity Data Points */}
+        {/* KPI 3: Source Coverage */}
         <motion.div
           data-testid="kpi-datapoints"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all flex flex-col justify-between min-h-[170px] cursor-pointer"
+          className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 transition-all flex flex-col justify-between min-h-[170px]"
         >
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold shadow-2xs bg-purple-50 text-purple-700 border border-purple-200/60">
-                Sensor Telemetry
+            <div className="flex items-center justify-between mb-3 gap-1">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold shadow-2xs bg-purple-50 text-purple-700 border border-purple-200/60 truncate">
+                {coveragePctLabel}
               </span>
-              <div className="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 border border-purple-100 group-hover:scale-110 transition-transform">
-                <Activity className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 border border-purple-100 group-hover:scale-110 transition-transform shrink-0">
+                <FileCheck2 className="w-4 h-4" />
               </div>
             </div>
             <div className="text-3xl sm:text-4xl font-extrabold text-zinc-950 tracking-tight">
-              10,000+
+              {sourceCoverage.numerator} / {sourceCoverage.denominator}
             </div>
             <div className="text-xs sm:text-sm font-semibold text-[#1A1A1A] mt-1">
-              Microgravity Data Points
+              Source Coverage
             </div>
           </div>
           <p className="text-[11px] text-[#64748B] mt-2 leading-relaxed">
-            Multi-channel time-series tracking flame standoff, soot &amp; thermal profiles.
+            Studies backed by mapped primary PSI source records.
           </p>
         </motion.div>
 
-        {/* KPI 4: Peer-Reviewed Evidence Claims */}
+        {/* KPI 4: Evidence Claims */}
         <motion.div
           data-testid="kpi-claims"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all flex flex-col justify-between min-h-[170px] cursor-pointer"
+          className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 transition-all flex flex-col justify-between min-h-[170px]"
         >
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold shadow-2xs bg-[#D4FC02]/20 text-zinc-950 border border-[#D4FC02]">
-                AIAA &amp; Combust. Flame
+                {sourceCount} Sources
               </span>
               <div className="w-8 h-8 rounded-xl bg-[#D4FC02]/25 flex items-center justify-center text-zinc-950 border border-[#D4FC02]/60 group-hover:scale-110 transition-transform">
                 <Award className="w-4 h-4" />
               </div>
             </div>
             <div className="text-3xl sm:text-4xl font-extrabold text-zinc-950 tracking-tight">
-              {totalClaims}
+              {claimCount}
             </div>
             <div className="text-xs sm:text-sm font-semibold text-[#1A1A1A] mt-1">
               Evidence Claims
             </div>
           </div>
           <p className="text-[11px] text-[#64748B] mt-2 leading-relaxed">
-            Scientifically validated claims with DOI provenance and confidence scores.
+            Extracted provenance claims linked across {sourceCount} indexed documents.
           </p>
         </motion.div>
 
@@ -161,7 +211,7 @@ export const KpiStatCards: React.FC = () => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="relative group bg-amber-100/60 rounded-[36px] p-5 hover:shadow-[0_8px_30px_rgba(245,158,11,0.15)] transition-all flex flex-col justify-between min-h-[170px] cursor-pointer"
+          className="relative group bg-amber-100/60 rounded-[36px] p-5 hover:shadow-[0_8px_30px_rgba(245,158,11,0.15)] transition-all flex flex-col justify-between min-h-[170px]"
         >
           <div>
             <div className="flex items-center justify-between mb-3">
