@@ -29,6 +29,7 @@ import type {
 } from '@/types/api';
 import {
   type ApiQueryOptions,
+  handleTimeoutFallback,
   isUuid,
   normalizeNonEmptyId,
   shouldFallback,
@@ -54,6 +55,7 @@ export function useCatalogCapabilitiesQuery(
         return mapCatalogCapabilitiesDto(dto);
       } catch (err) {
         if (shouldFallback(options?.enableFallback)) {
+          handleTimeoutFallback(err);
           return getMockCatalogCapabilities();
         }
         throw err;
@@ -80,6 +82,7 @@ export function useInvestigationsQuery(
         return mapPaginatedPage(page, mapInvestigationDto);
       } catch (err) {
         if (shouldFallback(options?.enableFallback)) {
+          handleTimeoutFallback(err);
           return getMockInvestigationsPage(params);
         }
         throw err;
@@ -110,6 +113,7 @@ export function useInvestigationDetailQuery(
         return mapInvestigationDetailDto(dto);
       } catch (err) {
         if (shouldFallback(options?.enableFallback)) {
+          handleTimeoutFallback(err);
           return getMockInvestigationDetail(trimmed);
         }
         throw err;

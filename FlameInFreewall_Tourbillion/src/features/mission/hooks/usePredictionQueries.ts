@@ -16,7 +16,7 @@ import {
   getMockPredictionResponse,
 } from '@/api/mockFallback';
 import type { ApiQueryOptions } from '@/hooks/api/queryHelpers';
-import { shouldFallback } from '@/hooks/api/queryHelpers';
+import { handleTimeoutFallback, shouldFallback } from '@/hooks/api/queryHelpers';
 import { apiQueryKeys } from '@/hooks/api/queryKeys';
 
 /**
@@ -35,6 +35,7 @@ export function usePredictionReadinessQuery(
         return await getPredictionReadiness(modelId, signal);
       } catch (err) {
         if (shouldFallback(options?.enableFallback)) {
+          handleTimeoutFallback(err);
           return getMockPredictionReadiness(modelId);
         }
         throw err;

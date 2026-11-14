@@ -3,9 +3,67 @@ import {
   type UseQueryOptions,
   type UseQueryResult,
 } from '@tanstack/react-query';
+import { ApiClientError } from '@/api/client';
 import type { PaginatedPageDto, PaginationParamsDto } from '@/api/dto';
 import { mapPaginatedPage } from '@/api/mappers';
+import { toast } from '@/components/toast/toast-store';
 import type { MappedPage } from '@/types/api';
+
+let lastTimeoutToastAt = 0;
+
+/**
+ * Resets the throttle timestamp for server timeout notifications (used in tests).
+ */
+export function resetTimeoutToastThrottle(): void {
+  lastTimeoutToastAt = 0;
+}
+
+/**
+ * Detects whether an error represents a server response timeout, socket hangup, or connection reset.
+ */
+export function isTimeoutError(error: unknown): boolean {
+  if (!error) return false;
+  if (error instanceof ApiClientError) {
+    if (error.code === 'REQUEST_TIMEOUT') return true;
+    if (
+      error.status === 0 ||
+      error.status === 500 ||
+      error.status === 502 ||
+      error.status === 503 ||
+      error.status === 504 ||
+      error.status === 408
+    ) {
+      return true;
+    }
+    if (/timeout|timed out|socket hang up|econnreset|internal server error/i.test(error.message)) {
+      return true;
+    }
+    return false;
+  }
+  if (error instanceof Error) {
+    const code = (error as { code?: string }).code;
+    if (code === 'ECONNABORTED' || code === 'ETIMEDOUT' || code === 'ECONNRESET') return true;
+    if (/timeout|timed out|socket hang up|econnreset|server error/i.test(error.message)) return true;
+    return false;
+  }
+  return false;
+}
+
+/**
+ * Displays a toast notification if the error is due to a server response timeout,
+ * throttled across concurrent query executions.
+ */
+export function handleTimeoutFallback(error?: unknown): void {
+  if (error && !isTimeoutError(error)) return;
+  const now = Date.now();
+  if (now - lastTimeoutToastAt > 4000) {
+    lastTimeoutToastAt = now;
+    toast.warning(
+      'Quá thời gian phản hồi server',
+      'Hệ thống chuyển sang chế độ dữ liệu dự phòng (Offline Fallback).'
+    );
+  }
+}
 
 /**
  * Shared TanStack Query option overrides omitting internally managed keys.
@@ -82,6 +140,7 @@ export function useScopedPaginatedQuery<TDto, TMapped>(
         return mapPaginatedPage(page, mapItem);
       } catch (err) {
         if (fallbackFetcher && shouldFallback(options?.enableFallback)) {
+          handleTimeoutFallback(err);
           return fallbackFetcher(trimmedId, pagination);
         }
         throw err;
