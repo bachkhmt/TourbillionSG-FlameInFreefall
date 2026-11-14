@@ -12,6 +12,12 @@ import {
   listRunConditions,
   listRunMeasurements,
 } from '@/api/services';
+import {
+  getMockConditions,
+  getMockObservationsPage,
+  getMockRunMeasurements,
+  getMockRunsPage,
+} from '@/api/mockFallback';
 import type {
   MappedCondition,
   MappedMeasurement,
@@ -37,6 +43,7 @@ export function useInvestigationRunsQuery(
     getQueryKey: apiQueryKeys.investigationRuns,
     fetcher: listInvestigationRuns,
     mapItem: mapRunDto,
+    fallbackFetcher: getMockRunsPage,
   });
 }
 
@@ -55,6 +62,7 @@ export function useRunConditionsQuery(
     getQueryKey: apiQueryKeys.runConditions,
     fetcher: listRunConditions,
     mapItem: mapConditionDto,
+    fallbackFetcher: getMockConditions,
   });
 }
 
@@ -73,6 +81,7 @@ export function useRunMeasurementsQuery(
     getQueryKey: apiQueryKeys.runMeasurements,
     fetcher: listRunMeasurements,
     mapItem: mapMeasurementDto,
+    fallbackFetcher: getMockRunMeasurements,
   });
 }
 
@@ -91,5 +100,6 @@ export function useInvestigationMeasurementsQuery(
     getQueryKey: apiQueryKeys.investigationMeasurements,
     fetcher: listInvestigationMeasurements,
     mapItem: mapObservationDto,
+    fallbackFetcher: getMockObservationsPage,
   });
 }

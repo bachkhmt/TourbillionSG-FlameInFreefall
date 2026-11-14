@@ -14,6 +14,12 @@ import {
   getInvestigationTags,
   listInvestigations,
 } from '@/api/services';
+import {
+  FALLBACK_CONTEXT,
+  getMockCatalogCapabilities,
+  getMockInvestigationDetail,
+  getMockInvestigationsPage,
+} from '@/api/mockFallback';
 import type {
   MappedCatalogCapabilities,
   MappedInvestigation,
@@ -24,6 +30,7 @@ import type {
 import {
   type ApiQueryOptions,
   normalizeNonEmptyId,
+  shouldFallback,
   useScopedPaginatedQuery,
 } from './queryHelpers';
 import { apiQueryKeys } from './queryKeys';
@@ -40,6 +47,7 @@ export function isUuid(value: string): boolean {
 
 /**
  * Queries backend catalog filter/sort capabilities (`GET /catalog/capabilities`).
+ * Seamlessly falls back to mock capabilities when backend is unavailable.
  */
 export function useCatalogCapabilitiesQuery(
   options?: ApiQueryOptions<MappedCatalogCapabilities>
@@ -47,14 +55,24 @@ export function useCatalogCapabilitiesQuery(
   return useQuery<MappedCatalogCapabilities, Error>({
     ...options,
     queryKey: apiQueryKeys.catalogCapabilities,
-    queryFn: async ({ signal }) =>
-      mapCatalogCapabilitiesDto(await getCatalogCapabilities(signal)),
+    queryFn: async ({ signal }) => {
+      try {
+        const dto = await getCatalogCapabilities(signal);
+        return mapCatalogCapabilitiesDto(dto);
+      } catch (err) {
+        if (shouldFallback(options?.enableFallback)) {
+          return getMockCatalogCapabilities();
+        }
+        throw err;
+      }
+    },
     enabled: options?.enabled ?? true,
   });
 }
 
 /**
  * Queries paginated investigations matching filter/sort parameters (`GET /investigations`).
+ * Seamlessly falls back to 20 NASA PSI offline studies when backend is unavailable.
  */
 export function useInvestigationsQuery(
   params?: InvestigationListParamsDto,
@@ -64,8 +82,15 @@ export function useInvestigationsQuery(
     ...options,
     queryKey: apiQueryKeys.investigations(params),
     queryFn: async ({ signal }) => {
-      const page = await listInvestigations(params, signal);
-      return mapPaginatedPage(page, mapInvestigationDto);
+      try {
+        const page = await listInvestigations(params, signal);
+        return mapPaginatedPage(page, mapInvestigationDto);
+      } catch (err) {
+        if (shouldFallback(options?.enableFallback)) {
+          return getMockInvestigationsPage(params);
+        }
+        throw err;
+      }
     },
     enabled: options?.enabled ?? true,
   });
@@ -73,6 +98,7 @@ export function useInvestigationsQuery(
 
 /**
  * Queries a single investigation by UUID or slug, guarded when empty.
+ * Seamlessly falls back to mock detail when backend is unavailable.
  */
 export function useInvestigationDetailQuery(
   idOrSlug: string | undefined | null,
@@ -84,10 +110,17 @@ export function useInvestigationDetailQuery(
     ...options,
     queryKey: apiQueryKeys.investigationDetail(trimmed),
     queryFn: async ({ signal }) => {
-      const dto = isUuid(trimmed)
-        ? await getInvestigationById(trimmed, signal)
-        : await getInvestigationBySlug(trimmed, signal);
-      return mapInvestigationDetailDto(dto);
+      try {
+        const dto = isUuid(trimmed)
+          ? await getInvestigationById(trimmed, signal)
+          : await getInvestigationBySlug(trimmed, signal);
+        return mapInvestigationDetailDto(dto);
+      } catch (err) {
+        if (shouldFallback(options?.enableFallback)) {
+          return getMockInvestigationDetail(trimmed);
+        }
+        throw err;
+      }
     },
     enabled: Boolean(trimmed) && (options?.enabled ?? true),
   });
@@ -108,5 +141,17 @@ export function useInvestigationTagsQuery(
     getQueryKey: apiQueryKeys.investigationTags,
     fetcher: getInvestigationTags,
     mapItem: mapTagDto,
+    fallbackFetcher: (id) => {
+      const detail = getMockInvestigationDetail(id);
+      return {
+        items: detail.tags,
+        total: detail.tagsTotal,
+        offset: 0,
+        limit: 20,
+        hasMore: false,
+        next: null,
+        context: FALLBACK_CONTEXT,
+      };
+    },
   });
 }

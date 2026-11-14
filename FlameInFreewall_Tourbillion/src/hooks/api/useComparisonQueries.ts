@@ -8,8 +8,10 @@ import {
 import type { ComparisonRequestDto } from '@/api/dto';
 import { mapComparisonDto } from '@/api/mappers';
 import { compareInvestigations } from '@/api/services';
+import { getMockComparisonResult } from '@/api/mockFallback';
 import type { MappedComparisonResult } from '@/types/api';
 import type { ApiQueryOptions } from './queryHelpers';
+import { shouldFallback } from './queryHelpers';
 import { apiQueryKeys } from './queryKeys';
 
 function normalizeComparisonIds(
@@ -28,6 +30,7 @@ function normalizeComparisonIds(
 /**
  * Queries side-by-side comparison across 2 to 3 distinct investigations (`POST /compare`).
  * Disabled automatically when distinct non-empty IDs fall outside `[2, 3]`.
+ * Seamlessly falls back to offline comparative analysis if backend is unavailable.
  */
 export function useComparisonQuery(
   investigationIds: string[],
@@ -41,9 +44,9 @@ export function useComparisonQuery(
   return useQuery<MappedComparisonResult, Error>({
     ...options,
     queryKey: apiQueryKeys.comparison(normalizedIds, pagination),
-    queryFn: async ({ signal }) =>
-      mapComparisonDto(
-        await compareInvestigations(
+    queryFn: async ({ signal }) => {
+      try {
+        const dto = await compareInvestigations(
           {
             investigationIds: normalizedIds,
             ...(pagination?.observationOffset !== undefined
@@ -54,8 +57,15 @@ export function useComparisonQuery(
               : {}),
           },
           signal
-        )
-      ),
+        );
+        return mapComparisonDto(dto);
+      } catch (err) {
+        if (shouldFallback(options?.enableFallback)) {
+          return getMockComparisonResult(normalizedIds);
+        }
+        throw err;
+      }
+    },
     enabled: isValidSelection && (options?.enabled ?? true),
   });
 }

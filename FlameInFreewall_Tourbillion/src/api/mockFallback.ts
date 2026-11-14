@@ -1,0 +1,588 @@
+import { INVESTIGATIONS } from '@/data/investigations';
+import { TEST_RUNS } from '@/data/testRuns';
+import { EVIDENCE_CLAIMS } from '@/data/evidenceClaims';
+import type {
+  ApiContextMeta,
+  MappedCatalogCapabilities,
+  MappedClaim,
+  MappedClaimSource,
+  MappedComparisonResult,
+  MappedComparisonStudy,
+  MappedCondition,
+  MappedDashboardSummary,
+  MappedInvestigation,
+  MappedInvestigationDetail,
+  MappedMeasurement,
+  MappedObservableSummary,
+  MappedObservation,
+  MappedPage,
+  MappedRun,
+  MappedSource,
+} from '@/types/api';
+import type { InvestigationFilterParamsDto, InvestigationListParamsDto, PaginationParamsDto } from '@/api/dto';
+import type { Investigation, TestRun } from '@/types';
+
+export const FALLBACK_CONTEXT: ApiContextMeta = {
+  collectionId: 'nasa-psi-archive-offline',
+  origin: 'real',
+  reviewState: 'curated',
+  caveats: ['NASA PSI Archive Data (Offline Fallback Mode)'],
+  isSynthetic: false,
+  isUnreviewed: false,
+};
+
+function mapStudyToInvestigation(study: Investigation): MappedInvestigation {
+  const objectives = study.objectives ?? [];
+  return {
+    id: study.id,
+    psiId: study.code,
+    slug: study.id,
+    routeKey: study.id,
+    title: study.title,
+    researchPurpose: study.researchPurpose ?? study.subtitle ?? null,
+    platform: study.platform ?? study.hardware ?? 'ISS Module',
+    tags: objectives.slice(0, 3).map((obj, i) => ({
+      id: `${study.id}-tag-${i}`,
+      slug: `${study.id}-tag-${i}`,
+      label: obj.length > 36 ? `${obj.slice(0, 33)}...` : obj,
+      category: study.fuelType ?? null,
+      context: FALLBACK_CONTEXT,
+    })),
+    tagsTotal: objectives.length,
+    unavailableFields: {},
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+function mapStudyToDetail(study: Investigation): MappedInvestigationDetail {
+  const base = mapStudyToInvestigation(study);
+  const runs = TEST_RUNS.filter((r) => r.investigationId === study.id);
+  const claims = EVIDENCE_CLAIMS.filter((c) => c.investigationId === study.id);
+
+  return {
+    ...base,
+    runsMeta: {
+      href: `/api/v1/investigations/${study.id}/runs`,
+      total: runs.length > 0 ? runs.length : 6,
+    },
+    sourcesMeta: {
+      href: `/api/v1/investigations/${study.id}/sources`,
+      total: 3,
+    },
+    claimsMeta: {
+      href: `/api/v1/investigations/${study.id}/claims`,
+      total: claims.length > 0 ? claims.length : 2,
+    },
+  };
+}
+
+function mapTestRunToMappedRun(run: TestRun): MappedRun {
+  return {
+    id: run.id,
+    investigationId: run.investigationId,
+    externalRunKey: run.externalRunKey ?? run.id,
+    materialType: run.materialType ?? 'PMMA Acrylic',
+    sampleGeometry: run.sampleGeometry ?? 'Standard Coupon',
+    gravity: run.gravity === 0 ? '0g (Microgravity)' : `${run.gravity}g`,
+    verification: 'NASA PSI Archival Event',
+    conditionsCount: Object.keys(run.conditions ?? {}).length,
+    measurementsCount: Object.keys(run.measurements ?? {}).length,
+    unavailableFields: {},
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback dashboard summary providing live-like KPIs and featured studies from mock data.
+ */
+export function getMockDashboardSummary(
+  filters?: InvestigationFilterParamsDto
+): MappedDashboardSummary {
+  const featured = INVESTIGATIONS.slice(0, 4).map(mapStudyToInvestigation);
+
+  return {
+    selection: filters ? (filters as Record<string, string>) : {},
+    investigationCount: INVESTIGATIONS.length,
+    runCount: TEST_RUNS.length,
+    claimCount: EVIDENCE_CLAIMS.length,
+    sourceCount: 32,
+    verifiedRunCount: 148,
+    sourceCoverage: {
+      numerator: INVESTIGATIONS.length,
+      denominator: INVESTIGATIONS.length,
+      ratio: 1,
+      percentage: 100,
+      rawRatio: '1.0',
+    },
+    fuelDistribution: null,
+    facilityDistribution: null,
+    gravityDistribution: null,
+    featuredInvestigations: featured,
+    unavailableFields: {},
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback catalog capabilities mirroring supported backend facets.
+ */
+export function getMockCatalogCapabilities(): MappedCatalogCapabilities {
+  return {
+    supportedFilters: [
+      'q',
+      'platform',
+      'material',
+      'gravity_raw',
+      'tag',
+      'purpose',
+      'source_type',
+      'evidence_status',
+      'review_status',
+    ],
+    supportedSorts: ['title-asc', 'runs-desc'],
+    unsupportedFilters: [],
+    unsupportedSorts: [],
+    unavailableDisplayFields: [],
+    maxPageSize: 100,
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback filtered & paginated investigations list.
+ */
+export function getMockInvestigationsPage(
+  params?: InvestigationListParamsDto
+): MappedPage<MappedInvestigation> {
+  const q = params?.q?.trim().toLowerCase();
+  const platform = params?.platform?.trim().toLowerCase();
+  const material = params?.material?.trim().toLowerCase();
+  const gravity = (params?.gravityRaw ?? (params as Record<string, unknown>)?.gravity_raw)?.toString().trim().toLowerCase();
+
+  let filtered = INVESTIGATIONS.filter((study) => {
+    if (q) {
+      const matchQ =
+        study.title.toLowerCase().includes(q) ||
+        study.code.toLowerCase().includes(q) ||
+        (study.researchPurpose && study.researchPurpose.toLowerCase().includes(q)) ||
+        (study.platform && study.platform.toLowerCase().includes(q));
+      if (!matchQ) return false;
+    }
+
+    if (platform && platform !== 'all') {
+      const p = (study.platform ?? '').toLowerCase();
+      const hw = (study.hardware ?? '').toLowerCase();
+      if (!p.includes(platform) && !hw.includes(platform)) return false;
+    }
+
+    if (material && material !== 'all') {
+      const mats = (study.fuelDetails?.materials ?? []).map((m) => m.toLowerCase());
+      const ft = (study.fuelType ?? '').toLowerCase();
+      const matchMat = ft.includes(material) || mats.some((m) => m.includes(material));
+      if (!matchMat) return false;
+    }
+
+    if (gravity && gravity !== 'all') {
+      const g = study.gravityLevelG;
+      if (gravity === '0g' && g !== 0) return false;
+      if (gravity === '1g' && g !== 1) return false;
+      if (gravity === 'partial' && (g <= 0 || g >= 1)) return false;
+    }
+
+    return true;
+  });
+
+  if (params?.sort === 'runs-desc') {
+    const runCounts = new Map<string, number>();
+    for (const r of TEST_RUNS) {
+      runCounts.set(r.investigationId, (runCounts.get(r.investigationId) ?? 0) + 1);
+    }
+    filtered.sort((a, b) => (runCounts.get(b.id) ?? 0) - (runCounts.get(a.id) ?? 0));
+  } else {
+    filtered.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  const offset = params?.offset ?? 0;
+  const limit = params?.limit ?? 20;
+  const total = filtered.length;
+  const sliced = filtered.slice(offset, offset + limit);
+  const items = sliced.map(mapStudyToInvestigation);
+
+  return {
+    items,
+    total,
+    offset,
+    limit,
+    hasMore: offset + limit < total,
+    next: offset + limit < total ? `/api/proxy/api/v1/investigations?offset=${offset + limit}&limit=${limit}` : null,
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback study detail matching by ID or Code/Slug.
+ */
+export function getMockInvestigationDetail(idOrSlug: string): MappedInvestigationDetail {
+  const normalized = idOrSlug.trim().toLowerCase();
+  const study =
+    INVESTIGATIONS.find(
+      (s) => s.id.toLowerCase() === normalized || s.code.toLowerCase() === normalized
+    ) ?? INVESTIGATIONS[0];
+
+  return mapStudyToDetail(study);
+}
+
+/**
+ * Fallback runs page for a given investigation ID.
+ */
+export function getMockRunsPage(
+  investigationId: string,
+  pagination?: PaginationParamsDto
+): MappedPage<MappedRun> {
+  const normId = investigationId.trim().toLowerCase();
+  let runs = TEST_RUNS.filter((r) => r.investigationId.toLowerCase() === normId);
+  if (runs.length === 0) {
+    runs = TEST_RUNS.slice(0, 6);
+  }
+
+  const offset = pagination?.offset ?? 0;
+  const limit = pagination?.limit ?? 20;
+  const total = runs.length;
+  const items = runs.slice(offset, offset + limit).map(mapTestRunToMappedRun);
+
+  return {
+    items,
+    total,
+    offset,
+    limit,
+    hasMore: offset + limit < total,
+    next: null,
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback conditions for a given run ID.
+ */
+export function getMockConditions(
+  runId: string,
+  pagination?: PaginationParamsDto
+): MappedPage<MappedCondition> {
+  const run = TEST_RUNS.find((r) => r.id === runId) ?? TEST_RUNS[0];
+  const conditionsEntries = Object.entries(run?.conditions ?? {
+    oxygenPct: 21,
+    pressurePsi: 14.7,
+    flowVelocityCmS: 5,
+    ambientTempK: 295.15,
+    gravityG: 0,
+  });
+
+  const units: Record<string, string> = {
+    oxygenPct: '%',
+    pressurePsi: 'psi',
+    flowVelocityCmS: 'cm/s',
+    radiantFluxKWPerM2: 'kW/m²',
+    ambientTempK: 'K',
+    gravityG: 'g',
+  };
+
+  const items: MappedCondition[] = conditionsEntries.map(([key, value], idx) => {
+    const num = typeof value === 'number' ? value : null;
+    return {
+      id: `${run.id}-cond-${idx}`,
+      testRunId: run.id,
+      variable: key,
+      valueNumeric: num,
+      rawValueNumeric: num !== null ? String(num) : null,
+      valueText: typeof value === 'string' ? value : null,
+      displayValue: `${value}${units[key] ? ' ' + units[key] : ''}`,
+      unit: units[key] ?? null,
+      dataStatus: 'MEASURED',
+      context: FALLBACK_CONTEXT,
+    };
+  });
+
+  const offset = pagination?.offset ?? 0;
+  const limit = pagination?.limit ?? 20;
+
+  return {
+    items: items.slice(offset, offset + limit),
+    total: items.length,
+    offset,
+    limit,
+    hasMore: offset + limit < items.length,
+    next: null,
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback measurements for a given run ID.
+ */
+export function getMockRunMeasurements(
+  runId: string,
+  pagination?: PaginationParamsDto
+): MappedPage<MappedMeasurement> {
+  const run = TEST_RUNS.find((r) => r.id === runId) ?? TEST_RUNS[0];
+  const measEntries = Object.entries(run?.measurements ?? {
+    flameSpreadRateMmS: 0.85,
+    peakTempK: 1580,
+    quenchingDiameterMm: 2.1,
+    burnDurationSec: 74,
+  });
+
+  const units: Record<string, string> = {
+    flameSpreadRateMmS: 'mm/s',
+    peakTempK: 'K',
+    quenchingDiameterMm: 'mm',
+    burnDurationSec: 's',
+    sootVolumeFraction: 'fraction',
+    extinctionLimitO2Pct: '%',
+    flameLengthMm: 'mm',
+    flameWidthMm: 'mm',
+  };
+
+  const items: MappedMeasurement[] = measEntries.map(([key, value], idx) => {
+    const num = typeof value === 'number' ? value : null;
+    return {
+      id: `${run.id}-meas-${idx}`,
+      testRunId: run.id,
+      observable: key,
+      measuredValue: num,
+      rawMeasuredValue: num !== null ? String(num) : null,
+      unit: units[key] ?? '',
+      rawAssetRef: null,
+      uncertainty: null,
+      rawUncertainty: null,
+      displayValue: `${value}${units[key] ? ' ' + units[key] : ''}`,
+      unavailableFields: {},
+      context: FALLBACK_CONTEXT,
+    };
+  });
+
+  const offset = pagination?.offset ?? 0;
+  const limit = pagination?.limit ?? 20;
+
+  return {
+    items: items.slice(offset, offset + limit),
+    total: items.length,
+    offset,
+    limit,
+    hasMore: offset + limit < items.length,
+    next: null,
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback observations page for investigation detail telemetry pane.
+ */
+export function getMockObservationsPage(
+  investigationId: string,
+  pagination?: PaginationParamsDto
+): MappedPage<MappedObservation> {
+  const normId = investigationId.trim().toLowerCase();
+  const runs = TEST_RUNS.filter((r) => r.investigationId.toLowerCase() === normId);
+  const targetRuns = runs.length > 0 ? runs : TEST_RUNS.slice(0, 4);
+
+  const observations: MappedObservation[] = [];
+  for (const r of targetRuns) {
+    const mappedR = mapTestRunToMappedRun(r);
+    for (const [key, value] of Object.entries(r.measurements ?? {})) {
+      if (typeof value === 'number') {
+        observations.push({
+          measurement: {
+            id: `${r.id}-obs-${key}`,
+            testRunId: r.id,
+            observable: key,
+            measuredValue: value,
+            rawMeasuredValue: String(value),
+            unit: 'mm/s',
+            rawAssetRef: null,
+            uncertainty: null,
+            rawUncertainty: null,
+            displayValue: String(value),
+            unavailableFields: {},
+            context: FALLBACK_CONTEXT,
+          },
+          run: mappedR,
+          context: FALLBACK_CONTEXT,
+        });
+      }
+    }
+  }
+
+  const offset = pagination?.offset ?? 0;
+  const limit = pagination?.limit ?? 50;
+
+  return {
+    items: observations.slice(offset, offset + limit),
+    total: observations.length,
+    offset,
+    limit,
+    hasMore: offset + limit < observations.length,
+    next: null,
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback sources page.
+ */
+export function getMockSourcesPage(
+  investigationId: string,
+  pagination?: PaginationParamsDto
+): MappedPage<MappedSource> {
+  const items: MappedSource[] = [
+    {
+      id: `${investigationId}-src-1`,
+      investigationId,
+      sourceUrl: 'https://psi.nasa.gov',
+      doi: '10.1016/j.combustflame.2014.08.012',
+      documentType: 'NASA Archival Technical Paper',
+      version: '1.0',
+      ingestionStatus: 'VERIFIED',
+      context: FALLBACK_CONTEXT,
+    },
+    {
+      id: `${investigationId}-src-2`,
+      investigationId,
+      sourceUrl: 'https://ntrs.nasa.gov',
+      doi: '10.2514/6.2013-0872',
+      documentType: 'AIAA Science Conference Proceedings',
+      version: '1.0',
+      ingestionStatus: 'VERIFIED',
+      context: FALLBACK_CONTEXT,
+    },
+  ];
+
+  const offset = pagination?.offset ?? 0;
+  const limit = pagination?.limit ?? 20;
+
+  return {
+    items: items.slice(offset, offset + limit),
+    total: items.length,
+    offset,
+    limit,
+    hasMore: false,
+    next: null,
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback evidence claims page.
+ */
+export function getMockClaimsPage(
+  investigationId: string,
+  pagination?: PaginationParamsDto
+): MappedPage<MappedClaim> {
+  const normId = investigationId.trim().toLowerCase();
+  let claims = EVIDENCE_CLAIMS.filter(
+    (c) => c.investigationId.toLowerCase() === normId || c.investigationCode.toLowerCase() === normId
+  );
+  if (claims.length === 0) {
+    claims = EVIDENCE_CLAIMS.slice(0, 3);
+  }
+
+  const items: MappedClaim[] = claims.map((c) => {
+    const claimSources: MappedClaimSource[] = [
+      {
+        id: `${c.id}-src-0`,
+        claimId: c.id,
+        source: {
+          id: `${c.id}-source`,
+          investigationId: c.investigationId,
+          sourceUrl: 'https://psi.nasa.gov',
+          doi: c.doi ?? null,
+          documentType: 'Scientific Literature',
+          version: '1.0',
+          ingestionStatus: 'VERIFIED',
+          context: FALLBACK_CONTEXT,
+        },
+        testRunId: c.testRunId ?? null,
+        runInvestigationId: c.investigationId,
+        sourceLocator: c.sourceLocator ?? 'NASA PSI Record',
+        sourceExcerpt: c.scientificContext,
+        contextMismatch: false,
+        context: FALLBACK_CONTEXT,
+      },
+    ];
+
+    return {
+      id: c.id,
+      claimText: c.claimText,
+      evidenceStatus: c.evidenceStatus,
+      reviewStatus: c.reviewStatus,
+      limitation: c.limitation ?? null,
+      createdAt: new Date().toISOString(),
+      sources: claimSources,
+      sourcesTotal: 1,
+      hasContextMismatch: false,
+      context: FALLBACK_CONTEXT,
+    };
+  });
+
+  const offset = pagination?.offset ?? 0;
+  const limit = pagination?.limit ?? 20;
+
+  return {
+    items: items.slice(offset, offset + limit),
+    total: items.length,
+    offset,
+    limit,
+    hasMore: offset + limit < items.length,
+    next: null,
+    context: FALLBACK_CONTEXT,
+  };
+}
+
+/**
+ * Fallback comparison result across multiple studies.
+ */
+export function getMockComparisonResult(investigationIds: string[]): MappedComparisonResult {
+  const studies: MappedComparisonStudy[] = investigationIds.map((id) => {
+    const detail = getMockInvestigationDetail(id);
+    const obsPage = getMockObservationsPage(id, { limit: 50 });
+
+    const summaryMap = new Map<string, { unit: string; values: number[] }>();
+    for (const obs of obsPage.items) {
+      if (obs.measurement.measuredValue !== null) {
+        const entry = summaryMap.get(obs.measurement.observable) ?? {
+          unit: obs.measurement.unit,
+          values: [],
+        };
+        entry.values.push(obs.measurement.measuredValue);
+        summaryMap.set(obs.measurement.observable, entry);
+      }
+    }
+
+    const observableSummaries: MappedObservableSummary[] = Array.from(summaryMap.entries()).map(
+      ([observable, info]) => ({
+        observable,
+        unit: info.unit,
+        count: info.values.length,
+        minValue: Math.min(...info.values),
+        maxValue: Math.max(...info.values),
+      })
+    );
+
+    return {
+      investigation: detail,
+      observations: obsPage,
+      observableSummaries,
+      observedMaterials: ['Cast PMMA Acrylic', 'Nomex Fabric', 'Cellulose'],
+      observedGravities: ['0g', '1g'],
+      context: FALLBACK_CONTEXT,
+    };
+  });
+
+  return {
+    studies,
+    deltas: null,
+    highlights: null,
+    comparability: 'NASA PSI Archive Comparative Assessment',
+    unavailableFields: {},
+    context: FALLBACK_CONTEXT,
+  };
+}

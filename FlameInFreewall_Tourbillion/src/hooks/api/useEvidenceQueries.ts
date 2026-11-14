@@ -6,6 +6,11 @@ import {
   listInvestigationClaims,
   listInvestigationSources,
 } from '@/api/services';
+import {
+  FALLBACK_CONTEXT,
+  getMockClaimsPage,
+  getMockSourcesPage,
+} from '@/api/mockFallback';
 import type {
   MappedClaim,
   MappedClaimSource,
@@ -30,6 +35,7 @@ export function useInvestigationSourcesQuery(
     getQueryKey: apiQueryKeys.investigationSources,
     fetcher: listInvestigationSources,
     mapItem: mapSourceDto,
+    fallbackFetcher: getMockSourcesPage,
   });
 }
 
@@ -48,6 +54,7 @@ export function useInvestigationClaimsQuery(
     getQueryKey: apiQueryKeys.investigationClaims,
     fetcher: listInvestigationClaims,
     mapItem: mapClaimDto,
+    fallbackFetcher: getMockClaimsPage,
   });
 }
 
@@ -66,5 +73,14 @@ export function useClaimSourcesQuery(
     getQueryKey: apiQueryKeys.claimSources,
     fetcher: listClaimSources,
     mapItem: mapClaimSourceDto,
+    fallbackFetcher: () => ({
+      items: [],
+      total: 0,
+      offset: 0,
+      limit: 20,
+      hasMore: false,
+      next: null,
+      context: FALLBACK_CONTEXT,
+    }),
   });
 }
