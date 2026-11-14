@@ -1,65 +1,49 @@
 import { create } from 'zustand';
-import type { ChatMessage } from '../types';
+import type { MappedChatMessage } from '../types/api';
+import { clearChatSessionId } from '../lib/chatSession';
 
+/**
+ * UI state for the grounded assistant. Messages mirror what the backend stored for the
+ * current session; the server remains the source of truth for history.
+ */
 export interface AiAssistantStoreState {
   isOpen: boolean;
   activeContextStudyId: string | null;
-  messages: ChatMessage[];
-  isStreaming: boolean;
+  sessionId: string | null;
+  messages: MappedChatMessage[];
 
   setOpen: (open: boolean) => void;
   toggleOpen: () => void;
   setActiveContextStudyId: (id: string | null) => void;
-  addMessage: (
-    message: Omit<ChatMessage, 'id' | 'timestamp'> & {
-      id?: string;
-      timestamp?: number;
-    }
-  ) => void;
-  clearMessages: () => void;
-  setIsStreaming: (isStreaming: boolean) => void;
+  setConversation: (sessionId: string, messages: MappedChatMessage[]) => void;
+  appendMessages: (sessionId: string, messages: MappedChatMessage[]) => void;
+  /** Forgets the tab token and local messages; server rows are not deleted. */
+  resetConversation: () => void;
 }
 
 export const useAiAssistantStore = create<AiAssistantStoreState>((set) => ({
   isOpen: false,
   activeContextStudyId: null,
+  sessionId: null,
   messages: [],
-  isStreaming: false,
 
-  setOpen: (open: boolean) =>
-    set({
-      isOpen: open,
-    }),
+  setOpen: (open) => set({ isOpen: open }),
 
-  toggleOpen: () =>
+  toggleOpen: () => set((state) => ({ isOpen: !state.isOpen })),
+
+  setActiveContextStudyId: (id) => set({ activeContextStudyId: id }),
+
+  setConversation: (sessionId, messages) => set({ sessionId, messages }),
+
+  appendMessages: (sessionId, messages) =>
     set((state) => ({
-      isOpen: !state.isOpen,
+      sessionId,
+      messages:
+        state.sessionId === sessionId ? [...state.messages, ...messages] : [...messages],
     })),
 
-  setActiveContextStudyId: (id: string | null) =>
-    set({
-      activeContextStudyId: id,
-    }),
-
-  addMessage: (message) =>
-    set((state) => {
-      const fullMessage: ChatMessage = {
-        ...message,
-        id: message.id || `msg-${Date.now()}-${state.messages.length + 1}`,
-        timestamp: message.timestamp ?? Date.now(),
-      };
-      return {
-        messages: [...state.messages, fullMessage],
-      };
-    }),
-
-  clearMessages: () =>
-    set({
-      messages: [],
-    }),
-
-  setIsStreaming: (isStreaming: boolean) =>
-    set({
-      isStreaming,
-    }),
+  resetConversation: () => {
+    clearChatSessionId();
+    set({ sessionId: null, messages: [] });
+  },
 }));
