@@ -1,11 +1,13 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { screen, fireEvent, act, waitFor } from '@testing-library/react';
-import { ComparisonBar } from '../src/components/explorer/ComparisonBar';
-import { ComparisonColumn } from '../src/components/explorer/ComparisonColumn';
-import { ComparisonMatrixTable } from '../src/components/explorer/ComparisonMatrixTable';
-import { ComparisonModal } from '../src/components/explorer/ComparisonModal';
-import { ParameterDeltaSummary } from '../src/components/explorer/ParameterDeltaSummary';
+import {
+  ComparisonBar,
+  ComparisonColumn,
+  ComparisonMatrixTable,
+  ComparisonModal,
+  ParameterDeltaSummary,
+} from '@/features/explorer';
 import { Header } from '../src/components/layout/Header';
 import ExplorerPage from '../src/app/(dashboard)/explorer/page';
 import { mapComparisonDto } from '../src/api/mappers';

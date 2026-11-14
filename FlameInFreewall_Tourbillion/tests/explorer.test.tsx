@@ -1,18 +1,20 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ExplorerFiltersBar } from '../src/components/explorer/ExplorerFiltersBar';
-import { InvestigationCard } from '../src/components/explorer/InvestigationCard';
-import { InvestigationTable } from '../src/components/explorer/InvestigationTable';
-import { ExplorerComparisonBar } from '../src/components/explorer/ExplorerComparisonBar';
+import {
+  ExplorerFiltersBar,
+  InvestigationCard,
+  InvestigationTable,
+  ExplorerComparisonBar,
+  StudyHeader,
+  TestRunsTable,
+  TelemetryPane,
+  ClaimsList,
+  ChamberOverviewTab,
+  PsiExportTab,
+} from '@/features/explorer';
 import ExplorerPage from '../src/app/(dashboard)/explorer/page';
 import StudyDetailPage from '../src/app/(dashboard)/explorer/[id]/page';
-import { StudyHeader } from '../src/components/explorer/detail/StudyHeader';
-import { TestRunsTable } from '../src/components/explorer/detail/TestRunsTable';
-import { TelemetryPane } from '../src/components/explorer/detail/TelemetryPane';
-import { ClaimsList } from '../src/components/explorer/detail/ClaimsList';
-import { ChamberOverviewTab } from '../src/components/explorer/detail/ChamberOverviewTab';
-import { PsiExportTab } from '../src/components/explorer/detail/PsiExportTab';
 import { ApiClientError } from '../src/api/client';
 import { useWorkspaceStore } from '../src/store/useWorkspaceStore';
 import { toastStore } from '../src/components/toast/toast-store';

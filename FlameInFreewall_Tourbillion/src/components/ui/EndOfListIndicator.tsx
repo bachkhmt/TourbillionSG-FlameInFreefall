@@ -7,7 +7,7 @@ export interface EndOfListIndicatorProps {
 }
 
 export const EndOfListIndicator: React.FC<EndOfListIndicatorProps> = ({
-  text = 'Bạn đã xem hết danh sách nghiên cứu PSI',
+  text = "You've reached the end of the NASA PSI catalog",
   className = '',
 }) => {
   return (

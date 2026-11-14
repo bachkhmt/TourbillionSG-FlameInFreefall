@@ -13,7 +13,35 @@ import type { MappedPage } from '@/types/api';
 export type ApiQueryOptions<TData> = Omit<
   UseQueryOptions<TData, Error>,
   'queryKey' | 'queryFn'
->;
+> & {
+  enableFallback?: boolean;
+};
+
+/**
+ * Determines whether offline mock fallback should be activated on error.
+ * Enabled by default in browser runtime (development / production) for resilience.
+ * Disabled by default in automated testing (NODE_ENV === 'test') so that error-state
+ * assertions and error banner unit tests execute as intended.
+ */
+export function shouldFallback(enableFallback?: boolean): boolean {
+  if (typeof enableFallback === 'boolean') {
+    return enableFallback;
+  }
+  if (process.env.NODE_ENV === 'test') {
+    return false;
+  }
+  return true;
+}
+
+const UUID_V1_TO_5_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Returns `true` when `value` matches a strict RFC-4122 UUID v1-5 string.
+ */
+export function isUuid(value: string): boolean {
+  return UUID_V1_TO_5_REGEX.test(value);
+}
 
 /**
  * Trims an optional identifier string to `""` when nullish or whitespace-only.
@@ -33,23 +61,31 @@ export interface ScopedPaginatedQueryConfig<TDto, TMapped> {
     signal?: AbortSignal
   ) => Promise<PaginatedPageDto<TDto>>;
   mapItem: (item: TDto) => TMapped;
+  fallbackFetcher?: (id: string, pagination?: PaginationParamsDto) => MappedPage<TMapped>;
 }
 
 /**
- * Shared hook helper for ID-scoped paginated endpoints with automatic `enabled` guard and DTO mapping.
+ * Shared hook helper for ID-scoped paginated endpoints with automatic `enabled` guard, DTO mapping, and offline fallback.
  */
 export function useScopedPaginatedQuery<TDto, TMapped>(
   config: ScopedPaginatedQueryConfig<TDto, TMapped>
 ): UseQueryResult<MappedPage<TMapped>, Error> {
-  const { id, pagination, options, getQueryKey, fetcher, mapItem } = config;
+  const { id, pagination, options, getQueryKey, fetcher, mapItem, fallbackFetcher } = config;
   const trimmedId = normalizeNonEmptyId(id);
 
   return useQuery<MappedPage<TMapped>, Error>({
     ...options,
     queryKey: getQueryKey(trimmedId, pagination),
     queryFn: async ({ signal }) => {
-      const page = await fetcher(trimmedId, pagination, signal);
-      return mapPaginatedPage(page, mapItem);
+      try {
+        const page = await fetcher(trimmedId, pagination, signal);
+        return mapPaginatedPage(page, mapItem);
+      } catch (err) {
+        if (fallbackFetcher && shouldFallback(options?.enableFallback)) {
+          return fallbackFetcher(trimmedId, pagination);
+        }
+        throw err;
+      }
     },
     enabled: Boolean(trimmedId) && (options?.enabled ?? true),
   });

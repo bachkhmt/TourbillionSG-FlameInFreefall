@@ -1,11 +1,13 @@
 import { apiRequest } from '../client';
 import type {
+  ChatAdvisorOutputDto,
   ChatExchangeDto,
   ChatMessagePageDto,
   ChatReadinessDto,
   ChatSessionCreateDto,
   ChatSessionDto,
   ChatSourceDto,
+  EvaluationRequestDto,
   PaginationParamsDto,
 } from '../dto';
 
@@ -71,6 +73,18 @@ export function getChatSource(
 ): Promise<ChatSourceDto> {
   return apiRequest<ChatSourceDto>(`/chat/sources/${id(sourceId)}`, {
     query: { locator, corpus_version: corpusVersion },
+    signal,
+  });
+}
+
+/** Per-pillar grounded advisor assessment (`POST /advisor/assessments`). No local fallback. */
+export function getAdvisorAssessment(
+  payload: EvaluationRequestDto,
+  signal?: AbortSignal
+): Promise<ChatAdvisorOutputDto> {
+  return apiRequest<ChatAdvisorOutputDto>('/advisor/assessments', {
+    method: 'POST',
+    body: payload,
     signal,
   });
 }

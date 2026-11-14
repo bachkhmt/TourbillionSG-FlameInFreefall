@@ -4,11 +4,13 @@
  */
 
 import React from 'react';
-import { LandingHero } from '@/components/landing/LandingHero';
-import { KurzgesagtFlameScene } from '@/components/landing/KurzgesagtFlameScene';
-import { AtmosphericPhysics } from '@/components/landing/AtmosphericPhysics';
-import { MissionControlCTA } from '@/components/landing/MissionControlCTA';
-import { LandingFooter } from '@/components/landing/LandingFooter';
+import {
+  LandingHero,
+  KurzgesagtFlameScene,
+  AtmosphericPhysics,
+  MissionControlCTA,
+  LandingFooter,
+} from '@/features/landing';
 
 export const metadata = {
   title: 'FlameGuard AI — Flame in Freefall | NASA Space Apps Challenge 2026',

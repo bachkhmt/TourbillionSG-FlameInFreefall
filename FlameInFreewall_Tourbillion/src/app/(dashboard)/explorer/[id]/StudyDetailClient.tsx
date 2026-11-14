@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { motion } from 'framer-motion';
 import {
   AlertCircle,
   ArrowLeft,
@@ -13,25 +14,25 @@ import {
   Gauge,
 } from 'lucide-react';
 import { ApiClientError } from '@/api/client';
+import type { MappedInvestigationDetail } from '@/types/api';
+import { useWorkspaceStore } from '@/store/useWorkspaceStore';
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import {
   useInvestigationClaimsQuery,
   useInvestigationDetailQuery,
   useInvestigationMeasurementsQuery,
   useInvestigationRunsQuery,
   useInvestigationSourcesQuery,
-} from '@/hooks/api';
-import type { MappedInvestigationDetail } from '@/types/api';
-import { useWorkspaceStore } from '@/store/useWorkspaceStore';
-import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
-import { StudyDetailShimmer } from '@/components/explorer/detail/StudyDetailShimmer';
-import { StudyHeader } from '@/components/explorer/detail/StudyHeader';
-import { ChamberOverviewTab } from '@/components/explorer/detail/ChamberOverviewTab';
-import { TestRunsTable } from '@/components/explorer/detail/TestRunsTable';
-import { TelemetryPane } from '@/components/explorer/detail/TelemetryPane';
-import { ClaimsList } from '@/components/explorer/detail/ClaimsList';
-import { PsiExportTab } from '@/components/explorer/detail/PsiExportTab';
-import { ComparisonBar } from '@/components/explorer/ComparisonBar';
-import { ComparisonModal } from '@/components/explorer/ComparisonModal';
+  StudyDetailShimmer,
+  StudyHeader,
+  ChamberOverviewTab,
+  TestRunsTable,
+  TelemetryPane,
+  ClaimsList,
+  PsiExportTab,
+  ComparisonBar,
+  ComparisonModal,
+} from '@/features/explorer';
 
 export type StudyDetailTab = 'overview' | 'runs' | 'telemetry' | 'claims' | 'psi-export';
 
@@ -155,8 +156,11 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
   ];
 
   return (
-    <div
+    <motion.div
       data-testid="study-detail-page"
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       className="w-full max-w-7xl mx-auto space-y-6 py-2 pb-24"
     >
       <StudyHeader
@@ -192,7 +196,13 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
         })}
       </div>
 
-      <section aria-label="Tab Content" className="transition-all duration-200">
+      <motion.section
+        key={activeTab}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.28, ease: 'easeOut' }}
+        aria-label="Tab Content"
+      >
         {activeTab === 'overview' && (
           <ChamberOverviewTab
             study={study}
@@ -242,7 +252,7 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
             claims={claims}
           />
         )}
-      </section>
+      </motion.section>
 
       <ComparisonBar
         compareList={compareList}
@@ -258,7 +268,7 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
         compareList={compareList}
         onRemove={removeFromCompare}
       />
-    </div>
+    </motion.div>
   );
 }
 

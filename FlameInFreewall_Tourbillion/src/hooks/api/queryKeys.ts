@@ -42,4 +42,8 @@ export const apiQueryKeys = {
     ['api', 'chat', 'history', sessionId, offset] as const,
   chatSource: (sourceId: string, locator: string, corpusVersion: string) =>
     ['api', 'chat', 'source', sourceId, locator, corpusVersion] as const,
+  scenarioEvaluation: (digestOrId: string) =>
+    ['api', 'scenario', 'evaluation', digestOrId] as const,
+  predictionReadiness: (modelId?: string) =>
+    ['api', 'prediction', 'readiness', modelId ?? 'default'] as const,
 } as const;

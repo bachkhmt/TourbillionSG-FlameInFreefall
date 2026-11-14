@@ -4,7 +4,7 @@ import React, { useContext } from 'react';
 import { QueryClientContext } from '@tanstack/react-query';
 import { Activity, AlertTriangle, RefreshCw, WifiOff } from 'lucide-react';
 import { ApiClientError } from '@/api/client';
-import { useReadyQuery } from '@/hooks/api';
+import { useReadyQuery } from '@/features/dashboard';
 import { toast } from '@/components/toast/toast-store';
 
 type PillStatusKey = 'checking' | 'ready' | 'db-unavailable' | 'offline';

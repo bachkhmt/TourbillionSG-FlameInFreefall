@@ -2,16 +2,19 @@
 
 import React, { Suspense } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
 import {
   Rocket,
   Layers,
   Sparkles,
 } from 'lucide-react';
-import { ScenarioConfigForm } from '@/components/mission/ScenarioConfigForm';
-import { ConditionGapMatrix } from '@/components/mission/ConditionGapMatrix';
-import { RankedEvidenceList } from '@/components/mission/RankedEvidenceList';
-import { PredictiveLabPanel } from '@/components/mission/PredictiveLabPanel';
 import { EndOfListIndicator } from '@/components/ui/EndOfListIndicator';
+import {
+  ScenarioConfigForm,
+  ConditionGapMatrix,
+  RankedEvidenceList,
+  PredictiveLabPanel,
+} from '@/features/mission';
 
 type MissionView = 'evidence' | 'prediction';
 
@@ -30,8 +33,11 @@ function MissionContent() {
   };
 
   return (
-    <div
+    <motion.div
       data-testid="mission-workbench"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       className="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 py-2 pt-0"
     >
       {/* Top Header Sticky with Backdrop Blur matching Explorer / StructPaper */}
@@ -104,8 +110,8 @@ function MissionContent() {
       )}
 
       {/* End of List Indicator */}
-      <EndOfListIndicator text="Bạn đã xem hết danh sách dữ liệu kịch bản" />
-    </div>
+      <EndOfListIndicator text="You have reached the end of the mission scenario evidence list" />
+    </motion.div>
   );
 }
 

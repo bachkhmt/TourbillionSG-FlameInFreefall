@@ -46,7 +46,7 @@ export const Toaster: React.FC = () => {
   return (
     <div
       aria-live="polite"
-      aria-label="Thông báo hệ thống"
+      aria-label="System notifications"
       className="fixed top-0 left-1/2 -translate-x-1/2 z-[99999] pointer-events-none flex flex-col items-center gap-2 w-full max-w-xl px-4 pt-0 select-none"
     >
       <AnimatePresence mode="popLayout">
