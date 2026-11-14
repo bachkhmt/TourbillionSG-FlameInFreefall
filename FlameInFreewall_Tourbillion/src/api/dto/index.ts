@@ -5,3 +5,4 @@ export * from './runs';
 export * from './evidence';
 export * from './dashboard';
 export * from './comparison';
+export * from './chat';

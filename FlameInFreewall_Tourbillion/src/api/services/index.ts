@@ -5,3 +5,4 @@ export * from './runsService';
 export * from './evidenceService';
 export * from './dashboardService';
 export * from './comparisonService';
+export * from './chatService';

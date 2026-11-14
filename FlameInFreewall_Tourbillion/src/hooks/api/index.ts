@@ -6,3 +6,4 @@ export * from './useRunQueries';
 export * from './useEvidenceQueries';
 export * from './useDashboardQueries';
 export * from './useComparisonQueries';
+export * from './useChatQueries';
