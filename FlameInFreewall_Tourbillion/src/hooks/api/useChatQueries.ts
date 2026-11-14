@@ -120,6 +120,22 @@ export interface SendChatVariables {
   sessionId: string | null;
   /** Canonical investigation UUID scoping a new session, if any. */
   investigationId?: string | null;
+  /**
+   * Lifecycle hooks run inside the mutation itself, so they still fire when the calling
+   * component unmounts mid-request (unlike `mutate(..., { onSuccess })`).
+   */
+  onSessionCreated?: (sessionId: string) => void;
+  onExchange?: (result: SendChatResult) => void;
+  /** The request may or may not have been stored (client timeout / network loss). */
+  onOutcomeUnknown?: (sessionId: string) => void;
+}
+
+/** A client-side timeout or transport failure: the server may already have committed. */
+export function isOutcomeUnknown(error: unknown): boolean {
+  return (
+    error instanceof ApiClientError &&
+    (error.code === 'REQUEST_TIMEOUT' || error.code === 'NETWORK_ERROR')
+  );
 }
 
 export interface SendChatResult {
@@ -145,20 +161,34 @@ export function useSendChatMessageMutation(): UseMutationResult<
 > {
   return useMutation<SendChatResult, Error, SendChatVariables>({
     retry: 0,
-    mutationFn: async ({ question, sessionId, investigationId }) => {
-      let id = sessionId ?? (await newSession(investigationId));
+    mutationFn: async (variables) => {
+      const { question, sessionId, investigationId } = variables;
+      const create = async () => {
+        const created = await newSession(investigationId);
+        // Record the id before sending so a lost response never orphans the session.
+        variables.onSessionCreated?.(created);
+        return created;
+      };
+      let id = sessionId ?? (await create());
       let exchange;
       try {
-        exchange = await sendChatMessage(id, question);
+        try {
+          exchange = await sendChatMessage(id, question);
+        } catch (error) {
+          if (!sessionId || !isNotFound(error)) throw error;
+          id = await create();
+          exchange = await sendChatMessage(id, question);
+        }
       } catch (error) {
-        if (!sessionId || !isNotFound(error)) throw error;
-        id = await newSession(investigationId);
-        exchange = await sendChatMessage(id, question);
+        if (isOutcomeUnknown(error)) variables.onOutcomeUnknown?.(id);
+        throw error;
       }
-      return {
+      const result: SendChatResult = {
         sessionId: id,
         messages: [mapChatMessageDto(exchange.user), mapChatMessageDto(exchange.assistant)],
       };
+      variables.onExchange?.(result);
+      return result;
     },
   });
 }

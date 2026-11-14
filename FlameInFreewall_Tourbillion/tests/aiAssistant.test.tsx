@@ -339,6 +339,68 @@ describe('Grounded AI assistant backed by the NASA chat API', () => {
       expect(useAiAssistantStore.getState().sessionId).toBeNull();
     });
 
+    it('keeps a stored exchange and its new session when the drawer closes mid-send', async () => {
+      let resolve: (value: ReturnType<typeof exchange>) => void = () => {};
+      services.sendChatMessage.mockReturnValue(new Promise((r) => (resolve = r)));
+      const view = openDrawer();
+      await ask('FLEX-007 D0?');
+      await waitFor(() => expect(services.sendChatMessage).toHaveBeenCalled());
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(SESSION_ID);
+
+      useAiAssistantStore.setState({ isOpen: false });
+      view.unmount();
+      resolve(exchange('FLEX-007 D0?'));
+      await waitFor(() => expect(useAiAssistantStore.getState().messages).toHaveLength(2));
+      expect(useAiAssistantStore.getState().sessionId).toBe(SESSION_ID);
+    });
+
+    it('reloads history after a client timeout instead of inviting a duplicate resend', async () => {
+      services.sendChatMessage.mockRejectedValue(
+        new ApiClientError({ message: 'Request timed out', status: 0, code: 'REQUEST_TIMEOUT' })
+      );
+      services.listChatMessages.mockResolvedValue({
+        items: [
+          message('user', 'u-1', userAnswer('FLEX-007 D0?')),
+          message('assistant', 'a-1', answer()),
+        ],
+        offset: 0,
+        limit: 100,
+      });
+      openDrawer();
+      await ask('FLEX-007 D0?');
+
+      expect(await screen.findByText(/D0\) của FLEX-007 khác nhau/)).toBeDefined();
+      expect(services.listChatMessages).toHaveBeenCalledWith(
+        SESSION_ID,
+        { offset: 0, limit: 100 },
+        expect.anything()
+      );
+      expect(
+        (screen.getByPlaceholderText(/Ask about NASA combustion/i) as HTMLInputElement).value
+      ).toBe('');
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(SESSION_ID);
+    });
+
+    it('ignores a late answer after the user started a new session', async () => {
+      let resolve: (value: ReturnType<typeof exchange>) => void = () => {};
+      useAiAssistantStore.setState({ sessionId: SESSION_ID });
+      sessionStorage.setItem(CHAT_SESSION_KEY, SESSION_ID);
+      services.sendChatMessage.mockReturnValue(new Promise((r) => (resolve = r)));
+      openDrawer();
+      await ask('FLEX-007 D0?');
+      await waitFor(() => expect(services.sendChatMessage).toHaveBeenCalled());
+      expect(
+        screen.getByRole('button', { name: /Start new session/i }).hasAttribute('disabled')
+      ).toBe(true);
+
+      useAiAssistantStore.getState().resetConversation();
+      resolve(exchange('FLEX-007 D0?'));
+      await new Promise((r) => setTimeout(r, 20));
+      expect(useAiAssistantStore.getState().messages).toHaveLength(0);
+      expect(useAiAssistantStore.getState().sessionId).toBeNull();
+      expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBeNull();
+    });
+
     it('closes on Escape and via the close button', async () => {
       openDrawer();
       await screen.findByRole('dialog');

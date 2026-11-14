@@ -15,6 +15,7 @@ import {
 import { ApiClientError } from '@/api/client';
 import {
   isNotFound,
+  isOutcomeUnknown,
   useChatHistoryQuery,
   useChatReadinessQuery,
   useSendChatMessageMutation,
@@ -37,10 +38,7 @@ function sendErrorMessage(error: unknown): string {
     if (error.status === 502) {
       return 'The evidence provider returned an answer that failed citation checks. Nothing was saved.';
     }
-    if (error.code === 'REQUEST_TIMEOUT') {
-      return 'The request timed out. Reopen the assistant to reload history before resending.';
-    }
-    if (error.status === 503 || error.status === 0) {
+    if (error.status === 503) {
       return 'Chat service unavailable. Check the backend connection and try again.';
     }
   }
@@ -59,8 +57,11 @@ const AiDrawerPanel: React.FC = () => {
   const sessionId = useAiAssistantStore((s) => s.sessionId);
   const activeContextStudyId = useAiAssistantStore((s) => s.activeContextStudyId);
   const setActiveContextStudyId = useAiAssistantStore((s) => s.setActiveContextStudyId);
+  const historyStale = useAiAssistantStore((s) => s.historyStale);
+  const setSession = useAiAssistantStore((s) => s.setSession);
   const setConversation = useAiAssistantStore((s) => s.setConversation);
   const appendMessages = useAiAssistantStore((s) => s.appendMessages);
+  const markHistoryStale = useAiAssistantStore((s) => s.markHistoryStale);
   const resetConversation = useAiAssistantStore((s) => s.resetConversation);
 
   const [input, setInput] = useState('');
@@ -74,29 +75,35 @@ const AiDrawerPanel: React.FC = () => {
 
   const readiness = useChatReadinessQuery();
   const ready = readiness.data?.state === 'ready';
-  const history = useChatHistoryQuery(storedSessionId, { enabled: ready && !sessionId });
   const send = useSendChatMessageMutation();
+  // Sync from the server when restoring a tab session, or after a send with unknown outcome.
+  const syncSessionId = storedSessionId ?? (historyStale ? sessionId : null);
+  const history = useChatHistoryQuery(syncSessionId, { enabled: ready && !send.isPending });
   const busy = send.isPending || history.isFetching;
 
   useEffect(() => {
-    if (history.data && !useAiAssistantStore.getState().sessionId) {
+    if (!history.data) return;
+    const state = useAiAssistantStore.getState();
+    if (!state.sessionId || (state.historyStale && state.sessionId === history.data.session.id)) {
       setConversation(history.data.session.id, history.data.messages);
-      setStoredSessionId(null);
+      setError(null);
     }
+    setStoredSessionId(null);
   }, [history.data, setConversation]);
 
   useEffect(() => {
-    if (!history.error || !storedSessionId) return;
+    if (!history.error || !syncSessionId) return;
     if (isNotFound(history.error)) {
       clearChatSessionId();
+      resetConversation();
       setError('Your previous session expired. Send a question to start a new one.');
     } else {
       // A transient failure does not revoke the existing server session.
-      setConversation(storedSessionId, []);
+      if (!useAiAssistantStore.getState().sessionId) setConversation(syncSessionId, []);
       setError('Earlier messages could not be loaded right now.');
     }
     setStoredSessionId(null);
-  }, [history.error, storedSessionId, setConversation]);
+  }, [history.error, syncSessionId, setConversation, resetConversation]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView?.({ behavior: 'smooth' });
@@ -120,18 +127,41 @@ const AiDrawerPanel: React.FC = () => {
     if (!question || busy || !ready) return;
     setError(null);
     setInput('');
+    // Results from a conversation the user abandoned (New session / Clear Context) are dropped.
+    const epoch = useAiAssistantStore.getState().epoch;
+    const isCurrent = () => useAiAssistantStore.getState().epoch === epoch;
+    const adopt = (id: string) => {
+      writeChatSessionId(id);
+      setSession(id);
+    };
     send.mutate(
       {
         question,
         sessionId,
         investigationId: isUuidLike(activeContextStudyId) ? activeContextStudyId : null,
-      },
-      {
-        onSuccess: (result) => {
+        // These run inside the mutation, so they still apply if the drawer is closed meanwhile.
+        onSessionCreated: (id) => {
+          if (isCurrent()) adopt(id);
+        },
+        onExchange: (result) => {
+          if (!isCurrent()) return;
           writeChatSessionId(result.sessionId);
           appendMessages(result.sessionId, result.messages);
         },
+        onOutcomeUnknown: (id) => {
+          if (!isCurrent()) return;
+          adopt(id);
+          markHistoryStale();
+        },
+      },
+      {
         onError: (failure) => {
+          if (!isCurrent()) return;
+          if (isOutcomeUnknown(failure)) {
+            // The server may have stored it; history is reloaded instead of inviting a resend.
+            setError('The request did not finish in time. Reloading history to check whether it was saved…');
+            return;
+          }
           setInput(question);
           setError(sendErrorMessage(failure));
         },
@@ -190,7 +220,8 @@ const AiDrawerPanel: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleNewSession}
-                  className="p-1.5 rounded-lg text-gray-300 hover:text-[#D4FC02] hover:bg-white/10 transition-colors"
+                  disabled={busy}
+                  className="p-1.5 rounded-lg text-gray-300 hover:text-[#D4FC02] hover:bg-white/10 disabled:opacity-40 transition-colors"
                   title="Start a new session (server history is kept)"
                   aria-label="Start new session"
                 >
@@ -219,7 +250,8 @@ const AiDrawerPanel: React.FC = () => {
               <button
                 type="button"
                 onClick={handleClearContext}
-                className="hover:underline text-[11px] text-blue-700 ml-2 shrink-0 font-medium cursor-pointer"
+                disabled={busy}
+                className="hover:underline text-[11px] text-blue-700 ml-2 shrink-0 font-medium cursor-pointer disabled:opacity-40"
               >
                 Clear Context
               </button>
