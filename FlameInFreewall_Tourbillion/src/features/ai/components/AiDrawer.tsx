@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Fragment, useEffect, useRef, useState } from 'react';
-import { Compass } from 'lucide-react';
+import { ChevronDown, Compass, History, Shield } from 'lucide-react';
 import { ApiClientError } from '@/api/client';
 import {
   isNotFound,
@@ -18,6 +18,9 @@ import { AiMessageItem } from './AiMessageItem';
 import { chatButton, chatField } from './chatStyles';
 
 const DEFAULT_PRIVACY = 'Anyone with the session ID can view the chat for 24 hours.';
+const disclosureSummary = 'flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 font-semibold text-[#0B2374] hover:border-[#0B2374] [&::-webkit-details-marker]:hidden';
+const disclosureChevron = 'ml-auto size-4 shrink-0 group-open:rotate-180';
+const historyButton = 'min-h-11 min-w-0 cursor-pointer whitespace-nowrap rounded-lg border border-slate-200 px-1 text-xs font-semibold text-[#0B2374] hover:border-slate-500 disabled:cursor-default disabled:opacity-40';
 
 interface HistoryRequest {
   sessionId: string;
@@ -97,7 +100,7 @@ const AiDrawerPanel: React.FC = () => {
   }, [historyStale, sessionId, historyOffset, historyRequest]);
 
   useEffect(() => {
-    if (!history.data || !historyRequest) return;
+    if (!history.data || history.isFetching || history.isError || !historyRequest) return;
     const state = useAiAssistantStore.getState();
     const current =
       state.epoch === historyRequest.epoch &&
@@ -108,7 +111,7 @@ const AiDrawerPanel: React.FC = () => {
       setError(null);
     }
     setHistoryRequest(null);
-  }, [history.data, historyRequest, setHistoryPage]);
+  }, [history.data, history.isFetching, history.isError, historyRequest, setHistoryPage]);
 
   useEffect(() => {
     if (!history.error || !historyRequest) return;
@@ -236,9 +239,13 @@ const AiDrawerPanel: React.FC = () => {
           </button>
         </header>
 
-        <details className="mx-5 my-2 text-xs text-slate-600">
-          <summary className="cursor-pointer">Chat privacy · Do not share private information</summary>
-          <p className="mt-1">{privacy ?? DEFAULT_PRIVACY}</p>
+        <details className="group mx-5 my-2 shrink-0 text-xs text-slate-600">
+          <summary className={disclosureSummary}>
+            <Shield className="size-4 shrink-0" aria-hidden="true" />
+            <span>Chat privacy</span>
+            <ChevronDown className={disclosureChevron} aria-hidden="true" />
+          </summary>
+          <p className="mt-2">Do not share private information. {privacy ?? DEFAULT_PRIVACY}</p>
           <p className="mt-1">
             Starting a new session clears the chat from this tab. Saved messages stay on the server
             until cleanup.
@@ -336,35 +343,41 @@ const AiDrawerPanel: React.FC = () => {
         )}
 
         {sessionId && (
-          <details className="mx-5 my-2 text-xs text-slate-600">
-            <summary className="cursor-pointer">Conversation history</summary>
-            <div className="mt-2 flex flex-wrap gap-2">
+          <details className="group mx-5 my-2 shrink-0 text-xs text-slate-600">
+            <summary className={disclosureSummary}>
+              <History className="size-4 shrink-0" aria-hidden="true" />
+              <span>Conversation history</span>
+              <ChevronDown className={disclosureChevron} aria-hidden="true" />
+            </summary>
+            <div className="mt-2 grid grid-cols-4 gap-1" role="group" aria-label="Conversation history actions">
               <button
                 type="button"
-                className={chatButton}
+                className={`${historyButton} bg-white`}
+                aria-label="Refresh history"
                 disabled={busy}
                 onClick={() => loadPage(historyOffset)}
               >
-                Refresh history
+                Refresh
               </button>
               <button
                 type="button"
-                className={chatButton}
+                className={`${historyButton} bg-white`}
+                aria-label="Previous"
                 disabled={busy || historyOffset === 0}
                 onClick={() => loadPage(historyOffset - CHAT_HISTORY_LIMIT)}
               >
-                Previous
+                Prev
               </button>
               <button
                 type="button"
-                className={chatButton}
+                className={`${historyButton} bg-white`}
                 disabled={busy || !historyHasMore}
                 onClick={() => loadPage(historyOffset + CHAT_HISTORY_LIMIT)}
               >
                 Next
               </button>
-              <button type="button" className={chatButton} disabled={busy} onClick={startNewSession}>
-                Start new session
+              <button type="button" className={`${historyButton} bg-blue-50`} disabled={busy} onClick={startNewSession}>
+                New chat
               </button>
             </div>
           </details>
