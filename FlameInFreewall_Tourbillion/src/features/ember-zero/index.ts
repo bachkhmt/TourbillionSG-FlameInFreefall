@@ -7,3 +7,7 @@ export * from './components/act1-flame/ProceduralFlameCanvas';
 export * from './components/act1-flame/FloatingPropsLayer';
 export * from './components/act1-flame/DualAtmosphereDial';
 export * from './components/story/EmberStoryOverlay';
+export * from './components/act2-machine/LabLightsTransition';
+export * from './components/act2-machine/InteractiveGapDemo';
+export * from './components/act2-machine/LockedPredictiveDemo';
+export * from './components/act2-machine/ValueRevealDeck';
