@@ -1,11 +1,20 @@
 "use client";
 
-import React from 'react';
+import React, { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Rocket } from 'lucide-react';
 import { EndOfListIndicator } from '@/components/ui/EndOfListIndicator';
 import { ScenarioConfigForm } from '@/features/mission';
 import { MissionResearch } from '@/features/mission/components/MissionResearch';
+import { useMissionFocusKeys } from '@/features/mission/compareFocus';
+
+/** Reads `?compare=` handed over by the Comparison modal. */
+function FocusedMissionResearch() {
+  const params = useSearchParams();
+  const focusKeys = useMissionFocusKeys(params?.get('compare'));
+  return <MissionResearch focusKeys={focusKeys} />;
+}
 
 export default function MissionPage() {
   return (
@@ -29,7 +38,9 @@ export default function MissionPage() {
       </header>
       <ScenarioConfigForm />
       <div data-testid="evidence-view-container" className="space-y-6">
-        <MissionResearch />
+        <Suspense fallback={<MissionResearch />}>
+          <FocusedMissionResearch />
+        </Suspense>
       </div>
       <EndOfListIndicator text="You have reached the end of the mission scenario evidence list" />
     </motion.div>

@@ -351,6 +351,34 @@ async def test_followup_context_is_scoped_and_provider_is_injectable(chat_api):
     assert not current.history_truncated
 
 
+async def test_answer_language_reaches_the_provider_and_is_optional(chat_api):
+    client, app = chat_api
+    requests = []
+
+    class Adapter(MockProvider):
+        async def answer(self, request):
+            requests.append(request)
+            return await super().answer(request)
+
+    app.state.chat_provider_factory = Adapter
+    identity = await create_session(client)
+    url = f"/api/v1/chat/sessions/{identity}/messages"
+    for body, expected in [
+        ({"question": "FLEX-007 D0?", "language": "en"}, "en"),
+        ({"question": "FLEX-007 D0?", "language": "vi"}, "vi"),
+        ({"question": "FLEX-007 D0?", "language": None}, None),
+        ({"question": "FLEX-007 D0?"}, None),
+    ]:
+        result = await client.post(url, json=body)
+        assert result.status_code == 201, result.text
+        assert requests[-1].language == expected
+    sent = len(requests)
+    for language in ["fr", "EN", ""]:
+        rejected = await client.post(url, json={"question": "FLEX-007 D0?", "language": language})
+        assert rejected.status_code == 422
+    assert len(requests) == sent
+
+
 async def test_history_bounds_and_publication_gate(chat_api, chat_db):
     from uuid import UUID
 

@@ -5,6 +5,7 @@ import { AiDrawer, FloatingAiDock } from '@/features/ai';
 import { AppShell } from '../src/components/layout/AppShell';
 import { useAiAssistantStore } from '../src/store/useAiAssistantStore';
 import { CHAT_SESSION_KEY } from '../src/lib/chatSession';
+import { CHAT_LANGUAGE_KEY } from '../src/lib/chatLanguage';
 import { ApiClientError } from '../src/api/client';
 import * as apiServices from '@/api/services';
 import type { ChatAnswerDto, ChatMessageDto, ChatReadinessDto } from '@/api/dto';
@@ -136,7 +137,9 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
   beforeEach(() => {
     vi.clearAllMocks();
     sessionStorage.clear();
+    localStorage.clear();
     useAiAssistantStore.getState().resetConversation();
+    useAiAssistantStore.setState({ answerLanguage: 'en', answerLanguageHydrated: false });
     useAiAssistantStore.setState({ isOpen: false, activeContextStudyId: null });
     services.getChatReadiness.mockResolvedValue(readyDto());
     services.createChatSession.mockResolvedValue(sessionDto());
@@ -195,7 +198,7 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
 
       expect(await screen.findByText(/D0\) của FLEX-007 khác nhau/)).toBeDefined();
       expect(services.createChatSession).toHaveBeenCalledWith({});
-      expect(services.sendChatMessage).toHaveBeenCalledWith(SESSION_ID, 'FLEX-007 D0?');
+      expect(services.sendChatMessage).toHaveBeenCalledWith(SESSION_ID, 'FLEX-007 D0?', 'en');
       expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(SESSION_ID);
       expect(screen.queryByText('You')).toBeNull();
       expect(screen.queryByText('FlameGuard AI', { selector: 'strong' })).toBeNull();
@@ -231,8 +234,9 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
       await ask('FLEX-007 D0?');
 
       await screen.findByText(/D0\) của FLEX-007 khác nhau/);
-      expect(services.sendChatMessage).toHaveBeenNthCalledWith(1, SESSION_ID, 'FLEX-007 D0?');
-      expect(services.sendChatMessage).toHaveBeenNthCalledWith(2, fresh, 'FLEX-007 D0?');
+      // The retry in a fresh session keeps the selected answer language.
+      expect(services.sendChatMessage).toHaveBeenNthCalledWith(1, SESSION_ID, 'FLEX-007 D0?', 'en');
+      expect(services.sendChatMessage).toHaveBeenNthCalledWith(2, fresh, 'FLEX-007 D0?', 'en');
       expect(sessionStorage.getItem(CHAT_SESSION_KEY)).toBe(fresh);
     });
 
@@ -431,6 +435,26 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
       fireEvent.click(await screen.findByRole('button', { name: 'View source 1' }));
     }
 
+    it('opens the raw file itself, not the NASA redirect=false text response', async () => {
+      services.getChatSource.mockResolvedValue({
+        source_document_id: SOURCE_ID,
+        locator: 'CSV row 8',
+        corpus_version: CORPUS,
+        filename: 'PSI-69_Experimental table_FLEX.csv',
+        source_url:
+          'https://psi.nasa.gov/geode-py/ws/studies/PSI-69/download?file=PSI-69_Experimental+table_FLEX.csv&version=1&redirect=false',
+        sha256: 'b'.repeat(64),
+        license: 'CC0-1.0',
+        title: 'FLEX',
+        review_status: 'unreviewed',
+      });
+      await sendAndOpenSource();
+      const raw = await screen.findByRole('link', { name: /Open raw file/ });
+      expect(raw.getAttribute('href')).toBe(
+        'https://psi.nasa.gov/geode-py/ws/studies/PSI-69/download?file=PSI-69_Experimental+table_FLEX.csv&version=1'
+      );
+    });
+
     it('opens revision-pinned source metadata for a citation', async () => {
       const fileUrl = 'https://psi.nasa.gov/geode-py/ws/studies/PSI-69/download?fileId=example';
       services.getChatSource.mockResolvedValue({
@@ -509,6 +533,71 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
       expect(screen.getByTestId('page-content')).toBeDefined();
       expect(screen.getByTestId('floating-ai-dock')).toBeDefined();
       expect(services.getChatReadiness).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('answer language', () => {
+    function languageButton(name: 'EN' | 'VI') {
+      return screen.getByRole('button', { name: new RegExp(`^${name}`) });
+    }
+
+    it('defaults to English and sends it with every question', async () => {
+      services.sendChatMessage.mockResolvedValue(exchange('FLEX-007 D0?'));
+      openDrawer();
+      await screen.findByRole('group', { name: 'Answer language' });
+      expect(languageButton('EN').getAttribute('aria-pressed')).toBe('true');
+      expect(languageButton('VI').getAttribute('aria-pressed')).toBe('false');
+      expect(screen.getByText(/Source excerpts stay in their original language/)).toBeDefined();
+      await ask('FLEX-007 D0?');
+      await waitFor(() =>
+        expect(services.sendChatMessage).toHaveBeenCalledWith(SESSION_ID, 'FLEX-007 D0?', 'en')
+      );
+    });
+
+    it('switches to Vietnamese, remembers it and keeps it across a new conversation', async () => {
+      services.sendChatMessage.mockResolvedValue(exchange('FLEX-007 D0?'));
+      const view = openDrawer();
+      await screen.findByRole('group', { name: 'Answer language' });
+      fireEvent.click(languageButton('VI'));
+      expect(languageButton('VI').getAttribute('aria-pressed')).toBe('true');
+      expect(localStorage.getItem(CHAT_LANGUAGE_KEY)).toBe('vi');
+      await ask('FLEX-007 D0?');
+      await waitFor(() =>
+        expect(services.sendChatMessage).toHaveBeenCalledWith(SESSION_ID, 'FLEX-007 D0?', 'vi')
+      );
+
+      useAiAssistantStore.getState().resetConversation();
+      expect(useAiAssistantStore.getState().answerLanguage).toBe('vi');
+
+      // Simulate a page reload: fresh store, stored choice is read again.
+      view.unmount();
+      useAiAssistantStore.setState({ answerLanguage: 'en', answerLanguageHydrated: false });
+      openDrawer();
+      await waitFor(() => expect(languageButton('VI').getAttribute('aria-pressed')).toBe('true'));
+    });
+
+    it('falls back to English when browser storage is unavailable', async () => {
+      const getItem = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('blocked');
+      });
+      const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new Error('blocked');
+      });
+      try {
+        const view = openDrawer();
+        await screen.findByRole('group', { name: 'Answer language' });
+        expect(languageButton('EN').getAttribute('aria-pressed')).toBe('true');
+        fireEvent.click(languageButton('VI'));
+        expect(languageButton('VI').getAttribute('aria-pressed')).toBe('true');
+        // Closing and reopening the drawer keeps the in-page choice.
+        view.unmount();
+        openDrawer();
+        await screen.findByRole('group', { name: 'Answer language' });
+        expect(languageButton('VI').getAttribute('aria-pressed')).toBe('true');
+      } finally {
+        getItem.mockRestore();
+        setItem.mockRestore();
+      }
     });
   });
 });

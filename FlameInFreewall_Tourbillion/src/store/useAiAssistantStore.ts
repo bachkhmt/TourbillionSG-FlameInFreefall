@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import type { MappedChatMessage } from '../types/api';
 import { clearChatSessionId } from '../lib/chatSession';
+import {
+  DEFAULT_CHAT_LANGUAGE,
+  readChatLanguage,
+  writeChatLanguage,
+  type ChatAnswerLanguage,
+} from '../lib/chatLanguage';
 
 /** Exchanges kept in `recent` before older ones are only reachable through history pages. */
 export const RECENT_LIMIT = 50;
@@ -29,6 +35,10 @@ export interface AiAssistantStoreState {
   epoch: number;
   /** True when a send ended without a known outcome (client timeout/network): resync history. */
   historyStale: boolean;
+  /** Assistant framing language; kept across conversations, English by default. */
+  answerLanguage: ChatAnswerLanguage;
+  /** Storage is read once per page so a choice survives drawer reopen even if storage is blocked. */
+  answerLanguageHydrated: boolean;
 
   setOpen: (open: boolean) => void;
   toggleOpen: () => void;
@@ -38,6 +48,9 @@ export interface AiAssistantStoreState {
   setHistoryPage: (sessionId: string, page: ChatHistoryPage, privacy?: string | null) => void;
   appendRecent: (sessionId: string, messages: MappedChatMessage[]) => void;
   markHistoryStale: () => void;
+  setAnswerLanguage: (language: ChatAnswerLanguage) => void;
+  /** Reads the browser's stored choice (client only; never during store creation/SSR). */
+  hydrateAnswerLanguage: () => void;
   /** Forgets the tab token and local messages; server rows are not deleted. */
   resetConversation: () => void;
 }
@@ -57,6 +70,8 @@ export const useAiAssistantStore = create<AiAssistantStoreState>((set) => ({
   activeContextStudyId: null,
   ...EMPTY_CONVERSATION,
   epoch: 0,
+  answerLanguage: DEFAULT_CHAT_LANGUAGE,
+  answerLanguageHydrated: false,
 
   setOpen: (open) => set({ isOpen: open }),
 
@@ -90,6 +105,18 @@ export const useAiAssistantStore = create<AiAssistantStoreState>((set) => ({
     ),
 
   markHistoryStale: () => set({ historyStale: true }),
+
+  setAnswerLanguage: (language) => {
+    writeChatLanguage(language);
+    set({ answerLanguage: language, answerLanguageHydrated: true });
+  },
+
+  hydrateAnswerLanguage: () =>
+    set((state) =>
+      state.answerLanguageHydrated
+        ? {}
+        : { answerLanguage: readChatLanguage(), answerLanguageHydrated: true }
+    ),
 
   resetConversation: () => {
     clearChatSessionId();

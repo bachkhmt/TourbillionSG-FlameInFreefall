@@ -48,6 +48,12 @@ export const NAV_ITEMS: NavItemConfig[] = [
     icon: Rocket,
   },
   {
+    path: "/studio",
+    label: "3D Flame Studio",
+    description: "Interactive 3D combustion model",
+    icon: Flame,
+  },
+  {
     path: "/resources",
     label: "Official Resources",
     description: "NASA data, science context & case studies",
@@ -91,7 +97,6 @@ export const Sidebar: React.FC = () => {
     NAV_ITEMS.forEach((item) => {
       router.prefetch(item.path);
     });
-    router.prefetch("/studio");
   }, [router]);
 
   const isNavActive = (path: string): boolean => {
@@ -164,6 +169,10 @@ export const Sidebar: React.FC = () => {
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const active = isNavActive(item.path);
+              const isStudio = item.path === "/studio";
+              const iconClassName = active
+                ? "text-zinc-950"
+                : "text-zinc-600 group-hover:text-zinc-950";
 
               return (
                 <motion.div
@@ -172,23 +181,23 @@ export const Sidebar: React.FC = () => {
                   className="w-full"
                 >
                   <DockPillButton
-                    id={`nav-pill-${item.path.replace("/", "")}`}
+                    id={isStudio ? "sidebar-studio-button" : `nav-pill-${item.path.replace("/", "")}`}
                     href={item.path}
                     isExpanded={isExpanded}
                     active={active}
                     icon={
                       <Icon
-                        className={`w-5 h-5 transition-colors ${
-                          active
-                            ? "text-zinc-950"
-                            : "text-zinc-600 group-hover:text-zinc-950"
-                        }`}
-                        strokeWidth={2.5}
+                        className={
+                          isStudio
+                            ? "w-6 h-6 text-amber-500 group-hover:text-amber-600 transition-colors"
+                            : `w-5 h-5 transition-colors ${iconClassName}`
+                        }
+                        strokeWidth={isStudio ? 3 : 2.5}
                       />
                     }
                     label={item.label}
                     description={item.description}
-                    tooltipText={isExpanded ? undefined : item.label}
+                    tooltipText={isStudio ? "Launch 3D Flame Studio" : item.label}
                   />
                 </motion.div>
               );
@@ -200,20 +209,6 @@ export const Sidebar: React.FC = () => {
             variants={dockItemVariants}
             className="relative z-10 flex flex-col items-start gap-3 w-full"
           >
-            <DockPillButton
-              id="sidebar-studio-button"
-              href="/studio"
-              isExpanded={isExpanded}
-              icon={
-                <Flame
-                  className="w-6 h-6 text-amber-500 group-hover:text-amber-600 transition-colors"
-                  strokeWidth={3}
-                />
-              }
-              label="3D Flame Studio"
-              description="Interactive 3D combustion model"
-              tooltipText={isExpanded ? undefined : "Launch 3D Flame Studio"}
-            />
             <DockPillButton
               id="sidebar-reset-button"
               onClick={handleResetWorkspace}

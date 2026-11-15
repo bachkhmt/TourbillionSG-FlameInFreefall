@@ -7,7 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db_session
+from app.core.database import get_probe_session
 from app.schemas.health import HealthResponse, ReadinessResponse
 
 router = APIRouter(tags=["health"])
@@ -27,7 +27,7 @@ async def health() -> HealthResponse:
 async def ready(
     request: Request,
     response: Response,
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    session: Annotated[AsyncSession, Depends(get_probe_session)],
 ) -> ReadinessResponse:
     try:
         async with asyncio.timeout(request.app.state.settings.db_ready_timeout_seconds):

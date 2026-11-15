@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-studio-demo="nca"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NCA · Narrow Channel Apparatus (NASA SoFIE)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="/assets/fonts/inter.css">
+<style>
+:root{--bg:#e4eaee;--card:#f5f8fa;--ink:#15212b;--mut:#566673;--line:#c2ced6;--acc:#1b5ea8;--onacc:#fff;--A:#c96a00;--B:#0b8a73;--C:#6b4bc4;--reg:rgba(107,75,196,.12);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e151c;--card:#16212b;--ink:#e3ebf1;--mut:#97a8b6;--line:#2b3b48;--acc:#6fb1f2;--onacc:#08121c;--A:#f0963a;--B:#34c4a8;--C:#a28bf0;--reg:rgba(162,139,240,.16);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e151c;--card:#16212b;--ink:#e3ebf1;--mut:#97a8b6;--line:#2b3b48;--acc:#6fb1f2;--onacc:#08121c;--A:#f0963a;--B:#34c4a8;--C:#a28bf0;--reg:rgba(162,139,240,.16);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 'Plus Jakarta Sans',Inter,system-ui,sans-serif}
+.w{max-width:1180px;margin:0 auto;padding:18px 16px 28px}
+h1{font-size:1.5rem;margin:0 0 4px;font-weight:700}
+.sub{color:var(--mut);margin:0 0 14px;max-width:72ch;font-size:.92rem}
+.ctl{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px 20px}
+.sl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;font-size:.85rem;align-content:start}
+.sl input[type=range]{grid-column:1/3;width:100%;accent-color:var(--acc);margin:4px 0}
+.sl .chk{grid-column:1/3;color:var(--mut);font-size:.8rem}
+output{font-weight:700;font-variant-numeric:tabular-nums}
+.tg{font-style:normal;font-size:.68rem;padding:1px 6px;border-radius:9px;margin-left:4px;border:1px solid var(--line);color:var(--mut);white-space:nowrap}
+.tg.a{border-color:var(--A);color:var(--A)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:7px;padding:6px 12px;cursor:pointer}
+button.on,button.pri{background:var(--acc);color:var(--onacc);border-color:var(--acc)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.clock{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.pn{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.pn header{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:baseline;padding:8px 12px;border-left:5px solid var(--c)}
+.pn h2{margin:0;font-size:.98rem}
+.pn .sd{color:var(--mut);font-size:.82rem}
+.pn .st{margin-left:auto;font-size:.82rem;font-variant-numeric:tabular-nums}
+.pn canvas{display:block;width:100%;background:linear-gradient(#0b1625,#102239)}
+.cb{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;position:sticky;top:8px}
+.cb h3{margin:0 0 6px;font-size:.95rem}
+#ch{display:block;width:100%}
+.lg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.8rem;margin-top:6px}
+.lg i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.cap{font-size:.8rem;color:var(--mut);margin:6px 0 0}
+.nt{margin-top:14px;font-size:.82rem;color:var(--mut);display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px 24px}
+.nt b{color:var(--ink)}
+</style><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body><div class="w">
+<h1>NCA: Opposed Flame Spread on PMMA</h1>
+<p class="sub">NASA SoFIE Investigation. Flat PMMA flight sample (10 × 5 × 1 cm) with opposed forced airflow. Under identical O₂, flow velocity, and pressure, three comparative viewports illustrate how narrow ground channels suppress buoyant convection to emulate true microgravity.</p>
+
+<section class="ctl" aria-label="Controls">
+<label class="sl"><span>Oxygen (O₂) <em class="tg">Range: 21–85%</em></span><output id="oo2"></output><input type="range" id="o2" min="21" max="85" step="1" value="21"></label>
+<label class="sl"><span>Opposed Flow <em class="tg">0–60 cm/s</em></span><output id="ou"></output><input type="range" id="u" min="0" max="60" step="1" value="20"></label>
+<label class="sl"><span>Channel Gap (B) <em class="tg">SDSU: 5 mm</em></span><output id="ow"></output><input type="range" id="w" min="3" max="20" step="1" value="5"></label>
+<div class="sl"><span>Pressure <em class="tg a">Assumed</em></span><output id="op"></output><input type="range" id="p" min="20" max="110" step="1" value="101" aria-label="Pressure"><label class="chk"><input type="checkbox" id="pa" checked> Normoxic curve (pO₂ ≈ 21.3 kPa)</label></div>
+</section>
+
+<div class="bar">
+<button id="sw" class="pri">Sweep Flow</button>
+<button id="pz">Pause</button>
+<button id="rs">Restart Run</button>
+<span id="sp" role="group" aria-label="Simulation Speed"><button data-s="1">×1</button> <button data-s="10">×10</button> <button data-s="50">×50</button> <button data-s="200" class="on">×200</button></span>
+<span class="clock" id="clk"></span>
+</div>
+
+<div class="grid">
+<div id="pns"></div>
+<aside class="cb"><h3>Spread Rate vs Flow Velocity</h3><canvas id="ch" aria-label="Flame spread rate curves vs flow velocity across three gravity configurations"></canvas>
+<div class="lg"><span><i style="background:var(--A)"></i>A · 1g Open Channel (Buoyant)</span><span><i style="background:var(--B)"></i>B · 1g Narrow Channel (5 mm)</span><span><i style="background:var(--C)"></i>C · μg Spaceflight (ISS)</span></div>
+<p class="cap" id="cap"></p></aside>
+</div>
+
+<div class="nt">
+<div><b>NASA Reference Baseline:</b> PMMA 10 × 5 × 1 cm opposed flame spread; SDSU narrow channel gap 5 mm; MSU ground test facility (non-flight apparatus): flow 8–58 cm/s, spread rate 0.02–0.07 mm/s, regression burning above ~30 cm/s exhibiting weak flow dependence. BASS experiments show faint blue chemiluminescent flames at low flow with occasional soot bursts from vapor bubbles; radiative-thermal-kinetic combustion regimes; flame standoff ~1.1 mm decreasing with velocity; flamelet cellular breakup observed near flammability boundaries, expanding at lower pressure.</div>
+<div><b>Assumed Parameters (Illustrative Phenomenological Model):</b> Gravity-dependent O₂ scaling exponents (A: 1.7, C: 0.65, B: gap interpolation); kinetic blowoff beyond ~58 cm/s (A: ~22 cm/s); normoxic pressure scaling; low-flow extinction threshold ~3 cm/s at 21% O₂; channel wall convective/conductive heat loss. 3D WebGL volumetric raymarching for qualitative visualization. Numerical curves are illustrative approximations from NASA research studies.</div>
+</div>
+</div>
+
+<script>
+(()=>{
+const $=i=>document.getElementById(i),cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),fm=(v,d=3)=>v.toFixed(d).replace('.',',');
+const S={o2:21,u:20,w:5,P:101.3,auto:true,spd:200,paused:false},N=201,NB=12;
+let seed=7;const rnd=()=>(seed=seed*16807%2147483647)/2147483647;
+const BU=Array.from({length:NB},()=>({x:8+rnd()*88,d:1.3+rnd()*3.2,r:.4+rnd()*.5}));
+let sweeping=false,sweepDone=false,sweepU=0,dirty=1,gT=0;
+
+function par(f){const bb=Math.pow(S.w/20,2),o=Math.pow(S.o2/21,f==='A'?1.7:f==='B'?.65+1.05*bb:.65),p=Math.sqrt(S.P*S.o2/100/21.27),c=Math.exp(-(S.w-3)/3);
+ let sc=o*p,q=3*Math.pow(21/S.o2,.8)/p,ub=0;
+ if(f==='B'){sc*=1-.25*c;q*=1+.6*c;ub=12*Math.pow(S.w/20,2)}
+ if(f==='A'){sc*=1.1;q=0;ub=12}
+ return{sc,q,ub,uk:(f==='A'?22:58)*Math.sqrt(S.o2/21),tau:f==='A'?15:25}}
+const sm=x=>{x=cl(x);return x*x*(3-2*x)};
+function g(u,q,a){q=Math.min(q,7.5);const v=u>=30?.07:u>=8?.02+.05*sm((u-8)/22):u<=q?0:.02*(u-q)/(8-q);return u>a.uk?v*Math.exp(-(u-a.uk)/a.tau):v}
+function sp(f,u){const a=par(f),ue=Math.hypot(u,a.ub);
+ if(ue<=a.q||(f!=='A'&&u<a.q))return{V:0,ue,a};return{V:a.sc*g(ue,a.q,a),ue,a}}
+
+const T={A:['(A) 1g Open Channel','Buoyant flame lifted & tilted'],B:['(B) 1g Narrow Channel','Quenched against top wall'],C:['(C) μg Spaceflight','Compact, surface-attached flame']};
+function init(P){P.xf=100;P.tp=new Uint8Array(N);P.rg=new Uint8Array(N);P.dep=new Float32Array(N);P.tp[200]=1;P.pp=new Uint8Array(NB);P.fl=[];P.I=1;P.s='burn';P.V=0;P.ue=0;P.reg=false}
+const PN=['A','B','C'].map(f=>{const el=document.createElement('section');el.className='pn';el.style.setProperty('--c','var(--'+f+')');
+ el.innerHTML='<header><h2>'+T[f][0]+'</h2><span class="sd">'+T[f][1]+'</span><span class="st"></span></header><canvas></canvas>';
+ $('pns').appendChild(el);const P={f,cv:el.querySelector('canvas'),st:el.querySelector('.st')};init(P);return P});
+
+function upd(P,sd,wd){
+ P.fl.forEach(q=>q.a+=wd);P.fl=P.fl.filter(q=>q.a<.9);
+ if(P.s==='burn'){
+  if(P.V>0){const nx=Math.max(0,P.xf-P.V*sd);
+   for(let i=Math.ceil(nx*2);i<=Math.floor(P.xf*2);i++)if(!P.tp[i]){P.tp[i]=1;P.rg[i]=P.reg?1:0}
+   P.xf=nx;
+   BU.forEach((b,k)=>{if(!P.pp[k]&&P.xf<=b.x){P.pp[k]=1;P.fl.push({a:0})}});
+   for(let i=0;i<N;i++)if(P.tp[i]&&P.dep[i]<10)P.dep[i]+=(P.rg[i]?.35:.03)*P.V*sd/(1+P.dep[i]/4);
+   if(P.xf<=0)P.s='done'}
+  P.I+=((P.V>0?1:0)-P.I)*Math.min(1,wd);
+  if(P.V===0&&P.I<.04){P.s='out';P.I=0}
+ }else P.I+=(0-P.I)*Math.min(1,wd/1.2)}
+
+const glc=document.createElement('canvas');let GL=glc.getContext('webgl',{premultipliedAlpha:false,antialias:false}),gu={};
+if(GL){try{
+const fs=`precision highp float;
+uniform float uDpr,uHc,uFx,uYs,uS,uL,uH,uSt,uB,uTl,uCe,uI,uT,uTb,uFl,uO,uFm;
+float h31(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
+return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){return .5*vn(p)+.25*vn(p*2.03+7.1)+.125*vn(p*4.07+3.3);}
+float g2(float x){return exp(-x*x);}
+vec3 ramp(float t){vec3 c=mix(vec3(.04,.14,.95),vec3(.3,.62,1.),smoothstep(0.,.45,t));return mix(c,vec3(.85,.95,1.),smoothstep(.45,1.,t));}
+void main(){
+vec2 p=gl_FragCoord.xy/uDpr;
+float x=(p.x-uFx)/uS,y=(uYs-(uHc-p.y))/uS;
+float j=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+vec3 acc=vec3(0.);
+if(uI>.01){
+if(y>-2.&&y<uCe+2.&&x>-10.&&x<uL*1.5+10.){
+for(int i=0;i<16;i++){
+float z=(float(i)+j)*3.5-28.;
+float nb=fbm(vec3(x*.1,y*.1-uT*1.6,z*.1));
+float dsp=(nb-.5)*uTb*(1.+3.*uB)*4.*smoothstep(0.,uH+.5,y);
+float yy=y+dsp,xs=x+dsp*.6-uTl*yy;
+float u=clamp((xs+.12*uL)/(1.12*uL),0.,1.);
+float hx=uH*pow(sin(3.14159*u),.7);
+float yn=(yy-uSt)/max(hx,.1);
+float lat=(1.-smoothstep(16.,27.,abs(z)))*mix(1.,smoothstep(0.,.5,sin(z*.35+uT*.2)*sin(z*.17-uT*.13+1.)+.3),uFm);
+float d=g2((yn-.3)/.5)*smoothstep(uSt-.4,uSt+.3,yy)*smoothstep(0.,.5,hx)*lat*(1.-smoothstep(uCe-.7,uCe,yy));
+d*=.75+.5*nb;
+acc+=ramp(clamp(d*(1.1-.6*clamp(yn,0.,1.)),0.,1.))*d;
+float fx=g2((xs-.4*uL)/(.25*uL+2.)),fy=exp(-max(yy-uSt,0.)/(2.+6.*uB))*smoothstep(uSt-.3,uSt,yy);
+acc+=vec3(1.,.5,.1)*uFl*fx*fy*(.3+nb)*lat*1.6;
+}
+acc*=.075*pow(uI,.7)*pow(uO,.3);
+}
+vec2 hc=vec2(x-.4*uL,y-uSt-uH*.4);
+acc+=vec3(.05,.18,.5)*exp(-dot(hc,hc)/(.5*uL*uL+uH*uH+4.))*.14*uI;
+}
+gl_FragColor=vec4(1.-exp(-acc),1.);}`;
+const mk=(t,s)=>{const o=GL.createShader(t);GL.shaderSource(o,s);GL.compileShader(o);if(!GL.getShaderParameter(o,GL.COMPILE_STATUS))throw GL.getShaderInfoLog(o);return o};
+const pr=GL.createProgram();GL.attachShader(pr,mk(GL.VERTEX_SHADER,'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}'));GL.attachShader(pr,mk(GL.FRAGMENT_SHADER,fs));GL.linkProgram(pr);GL.useProgram(pr);
+GL.bindBuffer(GL.ARRAY_BUFFER,GL.createBuffer());GL.bufferData(GL.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),GL.STATIC_DRAW);
+const al=GL.getAttribLocation(pr,'a');GL.enableVertexAttribArray(al);GL.vertexAttribPointer(al,2,GL.FLOAT,false,0,0);
+'Dpr Hc Fx Ys S L H St B Tl Ce I T Tb Fl O Fm'.split(' ').forEach(n=>gu[n]=GL.getUniformLocation(pr,'u'+n));
+}catch(e){GL=null}}
+function glFlame(P,c,o){
+const w=Math.round(P.W*P.dpr),h=Math.round(P.H*P.dpr);
+if(glc.width!==w||glc.height!==h){glc.width=w;glc.height=h}
+GL.viewport(0,0,w,h);const U=(n,v)=>GL.uniform1f(gu[n],v);
+U('Dpr',P.dpr);U('Hc',P.H);U('Fx',o.fx);U('Ys',o.ys);U('S',o.s);U('L',o.L);U('H',o.h);U('St',o.st);U('B',o.b);U('Tl',o.tl);U('Ce',o.ce);U('I',o.I);U('T',performance.now()/1000);U('Tb',o.tb);U('Fl',o.fl);U('O',o.o);U('Fm',o.fm);
+GL.drawArrays(GL.TRIANGLES,0,3);
+c.save();c.globalCompositeOperation='lighter';c.drawImage(glc,0,0,P.W,P.H);c.restore()}
+function arrow(c,x1,x2,y){c.beginPath();c.moveTo(x1,y);c.lineTo(x2,y);const d=x2>x1?-1:1;c.moveTo(x2,y);c.lineTo(x2+7*d,y-4);c.moveTo(x2,y);c.lineTo(x2+7*d,y+4);c.stroke()}
+function draw(P,pv){
+ const c=P.cv.getContext('2d'),W=P.W,H=P.H-44,s=W*.008,ox=W*.1,bot=H-20,t0=bot-10*s,X=m=>ox+m*s,f=P.f;
+ c.setTransform(P.dpr,0,0,P.dpr,0,0);c.clearRect(0,0,W,P.H);
+ const a=par(f),b=f==='A'?1:f==='B'?Math.pow(S.w/20,2):0;
+ c.font='11px Inter,sans-serif';c.fillStyle=c.strokeStyle='#8fa6bb';c.lineWidth=1;
+ arrow(c,X(2),X(16),14);c.textAlign='left';c.fillText('flow',X(17.5),18);
+ arrow(c,X(98),X(84),14);c.textAlign='right';c.fillText('spread',X(82.5),18);
+ if(f==='B'){const yc=t0-S.w*s-6;c.fillStyle='rgba(150,215,240,.22)';c.fillRect(X(-3),yc,106*s,6);c.strokeStyle='rgba(170,225,245,.65)';c.strokeRect(X(-3),yc,106*s,6);
+  c.fillStyle='#8fa6bb';c.textAlign='left';c.fillText('gap '+S.w+' mm',X(103.5),yc+6)}
+ for(let i=0;i<N;i++){const d=P.dep[i];if(d>=10)continue;const y=t0+d*s;
+  c.fillStyle='#e6dabb';c.fillRect(X(i/2)-.5,y,.5*s+1,bot-y);
+  if(P.tp[i]){c.fillStyle='#7d6c46';c.fillRect(X(i/2)-.5,y,.5*s+1,2)}}
+ if(P.s==='burn'&&P.I>.1){const mx=X(P.xf),my=t0+Math.min(9,P.dep[Math.min(200,Math.round(P.xf*2)+6)])*s,tn=performance.now()/900;c.fillStyle='rgba(255,196,90,.55)';c.fillRect(mx,my-.2*s,9*s,1.4*s);c.strokeStyle='rgba(255,240,200,.85)';for(let k=0;k<4;k++){c.beginPath();c.arc(mx+(k*2+(tn+k)%3*1.2)*s,my+.5*s,(.25+.15*(k%2))*s,0,6.29);c.stroke()}}
+ BU.forEach((q,k)=>{if(P.pp[k])return;c.beginPath();c.arc(X(q.x),t0+q.d*s,q.r*s,0,6.29);c.fillStyle='rgba(255,255,255,.55)';c.fill();c.strokeStyle='rgba(120,100,60,.55)';c.stroke()});
+ c.strokeStyle=c.fillStyle='#8fa6bb';c.beginPath();c.moveTo(X(0),bot+8);c.lineTo(X(100),bot+8);c.stroke();
+ c.textAlign='center';c.fillText('10 cm',X(50),H-3);c.textAlign='right';c.fillText('1 cm',ox-6,t0+5*s+4);
+ const I=pv?(P.V>0?1:0):P.I;
+ {const sy=H+10,sh=30,zs=sh/50,tt=performance.now()/1000,k0=f==='A'?0:cl(1-(P.ue-a.q)*Math.sqrt(S.P*S.o2/100/21.27)/6,0,1);c.fillStyle='#2b3342';c.fillRect(X(0),sy,100*s,sh);c.fillStyle='#e6dabb';c.fillRect(X(0),sy,P.xf*s,sh);
+  for(let z=-25;z<25;z++){const v=(1-sm((Math.abs(z)-16)/11))*(1-k0+k0*sm((Math.sin(z*.35+tt*.2)*Math.sin(z*.17-tt*.13+1)+.3)/.5))*I;if(v>.03){c.fillStyle='rgba(90,170,255,'+Math.min(.95,v)+')';c.fillRect(X(P.xf)-.5*s,sy+(z+25)*zs,6*s,zs+.5)}}
+  c.fillStyle='#8fa6bb';c.textAlign='left';c.fillText('top view',X(101),sy+sh/2+3)}
+ if(I>.02){
+  const sf=f==='A'?1:.45+.55*cl((P.ue-a.q)/6),o=Math.pow(S.o2/21,.4),u=Math.sqrt(P.ue/10),e=I*sf*o;
+  const ys=t0+Math.min(9,P.dep[Math.min(200,Math.round(P.xf*2)+6)])*s,st=1.1*Math.sqrt(20/Math.max(P.ue,3))+1.6*b;
+  let h=(2.2+2.2*u)*e*(1+1.1*b)*(1+.5*cl(1-P.ue/20)),flat=false;const L=(5+5*u)*e*(f==='A'?.7:f==='B'?1.3-.6*b:1);
+  if(f==='B'){const mh=Math.max(.6,S.w-st-.6);if(h>=mh){h=mh;flat=true}}
+  const xl=X(P.xf)-1,xr=xl+L*s,yb=ys-st*s,yt=yb-h*s,xt=xl+L*s*.4+b*h*s*.3+b*Math.sin(performance.now()/180)*2;
+  if(GL)glFlame(P,c,{fx:xl,ys:ys,s:s,L:L,h:h,st:st,b:b,tl:.3*b,ce:f==='B'?S.w+(ys-t0)/s:999,I:I,tb:f==='A'?1:f==='B'?.4+.8*b:.12,fl:Math.max(0,...P.fl.map(q=>1-q.a/.9)),o:S.o2/21,fm:f==='A'?0:cl(1-(P.ue-a.q)*Math.sqrt(S.P*S.o2/100/21.27)/6,0,1)});else{const gr=c.createLinearGradient(0,yb,0,yt);gr.addColorStop(0,'rgba(70,150,255,'+.95*I+')');gr.addColorStop(.55,'rgba(120,200,255,'+.7*I+')');gr.addColorStop(1,'rgba(200,235,255,'+.12*I+')');
+  c.save();c.shadowColor='rgba(80,170,255,.85)';c.shadowBlur=14;c.fillStyle=gr;c.beginPath();
+  if(flat){c.moveTo(xl,yb);c.quadraticCurveTo(xl-3,yt,xl+.2*L*s,yt);c.lineTo(xr-.3*L*s,yt);c.quadraticCurveTo(xr+2,yt,xr,yb)}
+  else{c.moveTo(xl,yb);c.bezierCurveTo(xl-4,yb-(yb-yt)*.55,xt-(xt-xl)*.35,yt+(yb-yt)*.08,xt,yt);c.bezierCurveTo(xt+(xr-xt)*.35,yt+(yb-yt)*.1,xr-(xr-xt)*.1,yb-(yb-yt)*.4,xr,yb)}
+  c.closePath();c.fill();c.restore();
+  P.fl.forEach(q=>{const k=1-q.a/.9,fx=xl+10,Hp=Math.min((6+8*b)*s*k,f==='B'?(S.w-1)*s:1e3);
+   const rg=c.createRadialGradient(fx,yb,0,fx,yb,10+16*k);rg.addColorStop(0,'rgba(255,150,40,'+.85*k+')');rg.addColorStop(1,'rgba(255,120,20,0)');
+   c.fillStyle=rg;c.beginPath();c.arc(fx,yb,10+16*k,0,6.29);c.fill();
+   c.fillStyle='rgba(255,140,30,'+.75*k+')';c.beginPath();c.ellipse(fx,yb-Hp/2,3+4*k,Math.max(1,Hp/2),0,0,6.29);c.fill()})}}}
+
+const clk=t=>{t=Math.floor(t);const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60,p=n=>String(n).padStart(2,'0');return(h?h+':':'')+p(m)+':'+p(s)};
+function ui(){PN.forEach(P=>{const k=P.s==='out'?'Extinguished':P.s==='done'?'Burnout':P.reg?'Regression burning':'Steady spread';
+ P.st.textContent=k+' · V = '+fm(P.V)+' mm/s · burned '+fm(100-P.xf,1)+' mm'});
+ $('clk').textContent='Sim Time '+clk(gT)+' · ×'+S.spd}
+
+let CW=300,CH=280,cdpr=1;const ch=$('ch');
+function chart(){
+ const c=ch.getContext('2d'),W=CW,H=CH,L=50,R=12,T0=14,B=38,pw=W-L-R,ph=H-T0-B,css=getComputedStyle(document.documentElement),v=n=>css.getPropertyValue(n).trim();
+ const ink=v('--ink'),mut=v('--mut'),line=v('--line'),col={A:v('--A'),B:v('--B'),C:v('--C')};
+ c.setTransform(cdpr,0,0,cdpr,0,0);c.clearRect(0,0,W,H);
+ const us=[];for(let u=0;u<=90;u++)us.push(u);const cur={};let mx=.09;
+ ['A','B','C'].forEach(f=>cur[f]=us.map(u=>{const x=sp(f,u).V;mx=Math.max(mx,x);return x}));
+ const stp=mx<=.12?.02:mx<=.3?.05:.1,ym=Math.ceil(mx*1.08/stp)*stp,xs=u=>L+u/90*pw,ys=y=>T0+ph*(1-y/ym);
+ c.fillStyle=v('--reg');c.fillRect(xs(30),T0,xs(90)-xs(30),ph);
+ c.font='11px Inter,sans-serif';c.fillStyle=mut;c.textAlign='center';c.fillText('Blowoff / extinction limit (assumed)',xs(58),T0+12);
+ c.strokeStyle=line;c.lineWidth=1;c.fillStyle=mut;c.textAlign='right';
+ for(let y=0;y<=ym+1e-9;y+=stp){c.beginPath();c.moveTo(L,ys(y));c.lineTo(W-R,ys(y));c.stroke();c.fillText(fm(y,2),L-6,ys(y)+4)}
+ c.textAlign='center';for(let u=0;u<=90;u+=10)c.fillText(u,xs(u),T0+ph+15);
+ c.fillText('Flow Velocity (cm/s)',L+pw/2,H-6);c.save();c.translate(12,T0+ph/2);c.rotate(-Math.PI/2);c.fillText('Spread Rate (mm/s)',0,0);c.restore();
+ c.setLineDash([4,3]);c.strokeStyle=mut;c.strokeRect(xs(8),ys(.07),xs(58)-xs(8),ys(.02)-ys(.07));c.setLineDash([]);
+ c.textAlign='left';c.fillStyle=mut;c.fillText('MSU Ground Baseline',xs(8)+4,ys(.07)-4);
+ if(sweeping||sweepDone){const lim=sweeping?sweepU:90;
+  ['A','B','C'].forEach(f=>{c.strokeStyle=col[f];c.lineWidth=2.2;us.forEach((u,i)=>{if(!i||u>lim)return;c.setLineDash(f!=='B'||u<8||u>58?[4,3]:[]);c.beginPath();c.moveTo(xs(u-1),ys(cur[f][i-1]));c.lineTo(xs(u),ys(cur[f][i]));c.stroke()});c.setLineDash([])})}
+ else{c.fillStyle=mut;c.textAlign='center';c.fillText('Click "Sweep Flow" to render curves',L+pw/2,T0+ph*.45)}
+ c.setLineDash([2,3]);c.strokeStyle=ink;c.lineWidth=1;c.beginPath();c.moveTo(xs(S.u),T0);c.lineTo(xs(S.u),T0+ph);c.stroke();c.setLineDash([]);
+ ['A','B','C'].forEach(f=>{const r=sp(f,S.u);c.fillStyle=col[f];c.strokeStyle=ink;c.beginPath();c.arc(xs(S.u),ys(r.V),4.5,0,6.29);c.fill();c.stroke()});
+ const qb=par('B').q,qc=par('C').q;
+ $('cap').textContent='O₂ '+S.o2+'%, Gap '+S.w+' mm, P '+Math.round(S.P)+' kPa. Extinction limits (assumed): B ≈ '+fm(qb,1)+' cm/s, C ≈ '+fm(qc,1)+' cm/s; A sustains due to buoyant draft. Solid curve: MSU baseline (8–58 cm/s); dashed: assumed.'}
+
+function resize(){PN.forEach(P=>{const W=P.cv.clientWidth||300,s=W*.008,H=Math.max(214,Math.round(.256*W+94)),d=window.devicePixelRatio||1;
+  P.W=W;P.H=H;P.dpr=d;P.cv.width=W*d;P.cv.height=H*d;P.cv.style.height=H+'px'});
+ CW=ch.clientWidth||300;CH=cl(Math.round(CW*.78),250,360);cdpr=window.devicePixelRatio||1;ch.width=CW*cdpr;ch.height=CH*cdpr;ch.style.height=CH+'px';dirty=1}
+new ResizeObserver(resize).observe($('pns'));new ResizeObserver(resize).observe($('ch').parentElement);
+
+function sync(){$('oo2').textContent=S.o2+' %';$('ou').textContent=S.u+' cm/s';$('ow').textContent=S.w+' mm';$('op').textContent=Math.round(S.P)+' kPa';
+ $('o2').value=S.o2;$('u').value=S.u;$('w').value=S.w;$('p').value=S.P;$('p').disabled=S.auto}
+function setP(){if(S.auto)S.P=cl(101.3*21/S.o2,20,110)}
+['o2','u','w','p'].forEach(k=>$(k).oninput=e=>{const x=+e.target.value;if(k==='p')S.P=x;else S[k]=x;if(k==='o2')setP();sync();dirty=1});
+$('pa').onchange=e=>{S.auto=e.target.checked;setP();sync();dirty=1};
+$('sp').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.spd=+b.dataset.s;[...$('sp').children].forEach(x=>x.classList.toggle('on',x===b))};
+$('pz').onclick=()=>{S.paused=!S.paused;$('pz').textContent=S.paused?'Resume':'Pause'};
+$('rs').onclick=()=>{PN.forEach(init);gT=0};
+$('sw').onclick=()=>{if(sweeping)return;sweeping=true;sweepDone=false;sweepU=0;const keep=S.u;$('u').disabled=true;
+ const id=setInterval(()=>{S.u=sweepU;sync();dirty=1;if(sweepU>=60){clearInterval(id);sweeping=false;sweepDone=true;S.u=keep;$('u').disabled=false;sync();dirty=1}else sweepU++},90)};
+
+let last=performance.now();
+function loop(now){const wd=Math.min(.1,(now-last)/1000);last=now;
+ PN.forEach(P=>{const r=sp(P.f,S.u);P.V=r.V;P.ue=r.ue;P.reg=r.V>0&&r.ue>30});
+ if(!S.paused&&!sweeping){const sd=wd*S.spd;PN.forEach(P=>upd(P,sd,wd));if(PN.some(P=>P.s==='burn'))gT+=sd}
+ PN.forEach(P=>draw(P,sweeping));ui();if(dirty){chart();dirty=0}
+ requestAnimationFrame(loop)}
+setP();sync();resize();requestAnimationFrame(loop);
+})();
+</script></body></html>

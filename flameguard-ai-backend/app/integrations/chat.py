@@ -1,5 +1,5 @@
 import asyncio
-from typing import Protocol
+from typing import Literal, Protocol
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -22,6 +22,8 @@ class ConversationMessage(BaseModel):
 class RagRequest(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
     question: str = Field(min_length=1, max_length=4000)
+    # Requested language for provider framing text; None keeps per-question detection.
+    language: Literal["en", "vi"] | None = None
     history: tuple[ConversationMessage, ...] = Field(default=(), max_length=HISTORY_MESSAGES)
     history_truncated: bool = False
     investigation_id: UUID | None = None

@@ -5,10 +5,11 @@ from decimal import Decimal
 
 from app.integrations.chat import CorpusPassage
 from app.integrations.rag.retrieval import fold, refusal, select_passages
+from app.integrations.rag.vocabulary import language, message
 from app.schemas.api.chat import Answer, Citation
 
 # Answer-composition version; bump when the text/selection rules change.
-VERSION = "nasa-extractive-v2"
+VERSION = "nasa-extractive-v4"
 MAX_CITATIONS = 4
 
 FLEX_RUN = re.compile(r"\bflex[- ]?(\d{3})\b")
@@ -17,7 +18,7 @@ TABLE_D0 = re.compile(r"(?:^|; )Droplet initial diameter; mm: (\d+(?:\.\d+)?)(?=
 SHEET_D0 = re.compile(r"^\s*D0\s*\(mm\)\s*=\s*(\d+(?:\.\d+)?)\s*$", re.MULTILINE)
 
 
-def flex_diameter_comparison(question, citations):
+def flex_diameter_comparison(question, citations, lang=None):
     query = fold(question)
     run = FLEX_RUN.search(query)
     if not run or not INITIAL_DIAMETER.search(query):
@@ -29,22 +30,31 @@ def flex_diameter_comparison(question, citations):
         if not re.match(rf"{run_id}(?=\s|$)", fold(excerpt)):
             continue
         if re.fullmatch(r"CSV row \d+", citation.source_locator):
-            label, match = "CSV table", TABLE_D0.search(excerpt)
+            label, match = "Bảng CSV", TABLE_D0.search(excerpt)
         elif citation.source_locator == "TEST CONDITIONS / D0 / kavg":
-            label, match = "Test sheet", SHEET_D0.search(excerpt)
+            label, match = "Phiếu thí nghiệm", SHEET_D0.search(excerpt)
         else:
             continue
         if match:
             values.setdefault(citation.source_document_id, (index, label, match[1]))
     if len({Decimal(value) for _, _, value in values.values()}) < 2:
         return None
+    if (lang or language(question)) == "en":
+        lines = "\n".join(
+            f"• {'CSV table' if label == 'Bảng CSV' else 'Test sheet'}: {value} mm [{index}]."
+            for index, label, value in values.values()
+        )
+        return (
+            f"Sources report different initial diameters (D0) for {run_id.upper()}.\n"
+            f"{lines}\nBoth values are retained with their source context."
+        )
     lines = "\n".join(
-        f"• {label} records {value} mm [{index}]." for index, label, value in values.values()
+        f"• {label} ghi {value} mm [{index}]." for index, label, value in values.values()
     )
     return (
-        f"Two sources record different initial diameters (D0) for {run_id.upper()}.\n"
+        f"Hai nguồn ghi đường kính ban đầu (D0) của {run_id.upper()} khác nhau.\n"
         f"{lines}\n"
-        "Keep both values per source. Open excerpts to view accompanying test conditions."
+        "Giữ cả hai giá trị theo từng nguồn. Mở trích đoạn để xem các điều kiện thử đi kèm."
     )
 
 
@@ -71,25 +81,23 @@ class ExtractiveProvider:
         return Answer(state="unavailable", text="Advisor provider unavailable.")
 
     async def answer(self, request):
-        reason = refusal(request.question)
+        lang = request.language
+        reason = refusal(request.question, lang)
         citations = () if reason else request.allowed_sources[:MAX_CITATIONS]
-        text = (
-            reason
-            or flex_diameter_comparison(request.question, citations)
-            or (
-                "Found the following source excerpts. Keep original units "
-                "and different values per source:\n\n"
-                + "\n\n".join(
-                    f"[{index}] {citation.source_excerpt}"
-                    for index, citation in enumerate(citations, 1)
+        text = reason or flex_diameter_comparison(request.question, citations, lang)
+        if text is None:
+            text = (
+                (
+                    message("found", request.question, lang)
+                    + "\n\n"
+                    + "\n\n".join(
+                        f"[{index}] {citation.source_excerpt}"
+                        for index, citation in enumerate(citations, 1)
+                    )
                 )
                 if citations
-                else (
-                    "No matching evidence found in the current corpus. "
-                    "Please specify the experiment name, run code, or specific parameter."
-                )
+                else message("missing", request.question, lang)
             )
-        )
         return Answer(
             state="answered" if citations else "abstained",
             text=text,

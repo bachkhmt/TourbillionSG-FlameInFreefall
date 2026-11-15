@@ -1,0 +1,412 @@
+[
+  {
+    "id": "development-01-en",
+    "split": "development",
+    "language": "en",
+    "question": "Which investigations studied fire suppression with carbon dioxide?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "flex"
+    ]
+  },
+  {
+    "id": "development-01-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "Thí nghiệm nào dập lửa bằng CO2 hoặc heli?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "flex"
+    ]
+  },
+  {
+    "id": "development-02-en",
+    "split": "development",
+    "language": "en",
+    "question": "What fuels were used in FLEX?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "flex"
+    ]
+  },
+  {
+    "id": "development-02-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "Mục tiêu và nhiên liệu của FLEX là gì?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "flex"
+    ]
+  },
+  {
+    "id": "development-03-en",
+    "split": "development",
+    "language": "en",
+    "question": "What is the objective of SAME-R smoke aerosol research?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "same-r"
+    ]
+  },
+  {
+    "id": "development-03-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "Mục tiêu nghiên cứu khói của SAME-R là gì?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "same-r"
+    ]
+  },
+  {
+    "id": "development-04-en",
+    "split": "development",
+    "language": "en",
+    "question": "What does SAME measure about smoke detection?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "same",
+      "same-r"
+    ]
+  },
+  {
+    "id": "development-04-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "SAME đo gì để phát hiện khói?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "same",
+      "same-r"
+    ]
+  },
+  {
+    "id": "development-05-en",
+    "split": "development",
+    "language": "en",
+    "question": "Compare BASS and Saffire",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "bass",
+      "bass-ii",
+      "saffire-i",
+      "saffire-ii",
+      "saffire-iii"
+    ],
+    "expected_groups": [
+      [
+        "bass",
+        "bass-ii"
+      ],
+      [
+        "saffire-i",
+        "saffire-ii",
+        "saffire-iii"
+      ]
+    ]
+  },
+  {
+    "id": "development-05-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "So sánh mục tiêu BASS và Saffire",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "bass",
+      "bass-ii",
+      "saffire-i",
+      "saffire-ii",
+      "saffire-iii"
+    ],
+    "expected_groups": [
+      [
+        "bass",
+        "bass-ii"
+      ],
+      [
+        "saffire-i",
+        "saffire-ii",
+        "saffire-iii"
+      ]
+    ]
+  },
+  {
+    "id": "development-06-en",
+    "split": "development",
+    "language": "en",
+    "question": "BRE gaseous fuel objective",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "bre"
+    ]
+  },
+  {
+    "id": "development-06-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "Mục tiêu nghiên cứu nhiên liệu khí của BRE?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "bre"
+    ]
+  },
+  {
+    "id": "development-07-en",
+    "split": "development",
+    "language": "en",
+    "question": "CFI-G inverse flame objective",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "cfi-g"
+    ]
+  },
+  {
+    "id": "development-07-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "Mục tiêu ngọn lửa ngược của CFI-G?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "cfi-g"
+    ]
+  },
+  {
+    "id": "development-08-en",
+    "split": "development",
+    "language": "en",
+    "question": "E-FIELD electric field objective",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "e-field"
+    ]
+  },
+  {
+    "id": "development-08-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "Mục tiêu điện trường của E-FIELD?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "e-field"
+    ]
+  },
+  {
+    "id": "development-09-en",
+    "split": "development",
+    "language": "en",
+    "question": "FLEX-007 D0 initial diameter conflict?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "flex"
+    ]
+  },
+  {
+    "id": "development-09-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "FLEX-007 đường kính D0 có mâu thuẫn?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "flex"
+    ]
+  },
+  {
+    "id": "development-10-en",
+    "split": "development",
+    "language": "en",
+    "question": "Which investigations use MSG hardware?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "bass",
+      "bass-ii",
+      "spice",
+      "slice"
+    ]
+  },
+  {
+    "id": "development-10-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "Thí nghiệm nào dùng phần cứng MSG?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "bass",
+      "bass-ii",
+      "spice",
+      "slice"
+    ]
+  },
+  {
+    "id": "development-11-en",
+    "split": "development",
+    "language": "en",
+    "question": "Is PMMA safe at 30% oxygen?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "development-11-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "PMMA có an toàn ở 30% oxy không?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "development-12-en",
+    "split": "development",
+    "language": "en",
+    "question": "Combustion measurements at Mars gravity 0.38g?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "development-12-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "Dữ liệu cháy ở trọng lực Sao Hỏa 0.38g?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "development-13-en",
+    "split": "development",
+    "language": "en",
+    "question": "FLEX-007 vs FLEX-008 D0?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "development-13-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "So sánh FLEX-007 và FLEX-008 D0?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "development-14-en",
+    "split": "development",
+    "language": "en",
+    "question": "highest oxygen concentration tested in microgravity",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "development-14-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "Thí nghiệm nào có nồng độ oxy cao nhất?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "development-15-en",
+    "split": "development",
+    "language": "en",
+    "question": "What is the bitcoin price today?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "development-15-vi",
+    "split": "development",
+    "language": "vi",
+    "question": "Giá bitcoin hôm nay?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "holdout-01-en",
+    "split": "holdout",
+    "language": "en",
+    "question": "FLEX-008 D0 initial droplet diameter",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "flex"
+    ]
+  },
+  {
+    "id": "holdout-01-vi",
+    "split": "holdout",
+    "language": "vi",
+    "question": "Đường kính ban đầu D0 của FLEX-008?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "flex"
+    ]
+  },
+  {
+    "id": "holdout-02-en",
+    "split": "holdout",
+    "language": "en",
+    "question": "What is the objective of DAFT dust research?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "daft"
+    ]
+  },
+  {
+    "id": "holdout-02-vi",
+    "split": "holdout",
+    "language": "vi",
+    "question": "Mục tiêu nghiên cứu bụi của DAFT là gì?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "daft"
+    ]
+  },
+  {
+    "id": "holdout-03-en",
+    "split": "holdout",
+    "language": "en",
+    "question": "CFI droplet experiments using MDCA in CIR",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "cfi"
+    ]
+  },
+  {
+    "id": "holdout-03-vi",
+    "split": "holdout",
+    "language": "vi",
+    "question": "Nghiên cứu giọt của CFI dùng MDCA trong CIR?",
+    "expected_state": "answered",
+    "expected_slugs": [
+      "cfi"
+    ]
+  },
+  {
+    "id": "holdout-04-en",
+    "split": "holdout",
+    "language": "en",
+    "question": "How many source records contain oxygen measurements?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "holdout-04-vi",
+    "split": "holdout",
+    "language": "vi",
+    "question": "Có bao nhiêu bản ghi có số đo oxy?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "holdout-05-en",
+    "split": "holdout",
+    "language": "en",
+    "question": "Are there measurements under lunar gravity?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  },
+  {
+    "id": "holdout-05-vi",
+    "split": "holdout",
+    "language": "vi",
+    "question": "Có số đo ở trọng lực Mặt Trăng không?",
+    "expected_state": "abstained",
+    "expected_slugs": []
+  }
+]

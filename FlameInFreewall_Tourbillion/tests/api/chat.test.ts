@@ -74,6 +74,16 @@ describe('chat service', () => {
     });
   });
 
+  it('sends the selected answer language only when one is given', async () => {
+    await sendChatMessage(ID, 'FLEX-007 D0?', 'vi');
+    expect(request).toHaveBeenLastCalledWith(`/chat/sessions/${ID}/messages`, {
+      method: 'POST',
+      body: { question: 'FLEX-007 D0?', language: 'vi' },
+      signal: undefined,
+      timeoutMs: CHAT_SEND_TIMEOUT_MS,
+    });
+  });
+
   it('pins source metadata to locator and corpus version', async () => {
     await getChatSource('a/b', 'CSV row 8', 'c'.repeat(64));
     expect(request).toHaveBeenLastCalledWith('/chat/sources/a%2Fb', {

@@ -3,6 +3,7 @@
 import React from 'react';
 import { ExternalLink, Database, BookOpen, Film, Flame, ShieldAlert, FileText } from 'lucide-react';
 import type { ChallengeResourceDto } from '@/api/dto';
+import { browserSourceUrl } from '@/lib/psiLinks';
 
 export interface ResourceCardProps {
   resource: ChallengeResourceDto;
@@ -98,7 +99,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
 
         {resource.source_url && (
           <a
-            href={resource.source_url}
+            href={browserSourceUrl(resource.source_url) ?? undefined}
             target="_blank"
             rel="noopener noreferrer"
             data-testid={`open-resource-link-${resource.resource_id}`}

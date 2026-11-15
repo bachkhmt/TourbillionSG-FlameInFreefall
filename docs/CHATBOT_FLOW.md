@@ -1,14 +1,17 @@
 # NASA Chatbot (Extractive RAG): Workflow and Execution Guide
 
-Updated 2026-11-14.
+Updated 2026-11-15.
 
 **Architecture:** Chat runs directly within this repository's backend. RAG plugs in via the
 Phase 6 `RagProvider` extension point and is enabled with `CHAT_PROVIDER=extractive`. Decisions are documented at:
 - [ADR-0005](../flameguard-ai-backend/docs/decisions/ADR-0005-real-corpus-extractive-chat.md)
 - [Phase 6b spec](../flameguard-ai-backend/specs/phase6b-real-corpus-chat/spec.md)
 
-**Answer scope:** The chatbot only extracts **verbatim** chunks from admitted CC0 sources, with
-citations linked to a specific corpus version. No LLMs and no paid providers.
+**Answer scope:** The chatbot only extracts **verbatim** chunks that have been admitted: PSI
+sources under their CC0 declaration, and NASA-authored article text under the separate rights
+policy of [ADR-0006](../flameguard-ai-backend/docs/decisions/ADR-0006-challenge-source-ownership.md).
+Citations are linked to a specific corpus version. CC0 is never assumed for NASA pages, images or
+transcripts. No LLMs and no paid providers.
 `review_status` is always `unreviewed`; the chatbot does not provide safe/unsafe conclusions.
 
 ## User Interaction Flow
@@ -154,3 +157,33 @@ Results as of 2026-11-14:
 Advisor reporting `PROVIDER_UNAVAILABLE`, unknown sources (404), and outdated corpus (409).
 
 This is a retrieval and persistence verification for the local demo, not a scientific or production evaluation.
+
+
+## Quality fixes (2026-11-15)
+
+Provider `nasa-extractive-v3` uses a bounded bilingual/chemistry vocabulary, recognises study
+families and balances excerpts when comparing. Lead-in and refusal text follow the question's
+language; excerpts stay verbatim. Questions that need aggregation across records (highest/lowest/
+how many/range) abstain and point to Explorer unless a specific run code is named. Aggregate
+numbers are never computed and presented as NASA statements.
+
+Product evaluation set: `integration_tests/data/chat_eval.json` (40 questions, 20 EN/20 VI, split
+and hash frozen before tuning). Development run:
+
+```bash
+PYTHONPATH=.:flameguard-ai-backend flameguard-ai-backend/.venv/bin/python -m integrations.nasa_data.chat_evaluation --split development
+```
+
+The ten holdout questions are run only after the retrieval rules are closed; results are reported
+separately in `flameguard-ai-backend/specs/phase6b-real-corpus-chat/evaluation.md`. This is a small
+team-authored benchmark, not scientific verification. The `playbook-rag/` prototype benchmark does
+not apply to this chatbot.
+
+## Answer language (2026-11-15)
+
+Provider `nasa-extractive-v4` accepts an explicit language. The chat drawer shows an `EN | VI`
+switch (English by default, remembered per browser) and sends `language` with each question.
+Only the provider's framing text (found/missing, refusals, FLEX D0 conflict summary) follows it;
+excerpts stay verbatim and citations are identical in both languages. Requests without
+`language` keep per-question detection. `timeout`/`unavailable` messages stay English. See
+`flameguard-ai-backend/specs/chat-answer-language/spec.md` and ADR-0009.

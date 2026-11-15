@@ -1,4 +1,5 @@
 import { apiRequest } from '../client';
+import type { ChatAnswerLanguage } from '@/lib/chatLanguage';
 import type {
   ChatAdvisorOutputDto,
   ChatExchangeDto,
@@ -54,11 +55,13 @@ export function listChatMessages(
 export function sendChatMessage(
   sessionId: string,
   question: string,
+  language?: ChatAnswerLanguage,
   signal?: AbortSignal
 ): Promise<ChatExchangeDto> {
   return apiRequest<ChatExchangeDto>(`/chat/sessions/${id(sessionId)}/messages`, {
     method: 'POST',
-    body: { question },
+    // Omitted language keeps the backend's per-question detection.
+    body: language ? { question, language } : { question },
     signal,
     timeoutMs: CHAT_SEND_TIMEOUT_MS,
   });

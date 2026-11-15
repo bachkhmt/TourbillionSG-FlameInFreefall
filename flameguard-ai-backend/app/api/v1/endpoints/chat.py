@@ -189,7 +189,7 @@ async def history(
 
 @router.post("/chat/sessions/{identity}/messages", response_model=Exchange, status_code=201)
 async def send(identity: UUID, value: Question, chat: Annotated[ChatService, Depends(service)]):
-    return await chat.send(identity, value.question)
+    return await chat.send(identity, value.question, value.language)
 
 
 @router.post("/advisor/assessments", response_model=AdvisorOutput)

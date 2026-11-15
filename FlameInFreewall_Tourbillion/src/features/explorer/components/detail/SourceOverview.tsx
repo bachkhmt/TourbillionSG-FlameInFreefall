@@ -5,6 +5,7 @@ import {
   useDescriptiveQuery,
 } from "@/api/services/evidenceNavigation";
 import { ApiErrorBanner } from "@/components/ui/ApiErrorBanner";
+import { browserSourceUrl } from '@/lib/psiLinks';
 export function SourceOverview({ id }: { id: string }) {
   const query = useStudyOverviewQuery(id);
   const conditions = useDescriptiveQuery({ investigationId: id });
@@ -42,7 +43,7 @@ export function SourceOverview({ id }: { id: string }) {
                   >
                     <p className="whitespace-pre-wrap">{p.text}</p>
                     <a
-                      href={p.sourceUrl}
+                      href={browserSourceUrl(p.sourceUrl) ?? undefined}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs text-blue-800 underline"

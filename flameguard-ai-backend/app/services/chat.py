@@ -327,7 +327,7 @@ class ChatService:
             raise HTTPException(502, "Retrieval unavailable") from None
         return verify_hits(hits, corpus.passages)
 
-    async def send(self, identity, question):
+    async def send(self, identity, question, language=None):
         info = await self.get(identity)
         retriever = getattr(self.provider, "retrieve", None)
         retrieval = callable(retriever)
@@ -380,6 +380,7 @@ class ChatService:
             )
         provider_request = RagRequest(
             question=question,
+            language=language,
             history=history,
             history_truncated=truncated,
             investigation_id=info.investigation_id,

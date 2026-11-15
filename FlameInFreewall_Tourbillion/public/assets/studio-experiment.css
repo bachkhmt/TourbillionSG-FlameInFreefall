@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root, body, button, input, select, textarea, h1, h2, h3, h4, p, span, label, small, b {
+  font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, sans-serif;
+}
+
+/* Small-screen adaptations for the supplied illustrations; physics is unchanged. */
+@media(max-width:620px){
+  [data-studio-demo="mist"] .maps,
+  [data-studio-demo="mist"] .sup,
+  [data-studio-demo="nca"] .nt{grid-template-columns:minmax(0,1fr)}
+  [data-studio-demo="mist"] .card:has(table){overflow-x:auto}
+}

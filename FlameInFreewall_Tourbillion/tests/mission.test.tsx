@@ -7,6 +7,7 @@ import {
 import MissionPage from '../src/app/(dashboard)/mission/page';
 import { useWorkspaceStore, DEFAULT_SCENARIO } from '../src/store/useWorkspaceStore';
 import { toastStore } from '../src/components/toast/toast-store';
+import { renderWithQuery } from './test-utils';
 
 const mockPush = vi.fn();
 let mockSearchParams = new URLSearchParams();
@@ -137,7 +138,7 @@ describe('Mission Scenario & Evidence Gap Matrix (/mission)', () => {
 
   describe('MissionPage evidence-only workspace', () => {
     it('renders configuration, condition gaps and related investigations', () => {
-      render(<MissionPage />);
+      renderWithQuery(<MissionPage />);
       expect(screen.getByTestId('scenario-config-form')).toBeDefined();
       expect(screen.getByRole('region', {name: 'Mission API evidence'})).toBeDefined();
       expect(screen.queryByTestId('ranked-evidence-list')).toBeNull();
@@ -147,15 +148,21 @@ describe('Mission Scenario & Evidence Gap Matrix (/mission)', () => {
 
     it('keeps legacy prediction URLs on evidence without loading a predictive panel', () => {
       mockSearchParams = new URLSearchParams('view=prediction');
-      render(<MissionPage />);
+      renderWithQuery(<MissionPage />);
       expect(screen.getByTestId('evidence-view-container')).toBeDefined();
       expect(screen.queryByTestId('predictive-lab-panel')).toBeNull();
       expect(screen.queryByTestId('view-tab-prediction')).toBeNull();
       expect(mockPush).not.toHaveBeenCalled();
     });
 
+    it('hands the comparison selection from ?compare= to the evidence panel', () => {
+      mockSearchParams = new URLSearchParams('compare=flex,bass-ii,flex');
+      renderWithQuery(<MissionPage />);
+      expect(screen.getByTestId('compare-focus').textContent).toContain('2 investigations selected in Comparison');
+    });
+
     it('keeps the selected habitat scenario in the evidence workspace', () => {
-      render(<MissionPage />);
+      renderWithQuery(<MissionPage />);
       fireEvent.click(screen.getByTestId('preset-artemis-lunar-base'));
       expect(useWorkspaceStore.getState().activeScenario.gravity).toBe(0.16);
       expect(screen.getByText(/a microgravity regime is not measured 0g/)).toBeDefined();
@@ -165,7 +172,7 @@ describe('Mission Scenario & Evidence Gap Matrix (/mission)', () => {
 
   describe('Mission Scenario Light Theme', () => {
     it('renders scenario configuration and gap matrix with light white cards and badges', () => {
-      render(<MissionPage />);
+      renderWithQuery(<MissionPage />);
       expect(screen.getAllByText(/Mission Scenario/i).length).toBeGreaterThan(0);
       expect(screen.getByRole('button', {name: 'Analyze evidence'})).toBeDefined();
       expect(screen.getByTestId('mission-workbench')).toBeInTheDocument();

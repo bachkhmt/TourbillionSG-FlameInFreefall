@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-studio-demo="rtdfs"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RTDFS · Residence Time Driven Flame Spread (NASA SoFIE)</title>
+<style>
+:root{--bg:#04070d;--fg:#c9d6ea;--bh:96px;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:12px/1.45 'Plus Jakarta Sans',Inter,system-ui,sans-serif;overflow:hidden;font-variant-numeric:tabular-nums}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#c:active{cursor:grabbing}
+#main{position:fixed;left:0;right:0;top:0;bottom:var(--bh);display:grid;grid-template-columns:1fr 1fr;pointer-events:none}
+@media (max-aspect-ratio:1/1){#main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}}
+.pa{position:relative;min-height:0;min-width:0;border-right:1px solid #ffffff14;border-bottom:1px solid #ffffff14}
+.pt{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center}
+.pt b{font-size:22px;font-weight:500;letter-spacing:.06em}
+.pt div{font-size:12px;min-height:1.4em}
+.hud{position:absolute;left:8px;bottom:8px;width:190px;max-width:48%;padding:6px 8px;background:#04070dcc;border:1px solid #ffffff12;border-radius:8px;display:grid;gap:3px}
+.hud div{display:flex;justify-content:space-between;gap:8px}
+.hud b{font-weight:500}
+.pb{height:3px;background:#ffffff18;border-radius:2px;overflow:hidden}.pb i{display:block;height:100%;width:0;background:#7aa2ff}
+.mp{position:absolute;right:8px;bottom:8px;width:170px;height:130px;border-radius:6px;border:1px solid #ffffff12}
+#bar{position:fixed;left:0;right:0;bottom:0;padding:6px 12px calc(6px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;align-items:center;background:#0a101cee;border-top:1px solid #ffffff14}
+#bar label{display:flex;gap:6px;align-items:center}
+output{min-width:4.6em;opacity:.75}
+input[type=range]{width:96px;accent-color:#5b8cff}
+button{font:inherit;color:inherit;background:#ffffff0f;border:1px solid #ffffff22;border-radius:6px;padding:4px 9px;cursor:pointer}
+button:hover{background:#ffffff22}
+:focus-visible{outline:2px solid #7aa2ff;outline-offset:2px}
+#rd{flex-basis:100%;text-align:center;opacity:.6;font-size:11px}
+#info{position:fixed;left:10px;top:calc(8px + env(safe-area-inset-top,0px));max-width:330px;opacity:.55;font-size:11px;z-index:2}
+#info:hover,#info[open]{opacity:.95}
+#info summary{cursor:pointer}
+#info p{margin:.4em 0;background:#04070dd9;padding:6px 8px;border-radius:6px}
+</style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body>
+<canvas id="c"></canvas>
+<div id="main"></div>
+<details id="info"><summary>Scientific Notes & Assumptions</summary>
+<p><b>NASA Reference Baseline:</b> Thin PMMA sheet (30 × 5 cm, ~0.1 mm nominal), opposed flame spread; at 0.1 mm thickness, flow velocity below ~2 cm/s leads to radiative quench extinction, while flow above ~40 cm/s approaches kinetic blowoff.</p>
+<p><b>Assumed Parameters (Illustrative Phenomenological Model):</b> Thickness δ 0.05–1.0 mm; O₂ 21–35%; low-flow quench boundary diminishes near ~35% O₂ and blowoff boundary shifts higher with oxygen; critical thickness δc ≈ 0.6 mm is a qualitative hypothesis for δ > 0.4 mm; 1g natural convective drift ~4 cm/s; ~1.5 mm/s spread rate scaling at 0.1 mm. Qualitative 3D visualization, not direct CFD. Drag mouse to rotate, scroll to zoom, Space to pause.</p></details>
+<div id="bar">
+<label>V <input id="sV" type="range" min="0" max="60" step="0.5" value="8"><output id="vV"></output></label>
+<label>δ <input id="sD" type="range" min="0.05" max="1" step="0.01" value="0.1"><output id="vD"></output></label>
+<label>O₂ <input id="sO" type="range" min="21" max="35" value="21"><output id="vO"></output></label>
+<label>Speed <input id="sp" type="range" min="5" max="60" value="20"><output id="vS"></output></label>
+<button id="bR">Reignite</button><button id="bP">Pause</button>
+<button data-v="1">V=1</button><button data-v="8">V=8</button><button data-v="50">V=50</button>
+<label><input type="checkbox" id="cA" checked> Auto-reignite</label>
+<div id="rd"></div></div>
+<script src="/assets/vendor/three-r128.min.js"></script>
+<script>
+const NOISE=`
+float h31(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
+ return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){return .5*vn(p)+.25*vn(p*2.03+7.1)+.125*vn(p*4.07+3.3);}
+float g2(float x){return exp(-x*x);}`;
+const VS=`varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`;
+const FF=NOISE+`
+uniform float uT,uI,uL,uStand,uLean,uShift,uTurb,uMode,uGain,uO,uHW,uScroll;
+uniform int uSteps;
+uniform vec3 uBoxC,uBoxH,uCa,uCb,uCc,uCd;
+varying vec3 vW;
+vec3 ramp(float t){vec3 c=mix(uCa,uCb,smoothstep(0.,.35,t));c=mix(c,uCc,smoothstep(.35,.7,t));return mix(c,uCd,smoothstep(.7,1.,t));}
+vec3 shade(vec3 p){
+ p.x+=uShift; // blowoff: lửa bị đẩy về phía vùng đã cháy
+ float aw=1.-smoothstep(uHW-.2,uHW+.6,abs(p.z));
+ if(uMode>.5){ // μg: màn xanh mỏng ôm hai mặt tấm, đuôi hội tụ phía sau
+  float t=clamp(-p.x/uL,0.,1.);
+  float h=uStand*(.10+.40*sqrt(t)*(1.-.65*t));
+  float ay=abs(p.y);
+  float n=(vn(p*2.5+vec3(0.,0.,uT*.2))-.5)*.06;
+  float w=.07+.07*sqrt(t);
+  float sh=g2((ay-h+n)/w);
+  float pf=1.-smoothstep(0.,.5,p.x);
+  float pt=p.x<0.?pow(1.-t,1.4):1.;
+  float pr=pf*pt;
+  float tip=g2((p.x+.15)/.35);
+  float d=sh*pr*(1.+1.6*tip)*aw;
+  float halo=.18*exp(-max(ay-h,0.)/.45)*pr*aw;
+  return mix(uCa,uCb,clamp(d,0.,1.))*(d+halo)+uCc*tip*d*.7+uCd*tip*tip*d*.5;
+ }
+ // 1g: lực nổi -> cột lửa cao, nghiêng theo dòng, nhiễu cuộn lên
+ float y=p.y,yy=max(y,0.),Hh=uL;
+ vec3 np=vec3(p.x*1.3,y*.9-uT*uScroll,p.z*1.3);
+ float n1=fbm(np),n2=vn(np*1.7+vec3(5.,0.,9.));
+ float wp=smoothstep(0.,2.5,y+.5)*uTurb;
+ float x2=p.x+uLean*yy*.5+(n1-.5)*.8*wp;
+ float z2=p.z+(n2-.5)*.7*wp;
+ float k=clamp(yy/Hh,0.,1.);
+ float w=.35+.5*k;
+ float az=1.-smoothstep(uHW-.3-.8*k,uHW+.5,abs(z2));
+ float up=smoothstep(-.1,.4,y);
+ float cl=g2(x2/w)*exp(-yy*yy/(Hh*Hh*.55))*up;
+ float bl=g2((abs(y)-.15)/.12)*(1.-up)*g2(x2/(w*1.3))*.7;
+ float d=max((cl*(.55+.9*n1)+bl)*az*(1.+(n1-.5)*uTurb*1.2),0.);
+ float tmp=clamp(d*.85,0.,1.)*(1.-.45*clamp(yy/(Hh*1.5),0.,1.));
+ return ramp(tmp)*d+uCb*.25*exp(-(p.x*p.x+y*y)/.3)*aw;
+}
+void main(){
+ vec3 ro=cameraPosition,rd=normalize(vW-ro);
+ vec3 inv=1./rd,t0=(uBoxC-uBoxH-ro)*inv,t1=(uBoxC+uBoxH-ro)*inv;
+ vec3 mn=min(t0,t1),mx=max(t0,t1);
+ float tn=max(max(mn.x,mn.y),max(mn.z,0.)),tf=min(min(mx.x,mx.y),mx.z);
+ if(tf<=tn)discard;
+ float dt=(tf-tn)/float(uSteps);
+ float j=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+ vec3 acc=vec3(0.);
+ for(int i=0;i<48;i++){if(i>=uSteps)break;acc+=shade(ro+rd*(tn+(float(i)+j)*dt))*dt;}
+ acc*=uGain*pow(max(uI,0.),.7)*pow(uO,.3);
+ gl_FragColor=vec4(1.-exp(-acc),1.);
+}`;
+const GVS=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+const GFF=`uniform vec3 uCol;uniform float uK;varying vec2 vUv;void main(){vec2 p=(vUv-.5)*2.;float r2=dot(p,p);float g=exp(-r2*4.)*.6+exp(-r2*12.)*.4;gl_FragColor=vec4(uCol*g*uK,1.);}`;
+
+const $=id=>document.getElementById(id),V3=a=>new THREE.Vector3(...a);
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+const rm=matchMedia('(prefers-reduced-motion: reduce)').matches,rmk=rm?.35:1;
+const PL=300,MS=2,MW=170,MH=130,ML=28,MB=20,MT=6,MR=6;
+const COL={spread:'#2f9e6b',quench:'#3a6fd0',thick:'#27458f',blow:'#d6563a'};
+let steps=44;
+const st={V:8,d:0.1,o:21,pause:false,sp:20};
+// ---------- vật lý định tính (giữ từ bản 2D) ----------
+const mk=g1=>({g1,xb:0,I:0.8,blow:0,rim:0.8,out:null,Vf:0,L:0,R:null,t:0});
+const Q=[mk(1),mk(0)];
+const reset=q=>Object.assign(q,mk(q.g1));
+const sstep=(a,b,x)=>{x=clamp((x-a)/(b-a),0,1);return x*x*(3-2*x)};
+// Vq, Vb: 2 và ~40 cm/s ở 0,1 mm, O2 21% (BASS-II). Vq không đổi theo δ trong 0,1-0,4 mm; chỉ khi δ > 0,4 mm mới nhích lên (giả thuyết δc)
+function lim(d,o){const Vq0=2*Math.max(0,1-(o-21)/14),Vb=40*Math.exp(0.06*(o-21)),dc=0.6*(1+0.06*(o-21)),s=clamp((d-0.4)/(dc-0.4),0,1);return{Vq:Vq0+(0.5*Vb-Vq0)*s*s,Vb,dc,thick:d>=dc};}
+function regime(V,d,o,g1){const L=lim(d,o);if(L.thick)return{k:'thick',e:0,nb:0,L};const Ve=g1?Math.hypot(V,4):V;
+ const eq=L.Vq>0?sstep(L.Vq,1.6*L.Vq,Ve):1,nb=sstep(L.Vb/3,L.Vb,Ve);
+ return{k:Ve<L.Vq?'quench':Ve>L.Vb?'blow':'spread',e:Math.min(eq,1-nb),nb,L};}
+function step(p,dt){
+ const R=regime(st.V,st.d,st.o,p.g1);p.R=R;p.t+=dt;
+ if(p.out){p.rim*=Math.exp(-dt/25);p.I=0;p.Vf=0;p.L=0;return;}
+ let tg,tau=15,h=0.35;
+ if(R.k==='thick'){tg=0;tau=90;h=0.3;}
+ else if(R.k==='quench'){tg=0;tau=35;}
+ else if(R.k==='blow'){p.blow=Math.min(1,p.blow+dt/30);tg=0.55*(1-p.blow);tau=12;}
+ else{tg=0.35+0.65*R.e;h=0.35+0.65*R.e;} // plateau (thermal regime): Vf không phụ thuộc V, chỉ ∝ 1/δ; giảm ở hai đầu
+ if(R.k!=='blow')p.blow=Math.max(0,p.blow-dt/10);
+ p.I+=(tg-p.I)*(1-Math.exp(-dt/tau));p.rim=p.I;
+ p.Vf=1.5*(0.1/st.d)*(1+0.04*(st.o-21))*h*Math.min(1,p.I/0.5)*(1-p.blow);
+ p.xb+=p.Vf*dt;p.L=(p.g1?40:22)*Math.pow(p.I,0.8);
+ if(p.xb>=PL){p.xb=PL;p.out='done';}else if(p.I<0.04)p.out=R.k;}
+function modeOf(p){const R=p.R||{k:'spread',e:1,nb:0};
+ if(p.out==='done')return['Burnout: Full sample consumed','#8a8f99'];
+ if(p.out==='quench')return['Extinguished: Radiative quench','#6f9bf0'];
+ if(p.out==='blow')return['Extinguished: Flow blowoff','#ef7a5e'];
+ if(p.out==='thick')return['Extinguished: Thermally thick','#8097d8'];
+ if(R.k==='quench')return['Radiative quench: Flame shrinks','#6f9bf0'];
+ if(R.k==='blow')return['Blowoff: Blown downstream, flickering','#ef7a5e'];
+ if(R.k==='thick')return['Thermally thick: Flame dies','#8097d8'];
+ return[R.e<0.35?'Weak spread (near boundary)':'Steady opposed spread','#37b57c'];}
+// ---------- DOM ----------
+$('main').innerHTML=['1g','μg'].map((t,i)=>`<div class="pa" id="pa${i}"><div class="pt"><b>${t}</b><div id="hm${i}"></div></div><div class="hud"><div>Spread Rate<b id="hv${i}"></b></div><div>Flame Length<b id="hl${i}"></b></div><div>Burned Length<b id="hb${i}"></b></div><div class="pb"><i id="pb${i}"></i></div></div><canvas class="mp" id="m${i}" width="${MW*MS}" height="${MH*MS}"></canvas></div>`).join('');
+const pa=[$('pa0'),$('pa1')],mp=[$('m0'),$('m1')],mapC=[];
+function buildMap(i){const c=mapC[i]||(mapC[i]=document.createElement('canvas'));c.width=MW*MS;c.height=MH*MS;const x=c.getContext('2d');x.scale(MS,MS);
+ x.fillStyle='#0c0f14';x.fillRect(0,0,MW,MH);
+ const pw=MW-ML-MR,ph=MH-MT-MB,g=Q[i].g1;
+ for(let a=0;a<pw;a+=2)for(let b=0;b<ph;b+=2){const V=60*((a+1)/pw)**2,d=0.05+0.95*(1-(b+1)/ph);x.fillStyle=COL[regime(V,d,st.o,g).k];x.fillRect(ML+a,MT+b,2,2);}
+ x.font='9px system-ui';x.fillStyle='#aab3c0';x.textAlign='center';
+ [0,2,10,40,60].forEach(v=>x.fillText(v,ML+pw*Math.sqrt(v/60),MH-10));
+ x.fillText('V (cm/s)',ML+pw/2,MH-1);
+ x.textAlign='right';[[0.05,'0,05'],[0.1,'0,1'],[0.5,'0,5'],[1,'1,0']].forEach(([d,t])=>x.fillText(t,ML-3,MT+ph*(1-(d-0.05)/0.95)+3));
+ x.fillStyle='rgba(255,255,255,.85)';x.textAlign='left';x.font='bold 9px system-ui';x.fillText('spread',ML+pw*0.3,MT+ph*0.8);
+ x.font='8px system-ui';x.fillText('quench',ML+1,MT+ph*0.5);x.fillText('blowoff',ML+pw*0.8,MT+ph*0.5);
+ if(!Q[i].g1){x.strokeStyle='#fff';x.lineWidth=1.2;[2,40].forEach(v=>{x.beginPath();x.arc(ML+pw*Math.sqrt(v/60),MT+ph*(1-(0.1-0.05)/0.95),2.5,0,6.283);x.stroke();});}}
+function drawMap(i){const x=mp[i].getContext('2d');x.setTransform(MS,0,0,MS,0,0);x.drawImage(mapC[i],0,0,MW,MH);
+ const pw=MW-ML-MR,ph=MH-MT-MB,px=ML+pw*Math.sqrt(st.V/60),py=MT+ph*(1-(st.d-0.05)/0.95);
+ x.beginPath();x.arc(px,py,5,0,6.283);x.fillStyle=Q[i].out?'#8a8f99':'#fff';x.fill();x.lineWidth=2;x.strokeStyle='#000';x.stroke();}
+// ---------- Three.js ----------
+const cv=$('c'),r=new THREE.WebGLRenderer({canvas:cv,antialias:false});
+r.setClearColor(0x04070d,1);
+const SN=140,spos=new Float32Array(SN*3);
+for(let k=0;k<SN;k++){spos[k*3]=Math.random()*16-8;spos[k*3+1]=Math.random()*5-1.5;spos[k*3+2]=Math.random()*7-3.5;}
+const sgeo=new THREE.BufferGeometry();sgeo.setAttribute('position',new THREE.BufferAttribute(spos,3));
+const bx=(w,h,d,c,o)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshBasicMaterial({color:c,transparent:o<1,opacity:o,depthWrite:false}));return m;};
+function mkPanel(m){
+ const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(32,1,.5,200);
+ const cc=m?[[.04,.14,.95],[.3,.62,1],[.8,.93,1],[.7,.9,1]]:[[.45,.04,0],[1,.36,.03],[1,.78,.22],[1,.95,.72]];
+ const bc=m?V3([-1.2,0,0]):V3([-1.5,2.4,0]),bh=m?V3([5,1.6,3.8]):V3([5,4.2,3.8]);
+ const U={uT:{value:0},uI:{value:0},uL:{value:2},uStand:{value:1},uLean:{value:.3},uShift:{value:0},uTurb:{value:1},uMode:{value:m},uGain:{value:m?8:1.4},uO:{value:1},uHW:{value:2.5},uSteps:{value:steps},uScroll:{value:1.9*(rm?.5:1)},uBoxC:{value:bc},uBoxH:{value:bh},uCa:{value:V3(cc[0])},uCb:{value:V3(cc[1])},uCc:{value:V3(cc[2])},uCd:{value:V3(cc[3])}};
+ const fire=new THREE.Mesh(new THREE.BoxGeometry(2,2,2),new THREE.ShaderMaterial({uniforms:U,vertexShader:VS,fragmentShader:FF,side:THREE.BackSide,transparent:true,blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false}));
+ fire.scale.copy(bh);fire.position.copy(bc);fire.renderOrder=3;fire.frustumCulled=false;
+ const plate=bx(1,1,1,0x9cc3ff,.2),rails=[bx(1,.09,.09,0xcfe4ff,.85),bx(1,.09,.09,0xcfe4ff,.85)],front=bx(1,1,1,0xffffff,1);
+ const clR=bx(.8,.9,5.8,0x4a5266,1),clL=bx(.8,.9,5.8,0x4a5266,1),wire=bx(.1,.1,5,0xff7a28,1);
+ const ghost=[0,1].map(k=>{const g=new THREE.BufferGeometry().setFromPoints([V3([0,0,0]),V3([1,0,0])]);const l=new THREE.Line(g,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.22}));l.position.z=k?2.5:-2.5;return l;});
+ const pts=new THREE.Points(sgeo,new THREE.PointsMaterial({color:0x7fa8ff,size:.07,transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending}));pts.frustumCulled=false;
+ const GU={uCol:{value:V3(m?[.15,.35,1]:[1,.55,.2])},uK:{value:0}};
+ const glow=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.ShaderMaterial({uniforms:GU,vertexShader:GVS,fragmentShader:GFF,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
+ glow.renderOrder=1;glow.frustumCulled=false;
+ sc.add(glow,plate,...rails,front,clR,clL,wire,...ghost,pts,fire);
+ return{sc,cam,U,GU,fire,plate,rails,front,clR,clL,wire,ghost,glow,m};}
+const P=[mkPanel(0),mkPanel(1)];
+const cam={th:.55,ph:.28,d:18,ty:.9};
+function place(p,asp){const k=p.cam,c=Math.cos(cam.ph);k.aspect=asp;k.updateProjectionMatrix();
+ k.position.set(cam.d*c*Math.sin(cam.th),cam.ty+cam.d*Math.sin(cam.ph),cam.d*c*Math.cos(cam.th));k.lookAt(0,cam.ty,0);k.updateMatrixWorld();}
+let A=0;
+function update(rdt){
+ const sp=1.2*Math.sqrt(st.V)*rdt;
+ for(let k=0;k<SN;k++){spos[k*3]-=sp;if(spos[k*3]<-8)spos[k*3]+=16;}
+ sgeo.attributes.position.needsUpdate=true;
+ P.forEach((p,i)=>{
+  const q=Q[i],u=p.U,xc=q.xb/10;
+  let Id=q.I*(1-.35*q.blow*(.5+.5*Math.sin(A*27+i)));
+  if(!i)Id*=1+.12*rmk*Math.sin(A*9)*(Math.sin(A*15.7)*.5+.5);
+  if(q.R&&q.R.k==='spread'&&q.R.nb>.8)Id*=1-.4*Math.min(1,(q.R.nb-.8)*5)*(.5+.5*Math.sin(A*19));
+  u.uT.value=A;u.uI.value=Id;u.uL.value=Math.max(.25,q.L/10);u.uO.value=st.o/21;
+  u.uStand.value=1/Math.sqrt(1+.12*(st.V+(i?0:4)));
+  u.uLean.value=Math.min(.7,.15+.012*st.V);
+  u.uShift.value=q.blow*2.2;
+  u.uTurb.value=(i?.05:1.*(1+1.5*(1-q.I/.9)))*rmk;
+  p.fire.visible=Id>.004;
+  const th=.03+st.d*.8,Lw=Math.max(.01,Math.min(20,30-xc));
+  p.plate.scale.set(Lw,th,5);p.plate.position.set(Lw/2,0,0);
+  p.rails.forEach((b,k)=>{b.scale.x=Lw;b.position.set(Lw/2,0,k?2.5:-2.5);});
+  const h=clamp(q.rim*1.4,0,1);
+  p.front.material.color.setRGB((.75+.25*h)*(.7+.6*q.rim),(.88-.38*h)*(.7+.6*q.rim),(1-.88*h)*(.7+.6*q.rim));
+  p.front.scale.set(.12,th+.1,5);
+  p.clR.position.set(30-xc+.4,0,0);p.clR.visible=30-xc<16;
+  p.clL.position.set(-xc-.4,0,0);p.clL.visible=xc<12;
+  p.wire.position.set(-xc,0,0);p.wire.visible=xc<12;
+  p.wire.material.color.setRGB(1,.35+.2*Math.max(0,1-q.t/80),.1);
+  const gl=Math.min(xc,14);p.ghost.forEach(l=>{l.scale.x=Math.max(gl,.001);l.position.x=-gl;});
+  const cy=i?0:1.8,dir=V3([0,cy,0]).sub(p.cam.position).normalize();
+  p.glow.position.set(0,cy,0).addScaledVector(dir,7);p.glow.quaternion.copy(p.cam.quaternion);
+  const sz=.6+.4*q.I;p.glow.scale.set(i?9*sz:10*sz,i?5*sz:12*sz,1);
+  p.GU.uK.value=Id*(i?.7:.55)*Math.min(1.4,st.o/21);
+  const[m,c]=modeOf(q),e=$('hm'+i);e.textContent=m;e.style.color=c;
+  $('hv'+i).textContent=q.Vf.toFixed(2)+' mm/s';$('hl'+i).textContent=q.L.toFixed(1)+' mm';
+  $('hb'+i).textContent=xc.toFixed(1)+' / 30 cm';$('pb'+i).style.width=(xc/30*100)+'%';
+  drawMap(i);
+ });}
+function renderAll(){const H=innerHeight;r.setScissorTest(true);
+ P.forEach((p,i)=>{const b=pa[i].getBoundingClientRect(),x=b.left,y=H-b.bottom,w=b.width,h=b.height;if(w<2||h<2)return;
+  r.setViewport(x,y,w,h);r.setScissor(x,y,w,h);place(p,w/h);r.render(p.sc,p.cam);});}
+function size(){r.setPixelRatio(Math.min(devicePixelRatio,1.5));r.setSize(innerWidth,innerHeight,false);
+ document.documentElement.style.setProperty('--bh',$('bar').offsetHeight+'px');}
+addEventListener('resize',size);
+// ---------- điều khiển ----------
+let drag=0,tmr;
+cv.onpointerdown=e=>{drag=1;cv.setPointerCapture(e.pointerId)};
+cv.onpointermove=e=>{if(drag){cam.th-=e.movementX*.006;cam.ph=clamp(cam.ph+e.movementY*.004,-.3,1.2)}};
+cv.onpointerup=()=>drag=0;
+cv.addEventListener('wheel',e=>{e.preventDefault();cam.d=clamp(cam.d*Math.exp(e.deltaY*.001),9,40)},{passive:false});
+function togglePause(){st.pause=!st.pause;$('bP').textContent=st.pause?'Tiếp tục':'Tạm dừng';}
+addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='BUTTON'){e.preventDefault();togglePause();}});
+function upd(){st.V=+$('sV').value;st.d=+$('sD').value;const o=+$('sO').value,oc=o!==st.o;st.o=o;st.sp=+$('sp').value;
+ $('vV').textContent=st.V+' cm/s';$('vD').textContent=st.d.toFixed(2)+' mm';$('vO').textContent=o+'%';$('vS').textContent='×'+st.sp;
+ if(oc)Q.forEach((_,i)=>buildMap(i));
+ const q=lim(st.d,st.o);
+ $('rd').textContent=q.thick?`δ ≥ δc ≈ ${q.dc.toFixed(2)} mm: luôn tắt (assumed)`:`μg: lan khi ${q.Vq.toFixed(1)} ≤ V ≤ ${q.Vb.toFixed(0)} cm/s · δc ≈ ${q.dc.toFixed(2)} mm (assumed, chỉ tác dụng khi δ > 0,4 mm) · mốc 2 và ~40 cm/s: BASS-II, 0,1 mm`;
+ clearTimeout(tmr);if($('cA').checked)tmr=setTimeout(()=>Q.forEach(p=>{if(p.out)reset(p);}),350);}
+['sV','sD','sO','sp'].forEach(id=>$(id).addEventListener('input',upd));
+$('bR').onclick=()=>Q.forEach(reset);$('bP').onclick=togglePause;
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{$('sV').value=b.dataset.v;upd();});
+Q.forEach((_,i)=>buildMap(i));upd();size();
+let last=performance.now(),fn=0,ft=last;
+function loop(now){requestAnimationFrame(loop);
+ const rdt=Math.min(.05,(now-last)/1000);last=now;
+ if(!st.pause){A+=rdt;Q.forEach(p=>step(p,rdt*st.sp));}
+ update(st.pause?0:rdt);renderAll();
+ fn++;if(now-ft>1000){const fps=fn*1000/(now-ft);fn=0;ft=now;if(fps<30&&steps>24){steps=steps>32?32:24;P.forEach(p=>p.U.uSteps.value=steps);}}}
+requestAnimationFrame(loop);
+</script></body></html>

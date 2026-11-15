@@ -359,3 +359,34 @@ async def test_provider_and_retrieval_timeouts_are_visible_without_citations(cli
             assert answer["state"] == "timeout" and answer["citations"] == []
     finally:
         app.state.settings.chat_timeout_seconds = 10
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Which investigations studied fire suppression with carbon dioxide?",
+        "Thí nghiệm nào dập lửa bằng CO2 hoặc heli?",
+        "Compare BASS and Saffire",
+        "highest oxygen concentration tested in microgravity",
+    ],
+)
+async def test_v3_http_navigation_and_aggregation(client, target, question):
+    client, _app = client
+    identity = await new_session(client)
+    response = await ask(client, identity, question)
+    assert response.status_code == 201, response.text
+    answer = response.json()["assistant"]["answer"]
+    if question.startswith("highest"):
+        assert answer["state"] == "abstained" and not answer["citations"]
+        assert "Explorer" in answer["text"]
+    else:
+        assert answer["state"] == "answered" and answer["citations"]
+    assert answer["provider_version"] == "nasa-extractive-v4"
+    registry = json.loads((target["collection"].parent / "corpus-registry.json").read_text())
+    slugs = [registry["sources"][c["source_document_id"]]["slug"] for c in answer["citations"]]
+    if "dioxide" in question or "CO2" in question:
+        assert "flex" in slugs[:2]
+    if question.startswith("Compare"):
+        assert "bass" in slugs and any(slug.startswith("saffire-") for slug in slugs)
+    if "Thí nghiệm" not in question:
+        assert not answer["text"].startswith(("Tìm", "Không", "Hãy"))
