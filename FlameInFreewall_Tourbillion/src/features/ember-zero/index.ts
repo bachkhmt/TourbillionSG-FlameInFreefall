@@ -5,3 +5,5 @@ export * from './store/useEmberStore';
 export * from './components/act1-flame/InteractiveIgniter';
 export * from './components/act1-flame/ProceduralFlameCanvas';
 export * from './components/act1-flame/FloatingPropsLayer';
+export * from './components/act1-flame/DualAtmosphereDial';
+export * from './components/story/EmberStoryOverlay';
