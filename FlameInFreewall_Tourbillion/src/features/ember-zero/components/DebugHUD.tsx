@@ -56,12 +56,12 @@ export const DebugHUD: React.FC<DebugHUDProps> = ({ className = '' }) => {
       data-testid="debug-hud"
       role="complementary"
       aria-label="Ember Zero Telemetry HUD"
-      className={`fixed bottom-4 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] bg-zinc-950/90 text-emerald-400 font-mono text-xs rounded-xl p-4 border border-emerald-500/30 shadow-2xl backdrop-blur-md transition-all ${className}`}
+      className={`fixed bottom-4 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] bg-zinc-950/90 text-lime-400 font-mono text-xs rounded-xl p-4 border border-lime-500/30 shadow-2xl backdrop-blur-md transition-all ${className}`}
     >
       {/* HUD Header */}
-      <div className="flex items-center justify-between pb-2 mb-3 border-b border-emerald-500/20">
+      <div className="flex items-center justify-between pb-2 mb-3 border-b border-lime-500/20">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+          <Activity className="w-4 h-4 text-lime-400 animate-pulse" />
           <span className="font-bold uppercase tracking-wider text-white">
             Debug HUD Telemetry
           </span>
@@ -70,7 +70,7 @@ export const DebugHUD: React.FC<DebugHUDProps> = ({ className = '' }) => {
           type="button"
           onClick={toggleDebug}
           aria-label="Đóng Debug HUD"
-          className="p-1 rounded hover:bg-emerald-500/20 text-emerald-400 transition-colors cursor-pointer"
+          className="p-1 rounded hover:bg-lime-500/20 text-lime-400 transition-colors cursor-pointer"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -78,35 +78,35 @@ export const DebugHUD: React.FC<DebugHUDProps> = ({ className = '' }) => {
 
       {/* Telemetry Stats Grid */}
       <div className="space-y-2 mb-4">
-        <div className="flex justify-between items-center py-0.5 border-b border-emerald-500/10">
+        <div className="flex justify-between items-center py-0.5 border-b border-lime-500/10">
           <span className="text-zinc-400">Tiến trình (Progress):</span>
-          <span className="font-bold text-emerald-300">
+          <span className="font-bold text-lime-300">
             {(progress * 100).toFixed(1)}%
           </span>
         </div>
 
-        <div className="flex justify-between items-center py-0.5 border-b border-emerald-500/10">
+        <div className="flex justify-between items-center py-0.5 border-b border-lime-500/10">
           <span className="text-zinc-400">Trọng lực (Gravity):</span>
-          <span className="font-bold text-emerald-300">
+          <span className="font-bold text-lime-300">
             {gravity.toFixed(2)}g
           </span>
         </div>
 
-        <div className="flex justify-between items-center py-0.5 border-b border-emerald-500/10">
+        <div className="flex justify-between items-center py-0.5 border-b border-lime-500/10">
           <span className="text-zinc-400">Nồng độ O₂ (Oxygen):</span>
-          <span className="font-bold text-emerald-300">
+          <span className="font-bold text-lime-300">
             {oxygenPct.toFixed(1)}%
           </span>
         </div>
 
-        <div className="flex justify-between items-center py-0.5 border-b border-emerald-500/10">
+        <div className="flex justify-between items-center py-0.5 border-b border-lime-500/10">
           <span className="text-zinc-400">Cảnh hiện tại (Scene):</span>
           <span className="font-bold text-cyan-300">
             {activeScene}
           </span>
         </div>
 
-        <div className="flex justify-between items-center py-0.5 border-b border-emerald-500/10">
+        <div className="flex justify-between items-center py-0.5 border-b border-lime-500/10">
           <span className="text-zinc-400">Đã châm lửa (Ignited):</span>
           <span className={isIgnited ? 'text-amber-400 font-bold' : 'text-zinc-500'}>
             {isIgnited ? 'TRUE' : 'FALSE'}
@@ -122,7 +122,7 @@ export const DebugHUD: React.FC<DebugHUDProps> = ({ className = '' }) => {
       </div>
 
       {/* Quick Controls */}
-      <div className="pt-2 border-t border-emerald-500/20 space-y-2">
+      <div className="pt-2 border-t border-lime-500/20 space-y-2">
         <div className="text-[10px] uppercase text-zinc-400 tracking-wider">
           Phím tắt: Bấm phím &apos;D&apos; để ẩn/hiện
         </div>

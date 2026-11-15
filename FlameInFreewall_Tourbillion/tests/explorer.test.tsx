@@ -820,7 +820,7 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
               }),
             ]),
             total: 3,
-            has_more: true,
+            next: 'http://test/next',
           },
         })
       );

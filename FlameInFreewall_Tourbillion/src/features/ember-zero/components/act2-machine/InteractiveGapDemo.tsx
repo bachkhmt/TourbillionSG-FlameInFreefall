@@ -168,13 +168,13 @@ export const InteractiveGapDemo: React.FC<InteractiveGapDemoProps> = ({
           className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md font-mono text-xs font-bold uppercase tracking-wider transition-colors ${
             current.isGap
               ? 'bg-rose-100 text-rose-800 border border-rose-300 animate-pulse'
-              : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+              : 'bg-lime-100 text-lime-900 border border-lime-300'
           }`}
         >
           {current.isGap ? (
             <AlertTriangle className="w-4 h-4 text-rose-600" />
           ) : (
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 text-lime-700" />
           )}
           <span>{current.statusLabel}</span>
         </div>
@@ -217,7 +217,7 @@ export const InteractiveGapDemo: React.FC<InteractiveGapDemoProps> = ({
           {current.isGap ? (
             <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
           ) : (
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+            <CheckCircle2 className="w-5 h-5 text-lime-700 shrink-0 mt-0.5" />
           )}
           <div>
             <p className="font-medium">{current.explanation}</p>
@@ -254,7 +254,7 @@ export const InteractiveGapDemo: React.FC<InteractiveGapDemoProps> = ({
                       ? 'bg-rose-600 text-white animate-pulse'
                       : isPartialDim
                       ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                      : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                      : 'bg-lime-100 text-lime-900 border border-lime-300'
                   }`}
                 >
                   {dim.status}

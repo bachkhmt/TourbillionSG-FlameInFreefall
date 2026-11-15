@@ -224,9 +224,9 @@ export const ValueRevealDeck: React.FC<ValueRevealDeckProps> = ({
                 <p className="text-blue-950 text-xs sm:text-sm leading-relaxed">{currentBeat.solution}</p>
               </div>
 
-              <div className="p-3.5 rounded-lg bg-emerald-50/50 border border-emerald-200">
-                <div className="text-xs font-mono font-bold text-emerald-800 uppercase mb-1">LỢI ÍCH ĐÃ KIỂM CHỨNG</div>
-                <p className="text-emerald-950 text-xs sm:text-sm leading-relaxed">{currentBeat.verifiedBenefit}</p>
+              <div className="p-3.5 rounded-lg bg-lime-50/50 border border-lime-200">
+                <div className="text-xs font-mono font-bold text-lime-800 uppercase mb-1">LỢI ÍCH ĐÃ KIỂM CHỨNG</div>
+                <p className="text-lime-950 text-xs sm:text-sm leading-relaxed">{currentBeat.verifiedBenefit}</p>
               </div>
             </div>
           </div>
@@ -254,22 +254,22 @@ export const ValueRevealDeck: React.FC<ValueRevealDeckProps> = ({
                 <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
                   <div className="font-bold text-[#0B2374]">BASS-II</div>
                   <div className="text-slate-500 mt-1">42 test runs (0.00g)</div>
-                  <div className="text-[11px] text-emerald-700 mt-1">✓ Đã lập chỉ mục</div>
+                  <div className="text-[11px] text-lime-700 mt-1">✓ Đã lập chỉ mục</div>
                 </div>
                 <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
                   <div className="font-bold text-[#0B2374]">CIR / FLEX</div>
                   <div className="text-slate-500 mt-1">118 droplet burns</div>
-                  <div className="text-[11px] text-emerald-700 mt-1">✓ Đã lập chỉ mục</div>
+                  <div className="text-[11px] text-lime-700 mt-1">✓ Đã lập chỉ mục</div>
                 </div>
                 <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
                   <div className="font-bold text-[#0B2374]">SoFIE-MIST</div>
                   <div className="text-slate-500 mt-1">36 solid flame tests</div>
-                  <div className="text-[11px] text-emerald-700 mt-1">✓ Đã lập chỉ mục</div>
+                  <div className="text-[11px] text-lime-700 mt-1">✓ Đã lập chỉ mục</div>
                 </div>
                 <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
                   <div className="font-bold text-[#0B2374]">SAME (Sensors)</div>
                   <div className="text-slate-500 mt-1">Particulate telemetry</div>
-                  <div className="text-[11px] text-emerald-700 mt-1">✓ Đã lập chỉ mục</div>
+                  <div className="text-[11px] text-lime-700 mt-1">✓ Đã lập chỉ mục</div>
                 </div>
               </div>
             </div>
@@ -300,7 +300,7 @@ export const ValueRevealDeck: React.FC<ValueRevealDeckProps> = ({
                 <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#0B2374]/70">
                   SO KHỚP SOFIE-MIST: 94.2% TƯƠNG ĐỒNG VẬT LÝ
                 </h4>
-                <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
+                <span className="text-xs font-mono font-bold text-lime-900 bg-lime-100 px-2 py-0.5 rounded border border-lime-300">
                   XẾP HẠNG 1 TRONG 20 NGHIÊN CỨU
                 </span>
               </div>

@@ -39,14 +39,14 @@
 - Create: `FlameInFreewall_Tourbillion/src/features/ember-zero/store/useEmberStore.ts`
 - Test: `FlameInFreewall_Tourbillion/tests/ember-zero-store.test.ts`
 
-- [ ] **Step 1:** Write the failing unit tests in `tests/ember-zero-store.test.ts` covering gravity interpolation curve, scene range bounds detection, and Zustand store updates.
-- [ ] **Step 2:** Run `npx vitest run tests/ember-zero-store.test.ts` to confirm test failure.
-- [ ] **Step 3:** Implement `types.ts` defining `SceneRangeId`, `EmberState`, `DialState`, `ValueBeat`, and `IgnitionStatus`.
-- [ ] **Step 4:** Implement `sceneRanges.ts` defining default progress marks (Scene 0 through Scene 7b).
-- [ ] **Step 5:** Implement `lib/gravityCurve.ts` with piecewise smoothstep logic mapping progress to gravity (1.00g -> 0.00g -> 0.16g).
-- [ ] **Step 6:** Implement `store/useEmberStore.ts` with Zustand store maintaining progress, gravity, oxygenPct, ignition state, audio state, and debug HUD visibility.
-- [ ] **Step 7:** Run `npx vitest run tests/ember-zero-store.test.ts` to verify all tests pass.
-- [ ] **Step 8:** Commit: `feat(ember-zero): scaffold core types, scene ranges, gravity curve, and zustand store`.
+- [x] **Step 1:** Write the failing unit tests in `tests/ember-zero-store.test.ts` covering gravity interpolation curve, scene range bounds detection, and Zustand store updates.
+- [x] **Step 2:** Run `npx vitest run tests/ember-zero-store.test.ts` to confirm test failure.
+- [x] **Step 3:** Implement `types.ts` defining `SceneRangeId`, `EmberState`, `DialState`, `ValueBeat`, and `IgnitionStatus`.
+- [x] **Step 4:** Implement `sceneRanges.ts` defining default progress marks (Scene 0 through Scene 7b).
+- [x] **Step 5:** Implement `lib/gravityCurve.ts` with piecewise smoothstep logic mapping progress to gravity (1.00g -> 0.00g -> 0.16g).
+- [x] **Step 6:** Implement `store/useEmberStore.ts` with Zustand store maintaining progress, gravity, oxygenPct, ignition state, audio state, and debug HUD visibility.
+- [x] **Step 7:** Run `npx vitest run tests/ember-zero-store.test.ts` to verify all tests pass.
+- [x] **Step 8:** Commit: `feat(ember-zero): scaffold core types, scene ranges, gravity curve, and zustand store`.
 
 ---
 
@@ -58,13 +58,13 @@
 - Create: `FlameInFreewall_Tourbillion/src/features/ember-zero/components/act1-flame/FloatingPropsLayer.tsx`
 - Test: `FlameInFreewall_Tourbillion/tests/ember-zero-flame.test.tsx`
 
-- [ ] **Step 1:** Write the failing component tests in `tests/ember-zero-flame.test.tsx` testing the igniter trigger, canvas mount, and floating props calculations.
-- [ ] **Step 2:** Run `npx vitest run tests/ember-zero-flame.test.tsx` to verify failure.
-- [ ] **Step 3:** Implement `InteractiveIgniter.tsx` supporting mouse drag, touch swipe, or spacebar hold to strike flint sparks and ignite the wick.
-- [ ] **Step 4:** Implement `ProceduralFlameCanvas.tsx` with GPU particle/fluid shading: rendering a flickering teardrop flame at 1.00g transitioning to a soft, breathing blue sphere at 0.00g with no pointed tip.
-- [ ] **Step 5:** Implement `FloatingPropsLayer.tsx` featuring drifting props (water droplet becoming a sphere, matchbox, pencil, paper) during "The Drop" (0.15–0.31 progress).
-- [ ] **Step 6:** Run `npx vitest run tests/ember-zero-flame.test.tsx` to confirm tests pass.
-- [ ] **Step 7:** Commit: `feat(ember-zero): build procedural flame canvas, interactive igniter, and floating props layer`.
+- [x] **Step 1:** Write the failing component tests in `tests/ember-zero-flame.test.tsx` testing the igniter trigger, canvas mount, and floating props calculations.
+- [x] **Step 2:** Run `npx vitest run tests/ember-zero-flame.test.tsx` to verify failure.
+- [x] **Step 3:** Implement `InteractiveIgniter.tsx` supporting mouse drag, touch swipe, or spacebar hold to strike flint sparks and ignite the wick.
+- [x] **Step 4:** Implement `ProceduralFlameCanvas.tsx` with GPU particle/fluid shading: rendering a flickering teardrop flame at 1.00g transitioning to a soft, breathing blue sphere at 0.00g with no pointed tip.
+- [x] **Step 5:** Implement `FloatingPropsLayer.tsx` featuring drifting props (water droplet becoming a sphere, matchbox, pencil, paper) during "The Drop" (0.15–0.31 progress).
+- [x] **Step 6:** Run `npx vitest run tests/ember-zero-flame.test.tsx` to confirm tests pass.
+- [x] **Step 7:** Commit: `feat(ember-zero): build procedural flame canvas, interactive igniter, and floating props layer`.
 
 ---
 
@@ -75,12 +75,12 @@
 - Create: `FlameInFreewall_Tourbillion/src/features/ember-zero/components/story/EmberStoryOverlay.tsx`
 - Test: `FlameInFreewall_Tourbillion/tests/ember-zero-dials.test.tsx`
 
-- [ ] **Step 1:** Write failing tests in `tests/ember-zero-dials.test.tsx` testing dual dial computation (ppO2 vs O2 Flammability), narrative text progression per scene, and reduced motion fallback.
-- [ ] **Step 2:** Run `npx vitest run tests/ember-zero-dials.test.tsx` to verify failure.
-- [ ] **Step 3:** Implement `DualAtmosphereDial.tsx` showing both Breathing dial (ppO2 normoxic in green) and Fire dial (O2 concentration surge in amber) with the punchline: *"Bạn thở vẫn thấy ổn. Ngọn lửa thì không."*
-- [ ] **Step 4:** Implement `EmberStoryOverlay.tsx` with editorial serif typography, floating weight-decay letter animations, and monospace telemetry annotations (NO BUOYANCY, DIFFUSION-LIMITED).
-- [ ] **Step 5:** Run `npx vitest run tests/ember-zero-dials.test.tsx` to verify all tests pass.
-- [ ] **Step 6:** Commit: `feat(ember-zero): build dual atmosphere dials and story typography overlay`.
+- [x] **Step 1:** Write failing tests in `tests/ember-zero-dials.test.tsx` testing dual dial computation (ppO2 vs O2 Flammability), narrative text progression per scene, and reduced motion fallback.
+- [x] **Step 2:** Run `npx vitest run tests/ember-zero-dials.test.tsx` to verify failure.
+- [x] **Step 3:** Implement `DualAtmosphereDial.tsx` showing both Breathing dial (ppO2 normoxic in green) and Fire dial (O2 concentration surge in amber) with the punchline: *"Bạn thở vẫn thấy ổn. Ngọn lửa thì không."*
+- [x] **Step 4:** Implement `EmberStoryOverlay.tsx` with editorial serif typography, floating weight-decay letter animations, and monospace telemetry annotations (NO BUOYANCY, DIFFUSION-LIMITED).
+- [x] **Step 5:** Run `npx vitest run tests/ember-zero-dials.test.tsx` to verify all tests pass.
+- [x] **Step 6:** Commit: `feat(ember-zero): build dual atmosphere dials and story typography overlay`.
 
 ---
 
@@ -93,14 +93,14 @@
 - Create: `FlameInFreewall_Tourbillion/src/features/ember-zero/components/act2-machine/LockedPredictiveDemo.tsx`
 - Test: `FlameInFreewall_Tourbillion/tests/ember-zero-value-reveal.test.tsx`
 
-- [ ] **Step 1:** Write failing tests in `tests/ember-zero-value-reveal.test.tsx` testing the dark-to-light theme transition, rendering of the 6 value beats, gap matrix highlight, and safety lock simulation.
-- [ ] **Step 2:** Run `npx vitest run tests/ember-zero-value-reveal.test.tsx` to verify failure.
-- [ ] **Step 3:** Implement `LabLightsTransition.tsx` providing the dramatic "Turn on the lab lights" transition: cinematic dark dissolves into StructPaper paper aesthetic (`#F8F9FA` + `#0B2374` + `#D4FC02`).
-- [ ] **Step 4:** Implement `InteractiveGapDemo.tsx` showcasing the 6-dimension Evidence Gap Matrix with Moon 0.16g flagged as RED GAP.
-- [ ] **Step 5:** Implement `LockedPredictiveDemo.tsx` demonstrating the LOCKED state when Lunar conditions are requested, explaining the 3 prerequisites audit.
-- [ ] **Step 6:** Implement `ValueRevealDeck.tsx` showcasing all 6 beats: 1. Tro tàn $\to$ Kho tàng, 2. Chòm sao so sánh, 3. Bản đồ lỗ hổng, 4. So khớp SoFIE-MIST, 5. Cỗ máy trung thực, 6. Về Trái Đất.
-- [ ] **Step 7:** Run `npx vitest run tests/ember-zero-value-reveal.test.tsx` to verify all tests pass.
-- [ ] **Step 8:** Commit: `feat(ember-zero): build lab lights transition and 6-beat value reveal deck`.
+- [x] **Step 1:** Write failing tests in `tests/ember-zero-value-reveal.test.tsx` testing the dark-to-light theme transition, rendering of the 6 value beats, gap matrix highlight, and safety lock simulation.
+- [x] **Step 2:** Run `npx vitest run tests/ember-zero-value-reveal.test.tsx` to verify failure.
+- [x] **Step 3:** Implement `LabLightsTransition.tsx` providing the dramatic "Turn on the lab lights" transition: cinematic dark dissolves into StructPaper paper aesthetic (`#F8F9FA` + `#0B2374` + `#D4FC02`).
+- [x] **Step 4:** Implement `InteractiveGapDemo.tsx` showcasing the 6-dimension Evidence Gap Matrix with Moon 0.16g flagged as RED GAP.
+- [x] **Step 5:** Implement `LockedPredictiveDemo.tsx` demonstrating the LOCKED state when Lunar conditions are requested, explaining the 3 prerequisites audit.
+- [x] **Step 6:** Implement `ValueRevealDeck.tsx` showcasing all 6 beats: 1. Tro tàn $\to$ Kho tàng, 2. Chòm sao so sánh, 3. Bản đồ lỗ hổng, 4. So khớp SoFIE-MIST, 5. Cỗ máy trung thực, 6. Về Trái Đất.
+- [x] **Step 7:** Run `npx vitest run tests/ember-zero-value-reveal.test.tsx` to verify all tests pass.
+- [x] **Step 8:** Commit: `feat(ember-zero): build lab lights transition and 6-beat value reveal deck`.
 
 ---
 
@@ -115,15 +115,15 @@
 - Create: `FlameInFreewall_Tourbillion/src/app/(landing)/ember-zero/page.tsx`
 - Test: `FlameInFreewall_Tourbillion/tests/ember-zero-page.test.tsx`
 
-- [ ] **Step 1:** Write failing tests in `tests/ember-zero-page.test.tsx` verifying page layout, navigation CTA links, 60s demo mode, and Debug HUD toggling.
-- [ ] **Step 2:** Run `npx vitest run tests/ember-zero-page.test.tsx` to verify failure.
-- [ ] **Step 3:** Implement `EarthImpactShowcase.tsx` detailing verified spinoff applications (zero-leak water mist valve, submarine smoke sensors, firefighter breathing equipment).
-- [ ] **Step 4:** Implement `MissionBriefCTA.tsx` with primary CTAs: "Enter Mission Control", "Explore 20 Studies", "60-Second Guided Tour", and "Skip Intro".
-- [ ] **Step 5:** Implement `DebugHUD.tsx` (toggled by 'D' key) tracking progress, gravity, active scene, and FPS.
-- [ ] **Step 6:** Implement `EmberZeroExperience.tsx` unifying Acts I, II, and III into a cohesive, scroll-driven experience with top navigation bar and audio ambient controller.
-- [ ] **Step 7:** Create `index.ts` barrel export and `src/app/(landing)/ember-zero/page.tsx` page component with dynamic import.
-- [ ] **Step 8:** Run `npx vitest run tests/ember-zero-page.test.tsx` to verify all tests pass.
-- [ ] **Step 9:** Commit: `feat(ember-zero): assemble master experience, earth impact showcase, and page route`.
+- [x] **Step 1:** Write failing tests in `tests/ember-zero-page.test.tsx` verifying page layout, navigation CTA links, 60s demo mode, and Debug HUD toggling.
+- [x] **Step 2:** Run `npx vitest run tests/ember-zero-page.test.tsx` to verify failure.
+- [x] **Step 3:** Implement `EarthImpactShowcase.tsx` detailing verified spinoff applications (zero-leak water mist valve, submarine smoke sensors, firefighter breathing equipment).
+- [x] **Step 4:** Implement `MissionBriefCTA.tsx` with primary CTAs: "Enter Mission Control", "Explore 20 Studies", "60-Second Guided Tour", and "Skip Intro".
+- [x] **Step 5:** Implement `DebugHUD.tsx` (toggled by 'D' key) tracking progress, gravity, active scene, and FPS.
+- [x] **Step 6:** Implement `EmberZeroExperience.tsx` unifying Acts I, II, and III into a cohesive, scroll-driven experience with top navigation bar and audio ambient controller.
+- [x] **Step 7:** Create `index.ts` barrel export and `src/app/(landing)/ember-zero/page.tsx` page component with dynamic import.
+- [x] **Step 8:** Run `npx vitest run tests/ember-zero-page.test.tsx` to verify all tests pass.
+- [x] **Step 9:** Commit: `feat(ember-zero): assemble master experience, earth impact showcase, and page route`.
 
 ---
 
@@ -133,7 +133,7 @@
 - Verify: `http://localhost:3000/ember-zero`
 - Verify: `http://localhost:3000/` (ensure existing landing is completely intact)
 
-- [ ] **Step 1:** Run full test suite: `npx vitest run tests/ember-zero*.test.ts*` to verify 100% test pass rate.
-- [ ] **Step 2:** Run typecheck and lint: `npm run lint` or `npx tsc --noEmit` to ensure clean compile.
-- [ ] **Step 3:** Launch browser subagent to navigate to `http://localhost:3000/ember-zero`, interact with igniter, scroll through Acts I, II, III, test 60s demo mode, and capture visual proof screenshots.
+- [x] **Step 1:** Run full test suite: `npx vitest run tests/ember-zero*.test.ts*` to verify 100% test pass rate.
+- [x] **Step 2:** Run typecheck and lint: `npm run lint` or `npx tsc --noEmit` to ensure clean compile.
+- [x] **Step 3:** Launch browser subagent to navigate to `http://localhost:3000/ember-zero`, interact with igniter, scroll through Acts I, II, III, test 60s demo mode, and capture visual proof screenshots.
 - [ ] **Step 4:** Push commit to origin/frontend.

@@ -256,7 +256,7 @@ export const EmberZeroExperience: React.FC<EmberZeroExperienceProps> = ({ classN
             aria-label="Bật Debug HUD (Phím D)"
             className={`p-2 rounded-lg border transition-colors cursor-pointer ${
               isDebugOpen
-                ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                ? 'bg-lime-500/20 text-lime-400 border-lime-500/40'
                 : 'bg-white/5 hover:bg-white/15 text-white/70 border-white/10'
             }`}
           >

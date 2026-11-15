@@ -61,7 +61,7 @@ export const LockedPredictiveDemo: React.FC<LockedPredictiveDemoProps> = ({
           className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md font-mono text-xs font-bold uppercase tracking-wider ${
             isMoonLocked && activeTab === 'locked'
               ? 'bg-rose-100 text-rose-800 border border-rose-300'
-              : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+              : 'bg-lime-100 text-lime-900 border border-lime-300'
           }`}
         >
           {isMoonLocked && activeTab === 'locked' ? (
@@ -71,7 +71,7 @@ export const LockedPredictiveDemo: React.FC<LockedPredictiveDemoProps> = ({
             </>
           ) : (
             <>
-              <Unlock className="w-4 h-4 text-emerald-600" />
+              <Unlock className="w-4 h-4 text-lime-700" />
               <span>SOFIE-MIST MATCH // 94.2% SIMILARITY</span>
             </>
           )}
@@ -142,13 +142,13 @@ export const LockedPredictiveDemo: React.FC<LockedPredictiveDemoProps> = ({
               <div className="space-y-3">
                 {/* Condition 1 */}
                 <div className="flex items-start gap-3 p-3 rounded-md bg-slate-50 border border-slate-200">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-lime-700 shrink-0 mt-0.5" />
                   <div className="text-sm">
                     <span className="font-bold text-[#0B2374]">1. Định luật bảo toàn (Conservation Laws):</span>
                     <span className="text-slate-700 ml-1">
                       Bảo toàn năng lượng, bảo toàn khối lượng và phương trình Navier-Stokes trong môi trường khí quyển kín.
                     </span>
-                    <span className="block text-[11px] font-mono text-emerald-700 mt-0.5">
+                    <span className="block text-[11px] font-mono text-lime-800 mt-0.5">
                       ✓ ĐÃ ĐÁP ỨNG — Mô hình hóa vật lý bảo toàn đầy đủ.
                     </span>
                   </div>
@@ -187,9 +187,9 @@ export const LockedPredictiveDemo: React.FC<LockedPredictiveDemoProps> = ({
         ) : (
           <div className="space-y-4">
             {/* Analogous SoFIE-MIST Match Card */}
-            <div className="p-4 rounded-lg bg-emerald-50/70 border border-emerald-300 text-emerald-950">
+            <div className="p-4 rounded-lg bg-lime-50/70 border border-lime-300 text-lime-950">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs uppercase font-bold text-emerald-900 tracking-wider">
+                <span className="font-mono text-xs uppercase font-bold text-lime-900 tracking-wider">
                   THÍ NGHIỆM GẦN NHẤT ĐƯỢC XÁC THỰC
                 </span>
                 <span className="px-2.5 py-1 rounded bg-[#0B2374] text-[#D4FC02] font-mono text-xs font-bold">

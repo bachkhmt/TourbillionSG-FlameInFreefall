@@ -564,7 +564,6 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
               <ClaimsList
                 study={study}
                 claims={claims}
-                sources={sources}
                 isLoading={claimsQuery.isLoading}
                 error={claimsQuery.error}
                 onRetry={() => claimsQuery.refetch()}

@@ -89,7 +89,7 @@ export const DualAtmosphereDial: React.FC<DualAtmosphereDialProps> = ({ classNam
             onClick={handleEarthPreset}
             className={`px-3.5 py-2 rounded-xl text-xs font-mono tracking-wider transition-all border ${
               selectedPreset === 'earth'
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
+                ? 'bg-lime-500/20 text-lime-300 border-lime-500/50 shadow-[0_0_15px_rgba(132,204,22,0.25)]'
                 : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-white'
             }`}
           >
@@ -116,8 +116,8 @@ export const DualAtmosphereDial: React.FC<DualAtmosphereDialProps> = ({ classNam
           data-testid="breathing-dial"
           className="relative p-6 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col items-center text-center overflow-hidden"
         >
-          <div className="absolute top-3 left-4 flex items-center gap-1.5 text-xs font-mono text-emerald-400 tracking-wider">
-            <Wind className="w-4 h-4 text-emerald-400" />
+          <div className="absolute top-3 left-4 flex items-center gap-1.5 text-xs font-mono text-lime-400 tracking-wider">
+            <Wind className="w-4 h-4 text-lime-400" />
             <span>ÁP SUẤT RIÊNG PHẦN</span>
           </div>
 
@@ -141,7 +141,7 @@ export const DualAtmosphereDial: React.FC<DualAtmosphereDialProps> = ({ classNam
                 cy="50"
                 r="40"
                 fill="none"
-                stroke="url(#emeraldGradient)"
+                stroke="url(#limeGradient)"
                 strokeWidth="7"
                 strokeDasharray={ppO2Circumference * 0.75}
                 strokeDashoffset={ppO2StrokeDashoffset}
@@ -149,16 +149,16 @@ export const DualAtmosphereDial: React.FC<DualAtmosphereDialProps> = ({ classNam
                 className="transition-all duration-500 ease-out"
               />
               <defs>
-                <linearGradient id="emeraldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#34d399" />
-                  <stop offset="100%" stopColor="#10b981" />
+                <linearGradient id="limeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#a3e635" />
+                  <stop offset="100%" stopColor="#84cc16" />
                 </linearGradient>
               </defs>
             </svg>
 
             {/* Inner Values */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl md:text-5xl font-mono font-bold tracking-tight text-white drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">
+              <span className="text-4xl md:text-5xl font-mono font-bold tracking-tight text-white drop-shadow-[0_0_12px_rgba(163,230,53,0.3)]">
                 {ppO2Formatted}
               </span>
               <span className="text-xs font-mono tracking-widest text-slate-400 uppercase mt-1">
@@ -172,7 +172,7 @@ export const DualAtmosphereDial: React.FC<DualAtmosphereDialProps> = ({ classNam
             data-testid="breathing-status-badge"
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold tracking-wider ${
               isNormoxic
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                ? 'bg-lime-500/20 text-lime-300 border border-lime-500/40 shadow-[0_0_12px_rgba(132,204,22,0.3)]'
                 : isHypoxic
                 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                 : 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
@@ -245,7 +245,7 @@ export const DualAtmosphereDial: React.FC<DualAtmosphereDialProps> = ({ classNam
                     ? 'text-rose-400'
                     : isElevatedFlammability
                     ? 'text-amber-400'
-                    : 'text-emerald-400'
+                    : 'text-lime-400'
                 }`}
               >
                 {flammabilityMultiplier}x
@@ -264,7 +264,7 @@ export const DualAtmosphereDial: React.FC<DualAtmosphereDialProps> = ({ classNam
                 ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-[0_0_15px_rgba(244,63,94,0.3)] animate-pulse'
                 : isElevatedFlammability
                 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                : 'bg-lime-500/20 text-lime-300 border border-lime-500/40'
             }`}
           >
             {isCriticalFlammability ? (

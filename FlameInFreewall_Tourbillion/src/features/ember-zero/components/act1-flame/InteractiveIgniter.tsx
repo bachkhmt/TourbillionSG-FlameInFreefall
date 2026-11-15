@@ -110,7 +110,7 @@ export const InteractiveIgniter: React.FC<InteractiveIgniterProps> = ({
             animate={{ scale: 1, opacity: 1 }}
             className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500/20 to-cyan-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shadow-[0_0_25px_rgba(255,180,84,0.3)]"
           >
-            <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+            <CheckCircle2 className="w-8 h-8 text-lime-400" />
           </motion.div>
           <div className="space-y-1">
             <h3 className="text-lg font-semibold text-white tracking-wide">

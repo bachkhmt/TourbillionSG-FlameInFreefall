@@ -125,7 +125,7 @@ export const EarthImpactShowcase: React.FC<EarthImpactShowcaseProps> = ({ classN
           </div>
 
           <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-slate-500 bg-white p-3 rounded-lg border border-[#0B2374]/15 shadow-sm">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <ShieldCheck className="w-4 h-4 text-lime-700" />
             <span>3 Ứng dụng đã chuyển giao công nghệ thành công</span>
           </div>
         </div>
@@ -173,7 +173,7 @@ export const EarthImpactShowcase: React.FC<EarthImpactShowcaseProps> = ({ classN
 
                   {/* Heritage Tag */}
                   <div className="mb-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 text-slate-700 font-mono text-[11px]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-lime-500"></span>
                     <span className="font-semibold text-slate-800">Nguồn di sản:</span>
                     <span>{spinoff.heritageSource}</span>
                   </div>
@@ -213,7 +213,7 @@ export const EarthImpactShowcase: React.FC<EarthImpactShowcaseProps> = ({ classN
                   <ul className="space-y-2 mb-2">
                     {spinoff.features.map((feature, fIdx) => (
                       <li key={fIdx} className="flex items-start gap-2 text-xs text-slate-600 font-sans">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-lime-700 shrink-0 mt-0.5" />
                         <span>{feature}</span>
                       </li>
                     ))}
