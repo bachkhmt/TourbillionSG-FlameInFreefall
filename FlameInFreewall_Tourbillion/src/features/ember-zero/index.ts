@@ -2,3 +2,6 @@ export * from './types';
 export * from './sceneRanges';
 export * from './lib/gravityCurve';
 export * from './store/useEmberStore';
+export * from './components/act1-flame/InteractiveIgniter';
+export * from './components/act1-flame/ProceduralFlameCanvas';
+export * from './components/act1-flame/FloatingPropsLayer';
