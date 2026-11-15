@@ -1,0 +1,44 @@
+[
+  {
+    "id": "gap-moon-mars-gravity",
+    "type": "gap_note",
+    "section": "de-bai",
+    "heading": "Khoảng trống số đo partial-g trong PSI và bằng chứng ngoài PSI",
+    "text": "Theo Playbook và phạm vi PSI của đề, kho PSI chưa có số đo cháy ở trọng lực Mặt Trăng (0,16g) hay Sao Hỏa (0,38g). Trong phạm vi này có dữ liệu vi trọng lực (0g) và trọng lực Trái Đất (1g); E-FIELD Flames chỉ mô phỏng một phần hiệu ứng trọng lực bằng điện trường. Ngoài PSI, LUCI đã có kết quả công bố; không được diễn giải khoảng trống PSI thành việc mọi nguồn NASA đều chưa có dữ liệu Mặt Trăng. FM2 là nghiên cứu liên quan nhưng tình trạng bay chưa xác nhận. Không nội suy khoảng giữa thành con số đo.",
+    "contextual": "Flame in Freefall Playbook > Ghi chú vùng chưa có dữ liệu (gap_note)",
+    "sourceRef": {
+      "title": "Flame in Freefall Playbook: phạm vi PSI, LUCI ngoài PSI và danh mục nguồn",
+      "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+    },
+    "status": "source-text",
+    "applies": "moon_mars_gravity"
+  },
+  {
+    "id": "gap-no-safety-verdict",
+    "type": "gap_note",
+    "section": "de-bai",
+    "heading": "Công cụ không kết luận an toàn hay không an toàn",
+    "text": "Theo playbook, ứng dụng chỉ cho thấy bằng chứng đã có và điều kiện đã thử. Nó không bao giờ kết luận một vật liệu là an toàn hoặc không an toàn, và phải ghi rõ đây là công cụ tham khảo nghiên cứu, không phải hệ thống an toàn vận hành.",
+    "contextual": "Flame in Freefall Playbook > Quy tắc trả lời và từ chối",
+    "sourceRef": {
+      "title": "Flame in Freefall Playbook: Hiểu đề",
+      "url": "Flame_in_Freefall_Playbook.html#de-bai"
+    },
+    "status": "source-text",
+    "applies": "safety_verdict"
+  },
+  {
+    "id": "gap-moon-base-conditions",
+    "type": "gap_note",
+    "section": "de-bai",
+    "heading": "Điều kiện khí quyển dự kiến của căn cứ Mặt Trăng",
+    "text": "Theo playbook, bộ đồ du hành có áp suất 4,3 psi với 100% oxy. Căn cứ Mặt Trăng và rover dự kiến ở mức giữa bộ đồ và Trái Đất: oxy từ 30% trở lên, áp suất từ 10,2 psi trở xuống. Đây là giá trị tối đa hoặc tối thiểu theo đề, không phải một giá trị cố định.",
+    "contextual": "Flame in Freefall Playbook > Vì sao căn cứ Mặt Trăng là bài toán khó",
+    "sourceRef": {
+      "title": "Flame in Freefall Playbook: Hiểu đề",
+      "url": "Flame_in_Freefall_Playbook.html#de-bai"
+    },
+    "status": "source-text",
+    "applies": "moon_base_conditions"
+  }
+]

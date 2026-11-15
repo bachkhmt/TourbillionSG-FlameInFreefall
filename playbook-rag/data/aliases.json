@@ -1,0 +1,20 @@
+{
+  "cir": ["combustion integrated rack", "tu thi nghiem chay iss"],
+  "msg": ["microgravity science glovebox", "hop gang tay"],
+  "mdca": ["multi-user droplet combustion apparatus", "dot giot long"],
+  "psi": ["physical sciences informatics", "kho du lieu"],
+  "loi": ["limiting oxygen index", "gioi han oxy"],
+  "rrf": ["reciprocal rank fusion", "tron ket qua"],
+  "rag": ["retrieval-augmented generation", "tim doan lien quan"],
+  "o2": ["oxy", "oxygen"],
+  "oxy": ["o2", "oxygen"],
+  "dap lua": ["suppression", "flex", "dap"],
+  "phong ngua": ["prevention"],
+  "phat hien": ["detection", "khoi", "same"],
+  "mat trang": ["moon", "luci", "fm2"],
+  "sao hoa": ["mars"],
+  "trong luc": ["gravity", "vi trong luc", "microgravity"],
+  "khoi": ["smoke", "aerosol", "same"],
+  "tu choi": ["refusal", "ngoai pham vi", "coverage none"],
+  "trich dan": ["citation", "validator", "chunk"]
+}

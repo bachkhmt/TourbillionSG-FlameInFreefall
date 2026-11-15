@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, type Variants } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -15,6 +15,7 @@ import {
   X,
   RotateCcw,
   ExternalLink,
+  BookOpen,
 } from 'lucide-react';
 import { DockPillButton } from './DockPillButton';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
@@ -46,6 +47,12 @@ export const NAV_ITEMS: NavItemConfig[] = [
     description: 'Gap matrix & predictive lab',
     icon: Rocket,
   },
+  {
+    path: '/resources',
+    label: 'Official Resources',
+    description: 'NASA data, science context & case studies',
+    icon: BookOpen,
+  },
 ];
 
 const dockContainerVariants: Variants = {
@@ -75,9 +82,17 @@ const dockItemVariants: Variants = {
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { activeScenario, resetWorkspace } = useWorkspaceStore();
+
+  React.useEffect(() => {
+    NAV_ITEMS.forEach((item) => {
+      router.prefetch(item.path);
+    });
+    router.prefetch('/studio');
+  }, [router]);
 
   const isNavActive = (path: string): boolean => {
     if (path === '/dashboard' && pathname === '/') return true;
@@ -96,7 +111,7 @@ export const Sidebar: React.FC = () => {
         initial={false}
         animate={{ width: isExpanded ? 280 : 58 }}
         transition={{ type: 'spring', stiffness: 160, damping: 18 }}
-        className="hidden sm:flex flex-col items-start justify-between h-[calc(100vh-1.5rem)] sticky top-3 my-3 ml-3.5 flex-shrink-0 z-30 select-none self-start"
+        className="hidden sm:flex flex-col items-start justify-between h-[calc(100vh-1.5rem)] sticky top-3 my-3 ml-3.5 flex-shrink-0 z-50 select-none self-start"
         aria-label="FlameGuard AI primary navigation dock"
       >
         <motion.div
@@ -166,6 +181,20 @@ export const Sidebar: React.FC = () => {
 
           {/* BOTTOM SECTION: QUICK ACTIONS */}
           <motion.div variants={dockItemVariants} className="relative z-10 flex flex-col items-start gap-3 w-full">
+            <DockPillButton
+              id="sidebar-studio-button"
+              href="/studio"
+              isExpanded={isExpanded}
+              icon={
+                <Flame
+                  className="w-6 h-6 text-amber-500 group-hover:text-amber-600 transition-colors"
+                  strokeWidth={3}
+                />
+              }
+              label="3D Flame Studio"
+              description="Interactive 3D combustion model"
+              tooltipText={isExpanded ? undefined : 'Launch 3D Flame Studio'}
+            />
             <DockPillButton
               id="sidebar-reset-button"
               onClick={handleResetWorkspace}

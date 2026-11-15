@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Compass, AlertCircle, RotateCcw, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import type { InvestigationListParamsDto } from '@/api/dto';
-import { handleTimeoutFallback } from '@/hooks/api/queryHelpers';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import { EndOfListIndicator } from '@/components/ui/EndOfListIndicator';
@@ -57,15 +56,6 @@ export default function ExplorerPage() {
   const items = useMemo(() => pageData?.items ?? [], [pageData]);
   const totalCount = pageData?.total ?? 0;
   const hasMore = pageData?.hasMore ?? false;
-
-  useEffect(() => {
-    if (
-      pageData?.context?.collectionId === 'nasa-psi-archive-offline' ||
-      pageData?.context?.caveats?.some((c) => /offline fallback/i.test(c))
-    ) {
-      handleTimeoutFallback();
-    }
-  }, [pageData]);
 
   const comparisonStudies = useMemo<ComparisonStudySummary[]>(
     () => items.map((inv) => ({ id: inv.id, label: inv.psiId })),
@@ -123,23 +113,39 @@ export default function ExplorerPage() {
         />
       </div>
 
-      {pageData && pageData.context.caveats.length > 0 && (
-        <div
-          data-testid="explorer-caveats-banner"
-          className="flex flex-wrap items-center gap-2 px-4 py-2.5 rounded-3xl bg-amber-50/90 border border-amber-200/90 text-xs text-amber-900"
-        >
-          <Info className="w-4 h-4 text-amber-700 shrink-0" />
-          <span className="px-2 py-0.5 rounded-full bg-white border border-amber-200 font-bold text-[11px] uppercase">
-            {pageData.context.origin} · {pageData.context.reviewState}
-          </span>
-          <span className="font-medium">{pageData.context.caveats.join(' · ')}</span>
-        </div>
-      )}
-
       <div className="flex items-center justify-between text-xs sm:text-sm text-zinc-500 px-1">
-        <span data-testid="explorer-summary-count">
-          Showing <span className="font-bold text-zinc-950">{items.length}</span> of {totalCount} NASA PSI Studies
-        </span>
+        <div className="flex items-center gap-2">
+          <span data-testid="explorer-summary-count">
+            Showing <span className="font-bold text-zinc-950">{items.length}</span> of {totalCount} NASA PSI Studies
+          </span>
+
+          {pageData && pageData.context.caveats.length > 0 && (
+            <div
+              data-testid="explorer-caveats-banner"
+              className="relative group inline-flex items-center"
+            >
+              <button
+                type="button"
+                aria-label="Offline Fallback & Caveats"
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 text-[11px] font-bold transition-colors cursor-pointer shadow-2xs"
+              >
+                <Info className="w-3 h-3 text-amber-800" />
+                <span>Offline Fallback</span>
+              </button>
+
+              <div className="absolute left-0 top-full mt-2 hidden group-hover:block group-focus-within:block z-50 w-72 sm:w-80 p-3.5 rounded-2xl bg-[#0B2374] text-white text-xs shadow-2xl border border-[#D4FC02]/30 pointer-events-none">
+                <div className="font-extrabold text-[#D4FC02] text-xs mb-1.5 flex items-center gap-1.5">
+                  <Info className="w-4 h-4 text-[#D4FC02] shrink-0" />
+                  <span>{pageData.context.origin} · {pageData.context.reviewState}</span>
+                </div>
+                <p className="leading-relaxed text-zinc-200 text-[11.5px] font-medium">
+                  {pageData.context.caveats.join(' · ')}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
         <span className="text-zinc-400 hidden sm:inline">
           Click any study to inspect test runs, observations &amp; evidence claims
         </span>

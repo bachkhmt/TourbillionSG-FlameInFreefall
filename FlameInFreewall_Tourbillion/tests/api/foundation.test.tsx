@@ -76,13 +76,13 @@ describe('Task 1: TanStack Query Foundation, Config, Error Banner & Test Harness
 
     it('returns default timeout when NEXT_PUBLIC_API_TIMEOUT_MS is missing or invalid', () => {
       delete process.env.NEXT_PUBLIC_API_TIMEOUT_MS;
-      expect(getApiTimeoutMs()).toBe(40000);
+      expect(getApiTimeoutMs()).toBe(60000);
       process.env.NEXT_PUBLIC_API_TIMEOUT_MS = 'not-a-number';
-      expect(getApiTimeoutMs()).toBe(40000);
+      expect(getApiTimeoutMs()).toBe(60000);
       process.env.NEXT_PUBLIC_API_TIMEOUT_MS = '0';
-      expect(getApiTimeoutMs()).toBe(40000);
+      expect(getApiTimeoutMs()).toBe(60000);
       process.env.NEXT_PUBLIC_API_TIMEOUT_MS = '-250';
-      expect(getApiTimeoutMs()).toBe(40000);
+      expect(getApiTimeoutMs()).toBe(60000);
     });
 
     it('parses valid positive NEXT_PUBLIC_API_TIMEOUT_MS', () => {
@@ -214,11 +214,14 @@ describe('Task 1: TanStack Query Foundation, Config, Error Banner & Test Harness
       const server500 = new ApiClientError({ message: 'Internal Server Error', status: 500, code: 'HTTP_ERROR' });
       expect(isTimeoutError(server500)).toBe(true);
 
-      const socketHangup = new Error('socket hang up');
-      expect(isTimeoutError(socketHangup)).toBe(true);
+      const reqTimeout408 = new ApiClientError({ message: 'Request Timeout', status: 408, code: 'HTTP_ERROR' });
+      expect(isTimeoutError(reqTimeout408)).toBe(true);
 
-      const regularError = new Error('Validation failed');
-      expect(isTimeoutError(regularError)).toBe(false);
+      const transportTimeout = new Error('Connection timed out');
+      expect(isTimeoutError(transportTimeout)).toBe(true);
+
+      const canceledError = new ApiClientError({ message: 'Request was aborted', status: 0, code: 'ERR_CANCELED' });
+      expect(isTimeoutError(canceledError)).toBe(false);
     });
 
     it('emits a toast warning and throttles concurrent duplicate toasts', () => {

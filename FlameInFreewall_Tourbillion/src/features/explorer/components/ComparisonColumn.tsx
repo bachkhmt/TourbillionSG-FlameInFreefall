@@ -5,9 +5,12 @@ import Link from 'next/link';
 import { X, Building2, ExternalLink, Tag, Activity, AlertTriangle } from 'lucide-react';
 import type { MappedComparisonStudy, MappedObservableSummary } from '@/types/api';
 
+import { useWorkspaceStore } from '@/store/useWorkspaceStore';
+
 export interface ComparisonColumnProps {
   study: MappedComparisonStudy;
   onRemove?: (id: string) => void;
+  onInspect?: () => void;
 }
 
 function formatSummaryValue(summary: MappedObservableSummary): string {
@@ -25,6 +28,7 @@ function formatSummaryValue(summary: MappedObservableSummary): string {
 export const ComparisonColumn: React.FC<ComparisonColumnProps> = ({
   study,
   onRemove,
+  onInspect,
 }) => {
   const inv = study.investigation;
   const unavailableEntries = Object.entries(inv.unavailableFields);
@@ -144,6 +148,10 @@ export const ComparisonColumn: React.FC<ComparisonColumnProps> = ({
       <div className="pt-3 border-t border-gray-200 mt-3">
         <Link
           href={`/explorer/${inv.routeKey}`}
+          onClick={() => {
+            onInspect?.();
+            useWorkspaceStore.getState().closeComparisonModal();
+          }}
           data-testid={`comparison-column-details-${inv.id}`}
           className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-gray-100 text-xs font-semibold text-zinc-800 border border-gray-200 shadow-2xs transition-colors"
         >

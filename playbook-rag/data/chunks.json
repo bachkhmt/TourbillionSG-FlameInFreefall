@@ -1,0 +1,2166 @@
+[
+ {
+  "id": "doc-01",
+  "type": "passage",
+  "section": "doc",
+  "heading": "",
+  "text": "Flame in Freefall Playbook TourbillionSG 12 ngàyđến ngày 14/11/2026, giờ mở hackathon NASA Space Apps Challenge 2026 Flame in Freefall Đề bài, kế hoạch, kiến trúc, dữ liệu và link nguồn của đội, gom về một trang. Đọc phần đầu nếu bạn muốn hiểu đề và biết mình phải làm gì. Các phần sau là tài liệu tra cứu cho cả đội. 14–15/11/202648 giờ6 ngườiĐóng băng tính năng ở H36Mức Intermediate đến Advanced Quy định của đề Không được bắt đầu làm dự án trước khi hackathon mở. Đọc đề và lập danh sách nguồn thì được. Tải dữ liệu, trích xuất và viết code phải để sau 14/11. Trang này chỉ là chuẩn bị. Nếu không chắc, đọc lại luật chính thức của cuộc thi.",
+  "contextual": "Flame in Freefall Playbook",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: doc",
+   "url": "Flame_in_Freefall_Playbook.html#doc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "de-bai-01",
+  "type": "passage",
+  "section": "de-bai",
+  "heading": "Đề bài này bắt bạn làm gì",
+  "text": "Build một trang web có AI. Người dùng chọn một tình huống, ví dụ “căn cứ Mặt Trăng”. Trang web chỉ ra những thí nghiệm lửa nào của NASA liên quan nhất, xếp hạng, so sánh và giải thích, luôn kèm nguồn. Chỗ nào chưa có dữ liệu thì nói thẳng là chưa có. Giống một thủ thư thông minh NASA có khoảng 20 hồ sơ thí nghiệm về lửa trong không trọng lực. Mỗi hồ sơ có nhiều tài liệu, số liệu và video. Người thường không biết bắt đầu từ đâu. App của bạn tìm đúng hồ sơ, so sánh và tóm tắt giúp họ. Biết nói “chưa có dữ liệu” Theo phạm vi PSI của đề, chưa có số đo cháy ở trọng lực Mặt Trăng trong kho. LUCI có kết quả công bố ngoài PSI và được gắn nhãn riêng. App phải nói rõ điều đó và không bịa con số. Đây là điểm có thể thắng hoặc thua. Không phải hệ thống an toàn App chỉ cho thấy bằng chứng đã có và điều kiện đã thử. Nó không bao giờ kết luận một vật liệu “an toàn” hay “không an toàn”.",
+  "contextual": "Flame in Freefall Playbook > Đề bài này bắt bạn làm gì",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Đề bài này bắt bạn làm gì",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "de-bai-02",
+  "type": "passage",
+  "section": "de-bai",
+  "heading": "Vì sao lửa trong không trọng lực lại khác",
+  "text": "Trên Trái Đất, khí nóng bay lên và kéo oxy mới vào chân lửa. Vì vậy ngọn nến có hình giọt nước và chập chờn. Trong không trọng lực không có khí nóng bay lên. Oxy chỉ tới lửa bằng cách khuếch tán chậm, nên lửa thành một quả cầu xanh mờ. Tốc độ dòng khí trở thành yếu tố rất quan trọng. Hệ quả: một bài thử cháy làm ở 1g trên Trái Đất chưa chắc cho kết quả đúng trong tàu vũ trụ.",
+  "contextual": "Flame in Freefall Playbook > Đề bài này bắt bạn làm gì > Vì sao lửa trong không trọng lực lại khác",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Vì sao lửa trong không trọng lực lại khác",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "de-bai-03",
+  "type": "passage",
+  "section": "de-bai",
+  "heading": "Vì sao căn cứ Mặt Trăng là bài toán khó",
+  "text": "Bộ đồ du hành chỉ có áp suất 4,3 psi với 100% oxy, để phi hành gia dễ cử động. Để họ ra ngoài nhanh mà không bị bệnh giảm áp, căn cứ Mặt Trăng và rover có áp suất dự kiến ở mức giữa bộ đồ và Trái Đất. Oxy từ 30% trở lên, áp suất từ 10,2 psi trở xuống. Nhiều oxy hơn thì vật liệu cháy dễ hơn rõ rệt. Câu hỏi của đề: dữ liệu hiện có nói được gì về điều kiện đó. Số liệu lấy từ đề, riêng 21% là nồng độ oxy của không khí. Mỗi thang vẽ đúng tỷ lệ. Vạch nhạt là giá trị tối đa hoặc tối thiểu, không phải một giá trị cố định.",
+  "contextual": "Flame in Freefall Playbook > Đề bài này bắt bạn làm gì > Vì sao căn cứ Mặt Trăng là bài toán khó",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Vì sao căn cứ Mặt Trăng là bài toán khó",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "de-bai-04",
+  "type": "passage",
+  "section": "de-bai",
+  "heading": "Ba trụ cột an toàn cháy và các thí nghiệm",
+  "text": "NASA chia công việc thành phòng ngừa, phát hiện và dập lửa. Mỗi thí nghiệm thuộc một hoặc nhiều trụ cột. Đây là bản đồ để bạn không bị lạc giữa hàng chục tên viết tắt. Nhóm | Thí nghiệm | Điểm cần nhớ Vật liệu rắn phòng ngừa | BASS, BASS-II, SPICE, SLICE | Chạy trong Glovebox (MSG) với cùng khung dòng khí dựng cho SPICE. Có cả nhiên liệu rắn và khí. Cháy quy mô lớn phòng ngừa | Saffire-I, II, III | I đo tốc độ lan lửa, tiêu hao khối lượng, nhiệt tỏa ra. II kiểm giới hạn oxy ở trọng lực thấp. III như I nhưng dòng khí khoảng 30 cm/s thay vì 20 cm/s. Bay trên tàu hàng tiếp tế. Phát hiện | SAME, SAME-R | Khói và aerosol. Một thiết bị đo của SAME được dùng lại để đo bụi trong DAFT và DAFT-2. Dập lửa | FLEX, FLEX-2, CFI | Giọt lỏng đang cháy, thiết bị MDCA trong CIR. FLEX dập lửa bằng cách pha loãng khí quyển với CO₂ hoặc heli.",
+  "contextual": "Flame in Freefall Playbook > Đề bài này bắt bạn làm gì > Ba trụ cột an toàn cháy và các thí nghiệm",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Ba trụ cột an toàn cháy và các thí nghiệm",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "de-bai-05",
+  "type": "passage",
+  "section": "de-bai",
+  "heading": "Ba trụ cột an toàn cháy và các thí nghiệm",
+  "text": "Lửa khí | ACME (6 thí nghiệm) | Cùng một bộ phần cứng module trong CIR. BRE nghiên cứu độ bắt cháy vật liệu trong khí quyển tĩnh. CFI-G có oxy tới 85%. E-FIELD Flames dùng điện trường để mô phỏng một phần trọng lực.",
+  "contextual": "Flame in Freefall Playbook > Đề bài này bắt bạn làm gì > Ba trụ cột an toàn cháy và các thí nghiệm",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Ba trụ cột an toàn cháy và các thí nghiệm",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "de-bai-06",
+  "type": "passage",
+  "section": "de-bai",
+  "heading": "Đề gợi ý gì và app của mình đáp lại thế nào",
+  "text": "Mọi gợi ý trong đề đều là “có thể làm”, không bắt buộc. Cột phải là cách đội chọn đáp lại. Đề nói | Màn hình hoặc tính năng của app Tìm thí nghiệm liên quan tới môi trường sống (tàu, trạm, căn cứ Mặt Trăng và Sao Hỏa, rover) | Mission Brief: chọn kịch bản, nhận bảng xếp hạng có breakdown và thanh trượt trọng số Trích dữ liệu hỗ trợ mô hình dự đoán cháy | Compare & Extract: xuất CSV/JSON kèm Data Card và notebook mẫu Chỉ ra nghiên cứu cho thiết bị an toàn thế hệ sau | Scorecard ba trụ cột và danh sách “thí nghiệm nên làm tiếp” lấy từ các ô trống Hiển thị mục tiêu, nhiên liệu, điều kiện thử, biến, cảm biến | Trang chi tiết mỗi investigation, dựng từ schema ở phần Kiến trúc So sánh giống và khác giữa các investigation | Compare: “mã gen” của 2 đến 4 investigation Dữ liệu quá nhiều, khó tìm, khó hiểu | Ask & Verify: hỏi đáp có trích nguồn từng câu, biết từ chối",
+  "contextual": "Flame in Freefall Playbook > Đề bài này bắt bạn làm gì > Đề gợi ý gì và app của mình đáp lại thế nào",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Đề gợi ý gì và app của mình đáp lại thế nào",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "de-bai-07",
+  "type": "passage",
+  "section": "de-bai",
+  "heading": "Đề gợi ý gì và app của mình đáp lại thế nào",
+  "text": "Chưa có dữ liệu trọng lực một phần | Evidence Map và dải trọng lực: ô trống hiện rõ, không nội suy thành số Ứng dụng trên Trái Đất (bình phun sương, đồ lính cứu hỏa) | Lăng kính Vũ trụ và Trái Đất: thẻ tĩnh (mức Should) Đề không nêu tiêu chí chấm điểm. Các mục trên được rút ra từ phần Objectives và Potential Considerations của đề.",
+  "contextual": "Flame in Freefall Playbook > Đề bài này bắt bạn làm gì > Đề gợi ý gì và app của mình đáp lại thế nào",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Đề gợi ý gì và app của mình đáp lại thế nào",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "de-bai-08",
+  "type": "passage",
+  "section": "de-bai",
+  "heading": "Bạn cần làm gì, theo thứ tự",
+  "text": "Từ nay đến 13/11 Chuẩn bị, chưa code Cả đội đọc trang này. Mở tab Resources của trang thử thách vì đề nói có thể bổ sung tài nguyên trước ngày thi. Chốt ai làm gì. Danh sách nguồn đã có sẵn ở phần Dữ liệu và link. H0 đến H3 Kiểm tra dữ liệu thật Trả lời các câu hỏi về dữ liệu PSI (danh sách ở phần Kế hoạch). Câu trả lời quyết định bản đồ có bao nhiêu điểm và xuất dữ liệu sâu đến đâu. H3 đến H36 Build bốn màn hình Mission Brief, Evidence Map, Compare & Extract, Ask & Verify. Hai data analyst tuyển chọn và kiểm chứng 15 đến 25 investigation ngay từ đầu, vì đó là nút thắt thật của dự án. H36 đến H48 Đóng băng, demo, nộp Không thêm tính năng. Chỉnh lỗi, thu demo, viết mô tả nộp bài, chuẩn bị phương án dự phòng.",
+  "contextual": "Flame in Freefall Playbook > Đề bài này bắt bạn làm gì > Bạn cần làm gì, theo thứ tự",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Bạn cần làm gì, theo thứ tự",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "de-bai-09",
+  "type": "passage",
+  "section": "de-bai",
+  "heading": "Từ điển các từ viết tắt",
+  "text": "Gõ để lọc. Các định nghĩa dùng ngôn ngữ đơn giản và bám theo đề.",
+  "contextual": "Flame in Freefall Playbook > Đề bài này bắt bạn làm gì > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển các từ viết tắt",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "app-01",
+  "type": "passage",
+  "section": "app",
+  "heading": "App trông thế nào",
+  "text": "Bài thử tiêu chuẩn ở 1g chưa chắc là trường hợp xấu nhất, và PSI chưa có dữ liệu trọng lực một phần. App chỉ ra NASA đã biết gì về lửa, và tri thức đó dừng ở đâu so với môi trường Moon base. Mọi tính năng phục vụ câu này, nên bài pitch gọn và mạch lạc. Có hai bằng chứng ủng hộ luận điểm: Olson (2004) cho thấy giới hạn oxy ở 1g khoảng 16,5% nhưng với luồng cỡ thông gió tàu lửa vẫn duy trì ở 14%, và nghiên cứu về khí quyển khám phá cho thấy test ở khí quyển chuẩn đánh giá thấp khả năng bắt lửa trên tàu. Link ở phần Dữ liệu và link.",
+  "contextual": "Flame in Freefall Playbook > App trông thế nào",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: App trông thế nào",
+   "url": "Flame_in_Freefall_Playbook.html#app"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "app-02",
+  "type": "passage",
+  "section": "app",
+  "heading": "Bốn màn hình cốt lõi",
+  "text": "Mission Brief Chọn kịch bản, nhận bảng xếp hạng có breakdown và thanh trượt trọng số, kèm điểm độ phủ bằng chứng cho ba trụ cột: phòng ngừa, phát hiện, dập lửa. Evidence Map Bản đồ oxy × luồng khí, đổi được sang oxy × áp suất. Phủ vùng mục tiêu (Trái Đất, ISS, bộ đồ, Moon base) và tô sáng ô chưa từng được thử. Bên dưới là dải trọng lực 0g đến 1g. Compare & Extract So sánh “mã gen” của 2 đến 4 investigation (giống đâu, khác đâu), rồi xuất bộ dữ liệu sẵn cho mô hình hóa. Ask & Verify Hỏi đáp có trích nguồn từng câu, biết nói “chưa đủ dữ liệu”, và có chế độ kiểm tra phát biểu.",
+  "contextual": "Flame in Freefall Playbook > App trông thế nào > Bốn màn hình cốt lõi",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Bốn màn hình cốt lõi",
+   "url": "Flame_in_Freefall_Playbook.html#app"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "app-03",
+  "type": "passage",
+  "section": "app",
+  "heading": "Hai hình minh họa cho khoảnh khắc “wow”",
+  "text": "Đây là hình minh họa Các ô và điểm trong hai hình dưới là ví dụ để cả đội hình dung giao diện. Chúng không phải dữ liệu PSI. Evidence Map (minh họa): ô xanh là điều kiện đã có bằng chứng, ô cam là vùng Moon base chưa ai thử. Với vật liệu rắn, trục dọc là luồng khí vì lửa trong vi trọng lực nhạy nhất ở đó. Với thí nghiệm khí hoặc giọt lỏng (ACME, MDCA), dùng trục oxy × áp suất. Dải trọng lực: hai đầu là kết quả đã đo, khoảng giữa gạch chéo và chỉ được xem như cận trên, cận dưới.",
+  "contextual": "Flame in Freefall Playbook > App trông thế nào > Hai hình minh họa cho khoảnh khắc “wow”",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Hai hình minh họa cho khoảnh khắc “wow”",
+   "url": "Flame_in_Freefall_Playbook.html#app"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "app-04",
+  "type": "passage",
+  "section": "app",
+  "heading": "Ba khoảnh khắc “wow” cho demo",
+  "text": "Đổi kịch bản Chuyển từ ISS sang Moon base, bảng xếp hạng đổi thứ tự và tooltip giải thích lý do. Vùng mù lộ ra Trên Evidence Map, vùng Moon base sáng lên với rất ít điểm dữ liệu, và dải trọng lực để trống rõ ràng. Câu hỏi của giám khảo Gõ “vật liệu qua bài thử 1g thì an toàn trên Mặt Trăng”. App trả lời PSI chưa đề cập, kèm trích dẫn tài liệu ngoài, gắn nhãn là giả thuyết.",
+  "contextual": "Flame in Freefall Playbook > App trông thế nào > Ba khoảnh khắc “wow” cho demo",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Ba khoảnh khắc “wow” cho demo",
+   "url": "Flame_in_Freefall_Playbook.html#app"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "app-05",
+  "type": "passage",
+  "section": "app",
+  "heading": "Những chỗ đã chỉnh so với bản ý tưởng trước",
+  "text": "Câu hỏi thiết kế Câu “Vải này dùng trong rover 30% O₂ có ổn không?” được nhập vào Claim Checker. App chỉ trả về bằng chứng gần nhất và điều kiện chưa thử, không bao giờ kết luận “ổn” hay “không ổn”. Trục của bản đồ Luồng khí làm trục chính cho vật liệu rắn. Thí nghiệm khí hoặc giọt lỏng dùng oxy × áp suất. Scorecard ba trụ cột Giữ lại, thêm đầu ra “thí nghiệm nên làm tiếp” để dashboard không chỉ tóm tắt quá khứ. Tài liệu ngoài PSI Kết quả trọng lực Mặt Trăng (LUCI), Saffire-V và các nguồn tương tự chỉ hiện dưới dạng dấu mốc có nhãn riêng, không trộn vào số liệu PSI.",
+  "contextual": "Flame in Freefall Playbook > App trông thế nào > Những chỗ đã chỉnh so với bản ý tưởng trước",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Những chỗ đã chỉnh so với bản ý tưởng trước",
+   "url": "Flame_in_Freefall_Playbook.html#app"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "ke-hoach-01",
+  "type": "passage",
+  "section": "ke-hoach",
+  "heading": "Kế hoạch 48 giờ cho 6 người",
+  "text": "Đội có 2 AI engineer (AI A, AI B), 2 data analyst (Analyst A, B) và 2 full-stack (Full-stack A, B). Giờ công là ước lượng thô của đội, chưa kiểm chứng với dữ liệu thật.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ cho 6 người",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch 48 giờ cho 6 người",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "ke-hoach-02",
+  "type": "passage",
+  "section": "ke-hoach",
+  "heading": "Danh sách tính năng và người làm",
+  "text": "Mức | Tính năng | Giờ công | Người làm chính Tổng giờ công so với quỹ giờ Thanh đậm là mức thấp, thanh nhạt là phần chênh tới mức cao. Toàn thanh bằng khoảng 200 giờ công của 6 người trước lúc đóng băng tính năng ở H36. Nút thắt Nút thắt thật sự không phải là code mà là việc tuyển chọn và kiểm chứng 15 đến 25 investigation, do hai analyst gánh. Cho họ bắt đầu sớm nhất. Mọi giá trị phải có nguồn và trạng thái verified, unverified hoặc placeholder.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ cho 6 người > Danh sách tính năng và người làm",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Danh sách tính năng và người làm",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "ke-hoach-03",
+  "type": "passage",
+  "section": "ke-hoach",
+  "heading": "Thứ tự các giai đoạn",
+  "text": "Mốc dưới đây lấy từ bản thiết kế RAG, tính theo giờ làm việc thực. Chỉnh lại theo lịch thật của đội khi hackathon mở. Đóng băng tính năng ở H36, phần còn lại của 48 giờ để demo và nộp. Mốc | Việc chính Giờ 0 đến 2 | Xem file thật, đếm token, chọn parser, chốt schema Giờ 2 đến 6 | Pipeline đọc và trích xuất, kiểm tay các ô quan trọng; dựng khung web Giờ 6 đến 10 | Chỉ mục BM25 và vector; bộ lọc và xếp hạng bản đầu; trang chi tiết thí nghiệm Giờ 10 đến 14 | Reranker, chat có trích dẫn, quy tắc từ chối; màn so sánh Giờ 14 đến 18 | Chạy bộ câu hỏi mẫu, chỉnh trọng số; hoàn thiện giao diện; ghi chú trọng lực Mặt Trăng Giờ 18 trở đi | Quay demo, viết mô tả nộp bài, dự phòng",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ cho 6 người > Thứ tự các giai đoạn",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Thứ tự các giai đoạn",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "ke-hoach-04",
+  "type": "passage",
+  "section": "ke-hoach",
+  "heading": "Danh sách việc để tick",
+  "text": "Dấu tick chỉ lưu trong trình duyệt của bạn, không chia sẻ cho người khác. Trước giờ G (đến 13/11) 3 giờ đầu của hackathon Kết quả của ba câu hỏi đầu trong danh sách H0 đến H3 quyết định thiết kế. Nếu PSI không có trường tốc độ luồng khí ở mức từng test, Evidence Map dùng oxy × áp suất và luồng khí chỉ hiện ở mức investigation. Lưu ý quy định Trong app, luôn ghi rõ đây là công cụ tham khảo nghiên cứu, không phải hệ thống an toàn vận hành.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ cho 6 người > Danh sách việc để tick",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Danh sách việc để tick",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-01",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "Kiến trúc hệ thống",
+  "text": "Thiết kế đầy đủ cho dashboard: sơ đồ hệ thống, pipeline dữ liệu, RAG, mô hình dữ liệu, xếp hạng, dự phòng và triển khai. Đây là đề xuất thiết kế, chưa kiểm chứng với dữ liệu PSI thật. Nguyên tắc xuyên suốt Không bịa dữ liệu. Mọi giá trị có nguồn và trạng thái (verified, unverified, placeholder). AI không đưa kết luận “an toàn” hay “không an toàn”. App phải chạy được kể cả khi API LLM hỏng.",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kiến trúc hệ thống",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-02",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "Hai bản thiết kế khác nhau chỗ nào, và chọn gì",
+  "text": "Đội có hai bản thiết kế: bản kiến trúc dashboard (JSON tĩnh trên Vercel) và bản RAG trong tài liệu docx (có bảng SQL, reranker). Hai bản khớp ở nguyên tắc nhưng khác ở vài lựa chọn. Cột “Chốt” là đề xuất của mình để cả đội khỏi tranh luận ở giờ đầu. Sửa nếu đội muốn khác. Chủ đề | Bản kiến trúc | Bản docx | Chốt Lưu bảng thí nghiệm | JSON tĩnh, kiểm bằng Zod | Bảng SQL | JSON tĩnh. Dưới 50 investigation thì lọc trong TypeScript là đủ, demo không phụ thuộc mạng Tìm từ khóa | MiniSearch (BM25) | SQLite FTS5 hoặc thư viện BM25 | MiniSearch Tìm theo nghĩa (vector) | Tùy chọn, vector tính trước khi build | Có, mô hình embedding tự chọn | Làm sau, khi BM25 và bộ câu hỏi mẫu đã chạy Rerank | Không nêu (lọc metadata và tăng điểm) | Có, giữ 5 đến 8 đoạn | Tùy chọn. Chỉ thêm nếu Recall@5 dưới 0,85. Có thể dùng bước chấm liên quan của Jev hoặc LLM",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > Hai bản thiết kế khác nhau chỗ nào, và chọn gì",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Hai bản thiết kế khác nhau chỗ nào, và chọn gì",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-03",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "Hai bản thiết kế khác nhau chỗ nào, và chọn gì",
+  "text": "Gắn nhãn đoạn | Metadata mỗi chunk | Thêm tiền tố ngữ cảnh 50 đến 100 token (Contextual Retrieval) | Làm cả hai. Sinh tiền tố bằng LLM một lần lúc build Tóm tắt một thí nghiệm | Chunk loại fact_card | Đưa nguyên tài liệu vào LLM | Đếm token thật trước. Nếu vừa thì dùng long context, cache kết quả lúc build Phân vai | Không nêu | 3 vai chung | Dùng 6 người của bản kế hoạch Tiêu chí xếp hạng | 7 tiêu chí, trọng số theo kịch bản | 6 thành phần, có trọng số khởi điểm | Bắt đầu với 6 thành phần của docx. Thêm “dữ liệu tải được” và “độ mới” nếu còn giờ",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > Hai bản thiết kế khác nhau chỗ nào, và chọn gì",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Hai bản thiết kế khác nhau chỗ nào, và chọn gì",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-04",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "1. Bối cảnh hệ thống",
+  "text": "Ai dùng app, app nói chuyện với những hệ thống nào bên ngoài. Dữ liệu NASA không được gọi trực tiếp lúc chạy mà được tuyển chọn trước, nên app nhanh và ổn định khi demo.",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 1. Bối cảnh hệ thống",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 1. Bối cảnh hệ thống",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-05",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "2. Thành phần",
+  "text": "Phần lớn logic chạy trong trình duyệt: xếp hạng, bản đồ, so sánh, xuất ZIP. Server chỉ có một endpoint /api/ask để giữ khóa API và kiểm soát RAG.",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 2. Thành phần",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 2. Thành phần",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-06",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "3. Pipeline dữ liệu (chạy ngoại tuyến)",
+  "text": "Đây là nút thắt của dự án. LLM chỉ soạn bản nháp trích xuất, và mọi trường phải có người đối chiếu nguồn trước khi được gắn nhãn verified. Ba bậc chiến lược dữ liệu Bậc A API hoặc tệp tải về chính thức, nếu có. Bậc B Xuất metadata rồi làm sạch. Bậc C Tự biên soạn 15 đến 25 investigation ưu tiên. Quyết định chọn bậc nào trong vài giờ đầu hackathon, sau khi xem tab Resources và chạy các kiểm tra H0 đến H3. Chi tiết các bước của docx: thu thập file PSI, đọc và làm sạch (giữ số trang để trích dẫn), trích xuất bằng AI theo schema kèm nguồn từng giá trị, cắt đoạn và thêm tiền tố ngữ cảnh, rồi lập chỉ mục BM25, vector và kho tài liệu gốc.",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 3. Pipeline dữ liệu (chạy ngoại tuyến)",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 3. Pipeline dữ liệu (chạy ngoại tuyến)",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-07",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "4. Thiết kế RAG",
+  "text": "Kho tri thức nhỏ (vài chục investigation, vài trăm chunk), nên BM25 là nền tảng, thêm embedding ở dạng tùy chọn, không cần vector DB. Ưu tiên của RAG ở đây là trả lời đúng nguồn và biết từ chối, không phải trả lời hay. 4.1 Luồng xử lý truy vấn RRF (Reciprocal Rank Fusion) gộp hai danh sách xếp hạng thành một: mục nào đứng cao ở cả hai danh sách được ưu tiên. 4.2 Trình tự gọi 4.3 Chiến lược chunking Loại chunk | Nội dung | Sinh bằng | Ghi chú fact_card | Một thẻ cho mỗi investigation: mục tiêu, nhiên liệu, phần cứng, trụ cột | Tự sinh từ JSON | Luôn có provenance, nguồn chính cho câu trả lời condition_row | Một dải điều kiện: O₂, áp suất, luồng khí, trọng lực | Tự sinh từ JSON | Trả lời câu hỏi định lượng và vẽ bản đồ source_passage | Tóm tắt ngắn hoặc đoạn trích có nhãn mục và trang | Người duyệt | Chỉ lưu tóm tắt cùng liên kết nếu chưa rõ giấy phép",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 4. Thiết kế RAG",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 4. Thiết kế RAG",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-08",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "4. Thiết kế RAG",
+  "text": "glossary | CIR, MDCA, MSG, BASS, ACME và các thuật ngữ | Thủ công | Phục vụ chế độ Sinh viên và mở rộng truy vấn gap_note | Ghi chú vùng chưa có dữ liệu (ví dụ chưa có dữ liệu trọng lực một phần) | Thủ công | Cho phép app nói “PSI chưa đề cập” có căn cứ Metadata mỗi chunk: id, investigationId, type, pillar, hardware, o2Range, sourceRef, status. Chunk nhỏ (khoảng 100 đến 250 từ), một ý một chunk, để trích dẫn chính xác. 4.4 Hợp đồng API 4.5 Quy tắc trả lời và từ chối Prompt: chỉ trả lời từ chunk được cấp, trả JSON đúng schema, không đưa phán quyết an toàn. Thiếu bằng chứng thì đặt coverage là none. Validator phía server: loại mọi câu không có citation nằm trong tập chunk đã cấp. Đây là cơ chế biến “AI không bịa” thành tính năng kiểm tra được. Nhãn mức bằng chứng: Đo trực tiếp, Suy ra từ nhiều thí nghiệm, Ước lượng (nội suy giữa vi trọng lực và trọng lực thường).",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 4. Thiết kế RAG",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 4. Thiết kế RAG",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-09",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "4. Thiết kế RAG",
+  "text": "Hỏi về trọng lực Mặt Trăng hoặc Sao Hỏa: nói rõ PSI chưa có dữ liệu đo, chỉ có hai đầu chặn và thí nghiệm E-FIELD mô phỏng một phần. Không đưa số ước lượng như dữ liệu đo. Dự phòng: giới hạn tần suất theo IP, timeout 15 giây, cache theo hash câu hỏi, và 3 câu trả lời dựng sẵn cho demo.",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 4. Thiết kế RAG",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 4. Thiết kế RAG",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-10",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "5. Mô hình dữ liệu",
+  "text": "Mỗi trường lá mang { value, source, status }. Trường chưa chắc chắn hiện huy hiệu trên giao diện. Các cột của bảng investigation Cột | Ghi chú experiment_id, name, family | Ví dụ Saffire-II, nhóm Saffire hardware | CIR/ACME, CIR/MDCA, MSG khung dòng khí, tàu hàng safety_area | Phòng ngừa, phát hiện, dập lửa purpose | Mục tiêu thí nghiệm, 1 đến 2 câu fuel_type, material, sample_geometry | Rắn, lỏng hoặc khí; vật liệu; hình dạng và kích thước mẫu hoặc đầu đốt o2_pct_min, o2_pct_max | Ghi rõ là phần trăm thể tích hay áp suất riêng phần pressure_min, pressure_max | Chuẩn hóa về một đơn vị (kPa hoặc psi) flow_cm_s_min, flow_cm_s_max | Tốc độ dòng khí; null nếu khí quyển tĩnh diluent | CO₂, heli, nitơ nếu có gravity_level | Vi trọng lực, trọng lực thường, mô phỏng một phần (E-FIELD) sensors | Danh sách cảm biến và phép đo variables_varied | Các lần thử khác nhau ở điểm nào key_findings | Kết quả chính, kèm nguồn data_links | Liên kết tới dữ liệu thô, video source_refs | Mỗi ô: tài liệu và trang verified | Đã được người kiểm hay mới do AI trích",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 5. Mô hình dữ liệu",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 5. Mô hình dữ liệu",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-11",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "6. Engine xếp hạng",
+  "text": "Hàm thuần, có kiểm thử đơn vị, tính lại ngay khi kéo thanh trượt. Dữ liệu thiếu hiển thị là “no data” và không bao giờ tính ngầm thành 0. score = Σ (wi × si), mỗi điểm thành phần nằm trong [0, 1]. Điểm gần: nếu điều kiện người dùng nằm trong khoảng [min, max] của thí nghiệm thì 1, ngoài khoảng thì giảm tuyến tính theo khoảng cách đã chuẩn hóa tới biên gần nhất. Thiếu giá trị thì không phạt điểm mà hiện nhãn “chưa rõ” và giảm độ tin cậy. Trạng thái (kịch bản, trọng số, lựa chọn) nằm trong tham số URL để chia sẻ được. Trọng số khởi điểm (phỏng đoán, phải chỉnh bằng bộ câu hỏi mẫu)",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 6. Engine xếp hạng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 6. Engine xếp hạng",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-12",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "7. Cơ chế dự phòng",
+  "text": "Bốn chế độ giao diện: đầy đủ, cache, retrieval-only và từ chối. Các phần còn lại của app (xếp hạng, bản đồ, so sánh, xuất dữ liệu) không phụ thuộc LLM.",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 7. Cơ chế dự phòng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 7. Cơ chế dự phòng",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-13",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "8. Triển khai và CI/CD",
+  "text": "Lớp | Lựa chọn | Lý do Framework | Next.js (App Router), TypeScript, Tailwind | Một repo, deploy một cú nhấp trên Vercel Biểu đồ | SVG tùy biến với d3-scale, d3-shape | Nhẹ, kiểm soát hoàn toàn bản đồ bằng chứng và hatch cho vùng mù Kiểm tra dữ liệu | Zod | Schema dùng chung cho build và API Truy xuất | MiniSearch (BM25), vector tính trước tùy chọn | Kho nhỏ, không cần vector DB Kiểm thử | Vitest, một ca Playwright smoke | Bảo vệ engine xếp hạng và validator",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 8. Triển khai và CI/CD",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 8. Triển khai và CI/CD",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "kien-truc-14",
+  "type": "passage",
+  "section": "kien-truc",
+  "heading": "9. Các quyết định kiến trúc chính",
+  "text": "Quyết định | Lý do | Đánh đổi Dữ liệu tĩnh JSON, không database | Nhanh, demo không phụ thuộc mạng, dễ kiểm chứng bằng Git | Cập nhật dữ liệu cần build lại BM25 trước, vector sau | Kho nhỏ, thuật ngữ chuyên ngành chính xác (BASS, CIR), ít phụ thuộc bên ngoài | Câu hỏi diễn đạt xa từ khóa có thể kém hơn, nên thêm alias và vector tùy chọn Một endpoint server duy nhất | Giữ khóa an toàn, ít thành phần để hỏng | Mọi truy vấn RAG đi qua một hàm, cần rate limit tốt Validator trích dẫn bắt buộc | Biến “không bịa” thành cơ chế kiểm tra được | Đôi khi loại cả câu đúng nếu LLM quên trích dẫn Không nội suy trọng lực Mặt Trăng, Sao Hỏa | PSI chưa có dữ liệu trọng lực một phần | Dải trống nhìn “ít tính năng” hơn, nhưng trung thực",
+  "contextual": "Flame in Freefall Playbook > Kiến trúc hệ thống > 9. Các quyết định kiến trúc chính",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: 9. Các quyết định kiến trúc chính",
+   "url": "Flame_in_Freefall_Playbook.html#kien-truc"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "rag-jev-01",
+  "type": "passage",
+  "section": "rag-jev",
+  "heading": "Để LLM viết, để Jev quyết định",
+  "text": "Jev của TypeSafe AI đảm nhận các bước “chọn đường, chấm điểm, cho phép trả lời”, còn LLM chỉ còn một việc là soạn câu trả lời. Đây là phần tùy chọn: kiến trúc ở trên chạy được mà không cần Jev. Phần lớn lệnh gọi LLM trong một pipeline RAG không cần viết chữ nào. Chúng chỉ cần chọn một nhãn và nói chắc đến đâu. Đó chính là việc của một System One model.",
+  "contextual": "Flame in Freefall Playbook > Để LLM viết, để Jev quyết định",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Để LLM viết, để Jev quyết định",
+   "url": "Flame_in_Freefall_Playbook.html#rag-jev"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "rag-jev-02",
+  "type": "passage",
+  "section": "rag-jev",
+  "heading": "Jev là gì, và chưa chắc điều gì",
+  "text": "3 primitive choice (chọn một đáp án), score (điểm 0 đến 1), null (không áp dụng). Đầu ra có kiểu cố định, kèm xác suất. 70–500 ms Độ trễ đầu-cuối theo TypeSafe. Các câu hỏi khai báo được đánh giá song song, không sinh token tuần tự. $0,042 / 1M Token đầu vào, token đầu ra miễn phí. Ngữ cảnh 32K. Đang early access, vào qua danh sách chờ. Cần kiểm chứng Các con số “nhanh gấp 133 đến 193 lần, rẻ gấp 444 lần so với LLM” là của TypeSafe. Các nguồn báo chí ghi hệ số khác nhau và chưa có benchmark độc lập. Jev không viết văn bản nên không thay được bước soạn câu trả lời. Vì còn trong danh sách chờ, đừng đặt kế hoạch 48 giờ phụ thuộc vào Jev. Mọi con số của Jev trong phần này là giả định có thể chỉnh.",
+  "contextual": "Flame in Freefall Playbook > Để LLM viết, để Jev quyết định > Jev là gì, và chưa chắc điều gì",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Jev là gì, và chưa chắc điều gì",
+   "url": "Flame_in_Freefall_Playbook.html#rag-jev"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "rag-jev-03",
+  "type": "passage",
+  "section": "rag-jev",
+  "heading": "Năm điểm quyết định, một lệnh gọi LLM",
+  "text": "Đường truy xuất giữ nguyên nền BM25, vector và RRF. Jev chen vào năm chỗ mà trước đây phải dùng LLM làm giám khảo. Chọn từng điểm để xem Jev nhận gì, trả gì và thay cho cái gì.",
+  "contextual": "Flame in Freefall Playbook > Để LLM viết, để Jev quyết định > Năm điểm quyết định, một lệnh gọi LLM",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Năm điểm quyết định, một lệnh gọi LLM",
+   "url": "Flame_in_Freefall_Playbook.html#rag-jev"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "rag-jev-04",
+  "type": "passage",
+  "section": "rag-jev",
+  "heading": "Thử ngưỡng tin cậy τ",
+  "text": "Kéo τ để thấy cùng một xác suất cho ra đường đi khác nhau. Xác suất dưới đây là minh họa, không phải đầu ra thật của Jev. Ngưỡng τ (độ chắc tối thiểu)0,80 Câu hỏi mẫu | Trong phạm vi | Đủ bằng chứng | Câu được hỗ trợ | Kết quả Quy tắc: dưới τ ở cổng phạm vi thì từ chối. Dưới τ ở coverage hoặc kiểm tra trích dẫn thì lùi về retrieval-only. τ cao thì ít bịa nhưng từ chối nhiều, nên chọn τ bằng bộ dữ liệu có nhãn.",
+  "contextual": "Flame in Freefall Playbook > Để LLM viết, để Jev quyết định > Thử ngưỡng tin cậy τ",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Thử ngưỡng tin cậy τ",
+   "url": "Flame_in_Freefall_Playbook.html#rag-jev"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "rag-jev-05",
+  "type": "passage",
+  "section": "rag-jev",
+  "heading": "Ước tính chi phí và độ trễ",
+  "text": "So sánh LLM làm giám khảo với Jev cho cùng năm điểm quyết định. Mọi giá trị chỉnh được, mặc định là giả định. Số truy vấn mỗi ngày Số chunk đem chấm điểm Độ trễ mỗi lệnh Jev (ms) Độ trễ mỗi lệnh LLM (ms) Giá LLM, $ mỗi 1M token vào Mô hình: 5 lệnh gọi tuần tự, tổng token vào ≈ 300 + 300 + (k × 250 + 300) + 1.200 + 1.500. LLM có thêm khoảng 40 token đầu ra mỗi lệnh, tính $15 mỗi 1M. Một tháng tính 30 ngày. Chưa tính bước soạn câu trả lời, vì cả hai phương án đều giữ nguyên bước đó.",
+  "contextual": "Flame in Freefall Playbook > Để LLM viết, để Jev quyết định > Ước tính chi phí và độ trễ",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Ước tính chi phí và độ trễ",
+   "url": "Flame_in_Freefall_Playbook.html#rag-jev"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "rag-jev-06",
+  "type": "passage",
+  "section": "rag-jev",
+  "heading": "Đo xem có đáng dùng không",
+  "text": "Chỉ số | Đo cái gì | Mục tiêu đề xuất Recall@k, MRR | Chunk đúng có nằm trong top-k, và đứng cao đến đâu, sau bước ③ | Không thấp hơn LLM giám khảo Độ chính xác trích dẫn | Tỷ lệ câu trả lời có trích dẫn thật sự chứa ý đó (bước ⑤) | ≥ 95%, kiểm bằng người Độ chính xác từ chối | Từ chối đúng câu ngoài phạm vi, không từ chối nhầm câu hợp lệ | Cân bằng theo ví dụ demo ECE (sai số hiệu chỉnh) | Jev nói 80% thì đúng khoảng 80% lần không? Quyết định chọn τ | Càng thấp càng tốt, đo trên dữ liệu của bạn p50 và p95 độ trễ | Thời gian thật của cả 5 điểm, gồm mạng | Thấp hơn rõ so với LLM giám khảo",
+  "contextual": "Flame in Freefall Playbook > Để LLM viết, để Jev quyết định > Đo xem có đáng dùng không",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Đo xem có đáng dùng không",
+   "url": "Flame_in_Freefall_Playbook.html#rag-jev"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "rag-jev-07",
+  "type": "passage",
+  "section": "rag-jev",
+  "heading": "Lộ trình triển khai",
+  "text": "1. Bộ nhãn vàng Gán nhãn 100 đến 200 câu hỏi: trong hay ngoài phạm vi, chunk liên quan, coverage đúng. Đây là tài sản dùng cho mọi bước sau, kể cả khi bỏ Jev. Với hackathon 2 ngày, thu nhỏ còn 20 đến 30 câu. 2. Chạy bóng Jev chạy song song với LLM giám khảo, chỉ ghi log. So khớp quyết định, đo ECE và độ trễ, chọn τ. 3. Bật có dự phòng Jev quyết định thật. Lỗi, quá thời gian hoặc xác suất dưới τ thì lùi về luồng cũ: LLM giám khảo hoặc retrieval-only. Giữ BM25 và validator trích dẫn tất định làm lớp bảo vệ cuối. Jev bổ sung chứ không thay. Gói Jev sau một giao diện Decider để đổi sang LLM giám khảo bằng một biến môi trường. Jev chỉ nhận ngữ cảnh 32K, nên chia chunk ngắn và chấm theo lô khi k lớn.",
+  "contextual": "Flame in Freefall Playbook > Để LLM viết, để Jev quyết định > Lộ trình triển khai",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Lộ trình triển khai",
+   "url": "Flame_in_Freefall_Playbook.html#rag-jev"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-01",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Dữ liệu ở đâu và link nguồn",
+  "text": "Playbook là tài liệu gốc. Phần này đã gộp 25 mục tài liệu và 10 mục dataset/cổng dữ liệu từ “Flame in Freefall: nguồn tài liệu và dataset” ngày 02/11/2026: đối chiếu 19 mục có sẵn, bổ sung 16 mục mới, tổng cộng 55 nguồn duy nhất theo URL hoặc mã NTRS. Phân biệt bằng chứng và trạng thái nguồn Thông tin giấy phép, DOI, phiên bản và nội dung dataset dưới đây được giữ theo tài liệu bổ sung của đội; lần gộp này chưa kiểm chứng độc lập các trang bên ngoài. “Link có thật” không có nghĩa đã kiểm quyền sử dụng hoặc đã kiểm đúng số liệu. Với ghi chú hạn chế hoặc chưa rõ quyền, tạm chỉ lưu metadata, tóm tắt của đội và liên kết. Dataset, DOI và phiên bản · Tra cứu toàn bộ 55 nguồn · Quyền sử dụng và các bản cần hạn chế",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Dữ liệu ở đâu và link nguồn",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-02",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Bốn phát hiện ảnh hưởng tới kế hoạch",
+  "text": "AWS chưa được xác nhận có dữ liệu cháy Tài liệu cũ ghi bucket nasa-psi chỉ liệt kê DSI và OASIS, còn bản RAG docx cho rằng có thể dùng AWS Open Data. Chưa xác minh trực tiếp. Sau giờ mở hackathon, kiểm tra aws s3 ls --no-sign-request s3://nasa-psi/; ưu tiên PSI và NTRS cho dữ liệu cháy. PSI chạy bằng JavaScript; API chưa chốt Danh mục bổ sung chưa tìm được API công khai chính thức; thông tin “phải tải thủ công” mới là dẫn lại từ hướng dẫn không chính thức. Xem DevTools để kiểm tra cách trang tải dữ liệu hoặc hỏi msfc-psi-help@mail.nasa.gov. Endpoint nội bộ không tự động trở thành API công khai được hỗ trợ. LUCI có kết quả ngoài PSI Khoảng trống partial-g của PSI theo đề không có nghĩa mọi nguồn NASA đều chưa có dữ liệu Mặt Trăng. Playbook ghi LUCI đã có kết quả công bố; để dưới nhãn ngoài PSI. FM2 cần kiểm tra tình trạng bay, và từng bản LUCI/FM2 có ghi chú quyền riêng. Bài thử 1g chưa chắc là trường hợp xấu nhất",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Bốn phát hiện ảnh hưởng tới kế hoạch",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Bốn phát hiện ảnh hưởng tới kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-03",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Bốn phát hiện ảnh hưởng tới kế hoạch",
+  "text": "Giữ luận điểm từ Olson (2004) và nghiên cứu khí quyển khám phá trong Playbook. FM2 là nguồn bổ sung cần đọc đúng trạng thái công bố. Mỗi phát biểu định lượng phải gắn tài liệu, điều kiện thử và trạng thái kiểm chứng.",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Bốn phát hiện ảnh hưởng tới kế hoạch",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Bốn phát hiện ảnh hưởng tới kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-04",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Dataset, DOI và phiên bản",
+  "text": "Đây là danh mục định vị nguồn, chưa phải dữ liệu đã tải. PSI là nguồn cháy chính; danh mục ghi các trang PSI đã đọc có CC0-1.0 và dữ liệu sử dụng cần trích dẫn DOI. Chỉ áp dụng sau khi kiểm ngay trên đúng bản dataset. Không suy rộng giấy phép dataset sang bài báo/PDF đi kèm. Dataset hoặc cổng | Phạm vi và cách dùng | DOI / phiên bản | Thông tin từ danh mục bổ sung | Trạng thái quyền theo danh mục PSI Data Repository (cổng chính, dữ liệu cháy) | Cổng chính PSI; lọc Research Area = Combustion Science. | Chưa ghi nhận DOI | Trang tìm kiếm chạy bằng JavaScript. Hãy lọc Research Area = Combustion Science. | Danh mục ghi dùng được PSI-60: phân tích SPICE (ground investigation) | Phân tích SPICE trên mặt đất (ground investigation); phân biệt với test vi trọng lực. | 10.60555/mzjm-yv57 | DOI 10.60555/mzjm-yv57. CC0-1.0. Hơn 1.600 ảnh thô, nhiệt độ và thể tích muội. | Danh mục ghi dùng được",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Dataset, DOI và phiên bản",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Dataset, DOI và phiên bản",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-05",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Dataset, DOI và phiên bản",
+  "text": "PSI-69: FLEX, phiên bản 5 | FLEX, phiên bản 5; số dòng/cột được dẫn từ repo khác, chưa xác nhận trực tiếp. | 10.60555/mbq8-0451 Phiên bản 5 | DOI 10.60555/mbq8-0451. Theo một repo công khai: 274 test × 16 cột, CC0-1.0. Cần xác nhận trên trang PSI. | Chưa kiểm quyền PSI-159: ACME CFI-G (O₂ cao nhất trong vi trọng lực) | ACME CFI-G; đã có PSI-ID trong danh mục, chưa ghi nhận DOI/giấy phép. | Chưa ghi nhận DOI | Mình chỉ thấy mã trong danh sách PSI. Hãy mở trang và đọc DOI, giấy phép. | Chưa kiểm quyền PSI: danh sách investigation theo lĩnh vực | Cổng kiểm kê investigation theo lĩnh vực; không phải một dataset riêng. | Chưa ghi nhận DOI | Liệt kê ACME BRE, E-FIELD, S-Flames, BASS, BASS-II, CFI, FLEX, FLEX-2, SAME-R, SPICE… | Danh mục ghi dùng được PSI: nghiên cứu mặt đất dùng dữ liệu PSI (NRA) | Danh mục nghiên cứu phái sinh dùng dữ liệu PSI; PSI-117 chỉ được nhắc là sắp có. | Chưa ghi nhận DOI | Danh sách bộ dữ liệu phái sinh, ví dụ cool flame (PSI-117 sắp có). | Danh mục ghi dùng được",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Dataset, DOI và phiên bản",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Dataset, DOI và phiên bản",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-06",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Dataset, DOI và phiên bản",
+  "text": "NIST Fire Calorimetry Database (ứng dụng trên Trái Đất) | Dữ liệu đo cháy trên Trái Đất; nguồn tham khảo ngoài PSI. | 10.18434/mds2-2314 | DOI 10.18434/mds2-2314. Giấy phép NIST Open (https://www.nist.gov/open/license). Nhiệt giải phóng, CO, muội. | Danh mục ghi dùng được JAXA DARTS: Kibo Group Combustion (nguồn quốc tế) | Dữ liệu cháy giọt trên ISS của JAXA; nguồn quốc tế ngoài PSI. | Chưa ghi nhận DOI | Dữ liệu cháy giọt trên ISS. Chưa đọc giấy phép. | Chưa kiểm quyền Mendeley: phân loại kết quả cháy vật liệu rắn trong vi trọng lực | Bản đồ/phân loại tài liệu; không phải số liệu thô của thí nghiệm. | 10.17632/2gw4pjhkxz.1 | DOI 10.17632/2gw4pjhkxz.1. Bản đồ tài liệu, không phải số liệu thô. Chưa đọc giấy phép. | Chưa kiểm quyền MAPTIS (kết quả NASA-STD-6001, Test 1) | CSDL có kiểm soát truy cập; URL trong danh mục là bài NTRS giới thiệu, không phải endpoint tải MAPTIS. | Chưa ghi nhận DOI | Cơ sở dữ liệu cần tài khoản, không mở công khai. Chỉ dùng bài NTRS này (Work of the US Gov) để minh họa. | Danh mục ghi có hạn chế",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Dataset, DOI và phiên bản",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Dataset, DOI và phiên bản",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-07",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Dataset, DOI và phiên bản",
+  "text": "Không đánh đồng hai con số FLEX Báo cáo NTRS 20150023456 trình bày 284 test đầu tiên. Mục PSI-69 phiên bản 5 được danh mục dẫn từ một repo công khai là 274 test × 16 cột. Đây là hai mô tả của hai nguồn/phạm vi khác nhau; chưa có đối chiếu trực tiếp để kết luận thiếu 10 test hay dùng hai con số thay thế nhau. PSI-60: ghi nhận DOI 10.60555/mzjm-yv57, hơn 1.600 ảnh thô, nhiệt độ và thể tích muội; là ground investigation phân tích SPICE. PSI-69: ghi nhận DOI 10.60555/mbq8-0451, phiên bản 5. Phải xác minh kích thước bảng, header, đơn vị và giấy phép trên PSI trước khi chọn làm dataset nền. PSI-159: chỉ có mã ACME CFI-G; không tự điền DOI, giấy phép hoặc file chưa thấy. PSI-117 chỉ được nhắc là sắp có trong danh mục NRA, chưa tính là dataset sẵn dùng. NIST Fire Calorimetry: DOI 10.18434/mds2-2314, nhiệt giải phóng, CO và muội; danh mục nêu NIST Open License. Để riêng ở ứng dụng Trái Đất.",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Dataset, DOI và phiên bản",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Dataset, DOI và phiên bản",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-08",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Dataset, DOI và phiên bản",
+  "text": "JAXA DARTS: nguồn quốc tế về cháy giọt trên ISS, chưa đọc giấy phép. Mendeley: DOI 10.17632/2gw4pjhkxz.1, chỉ là bản đồ tài liệu, chưa đọc giấy phép. MAPTIS: theo danh mục cần tài khoản; bài NTRS giới thiệu không đồng nghĩa được truy cập toàn bộ CSDL.",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Dataset, DOI và phiên bản",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Dataset, DOI và phiên bản",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-09",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Thông tin cần lưu trước khi nạp dữ liệu",
+  "text": "Mỗi dataset cần có PSI-ID hoặc mã kho, DOI, phiên bản, URL trang và file, ngày truy cập, giấy phép đúng phiên bản, danh sách file, số test/hàng/cột và người kiểm. Với mỗi giá trị, giữ nguồn, trang hoặc test-ID, đơn vị và trạng thái verified, unverified hoặc placeholder như schema gốc. Trích dẫn dataset bằng DOI kèm phiên bản; trích dẫn tài liệu bằng mã NTRS hoặc URL và trang. Trong hồ sơ nộp Space Apps, ghi nhận mọi nguồn đã sử dụng, kể cả nguồn mở. Nội dung do AI tạo không được tự gắn nhãn “theo NASA”.",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Thông tin cần lưu trước khi nạp dữ liệu",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Thông tin cần lưu trước khi nạp dữ liệu",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-10",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Danh sách link nguồn hợp nhất",
+  "text": "Các bản trùng mã NTRS được gộp thành một dòng, giữ cả trang hồ sơ và PDF. Tìm theo tên, PSI-ID, DOI, mã NTRS, ghi chú hoặc lọc quyền; sao chép CSV/JSON giữ thông tin quyền do danh mục ghi nhận và xuất xứ. Tất cả trạng thái quyềnDanh mục ghi dùng đượcDanh mục ghi có hạn chếChưa kiểm quyềnChưa có thông tin quyền Nguồn và PDF | Loại | Xử lý trong RAG | Trạng thái link | Quyền theo danh mục | Ghi chú",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Danh sách link nguồn hợp nhất",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Danh sách link nguồn hợp nhất",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-11",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Quyền sử dụng và các bản cần hạn chế",
+  "text": "Danh mục bổ sung phân loại “dùng được” khi tác giả danh mục đã thấy Public Use Permitted hoặc là trang NASA; “chỉ tóm tắt + link” khi thấy hạn chế; “chưa kiểm” khi chưa đọc được trường Copyright. Đây là ghi nhận theo tài liệu đó, không phải kết luận rằng mọi nội dung trên một trang NASA đều được phép tái sử dụng. Bản tài liệu | Đúng file được ghi nhận | Ghi chú quyền trong danh mục | Cách xử lý tạm thời trong RAG BASS-II Summary Report 2021 | PDF 20210011385 | Use by or on behalf of the US Gov. Permitted. | Chỉ metadata, tóm tắt của đội và link; chưa đưa toàn văn vào corpus công khai. LUCI | PDF 20250010653 | Use by or on behalf of the US Gov. Permitted. | Chỉ metadata, tóm tắt của đội và link; chưa đưa toàn văn vào corpus công khai. FM2: poster | PDF 20240015307 | Use by or on behalf of the US Gov. Permitted. | Chỉ metadata, tóm tắt của đội và link; chưa đưa toàn văn vào corpus công khai.",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Quyền sử dụng và các bản cần hạn chế",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Quyền sử dụng và các bản cần hạn chế",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-12",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Quyền sử dụng và các bản cần hạn chế",
+  "text": "Saffire IV/V: hai bản ICES 2021 | PDF 20210017780 PDF 20210011521 | Portions of document may include copyright protected material. | Chỉ metadata, tóm tắt của đội và link; chưa đưa toàn văn vào corpus công khai. Saffire VI: ICES 2024 | PDF 20240002981 | Portions of document may include copyright protected material. | Chỉ metadata, tóm tắt của đội và link; chưa đưa toàn văn vào corpus công khai. Đã được danh mục ghi nhận Public Use Permitted: BASS-II 20160000593; FLEX 20150023456; báo cáo NASA Glenn/SAME 20170007283; NESC 2026 20260003925. Vẫn kiểm đúng bản tải và phần nội dung bên thứ ba trước khi đưa toàn văn vào corpus. Các bản còn chờ kiểm quyền: Saffire I; Olson 2004; SAME-2; NIST pub_id 904707; so sánh chất dập lửa; bay parabol; nước phun sương của Colorado School of Mines; Saffire status 2016; JASMAC-33; SoFIE; cảm biến CSA-CP/CDM; nghiên cứu bắt lửa 20080013149. Thông tin khoa học đã trích trong Playbook không tự chứng minh quyền nạp toàn văn.",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Quyền sử dụng và các bản cần hạn chế",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Quyền sử dụng và các bản cần hạn chế",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "du-lieu-13",
+  "type": "passage",
+  "section": "du-lieu",
+  "heading": "Quyền sử dụng và các bản cần hạn chế",
+  "text": "Bài tạp chí: giữ metadata, tóm tắt của đội và link nếu chưa xác định quyền. Cùng một investigation có thể có bản NASA, bản hội nghị và bản tạp chí với điều khoản khác nhau. NTRS khác PSI: NTRS có tài liệu API với POST /citations/search và GET /citations/{id}. Điều này không xác nhận PSI có API công khai tương tự. Mã [N1], [T1], [G2] trong docx vẫn thiếu Phụ lục B để ánh xạ URL. Mã [R1] (Contextual Retrieval) giữ nhãn chưa đối chiếu. Phần này gộp từ danh mục nguồn và dataset của đội đã được gộp đầy đủ ở trên; nội dung bổ sung không thay đổi các quyết định sản phẩm, kiến trúc và ưu tiên Must/Should của Playbook.",
+  "contextual": "Flame in Freefall Playbook > Dữ liệu ở đâu và link nguồn > Quyền sử dụng và các bản cần hạn chế",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Quyền sử dụng và các bản cần hạn chế",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "danh-gia-01",
+  "type": "passage",
+  "section": "danh-gia",
+  "heading": "Bộ câu hỏi mẫu",
+  "text": "Làm bộ 20 đến 30 câu có đáp án đã biết, chạy lại sau mỗi thay đổi lớn (cách cắt đoạn, embedding, trọng số). Tách đo truy hồi (Recall@K, MRR) khỏi đo câu trả lời (đúng và trung thực với nguồn) để biết lỗi nằm ở lớp nào. Các đáp án dưới đây phải được đối chiếu lại với tài liệu PSI thật trước khi dùng làm chuẩn. Chỉ số và mục tiêu đề xuất Chỉ số | Cách đo | Mục tiêu Recall@5 | Bộ câu hỏi vàng, chunk đúng có nằm trong top 5 không | ≥ 0,85 Độ chính xác trích dẫn | Câu trích dẫn có thật sự được chunk hỗ trợ không (duyệt tay) | ≥ 0,95 Từ chối đúng | Câu ngoài phạm vi có ra coverage none không | ≥ 0,90 Độ trễ | p95 của đường đầy đủ | < 6 giây",
+  "contextual": "Flame in Freefall Playbook > Đánh giá, rủi ro và những gì cố ý bỏ > Bộ câu hỏi mẫu",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Bộ câu hỏi mẫu",
+   "url": "Flame_in_Freefall_Playbook.html#danh-gia"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "danh-gia-02",
+  "type": "passage",
+  "section": "danh-gia",
+  "heading": "Rủi ro và cách giảm",
+  "text": "Rủi ro | Cách giảm Định dạng dữ liệu khó đọc | Thử vài parser trên 10 đến 20 tài liệu thật. Nhập tay phần thiết yếu của các thí nghiệm chính Trích xuất sai số liệu | Người kiểm các ô quan trọng (oxy, áp suất, dòng khí). Lưu nguồn từng ô Nhầm đơn vị (phần trăm oxy hay áp suất riêng phần, cm/s hay m/s) | Chuẩn hóa khi trích xuất. Header nhiều dòng và dòng đơn vị là nguồn lỗi quen thuộc AI bịa | Quy tắc trả lời ở phần Kiến trúc và kiểm tra mã nguồn trích dẫn Làm quá nhiều | Khóa bộ nhỏ làm tốt: lọc, so sánh, giải thích có trích dẫn. Ứng dụng Trái Đất và xuất dữ liệu làm sau Chi phí và độ trễ gọi API | Chạy trích xuất một lần, cache tóm tắt Vi phạm luật đề | Không code trước 14/11. Đối chiếu luật với đề gốc Số liệu nguồn là blog hoặc nhà cung cấp | Kiểm lại trước khi trích trong bài nộp. Số liệu Jev là tuyên bố của TypeSafe Phụ thuộc Jev khi còn danh sách chờ | Bọc sau giao diện Decider, luôn có đường lùi về LLM giám khảo hoặc retrieval-only",
+  "contextual": "Flame in Freefall Playbook > Đánh giá, rủi ro và những gì cố ý bỏ > Rủi ro và cách giảm",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Rủi ro và cách giảm",
+   "url": "Flame_in_Freefall_Playbook.html#danh-gia"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "danh-gia-03",
+  "type": "passage",
+  "section": "danh-gia",
+  "heading": "Cố ý bỏ, và khi nào xét lại",
+  "text": "Kỹ thuật hoặc tính năng | Vì sao bỏ | Xét lại khi GraphRAG, LazyGraphRAG, LightRAG | Chi phí dựng. Quan hệ gọn trong bảng | Corpus tăng nhiều hoặc cần tóm tắt cấp toàn corpus Multi-vector (ColPali, MUVERA) | Lưu trữ gấp 10 đến 100 lần embedding đơn, quy mô nhỏ | Tài liệu chủ yếu là ảnh, biểu đồ mà OCR hỏng DiskANN, quantization | Chỉ có ý nghĩa từ vài trăm triệu vector | Không áp dụng cho đề này Agentic nhiều vòng | Tăng độ trễ và token, demo cần nhanh | Có câu hỏi nhiều bước thật sự Long context cho cả corpus | Chi phí và độ trễ | Chỉ dùng cho tóm tắt từng thí nghiệm Contradiction Finder | Dễ báo sai, hậu quả khi demo cao (8 giờ công trở lên) | Sau khi các màn Must đã ổn định",
+  "contextual": "Flame in Freefall Playbook > Đánh giá, rủi ro và những gì cố ý bỏ > Cố ý bỏ, và khi nào xét lại",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Cố ý bỏ, và khi nào xét lại",
+   "url": "Flame_in_Freefall_Playbook.html#danh-gia"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "danh-gia-04",
+  "type": "passage",
+  "section": "danh-gia",
+  "heading": "Những điều chưa chắc",
+  "text": "Cần xác minh Kho AWS nasa-psi có dữ liệu cháy hay không (hai tài liệu mâu thuẫn). PSI có trường tốc độ luồng khí ở mức từng test không, và mỗi investigation có dữ liệu tải được hay chỉ có tài liệu. FM2 đã bay chưa. Chưa xác nhận, phải kiểm trước khi viết vào bài nộp. PSI-69 phiên bản 5 có đúng 274 test × 16 cột và CC0-1.0 không; thông tin hiện được dẫn gián tiếp. Kiểm DOI, file và giấy phép trực tiếp trên PSI. PSI-159 còn thiếu DOI/giấy phép; PSI-117 mới được nhắc là sắp có. JAXA và Mendeley chưa đọc điều khoản; MAPTIS là nguồn có kiểm soát truy cập. Con số “khoảng 20 thí nghiệm” là ước tính từ danh sách trong đề. Trọng số xếp hạng khởi điểm là phỏng đoán, phải chỉnh bằng bộ câu hỏi mẫu. Giờ công trong kế hoạch là ước lượng thô. Các kết quả định lượng của Contextual Retrieval (giảm lỗi truy hồi 49%, thêm reranking thì 67%) đo trên codebase, tiểu thuyết và paper, không phải dữ liệu cháy. Nguồn báo chí về ACME BRE cần đối chiếu với trang NASA.",
+  "contextual": "Flame in Freefall Playbook > Đánh giá, rủi ro và những gì cố ý bỏ > Những điều chưa chắc",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Những điều chưa chắc",
+   "url": "Flame_in_Freefall_Playbook.html#danh-gia"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "danh-gia-05",
+  "type": "passage",
+  "section": "danh-gia",
+  "heading": "Những điều chưa chắc",
+  "text": "Playbook là tài liệu gốc của đội. Tổng hợp từ các tài liệu: đề chính thức NASA Space Apps 2026 (Flame in Freefall), gói ý tưởng và kế hoạch 48 giờ, kiến trúc hệ thống dashboard, kiến trúc RAG với Jev, tài liệu RAG và nguồn nghiên cứu (docx), và danh sách link đã kiểm chứng; đã gộp thêm danh mục “Flame in Freefall: nguồn tài liệu và dataset” ngày 02/11/2026, giữ trạng thái chưa xác minh và ghi chú quyền theo từng bản. Các hình minh họa Evidence Map và dải trọng lực không chứa dữ liệu thật. Trang này là công cụ chuẩn bị, không phải hệ thống an toàn vận hành.",
+  "contextual": "Flame in Freefall Playbook > Đánh giá, rủi ro và những gì cố ý bỏ > Những điều chưa chắc",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Những điều chưa chắc",
+   "url": "Flame_in_Freefall_Playbook.html#danh-gia"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-psi",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "PSI",
+  "text": "PSI: Physical Sciences Informatics. Kho dữ liệu công khai của NASA về thí nghiệm khoa học vật lý, gồm cả cháy. Mỗi nghiên cứu có dữ liệu thô, dữ liệu đã xử lý, tài liệu, hình ảnh và danh sách công bố.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (PSI)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-investigation",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Investigation",
+  "text": "Investigation: Một thí nghiệm hoặc dự án thí nghiệm trong PSI, ví dụ BASS. App của đội xoay quanh đơn vị này.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Investigation)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-vi-trong-luc-0g-1g",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Vi trọng lực, 0g, 1g",
+  "text": "Vi trọng lực, 0g, 1g: Vi trọng lực là gần như không có trọng lực, như trên ISS. 1g là trọng lực Trái Đất. Mặt Trăng khoảng 0,16g, Sao Hỏa khoảng 0,38g.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Vi trọng lực, 0g, 1g)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-partial-gravity",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Partial gravity",
+  "text": "Partial gravity: Trọng lực một phần, giữa 0g và 1g. PSI hiện chưa có dữ liệu cháy ở mức này.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Partial gravity)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-iss",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "ISS",
+  "text": "ISS: Trạm Vũ trụ Quốc tế, nơi chạy hầu hết các thí nghiệm trong đề.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (ISS)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-o2-nong-do-oxy",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "O₂ (nồng độ oxy)",
+  "text": "O₂ (nồng độ oxy): Phần trăm oxy trong không khí. Không khí Trái Đất khoảng 21%. Oxy càng cao vật liệu càng dễ cháy.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (O₂ (nồng độ oxy))",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-psi-2",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "psi",
+  "text": "psi: Đơn vị áp suất. Mực nước biển là 14,7 psi.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (psi)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-dong-khi-airflow",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Dòng khí (airflow)",
+  "text": "Dòng khí (airflow): Tốc độ khí thổi qua mẫu cháy, tính bằng cm/s. Trong vi trọng lực không có đối lưu tự nhiên nên yếu tố này rất quan trọng.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Dòng khí (airflow))",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-loi",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "LOI",
+  "text": "LOI: Limiting Oxygen Index. Mức oxy thấp nhất để lửa còn duy trì được. Olson (2004) nêu LOI ở 1g khoảng 16,5% O₂.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (LOI)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-prevention-detection-suppression",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Prevention, Detection, Suppression",
+  "text": "Prevention, Detection, Suppression: Phòng ngừa, phát hiện, dập lửa. Ba trụ cột an toàn cháy của NASA.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Prevention, Detection, Suppression)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-bass-bass-ii",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "BASS, BASS-II",
+  "text": "BASS, BASS-II: Burning and Suppression of Solids. Đốt vật liệu rắn như vải và nhựa, thử luồng khí và dập. Chạy trong Glovebox.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (BASS, BASS-II)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-spice-slice",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "SPICE, SLICE",
+  "text": "SPICE, SLICE: Smoke Point In Co-flow Experiment và Structure and Liftoff In Combustion Experiment. Cùng BASS dùng chung khung dòng khí dựng cho SPICE.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (SPICE, SLICE)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-saffire",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Saffire",
+  "text": "Saffire: Spacecraft Fire Safety Demonstration. Đốt mẫu lớn trên tàu hàng tiếp tế ISS, không có người bên cạnh.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Saffire)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-same-same-r",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "SAME, SAME-R",
+  "text": "SAME, SAME-R: Smoke and Aerosol Measurement Experiment. Đo hạt khói để cải thiện cảm biến phát hiện cháy.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (SAME, SAME-R)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-daft-daft-2",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "DAFT, DAFT-2",
+  "text": "DAFT, DAFT-2: Dust and Aerosol Measurement Feasibility Test. Dùng lại một thiết bị đo của SAME để đo bụi.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (DAFT, DAFT-2)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-flex-flex-2",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "FLEX, FLEX-2",
+  "text": "FLEX, FLEX-2: Flame Extinguishment Experiment. Dập giọt lỏng đang cháy bằng cách pha loãng khí quyển với CO₂ hoặc heli.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (FLEX, FLEX-2)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-cfi-cfi-g",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "CFI, CFI-G",
+  "text": "CFI, CFI-G: Cool Flames Investigation. CFI dùng giọt lỏng. CFI-G thuộc ACME, dùng khí, có luồng oxy tới 85%.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (CFI, CFI-G)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-acme",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "ACME",
+  "text": "ACME: Advanced Combustion via Microgravity Experiments. Sáu thí nghiệm lửa khí, cùng một bộ phần cứng module trong CIR.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (ACME)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-bre",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "BRE",
+  "text": "BRE: Burning Rate Emulator, thuộc ACME. Đốt khí nhưng nghiên cứu độ bắt cháy của vật liệu trong khí quyển tĩnh.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (BRE)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-e-field-flames",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "E-FIELD Flames",
+  "text": "E-FIELD Flames: Thí nghiệm ACME dùng điện trường tác động lên ion trong lửa, mô phỏng một phần hiệu ứng trọng lực.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (E-FIELD Flames)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-cir",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "CIR",
+  "text": "CIR: Combustion Integrated Rack. Tủ thí nghiệm cháy trên ISS.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (CIR)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-msg",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "MSG",
+  "text": "MSG: Microgravity Science Glovebox. Hộp găng tay kín để làm thí nghiệm trên ISS.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (MSG)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-mdca",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "MDCA",
+  "text": "MDCA: Multi-user Droplet Combustion Apparatus. Thiết bị đốt giọt lỏng trong CIR, dùng cho FLEX, FLEX-2 và CFI.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (MDCA)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-luci-fm2",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "LUCI, FM2",
+  "text": "LUCI, FM2: Hai thí nghiệm trọng lực Mặt Trăng. Đề kỳ vọng dữ liệu của chúng sẽ được thêm vào PSI sau. LUCI đã có kết quả công bố.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (LUCI, FM2)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-ntrs",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "NTRS",
+  "text": "NTRS: NASA Technical Reports Server. Kho báo cáo kỹ thuật công khai của NASA, có API.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (NTRS)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-si",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "SI",
+  "text": "SI: Viết tắt “super intelligence” trong đề. Trong thực tế đội dùng AI và LLM.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (SI)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-rag",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "RAG",
+  "text": "RAG: Retrieval-Augmented Generation. Tìm các đoạn tài liệu liên quan trước, rồi mới nhờ AI trả lời chỉ dựa trên các đoạn đó.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (RAG)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-chunk",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Chunk",
+  "text": "Chunk: Đoạn tài liệu nhỏ, mỗi đoạn một ý, có id và nguồn để trích dẫn.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Chunk)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-bm25",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "BM25",
+  "text": "BM25: Cách tìm theo từ khóa có trọng số. Tốt với thuật ngữ chính xác như BASS hay CIR.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (BM25)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-vector-embedding",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Vector, embedding",
+  "text": "Vector, embedding: Cách tìm theo nghĩa. Tốt khi câu hỏi diễn đạt xa từ khóa.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Vector, embedding)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-rrf",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "RRF",
+  "text": "RRF: Reciprocal Rank Fusion. Gộp hai danh sách xếp hạng thành một.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (RRF)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-reranker",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Reranker",
+  "text": "Reranker: Bước chấm lại các đoạn đã tìm được để giữ vài đoạn tốt nhất.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Reranker)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-coverage",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Coverage",
+  "text": "Coverage: Mức bằng chứng đủ để trả lời: full, partial hoặc none.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Coverage)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gl-jev",
+  "type": "glossary",
+  "section": "de-bai",
+  "heading": "Jev",
+  "text": "Jev: Model của TypeSafe AI chỉ chọn nhãn hoặc chấm điểm rất nhanh, không viết văn bản. Dùng làm bộ quyết định trong RAG.",
+  "contextual": "Flame in Freefall Playbook > Từ điển các từ viết tắt",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Từ điển (Jev)",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "src-01",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Kho dữ liệu PSI (tìm investigation)",
+  "text": "Kho dữ liệu PSI (tìm investigation) (nhóm Cổng PSI). Trang chạy bằng JavaScript nên chưa đọc được nội dung. Mở bằng trình duyệt, xem tab Network để tìm API nội bộ. Bổ sung từ danh mục: Trang tìm kiếm chạy bằng JavaScript. Hãy lọc Research Area = Combustion Science.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Cổng PSI",
+  "sourceRef": {
+   "title": "Kho dữ liệu PSI (tìm investigation)",
+   "url": "https://psi.nasa.gov/physci/repo/search?q=&data_source=psi&data_type=investigation"
+  },
+  "status": "unconfirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-02",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Giới thiệu và lịch sử PSI",
+  "text": "Giới thiệu và lịch sử PSI (nhóm Cổng PSI). Mỗi nghiên cứu có dữ liệu thô, dữ liệu xử lý, mô hình, hình ảnh, tài liệu và danh sách công bố, nên mỗi investigation có gói tài liệu làm nguồn RAG.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Cổng PSI",
+  "sourceRef": {
+   "title": "Giới thiệu và lịch sử PSI",
+   "url": "https://science.nasa.gov/physical-sciences-informatics-psi/history-of-physical-science-informatics/"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-03",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Danh sách investigation Combustion Science (PSI research opportunity)",
+  "text": "Danh sách investigation Combustion Science (PSI research opportunity) (nhóm Cổng PSI). Checklist 15 đến 25 mục: ACME CLD, E-Field, s-Flames, BASS, BASS-II, CFI, DAFT, FLEX, FLEX-2, SAFFIRE I–III, SAME, SAME-R, SLICE, SPICE, ACME BRE. Đây là danh sách đủ điều kiện cho đề xuất PSI, chưa chắc là toàn bộ kho.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Cổng PSI",
+  "sourceRef": {
+   "title": "Danh sách investigation Combustion Science (PSI research opportunity)",
+   "url": "https://science.nasa.gov/physical-sciences-informatics-psi/nasa-psi-research-opportunity/"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-04",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Researcher’s Guide to PSI",
+  "text": "Researcher’s Guide to PSI (nhóm Cổng PSI). Cách dùng PSI.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Cổng PSI",
+  "sourceRef": {
+   "title": "Researcher’s Guide to PSI",
+   "url": "https://www.nasa.gov/connect/ebooks/researchers-guide-to-physical-sciences-informatics-system"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-05",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "PSI: liên hệ, hướng dẫn và link liên quan",
+  "text": "PSI: liên hệ, hướng dẫn và link liên quan (nhóm Cổng PSI). Email hỗ trợ: msfc-psi-help@mail.nasa.gov. Có thể hỏi trước về API, đừng chờ trả lời.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Cổng PSI",
+  "sourceRef": {
+   "title": "PSI: liên hệ, hướng dẫn và link liên quan",
+   "url": "https://www.nasa.gov/content/psi-contacts-tutorials-and-related-links"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-06",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Microgravity Analytics Tool",
+  "text": "Microgravity Analytics Tool (nhóm Cổng PSI). Quy trình so sánh ảnh và video trong không gian với trên Trái Đất. Trích dẫn ở phần tương lai.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Cổng PSI",
+  "sourceRef": {
+   "title": "Microgravity Analytics Tool",
+   "url": "https://science.nasa.gov/physical-sciences-informatics-psi/microgravity-analytics-tool/"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-07",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "BASS-II: kết quả tổng hợp",
+  "text": "BASS-II: kết quả tổng hợp (nhóm Vật liệu rắn). Luồng khí tới 53 cm/s, hơn 100 test. Dưới 1 cm/s lửa mờ, ổn định nhưng có thể bùng nhanh khi luồng tăng đột ngột. Rất hợp với trục luồng khí của Evidence Map. Bổ sung từ danh mục: Public Use Permitted. Luồng khí đến 53 cm/s, hơn 100 test.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Vật liệu rắn",
+  "sourceRef": {
+   "title": "BASS-II: kết quả tổng hợp",
+   "url": "https://ntrs.nasa.gov/citations/20160000593"
+  },
+  "status": "link-confirmed",
+  "storage": "pub"
+ },
+ {
+  "id": "src-08",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "ACME BRE: vật liệu cháy trong không khí tĩnh (báo chí)",
+  "text": "ACME BRE: vật liệu cháy trong không khí tĩnh (báo chí) (nhóm Vật liệu rắn). BRE cho thấy vật liệu có thể cháy hàng phút khi không có luồng khí, trong khí quyển tàu có người lái đang được cân nhắc. Nguồn báo chí, cần đối chiếu với trang NASA.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Vật liệu rắn",
+  "sourceRef": {
+   "title": "ACME BRE: vật liệu cháy trong không khí tĩnh (báo chí)",
+   "url": "https://nc.inverse.com/science/iss-fire-experiments"
+  },
+  "status": "needs-check",
+  "storage": "web"
+ },
+ {
+  "id": "src-09",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Saffire I (quy mô lớn)",
+  "text": "Saffire I (quy mô lớn) (nhóm Vật liệu rắn). Bổ sung từ danh mục: Chưa mở được trang để xác nhận.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Vật liệu rắn",
+  "sourceRef": {
+   "title": "Saffire I (quy mô lớn)",
+   "url": "https://ntrs.nasa.gov/citations/20170008805"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-10",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Saffire IV và V",
+  "text": "Saffire IV và V (nhóm Vật liệu rắn). Công suất tỏa nhiệt tới 10 kW nhưng điều kiện trung bình của tàu không vượt mức không chấp nhận được. Có cảnh báo một phần tài liệu có thể chứa nội dung có bản quyền. Bổ sung từ danh mục: Portions of document may include copyright protected material.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Vật liệu rắn",
+  "sourceRef": {
+   "title": "Saffire IV và V",
+   "url": "https://ntrs.nasa.gov/citations/20210017780"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-11",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Saffire VI",
+  "text": "Saffire VI (nhóm Vật liệu rắn). Bổ sung từ danh mục: Portions of document may include copyright protected material.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Vật liệu rắn",
+  "sourceRef": {
+   "title": "Saffire VI",
+   "url": "https://ntrs.nasa.gov/citations/20240002981"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-12",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "SAME: tóm tắt của NASA (PDF)",
+  "text": "SAME: tóm tắt của NASA (PDF) (nhóm Phát hiện khói). Bổ sung từ danh mục: Tài liệu NASA.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Phát hiện khói",
+  "sourceRef": {
+   "title": "SAME: tóm tắt của NASA (PDF)",
+   "url": "https://www.nasa.gov/wp-content/uploads/2025/07/smoke-aerosol-measurement-experiment-same.pdf"
+  },
+  "status": "link-confirmed",
+  "storage": "pub"
+ },
+ {
+  "id": "src-13",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "SAME-2",
+  "text": "SAME-2 (nhóm Phát hiện khói). Bổ sung từ danh mục: Bài ghi là tác phẩm chính phủ Mỹ; cần xác nhận trên NTRS.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Phát hiện khói",
+  "sourceRef": {
+   "title": "SAME-2",
+   "url": "https://ntrs.nasa.gov/api/citations/20130000422/downloads/20130000422.pdf"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-14",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Báo cáo cuối của NIST về khói",
+  "text": "Báo cáo cuối của NIST về khói (nhóm Phát hiện khói). Phần lớn hạt khói của các vật liệu được thử nhỏ hơn 500 nm. Giấy phép chưa rõ, nên lưu metadata và tóm tắt.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Phát hiện khói",
+  "sourceRef": {
+   "title": "Báo cáo cuối của NIST về khói",
+   "url": "https://www.nist.gov/node/1863886"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-15",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "DAFT",
+  "text": "DAFT (nhóm Phát hiện khói). Đánh giá máy đếm hạt P-Trak, một thiết bị chính của SAME, trong vi trọng lực dài hạn. Ví dụ đúng cho chi tiết đề nhắc về việc dùng lại một thiết bị.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Phát hiện khói",
+  "sourceRef": {
+   "title": "DAFT",
+   "url": "https://ntrs.nasa.gov/citations/20050215648"
+  },
+  "status": "link-confirmed",
+  "storage": "pub"
+ },
+ {
+  "id": "src-16",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "FLEX: báo cáo chi tiết",
+  "text": "FLEX: báo cáo chi tiết (nhóm Dập lửa). Trình bày 284 test đầu tiên và cố ý không diễn giải, chỉ cung cấp dữ liệu. Nguồn rất tốt cho bảng số liệu và nút xuất dữ liệu. Bổ sung từ danh mục: Public Use Permitted. Báo cáo số liệu, không diễn giải.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dập lửa",
+  "sourceRef": {
+   "title": "FLEX: báo cáo chi tiết",
+   "url": "https://ntrs.nasa.gov/citations/20150023456"
+  },
+  "status": "link-confirmed",
+  "storage": "pub"
+ },
+ {
+  "id": "src-17",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "FLEX: tổng quan (Springer)",
+  "text": "FLEX: tổng quan (Springer) (nhóm Dập lửa). Có bản quyền. Chỉ lưu metadata và tóm tắt của đội. Nêu giới hạn oxy khi pha loãng bằng CO₂ và heli cho metanol và heptan.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dập lửa",
+  "sourceRef": {
+   "title": "FLEX: tổng quan (Springer)",
+   "url": "https://link.springer.com/doi/10.1007/s12217-014-9372-2"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-18",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "So sánh CO₂, N₂ và He",
+  "text": "So sánh CO₂, N₂ và He (nhóm Dập lửa). Bổ sung từ danh mục: Chưa kiểm.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dập lửa",
+  "sourceRef": {
+   "title": "So sánh CO₂, N₂ và He",
+   "url": "https://ntrs.nasa.gov/citations/20040161262"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-19",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Tổng quan ACME: Space station’s quest for the secrets of fire",
+  "text": "Tổng quan ACME: Space station’s quest for the secrets of fire (nhóm ACME). ACME gồm 6 investigation, hơn 1.500 ngọn lửa.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > ACME",
+  "sourceRef": {
+   "title": "Tổng quan ACME: Space station’s quest for the secrets of fire",
+   "url": "https://www.nasa.gov/humans-in-space/space-stations-quest-for-the-secrets-of-fire/"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-20",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Danh sách công bố theo từng investigation ACME (PDF)",
+  "text": "Danh sách công bố theo từng investigation ACME (PDF) (nhóm ACME). Rất hữu ích để lập sourceRef cho từng thí nghiệm. Bổ sung từ danh mục: Tài liệu NASA. Dùng để lập sourceRef theo investigation.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > ACME",
+  "sourceRef": {
+   "title": "Danh sách công bố theo từng investigation ACME (PDF)",
+   "url": "https://www1.grc.nasa.gov/wp-content/uploads/ACME-publications-20230830.pdf"
+  },
+  "status": "link-confirmed",
+  "storage": "pub"
+ },
+ {
+  "id": "src-21",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Slide kết quả chính ACME (JASMAC-33)",
+  "text": "Slide kết quả chính ACME (JASMAC-33) (nhóm ACME). Bổ sung từ danh mục: Chưa kiểm.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > ACME",
+  "sourceRef": {
+   "title": "Slide kết quả chính ACME (JASMAC-33)",
+   "url": "https://ntrs.nasa.gov/api/citations/20210022542/downloads/ACME%20JASMAC-33%2020211007.pdf"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-22",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Trang ACME của NASA Glenn",
+  "text": "Trang ACME của NASA Glenn (nhóm ACME).",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > ACME",
+  "sourceRef": {
+   "title": "Trang ACME của NASA Glenn",
+   "url": "https://www1.grc.nasa.gov/space/iss-research/iss-fcf/cir/acme/"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-23",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "LUCI: tên lửa thăm dò quay tạo trọng lực Mặt Trăng",
+  "text": "LUCI: tên lửa thăm dò quay tạo trọng lực Mặt Trăng (nhóm Ngoài PSI: Moon base). Test cháy kéo dài hơn 25 giây. Đã có kết quả công bố. Dùng làm dấu mốc có nhãn riêng, không trộn vào số liệu PSI. Bổ sung từ danh mục: Use by or on behalf of the US Gov. Permitted.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "LUCI: tên lửa thăm dò quay tạo trọng lực Mặt Trăng",
+   "url": "https://ntrs.nasa.gov/citations/20250010653"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-24",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "FM2: Flammability of Materials on the Moon (poster)",
+  "text": "FM2: Flammability of Materials on the Moon (poster) (nhóm Ngoài PSI: Moon base). Bổ sung từ danh mục: Use by or on behalf of the US Gov. Permitted.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "FM2: Flammability of Materials on the Moon (poster)",
+   "url": "https://ntrs.nasa.gov/citations/20240015307"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-25",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "FM2: slide LPSC 2026 (có số liệu)",
+  "text": "FM2: slide LPSC 2026 (có số liệu) (nhóm Ngoài PSI: Moon base). Nêu giả thuyết giới hạn oxy cực tiểu ở gần trọng lực Mặt Trăng. Chưa xác nhận FM2 đã bay chưa, phải kiểm tra trước khi viết.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "FM2: slide LPSC 2026 (có số liệu)",
+   "url": "https://ntrs.nasa.gov/api/citations/20260001966/downloads/Ferkul-Lunar%20and%20Planetary%20Science%20Conf%202026%20v2.pdf"
+  },
+  "status": "needs-check",
+  "storage": "pub"
+ },
+ {
+  "id": "src-26",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Máy bay parabol 0,1 đến 1g",
+  "text": "Máy bay parabol 0,1 đến 1g (nhóm Ngoài PSI: Moon base). Bổ sung từ danh mục: Chưa kiểm.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "Máy bay parabol 0,1 đến 1g",
+   "url": "https://ntrs.nasa.gov/citations/20040053567"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-27",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Olson (2004), NASA/TM-2004-213114",
+  "text": "Olson (2004), NASA/TM-2004-213114 (nhóm Ngoài PSI: Moon base). LOI ở 1g khoảng 16,5% O₂, nhưng với luồng cỡ thông gió tàu lửa có thể duy trì ở 14%. Bằng chứng cho luận điểm bài thử 1g chưa chắc là xấu nhất. Bổ sung từ danh mục: Báo cáo NASA, chưa đọc trường Copyright.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "Olson (2004), NASA/TM-2004-213114",
+   "url": "https://ntrs.nasa.gov/api/citations/20040084156/downloads/20040084156.pdf"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-28",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Khí quyển khám phá 8,2 psia, 34% O₂",
+  "text": "Khí quyển khám phá 8,2 psia, 34% O₂ (nhóm Ngoài PSI: Moon base). Khuyến nghị đổi từ 8 psia và 32% lên 8,2 psia và 34% O₂ để giảm nguy cơ thiếu oxy.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "Khí quyển khám phá 8,2 psia, 34% O₂",
+   "url": "https://ntrs.nasa.gov/citations/20240003211"
+  },
+  "status": "link-confirmed",
+  "storage": "pub"
+ },
+ {
+  "id": "src-29",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Tính dễ cháy ở khí quyển khám phá (2026)",
+  "text": "Tính dễ cháy ở khí quyển khám phá (2026) (nhóm Ngoài PSI: Moon base). Kết luận tính dễ cháy của vật liệu là rào cản lớn nhất ở 8,2 psia và 34 đến 40% O₂, khoảng 70% hệ con cần thay vật liệu. Bổ sung từ danh mục: Public Use Permitted. 8,2 psia và 34–40% O₂.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "Tính dễ cháy ở khí quyển khám phá (2026)",
+   "url": "https://ntrs.nasa.gov/citations/20260003925"
+  },
+  "status": "link-confirmed",
+  "storage": "pub"
+ },
+ {
+  "id": "src-30",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Độ trễ bắt lửa ở khí quyển khám phá",
+  "text": "Độ trễ bắt lửa ở khí quyển khám phá (nhóm Ngoài PSI: Moon base). Test ở khí quyển chuẩn sẽ đánh giá thấp khả năng bắt lửa trên tàu. Bổ sung từ danh mục: Chưa kiểm.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "Độ trễ bắt lửa ở khí quyển khám phá",
+   "url": "https://ntrs.nasa.gov/api/citations/20080013149/downloads/20080013149.pdf"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-31",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Bài tổng quan y khoa và khí quyển (Aerospace Medicine and Human Performance)",
+  "text": "Bài tổng quan y khoa và khí quyển (Aerospace Medicine and Human Performance) (nhóm Ngoài PSI: Moon base). Bài tạp chí, coi như có bản quyền.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "Bài tổng quan y khoa và khí quyển (Aerospace Medicine and Human Performance)",
+   "url": "https://asma.kglmeridian.com/downloadpdf/view/journals/amhp/89/9/article-p792.pdf"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-32",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "NASA-STD-6001B (PDF)",
+  "text": "NASA-STD-6001B (PDF) (nhóm Ngoài PSI: Moon base). Test 1 là thử nghiệm lan truyền lửa hướng lên ở 1g, một trong các test bắt buộc. Đây chính là “bài thử 1g” mà app đặt dấu hỏi.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "NASA-STD-6001B (PDF)",
+   "url": "https://standards.nasa.gov/sites/default/files/standards/NASA/B-w/CHANGE-2/2/NASA-STD-6001B-w-Change-2_Admin-Change.pdf"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-33",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "NASA-STD-6001: trang chuẩn",
+  "text": "NASA-STD-6001: trang chuẩn (nhóm Ngoài PSI: Moon base).",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "NASA-STD-6001: trang chuẩn",
+   "url": "https://standards.nasa.gov/standard/nasa/nasa-std-6001"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-34",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "SoFIE (thay ACME trong CIR)",
+  "text": "SoFIE (thay ACME trong CIR) (nhóm Ngoài PSI: Moon base). Thí nghiệm GEL của SoFIE chạy test đầu ngày 13/1/2023. SoFIE không nằm trong danh sách đề nên coi là dấu mốc ngoài PSI. Bổ sung từ danh mục: Chưa kiểm. Không nằm trong danh sách investigation của đề.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ngoài PSI: Moon base",
+  "sourceRef": {
+   "title": "SoFIE (thay ACME trong CIR)",
+   "url": "https://ntrs.nasa.gov/citations/20200000361"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-35",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Spinoff NASA: bình chữa cháy phun sương nước mịn",
+  "text": "Spinoff NASA: bình chữa cháy phun sương nước mịn (nhóm Ứng dụng Trái Đất). Bình phun sương thay bình CO₂ không tương thích với thiết bị thở khẩn cấp. Chiếc cuối đến trạm năm 2016.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ứng dụng Trái Đất",
+  "sourceRef": {
+   "title": "Spinoff NASA: bình chữa cháy phun sương nước mịn",
+   "url": "https://spinoff.nasa.gov/node/11065"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-36",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Lịch sử dự án phun sương (Colorado School of Mines)",
+  "text": "Lịch sử dự án phun sương (Colorado School of Mines) (nhóm Ứng dụng Trái Đất). Bổ sung từ danh mục: Tác giả đại học, nhiều khả năng cần hạn chế.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ứng dụng Trái Đất",
+  "sourceRef": {
+   "title": "Lịch sử dự án phun sương (Colorado School of Mines)",
+   "url": "https://ntrs.nasa.gov/api/citations/20170009414/downloads/20170009414.pdf"
+  },
+  "status": "link-confirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-37",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Mines Newsroom: fighting fire with fine water mist",
+  "text": "Mines Newsroom: fighting fire with fine water mist (nhóm Ứng dụng Trái Đất).",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Ứng dụng Trái Đất",
+  "sourceRef": {
+   "title": "Mines Newsroom: fighting fire with fine water mist",
+   "url": "https://minesnewsroom.com/news/fighting-fire-fine-water-mist"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-38",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Tài liệu API của NTRS (OpenAPI, PDF)",
+  "text": "Tài liệu API của NTRS (OpenAPI, PDF) (nhóm Nạp vào RAG). POST /citations/search và GET /citations/{id}, kèm đường dẫn tải tài liệu. Tự viết script ngày H0 rất nhanh.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Nạp vào RAG",
+  "sourceRef": {
+   "title": "Tài liệu API của NTRS (OpenAPI, PDF)",
+   "url": "https://sti.nasa.gov/docs/20221122_OpenAPI_Documentation.pdf"
+  },
+  "status": "link-confirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-39",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Contextual Retrieval (Anthropic), mã R1 trong docx",
+  "text": "Contextual Retrieval (Anthropic), mã R1 trong docx (nhóm Nạp vào RAG). Link do mình thêm theo mã R1 trong docx, chưa đối chiếu vì Phụ lục B không có trong file. Số liệu 49% và 67% đo trên codebase, tiểu thuyết, paper, không phải dữ liệu cháy.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Nạp vào RAG",
+  "sourceRef": {
+   "title": "Contextual Retrieval (Anthropic), mã R1 trong docx",
+   "url": "https://www.anthropic.com/news/contextual-retrieval"
+  },
+  "status": "unconfirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-40",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Spacecraft Fire Safety Research at NASA Glenn (SAME)",
+  "text": "Spacecraft Fire Safety Research at NASA Glenn (SAME) (nhóm Tài liệu bổ sung). Bổ sung từ danh mục: Work of the US Gov. Public Use Permitted.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Tài liệu bổ sung",
+  "sourceRef": {
+   "title": "Spacecraft Fire Safety Research at NASA Glenn (SAME)",
+   "url": "https://ntrs.nasa.gov/api/citations/20170007283/downloads/20170007283.pdf"
+  },
+  "status": "unconfirmed",
+  "storage": "pub"
+ },
+ {
+  "id": "src-41",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Fluids and Combustion Facility (trang NASA Glenn)",
+  "text": "Fluids and Combustion Facility (trang NASA Glenn) (nhóm Tài liệu bổ sung). Bổ sung từ danh mục: Trang NASA. Chưa kiểm phần bên thứ ba.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Tài liệu bổ sung",
+  "sourceRef": {
+   "title": "Fluids and Combustion Facility (trang NASA Glenn)",
+   "url": "https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/science-facilities-on-the-iss/fluids-combustion-facility/"
+  },
+  "status": "unconfirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-42",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "BASS-II Summary Report (Olson et al. 2021)",
+  "text": "BASS-II Summary Report (Olson et al. 2021) (nhóm Tài liệu bổ sung). Bổ sung từ danh mục: Use by or on behalf of the US Gov. Permitted.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Tài liệu bổ sung",
+  "sourceRef": {
+   "title": "BASS-II Summary Report (Olson et al. 2021)",
+   "url": "https://ntrs.nasa.gov/api/citations/20210011385/downloads/TM-20210011385.pdf"
+  },
+  "status": "unconfirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-43",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Saffire IV/V: bài ICES 2021-266",
+  "text": "Saffire IV/V: bài ICES 2021-266 (nhóm Tài liệu bổ sung). Bổ sung từ danh mục: Portions of document may include copyright protected material.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Tài liệu bổ sung",
+  "sourceRef": {
+   "title": "Saffire IV/V: bài ICES 2021-266",
+   "url": "https://ntrs.nasa.gov/api/citations/20210011521/downloads/ICES%202021-266%200503-2021%20final.pdf"
+  },
+  "status": "unconfirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-44",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Báo cáo NIST về khói (pub_id 904707)",
+  "text": "Báo cáo NIST về khói (pub_id 904707) (nhóm Tài liệu bổ sung). Bổ sung từ danh mục: Cơ quan chính phủ Mỹ; chưa đọc điều khoản.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Tài liệu bổ sung",
+  "sourceRef": {
+   "title": "Báo cáo NIST về khói (pub_id 904707)",
+   "url": "https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=904707"
+  },
+  "status": "unconfirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-45",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Saffire status 2016 (slide)",
+  "text": "Saffire status 2016 (slide) (nhóm Tài liệu bổ sung). Bổ sung từ danh mục: Chưa kiểm.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Tài liệu bổ sung",
+  "sourceRef": {
+   "title": "Saffire status 2016 (slide)",
+   "url": "https://ntrs.nasa.gov/api/citations/20170002628/downloads/20170002628.pdf"
+  },
+  "status": "unconfirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-46",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "BASS-II: cảm biến CSA-CP và CDM (ICES 2015)",
+  "text": "BASS-II: cảm biến CSA-CP và CDM (ICES 2015) (nhóm Tài liệu bổ sung). Bổ sung từ danh mục: Chưa kiểm.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Tài liệu bổ sung",
+  "sourceRef": {
+   "title": "BASS-II: cảm biến CSA-CP và CDM (ICES 2015)",
+   "url": "https://ntrs.nasa.gov/api/citations/20150019858/downloads/20150019858.pdf"
+  },
+  "status": "unconfirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-47",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "PSI-60: phân tích SPICE (ground investigation)",
+  "text": "PSI-60: phân tích SPICE (ground investigation) (nhóm Dataset PSI và cổng tra cứu). Bổ sung từ danh mục: DOI 10.60555/mzjm-yv57. CC0-1.0. Hơn 1.600 ảnh thô, nhiệt độ và thể tích muội.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dataset PSI và cổng tra cứu",
+  "sourceRef": {
+   "title": "PSI-60: phân tích SPICE (ground investigation)",
+   "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-60"
+  },
+  "status": "unconfirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-48",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "PSI-69: FLEX, phiên bản 5",
+  "text": "PSI-69: FLEX, phiên bản 5 (nhóm Dataset PSI và cổng tra cứu). Bổ sung từ danh mục: DOI 10.60555/mbq8-0451. Theo một repo công khai: 274 test × 16 cột, CC0-1.0. Cần xác nhận trên trang PSI. Nhãn dùng được của danh mục là thông tin gián tiếp; cần kiểm lại giấy phép và kích thước ngay trên PSI.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dataset PSI và cổng tra cứu",
+  "sourceRef": {
+   "title": "PSI-69: FLEX, phiên bản 5",
+   "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-69"
+  },
+  "status": "unconfirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-49",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "PSI-159: ACME CFI-G (O₂ cao nhất trong vi trọng lực)",
+  "text": "PSI-159: ACME CFI-G (O₂ cao nhất trong vi trọng lực) (nhóm Dataset PSI và cổng tra cứu). Bổ sung từ danh mục: Mình chỉ thấy mã trong danh sách PSI. Hãy mở trang và đọc DOI, giấy phép.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dataset PSI và cổng tra cứu",
+  "sourceRef": {
+   "title": "PSI-159: ACME CFI-G (O₂ cao nhất trong vi trọng lực)",
+   "url": "https://psi.nasa.gov/physci/repo/data/investigations/PSI-159"
+  },
+  "status": "unconfirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-50",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "PSI: danh sách investigation theo lĩnh vực",
+  "text": "PSI: danh sách investigation theo lĩnh vực (nhóm Dataset PSI và cổng tra cứu). Bổ sung từ danh mục: Liệt kê ACME BRE, E-FIELD, S-Flames, BASS, BASS-II, CFI, FLEX, FLEX-2, SAME-R, SPICE…",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dataset PSI và cổng tra cứu",
+  "sourceRef": {
+   "title": "PSI: danh sách investigation theo lĩnh vực",
+   "url": "https://www.nasa.gov/physical-sciences-informatics-psi/psi-investigations-by-research-area/"
+  },
+  "status": "unconfirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-51",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "PSI: nghiên cứu mặt đất dùng dữ liệu PSI (NRA)",
+  "text": "PSI: nghiên cứu mặt đất dùng dữ liệu PSI (NRA) (nhóm Dataset PSI và cổng tra cứu). Bổ sung từ danh mục: Danh sách bộ dữ liệu phái sinh, ví dụ cool flame (PSI-117 sắp có).",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dataset PSI và cổng tra cứu",
+  "sourceRef": {
+   "title": "PSI: nghiên cứu mặt đất dùng dữ liệu PSI (NRA)",
+   "url": "https://www.nasa.gov/physical-sciences-informatics-psi/psi-nra-awarded-research-by-area/"
+  },
+  "status": "unconfirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-52",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "NIST Fire Calorimetry Database (ứng dụng trên Trái Đất)",
+  "text": "NIST Fire Calorimetry Database (ứng dụng trên Trái Đất) (nhóm Dataset và dữ liệu ngoài PSI). Bổ sung từ danh mục: DOI 10.18434/mds2-2314. Giấy phép NIST Open (https://www.nist.gov/open/license). Nhiệt giải phóng, CO, muội.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dataset và dữ liệu ngoài PSI",
+  "sourceRef": {
+   "title": "NIST Fire Calorimetry Database (ứng dụng trên Trái Đất)",
+   "url": "https://data.nist.gov/od/id/mds2-2314"
+  },
+  "status": "unconfirmed",
+  "storage": "web"
+ },
+ {
+  "id": "src-53",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "JAXA DARTS: Kibo Group Combustion (nguồn quốc tế)",
+  "text": "JAXA DARTS: Kibo Group Combustion (nguồn quốc tế) (nhóm Dataset và dữ liệu ngoài PSI). Bổ sung từ danh mục: Dữ liệu cháy giọt trên ISS. Chưa đọc giấy phép.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dataset và dữ liệu ngoài PSI",
+  "sourceRef": {
+   "title": "JAXA DARTS: Kibo Group Combustion (nguồn quốc tế)",
+   "url": "https://darts.isas.jaxa.jp/app/kibo-pm-experiments/experiment/combustion/gc"
+  },
+  "status": "unconfirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-54",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "Mendeley: phân loại kết quả cháy vật liệu rắn trong vi trọng lực",
+  "text": "Mendeley: phân loại kết quả cháy vật liệu rắn trong vi trọng lực (nhóm Dataset và dữ liệu ngoài PSI). Bổ sung từ danh mục: DOI 10.17632/2gw4pjhkxz.1. Bản đồ tài liệu, không phải số liệu thô. Chưa đọc giấy phép.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dataset và dữ liệu ngoài PSI",
+  "sourceRef": {
+   "title": "Mendeley: phân loại kết quả cháy vật liệu rắn trong vi trọng lực",
+   "url": "https://data.mendeley.com/datasets/2gw4pjhkxz/1"
+  },
+  "status": "unconfirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "src-55",
+  "type": "source",
+  "section": "du-lieu",
+  "heading": "MAPTIS (kết quả NASA-STD-6001, Test 1)",
+  "text": "MAPTIS (kết quả NASA-STD-6001, Test 1) (nhóm Dataset và dữ liệu ngoài PSI). Bổ sung từ danh mục: Cơ sở dữ liệu cần tài khoản, không mở công khai. Chỉ dùng bài NTRS này (Work of the US Gov) để minh họa.",
+  "contextual": "Flame in Freefall Playbook > Danh sách link nguồn > Dataset và dữ liệu ngoài PSI",
+  "sourceRef": {
+   "title": "MAPTIS (kết quả NASA-STD-6001, Test 1)",
+   "url": "https://ntrs.nasa.gov/citations/20040084025"
+  },
+  "status": "unconfirmed",
+  "storage": "meta"
+ },
+ {
+  "id": "plan-01",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Xếp hạng theo kịch bản, breakdown, trượt trọng số",
+  "text": "[Must] Xếp hạng theo kịch bản, breakdown, trượt trọng số. Giờ công ước lượng: 8–10. Người làm: Analyst B công thức; Full-stack A giao diện.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-02",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Evidence Map (oxy × luồng khí, đổi sang áp suất, tô ô trống)",
+  "text": "[Must] Evidence Map (oxy × luồng khí, đổi sang áp suất, tô ô trống). Giờ công ước lượng: 10–12. Người làm: Analyst B dữ liệu; Full-stack A đồ thị.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-03",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Dải trọng lực, khoảng giữa gạch chéo, không nội suy",
+  "text": "[Must] Dải trọng lực, khoảng giữa gạch chéo, không nội suy. Giờ công ước lượng: 3–4. Người làm: Full-stack A; Analyst A.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-04",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "So sánh “mã gen” investigation",
+  "text": "[Must] So sánh “mã gen” investigation. Giờ công ước lượng: 6–8. Người làm: Full-stack A; Analyst A.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-05",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Hỏi đáp trích nguồn, từ chối khi thiếu bằng chứng",
+  "text": "[Must] Hỏi đáp trích nguồn, từ chối khi thiếu bằng chứng. Giờ công ước lượng: 12–14. Người làm: AI A; AI B; Full-stack B.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-06",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Xuất CSV/JSON kèm Data Card và notebook mẫu",
+  "text": "[Must] Xuất CSV/JSON kèm Data Card và notebook mẫu. Giờ công ước lượng: 4–6. Người làm: Full-stack B; Analyst B.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-07",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Claim Checker: được hỗ trợ, bị phản bác, hoặc PSI chưa đề cập",
+  "text": "[Should] Claim Checker: được hỗ trợ, bị phản bác, hoặc PSI chưa đề cập. Giờ công ước lượng: 4–6. Người làm: AI B.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-08",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Scorecard ba trụ cột và danh sách “thí nghiệm nên làm tiếp” từ các ô trống",
+  "text": "[Should] Scorecard ba trụ cột và danh sách “thí nghiệm nên làm tiếp” từ các ô trống. Giờ công ước lượng: 4–5. Người làm: Analyst A; Full-stack A.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-09",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Lăng kính Vũ trụ và Trái Đất (thẻ tĩnh)",
+  "text": "[Should] Lăng kính Vũ trụ và Trái Đất (thẻ tĩnh). Giờ công ước lượng: 3. Người làm: Analyst A.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-10",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Chế độ Sinh viên và Kỹ sư (chú giải, đổi cách diễn đạt)",
+  "text": "[Should] Chế độ Sinh viên và Kỹ sư (chú giải, đổi cách diễn đạt). Giờ công ước lượng: 3–4. Người làm: AI A; Analyst A.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-11",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Hoạt hình mở đầu 10 giây (lửa giọt nước, quả cầu, điểm trên bản đồ)",
+  "text": "[Should] Hoạt hình mở đầu 10 giây (lửa giọt nước, quả cầu, điểm trên bản đồ). Giờ công ước lượng: 3. Người làm: Full-stack A.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "plan-12",
+  "type": "plan",
+  "section": "ke-hoach",
+  "heading": "Contradiction Finder (dễ báo sai, hậu quả khi demo cao)",
+  "text": "[Bỏ] Contradiction Finder (dễ báo sai, hậu quả khi demo cao). Giờ công ước lượng: 8+. Người làm: chưa giao.",
+  "contextual": "Flame in Freefall Playbook > Kế hoạch 48 giờ > Danh sách tính năng",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Kế hoạch",
+   "url": "Flame_in_Freefall_Playbook.html#ke-hoach"
+  },
+  "status": "source-text"
+ },
+ {
+  "id": "gap-moon-mars-gravity",
+  "type": "gap_note",
+  "section": "de-bai",
+  "heading": "Khoảng trống số đo partial-g trong PSI và bằng chứng ngoài PSI",
+  "text": "Theo Playbook và phạm vi PSI của đề, kho PSI chưa có số đo cháy ở trọng lực Mặt Trăng (0,16g) hay Sao Hỏa (0,38g). Trong phạm vi này có dữ liệu vi trọng lực (0g) và trọng lực Trái Đất (1g); E-FIELD Flames chỉ mô phỏng một phần hiệu ứng trọng lực bằng điện trường. Ngoài PSI, LUCI đã có kết quả công bố; không được diễn giải khoảng trống PSI thành việc mọi nguồn NASA đều chưa có dữ liệu Mặt Trăng. FM2 là nghiên cứu liên quan nhưng tình trạng bay chưa xác nhận. Không nội suy khoảng giữa thành con số đo.",
+  "contextual": "Flame in Freefall Playbook > Ghi chú vùng chưa có dữ liệu (gap_note)",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: phạm vi PSI, LUCI ngoài PSI và danh mục nguồn",
+   "url": "Flame_in_Freefall_Playbook.html#du-lieu"
+  },
+  "status": "source-text",
+  "applies": "moon_mars_gravity"
+ },
+ {
+  "id": "gap-no-safety-verdict",
+  "type": "gap_note",
+  "section": "de-bai",
+  "heading": "Công cụ không kết luận an toàn hay không an toàn",
+  "text": "Theo playbook, ứng dụng chỉ cho thấy bằng chứng đã có và điều kiện đã thử. Nó không bao giờ kết luận một vật liệu là an toàn hoặc không an toàn, và phải ghi rõ đây là công cụ tham khảo nghiên cứu, không phải hệ thống an toàn vận hành.",
+  "contextual": "Flame in Freefall Playbook > Quy tắc trả lời và từ chối",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Hiểu đề",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text",
+  "applies": "safety_verdict"
+ },
+ {
+  "id": "gap-moon-base-conditions",
+  "type": "gap_note",
+  "section": "de-bai",
+  "heading": "Điều kiện khí quyển dự kiến của căn cứ Mặt Trăng",
+  "text": "Theo playbook, bộ đồ du hành có áp suất 4,3 psi với 100% oxy. Căn cứ Mặt Trăng và rover dự kiến ở mức giữa bộ đồ và Trái Đất: oxy từ 30% trở lên, áp suất từ 10,2 psi trở xuống. Đây là giá trị tối đa hoặc tối thiểu theo đề, không phải một giá trị cố định.",
+  "contextual": "Flame in Freefall Playbook > Vì sao căn cứ Mặt Trăng là bài toán khó",
+  "sourceRef": {
+   "title": "Flame in Freefall Playbook: Hiểu đề",
+   "url": "Flame_in_Freefall_Playbook.html#de-bai"
+  },
+  "status": "source-text",
+  "applies": "moon_base_conditions"
+ }
+]

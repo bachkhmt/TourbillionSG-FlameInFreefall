@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowRight, Check, Plus, Sparkles, Tag } from 'lucide-react';
 import { useDashboardSummaryQuery } from '../hooks/useDashboardQueries';
@@ -21,6 +22,7 @@ export const CuratedStudiesGrid: React.FC<CuratedStudiesGridProps> = ({
   totalCount: totalCountProp,
   context: contextProp,
 }) => {
+  const router = useRouter();
   const compareList = useWorkspaceStore((state) => state.compareList);
   const toggleCompare = useWorkspaceStore((state) => state.toggleCompare);
   const setSelectedInvestigationId = useWorkspaceStore(
@@ -92,6 +94,14 @@ export const CuratedStudiesGrid: React.FC<CuratedStudiesGridProps> = ({
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent, routeKey: string, invId: string) => {
+    if ((e.target as HTMLElement).closest('button, a')) {
+      return;
+    }
+    setSelectedInvestigationId(invId);
+    router.push(`/explorer/${routeKey}`);
+  };
+
   return (
     <section aria-label="Curated PSI Studies" className="w-full space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -137,6 +147,7 @@ export const CuratedStudiesGrid: React.FC<CuratedStudiesGridProps> = ({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.2, ease: 'easeOut' }}
+                onClick={(e) => handleCardClick(e, inv.routeKey, inv.id)}
                 className={`rounded-3xl md:rounded-[36px] p-5 bg-gray-200/50 transition-all duration-300 flex flex-col justify-between relative group select-none cursor-pointer hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] ${
                   isComparing
                     ? 'ring-2 ring-[#D4FC02] shadow-[0_8px_30px_rgba(212,252,2,0.3)] bg-white'

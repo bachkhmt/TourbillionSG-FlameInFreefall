@@ -1,0 +1,151 @@
+{
+ "recall@5": 1.0,
+ "mrr": 0.813,
+ "refusal_accuracy": 1.0,
+ "rows": [
+  {
+   "q": "Saffire-II dùng để kiểm tra điều gì ở trọng lực thấp?",
+   "kind": "retrieval",
+   "rank": 2,
+   "ok": true
+  },
+  {
+   "q": "FLEX dập lửa bằng cách nào?",
+   "kind": "retrieval",
+   "rank": 2,
+   "ok": true
+  },
+  {
+   "q": "Thí nghiệm nào đo khói và aerosol để cải thiện cảm biến phát hiện cháy?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Thí nghiệm nào có luồng oxy cao tới 85%?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Thí nghiệm nào dùng điện trường để mô phỏng một phần trọng lực?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "CIR là viết tắt của gì?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "MDCA là thiết bị gì?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Áp suất của bộ đồ du hành là bao nhiêu psi?",
+   "kind": "retrieval",
+   "rank": 2,
+   "ok": true
+  },
+  {
+   "q": "Căn cứ Mặt Trăng dự kiến có nồng độ oxy và áp suất thế nào?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "RRF dùng để làm gì?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Timeout khi gọi LLM là bao lâu?",
+   "kind": "retrieval",
+   "rank": 5,
+   "ok": true
+  },
+  {
+   "q": "Hackathon bắt đầu ngày nào?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Validator trích dẫn phía server làm gì?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Khi LLM bị lỗi thì app làm gì?",
+   "kind": "retrieval",
+   "rank": 4,
+   "ok": true
+  },
+  {
+   "q": "Saffire-III khác Saffire-I thế nào về dòng khí?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "LOI nghĩa là gì?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Dữ liệu NASA có được gọi trực tiếp lúc chạy không?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Mục tiêu Recall@5 là bao nhiêu?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "BM25 tốt ở điểm nào?",
+   "kind": "retrieval",
+   "rank": 2,
+   "ok": true
+  },
+  {
+   "q": "Nhiên liệu tên lửa cháy thế nào?",
+   "kind": "refuse",
+   "reason": "off_topic",
+   "ok": true
+  },
+  {
+   "q": "Thời tiết Houston hôm nay?",
+   "kind": "refuse",
+   "reason": "off_topic",
+   "ok": true
+  },
+  {
+   "q": "Có dữ liệu cháy ở trọng lực Mặt Trăng không?",
+   "kind": "refuse",
+   "reason": "no_data_gap",
+   "ok": true
+  },
+  {
+   "q": "Vải này dùng trong rover 30% O₂ có an toàn không?",
+   "kind": "refuse",
+   "reason": "safety_verdict",
+   "ok": true
+  },
+  {
+   "q": "Vật liệu qua bài thử 1g thì an toàn trên Mặt Trăng",
+   "kind": "refuse",
+   "reason": "no_data_gap",
+   "ok": true
+  }
+ ]
+}

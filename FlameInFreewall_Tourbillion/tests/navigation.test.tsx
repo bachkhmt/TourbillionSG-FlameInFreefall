@@ -16,7 +16,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 describe('Sidebar Navigation Dock & Layout System', () => {
-  it('renders sticky navigation dock with only 3 PSI modules and no settings', () => {
+  it('renders sticky navigation dock with 4 PSI modules and no settings', () => {
     const { container } = render(<Sidebar />);
 
     // Sticky dock container check
@@ -27,18 +27,20 @@ describe('Sidebar Navigation Dock & Layout System', () => {
     expect(aside?.className).toContain('top-3');
     expect(aside?.className).toContain('ml-3.5');
 
-    // Exactly 3 modules in NAV_ITEMS
-    expect(NAV_ITEMS).toHaveLength(3);
+    // 4 modules in NAV_ITEMS
+    expect(NAV_ITEMS).toHaveLength(4);
     expect(NAV_ITEMS.map((item) => item.path)).toEqual([
       '/dashboard',
       '/explorer',
       '/mission',
+      '/resources',
     ]);
 
-    // 3 PSI modules rendered
+    // 4 PSI modules rendered
     expect(screen.getByLabelText(/Research Dashboard/i)).toBeTruthy();
     expect(screen.getByLabelText(/Experiment Explorer/i)).toBeTruthy();
     expect(screen.getByLabelText(/Mission Scenario/i)).toBeTruthy();
+    expect(screen.getByLabelText(/Official Resources/i)).toBeTruthy();
 
     // No settings
     expect(screen.queryByLabelText(/Settings/i)).toBeNull();
@@ -94,7 +96,7 @@ describe('Sidebar Navigation Dock & Layout System', () => {
     expect(badge.className).toContain('text-[#D4FC02]');
   });
 
-  it('BottomNav renders light theme dock with strictly 3 tabs and no settings', () => {
+  it('BottomNav renders light theme dock with 4 tabs and no settings', () => {
     render(<BottomNav />);
 
     const bottomNav = screen.getByTestId('bottom-nav');
@@ -106,6 +108,7 @@ describe('Sidebar Navigation Dock & Layout System', () => {
     expect(screen.getByTestId('bottom-nav-dashboard')).toBeTruthy();
     expect(screen.getByTestId('bottom-nav-explorer')).toBeTruthy();
     expect(screen.getByTestId('bottom-nav-mission')).toBeTruthy();
+    expect(screen.getByTestId('bottom-nav-resources')).toBeTruthy();
     expect(screen.queryByTestId('bottom-nav-settings')).toBeNull();
   });
 });

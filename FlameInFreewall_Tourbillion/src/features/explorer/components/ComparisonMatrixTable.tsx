@@ -5,9 +5,12 @@ import Link from 'next/link';
 import { X, Building2, ExternalLink, Tag, AlertTriangle } from 'lucide-react';
 import type { MappedComparisonStudy, MappedObservableSummary } from '@/types/api';
 
+import { useWorkspaceStore } from '@/store/useWorkspaceStore';
+
 export interface ComparisonMatrixTableProps {
   studies: MappedComparisonStudy[];
   onRemove?: (id: string) => void;
+  onInspect?: () => void;
 }
 
 function formatObservableRange(summary: MappedObservableSummary): string {
@@ -25,6 +28,7 @@ function formatObservableRange(summary: MappedObservableSummary): string {
 export const ComparisonMatrixTable: React.FC<ComparisonMatrixTableProps> = ({
   studies,
   onRemove,
+  onInspect,
 }) => {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-2xs">
@@ -215,6 +219,10 @@ export const ComparisonMatrixTable: React.FC<ComparisonMatrixTableProps> = ({
                 <td key={study.investigation.id} className="px-4 py-3 align-top border-r last:border-r-0 border-gray-100">
                   <Link
                     href={`/explorer/${study.investigation.routeKey}`}
+                    onClick={() => {
+                      onInspect?.();
+                      useWorkspaceStore.getState().closeComparisonModal();
+                    }}
                     data-testid={`comparison-column-details-${study.investigation.id}`}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-gray-100 text-xs font-semibold text-zinc-800 border border-gray-200 shadow-2xs transition-colors"
                   >

@@ -43,7 +43,7 @@ export const DashboardShimmer: React.FC = () => {
     <div data-testid="dashboard-shimmer" className="w-full space-y-8 sm:space-y-10 select-none">
       {/* KPI Stat Cards Shimmer */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-        {Array.from({ length: 5 }, (_, index) => (
+        {Array.from({ length: 4 }, (_, index) => (
           <div
             key={`kpi-shimmer-${index}`}
             className="bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 min-h-[170px] flex flex-col justify-between"
@@ -51,7 +51,7 @@ export const DashboardShimmer: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <ShimmerBar className="h-5 w-20 rounded-full" />
-                <ShimmerBar className="h-8 w-8 rounded-xl" />
+                <ShimmerBar className="h-7 w-7 rounded-xl" />
               </div>
               <ShimmerBar className="h-9 w-20 rounded-xl" />
               <ShimmerBar className="h-4 w-32 rounded-md" />
@@ -59,6 +59,18 @@ export const DashboardShimmer: React.FC = () => {
             <ShimmerBar className="h-3 w-full rounded-md mt-3" />
           </div>
         ))}
+        {/* KPI 5: Knowledge Void Shimmer */}
+        <div className="bg-amber-100/60 rounded-[36px] p-5 border border-amber-200/60 min-h-[170px] flex flex-col justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <ShimmerBar className="h-5 w-28 rounded-full" />
+              <ShimmerBar className="h-7 w-7 rounded-xl" />
+            </div>
+            <ShimmerBar className="h-9 w-24 rounded-xl" />
+            <ShimmerBar className="h-4 w-32 rounded-md" />
+          </div>
+          <ShimmerBar className="h-3 w-full rounded-md mt-3" />
+        </div>
       </div>
 
       {/* Curated Studies Grid Shimmer */}
@@ -66,20 +78,37 @@ export const DashboardShimmer: React.FC = () => {
         {Array.from({ length: 3 }, (_, index) => (
           <div
             key={`study-shimmer-${index}`}
-            className="bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 min-h-[230px] flex flex-col justify-between"
+            className="rounded-3xl md:rounded-[36px] p-5 bg-gray-200/50 min-h-[220px] flex flex-col justify-between"
           >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-2">
-                <ShimmerBar className="h-5 w-24 rounded-full" />
-                <ShimmerBar className="h-5 w-20 rounded-full" />
+            <div>
+              {/* Header: PSI ID, Platform, Compare button */}
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="flex items-center gap-1.5">
+                  <ShimmerBar className="h-5 w-16 rounded-full" />
+                  <ShimmerBar className="h-5 w-24 rounded-full" />
+                </div>
+                <ShimmerBar className="h-6 w-20 rounded-full" />
               </div>
-              <ShimmerBar className="h-5 w-3/4 rounded-md" />
-              <ShimmerBar className="h-3.5 w-full rounded-md" />
-              <ShimmerBar className="h-3.5 w-2/3 rounded-md" />
+
+              {/* Title & Purpose */}
+              <div className="space-y-2 mb-3">
+                <ShimmerBar className="h-5 w-3/4 rounded-md" />
+                <ShimmerBar className="h-3.5 w-full rounded-md" />
+                <ShimmerBar className="h-3.5 w-2/3 rounded-md" />
+              </div>
+
+              {/* Tags Strip */}
+              <div className="flex flex-wrap items-center gap-1.5 mt-3 mb-4">
+                <ShimmerBar className="h-4 w-16 rounded-full" />
+                <ShimmerBar className="h-4 w-20 rounded-full" />
+                <ShimmerBar className="h-4 w-14 rounded-full" />
+              </div>
             </div>
-            <div className="pt-3 border-t border-black/5 flex items-center gap-2">
-              <ShimmerBar className="h-8 flex-1 rounded-xl" />
-              <ShimmerBar className="h-8 w-24 rounded-xl" />
+
+            {/* Footer Metrics */}
+            <div className="pt-3 mt-4 border-t border-black/5 flex items-center justify-between">
+              <ShimmerBar className="h-4 w-28 rounded-md" />
+              <ShimmerBar className="h-3.5 w-16 rounded-md" />
             </div>
           </div>
         ))}
@@ -90,7 +119,7 @@ export const DashboardShimmer: React.FC = () => {
         {Array.from({ length: 3 }, (_, index) => (
           <div
             key={`domain-shimmer-${index}`}
-            className="bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 min-h-[210px] flex flex-col justify-between"
+            className="bg-gray-200/50 rounded-[36px] p-5 min-h-[210px] flex flex-col justify-between"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">

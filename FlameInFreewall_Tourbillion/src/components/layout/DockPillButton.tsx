@@ -4,8 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const MotionLink = motion.create(Link);
-
 export interface DockPillButtonProps {
   id?: string;
   icon: React.ReactNode;
@@ -118,45 +116,40 @@ export const DockPillButton: React.FC<DockPillButtonProps> = ({
     >
       {/* Conditionally render single interactive control: Link if href exists, button otherwise */}
       {href ? (
-        <MotionLink
+        <Link
           id={id}
           href={href}
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.96 }}
-          transition={{ type: 'spring', stiffness: 160, damping: 18 }}
-          className={controlClasses}
+          prefetch={true}
+          className={`${controlClasses} hover:scale-[1.03] active:scale-[0.96] transition-transform duration-100 ease-out`}
           aria-label={label}
           data-testid={testId}
         >
           {innerContent}
-        </MotionLink>
+        </Link>
       ) : (
-        <motion.button
+        <button
           id={id}
           type="button"
           onClick={onClick}
           disabled={disabled}
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.96 }}
-          transition={{ type: 'spring', stiffness: 160, damping: 15 }}
-          className={controlClasses}
+          className={`${controlClasses} hover:scale-[1.03] active:scale-[0.96] transition-transform duration-100 ease-out`}
           aria-label={label}
           data-testid={testId}
         >
           {innerContent}
-        </motion.button>
+        </button>
       )}
 
       {/* Liquid Glass Tooltip on Hover in Collapsed State */}
       <AnimatePresence>
         {showTooltip && !isExpanded && !active && tooltipText && (
-          <div className="absolute left-[68px] top-1/2 -translate-y-1/2 z-50 pointer-events-none whitespace-nowrap">
+          <div className="absolute left-[68px] top-1/2 -translate-y-1/2 z-[100] pointer-events-none whitespace-nowrap">
             <motion.div
               initial={{ opacity: 0, x: -8, scale: 0.95 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -8, scale: 0.95 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="h-10 px-3.5 rounded-2xl flex items-center bg-[#0B2374] backdrop-blur-md border border-[#D4FC02]/30 shadow-lg text-white font-extrabold text-xs tracking-tight whitespace-nowrap"
+              className="h-10 px-3.5 rounded-2xl flex items-center bg-[#0B2374] backdrop-blur-md border border-[#D4FC02]/30 shadow-2xl text-white font-extrabold text-xs tracking-tight whitespace-nowrap"
             >
               {tooltipText}
             </motion.div>
