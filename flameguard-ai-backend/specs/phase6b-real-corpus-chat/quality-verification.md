@@ -42,3 +42,19 @@ A read-only GET to the user-provided Azure frontend's `/api/proxy/api/v1/chat/re
 Pulled `origin/main` at `5ad0413` (Mission API integration / Predictive Lab removal) into the RAG branch with merge commit `39d7fae`. Git merged automatically with no conflict entries; upstream UI/mission changes remain intact. The four RAG algorithm file hashes and the frozen evaluation question hash are unchanged.
 
 Fresh combined-branch checks: root PostgreSQL **128 passed, 0 skipped**, exit0 (124.43s); backend PostgreSQL **700 passed, 0 skipped**, exit0 (61.52s); frontend **310 tests passed**, TypeScript `npx tsc --noEmit` passed and production `npm run build` passed, exit0. Only the approved test PostgreSQL55435 target was used. No deployment or shared DB import. PR7 updated with the merge and verification.
+
+## Family scope fix — 2026-11-15
+
+Manual HTTP review found "What is ACME?" abstaining, a regression from v2. Cause: the backend passes all catalog slugs; ACME member `flame-design` has no admitted passage, so the strict anchored-study check rejected the whole family. "ACME BRE" also widened to the full family. Details and the post-freeze note are in [evaluation.md](evaluation.md).
+
+| Check | Result |
+| --- | --- |
+| New regression tests before the fix | 7 failed for the expected reason (empty hits / abstained), 2 preconditions passed |
+| `integration_tests/test_nasa_chat_retrieval.py` after the fix | 57 passed |
+| Benchmark re-run (evaluator now passes catalog + registry slugs like `ChatService`) | development 30 and holdout 10: 0 changed cases; metrics unchanged |
+| Root full suite, `scripts/test_db.py run -- flameguard-ai-backend/.venv/bin/python -m pytest -q` | **137 passed, 0 skipped** (128 previous + 9 new) |
+| Backend full suite | **700 passed, 0 skipped** |
+| Ruff check/format on changed files, `git diff --check` | Passed |
+| HTTP smoke on the existing preview test target (55435) | "What is ACME?" / "ACME là gì?" answered with four ACME investigations; "What is ACME BRE?" only BRE; "Compare ACME and FLEX" both sides; "What is ACME Flame Design?" abstained; CO2, BASS/Saffire, SAME, FLEX-007 follow-up and safety abstention unchanged |
+
+Provider version remains `nasa-extractive-v3` (unreleased). No deployment, migration or shared DB change.

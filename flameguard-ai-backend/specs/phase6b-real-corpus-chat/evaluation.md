@@ -34,6 +34,14 @@ Recall@4 here means a question-level hit: at least one of the accepted investiga
 
 The question JSON/split/hash was authored and frozen before tuning. Development outcomes were used while adjusting bounded vocabulary/ranking. The main agent authored the holdout prompts but did not execute or inspect their results until an independent `kit-reviewer` returned PASS and source hashes were frozen. No retrieval/provider behavior was changed after that first holdout run.
 
+### Post-freeze amendment — family scope fix (2026-11-15)
+
+`retrieval.py` changed after the freeze above; `evaluation-freeze.json` is kept unchanged as the historical record. The change was found by manual HTTP review, not from holdout results: "What is ACME?" abstained over HTTP because the backend passes every catalog slug, and the cataloged ACME member `flame-design` has no admitted passage, so the strict "every anchored study must have candidates" rule rejected the whole family. The evaluator passed only registry slugs and could not reproduce it.
+
+Fix: a family name widens only to indexed members (named studies stay strict, so "What is ACME Flame Design?" still abstains), and naming a member ("ACME BRE") no longer widens to its family. The evaluator now passes catalog plus registry slugs, mirroring `ChatService`. Provider version stays `nasa-extractive-v3` because v3 had not been released or deployed.
+
+Re-run after the fix: development and holdout results are identical case by case to the published JSON (0 changed slugs or states; metrics unchanged). New `retrieval.py` SHA-256: `5bf3b5959efb8e1d5f405c85560314cf51b5d76a531452758177f9db190322d9`; the other three algorithm files are unchanged. No frozen question covers a family-only name, so the regression is guarded by dedicated tests in `integration_tests/test_nasa_chat_retrieval.py`, not by the benchmark.
+
 After publication, these questions are regression cases, not a permanently fresh test set. Future tuning requires a new held-out set for any new generalization claim. The pairs share topics and include related run/hardware queries, so ten holdout questions provide limited evidence beyond those topics.
 
 ## Preserved behavior and remaining limits
