@@ -1,49 +1,77 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#090b10">
-  <title>Studio · Flame in Freefall</title>
+  <title>NASA Combustion Studio · Flame in Freefall</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/assets/fonts/inter.css">
   <link rel="stylesheet" href="/assets/studio.css">
   <script type="module" src="/assets/studio.js"></script>
 </head>
 <body>
-  <a class="skip" href="#demo-title">Đến minh họa đang chọn</a>
+  <a class="skip" href="#demo-title">Skip to active experiment</a>
   <header class="topbar">
     <div class="brand-nav">
-      <a class="back-btn" href="/" onclick="if(window.history.length>1){window.history.back();return false;}" title="Quay lại" aria-label="Quay lại">
+      <a class="back-btn" href="/" onclick="if(window.history.length>1){window.history.back();return false;}" title="Back" aria-label="Back">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
-        <span class="back-btn-text">Quay lại</span>
+        <span class="back-btn-text">Back</span>
       </a>
-      <a class="brand" href="/" title="Về trang chính">
+      <a class="brand" href="/" title="Back to main page">
         <span class="brand-mark" aria-hidden="true"><svg width="20" height="25" viewBox="0 0 25 30" fill="none"><path d="M12.5 2C13.5 9 22 12 22 19a9.5 9.5 0 0 1-19 0C3 12 11.5 9 12.5 2Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12.5" cy="19" r="4" stroke="currentColor" stroke-width="1.5"/></svg></span>
-        <span>Flame in Freefall<small>STUDIO / PHÒNG QUAN SÁT LỬA</small></span>
+        <span>Flame in Freefall<small>COMBUSTION SIMULATION STUDIO</small></span>
       </a>
     </div>
-    <div class="top-links"><span class="badge">INTERACTIVE DEMO</span><a href="/" onclick="if(window.history.length>1){window.history.back();return false;}">← Về kho nghiên cứu</a></div>
+    <div class="top-links"><span class="badge">INTERACTIVE LABORATORY</span><a href="/" onclick="if(window.history.length>1){window.history.back();return false;}">← Back to Research Portal</a></div>
   </header>
   <div class="workspace">
     <aside class="sidebar" aria-labelledby="library-title">
-      <div class="sidebar-heading"><p class="eyebrow">KHÁM PHÁ QUA TƯƠNG TÁC</p><h2 id="library-title">Thư viện minh họa</h2><p>5 thí nghiệm SoFIE · 6 bản minh họa<br>và phòng quan sát lửa tự do</p></div>
-      <nav id="demo-list" class="demo-list" aria-label="Chọn minh họa"></nav>
-      <div class="sidebar-note">Các mô phỏng dùng tham số minh họa. Mốc số trong các bản demo chưa được xác minh nguồn.<br><a href="https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/solid-fuel-ignition-and-extinction-sofie/" target="_blank" rel="noopener noreferrer">Tìm hiểu SoFIE tại NASA ↗</a></div>
+      <div class="sidebar-heading">
+        <p class="eyebrow">PHYSICS EXPLORATION</p>
+        <h2 id="library-title">Experiment Library</h2>
+        <p>NASA CFM & SoFIE Investigations<br>aboard the International Space Station (ISS)</p>
+      </div>
+      <nav id="demo-list" class="demo-list" aria-label="Select experiment"></nav>
+      <div class="sidebar-note">
+        Simulations use phenomenological models and qualitative approximations based on NASA reference studies. Numerical thresholds are illustrative approximations.<br>
+        <a href="https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/solid-fuel-ignition-and-extinction-sofie/" target="_blank" rel="noopener noreferrer">Explore NASA SoFIE ↗</a>
+      </div>
     </aside>
     <main class="main">
       <div class="demo-heading">
-        <div><p id="demo-kind" class="eyebrow">QUAN SÁT 3D</p><h1 id="demo-title" tabindex="-1">Phòng quan sát lửa</h1><p id="demo-description">Khám phá hình dạng và chuyển động của ngọn lửa.</p></div>
-        <div class="actions"><button id="reload-demo" class="action" type="button">↻ Tải lại</button><a id="open-demo" class="action" href="/studio/experiments/candle.html" target="_blank" rel="noopener noreferrer">Mở riêng ↗</a></div>
+        <div>
+          <p id="demo-kind" class="eyebrow">3D VOLUMETRIC SIMULATION</p>
+          <h1 id="demo-title" tabindex="-1">Freefall Combustion Chamber</h1>
+          <p id="demo-description">Explore microgravity flame morphology, soot emission, and transport dynamics.</p>
+        </div>
+        <div class="actions">
+          <button id="reload-demo" class="action" type="button">↻ Reload</button>
+          <a id="open-demo" class="action" href="/studio/experiments/candle.html" target="_blank" rel="noopener noreferrer">Open Standalone ↗</a>
+        </div>
       </div>
-      <div class="provenance"><span aria-hidden="true">◇</span><span id="provenance">Minh họa hình ảnh tương tác. Hình dạng và màu sắc phục vụ quan sát.</span></div>
-      <section id="frame-host" class="frame-host" aria-label="Vùng chạy minh họa">
-        <div id="frame-state" class="frame-state"><span class="state-icon" aria-hidden="true">◌</span><p id="state-message" role="status" aria-live="polite">Đang chuẩn bị minh họa…</p><button id="retry-demo" class="action" type="button" hidden>Thử lại</button></div>
+      <div class="provenance">
+        <span aria-hidden="true">◇</span>
+        <span id="provenance">Interactive visual simulation. Morphological and spectroscopic model for physical observation.</span>
+      </div>
+      <section id="frame-host" class="frame-host" aria-label="Experiment canvas area">
+        <div id="frame-state" class="frame-state">
+          <span class="state-icon" aria-hidden="true">◌</span>
+          <p id="state-message" role="status" aria-live="polite">Initializing experiment chamber…</p>
+          <button id="retry-demo" class="action" type="button" hidden>Retry</button>
+        </div>
       </section>
-      <footer class="frame-footer"><p id="demo-hint">Kéo để xoay · Cuộn để thu phóng.</p><span id="demo-status" class="demo-status" role="status" aria-live="polite">Đang chuẩn bị</span></footer>
-      <noscript><p>Hãy bật JavaScript để chọn và chạy minh họa. <a href="/studio/experiments/candle.html">Mở phòng quan sát lửa</a>.</p></noscript>
+      <footer class="frame-footer">
+        <p id="demo-hint">Drag to rotate · Scroll to zoom · Use panel to adjust parameters.</p>
+        <span id="demo-status" class="demo-status" role="status" aria-live="polite">Initializing</span>
+      </footer>
+      <noscript>
+        <p>Please enable JavaScript to view and run combustion experiments. <a href="/studio/experiments/candle.html">Open flame observation chamber</a>.</p>
+      </noscript>
     </main>
   </div>
 </body>
