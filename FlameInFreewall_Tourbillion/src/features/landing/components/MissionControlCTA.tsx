@@ -38,9 +38,9 @@ const MISSION_CARDS: MissionCard[] = [
     badge: 'Telemetry & Catalog',
     badgeColor: 'text-zinc-950 border-lime-300 bg-[#D4FC02]',
     description:
-      'High-density telemetry overview across 20 NASA PSI investigations with 148+ verified flight test runs.',
+      'High-density telemetry overview across 24 NASA PSI investigations with 1,926 empirical flight test runs.',
     icon: Compass,
-    features: ['20 Microgravity Flight Studies', '148+ Verified Test Runs'],
+    features: ['24 Microgravity Flight Studies', '1,926 Empirical Test Runs'],
     ctaText: 'Enter Dashboard',
     ctaStyle: 'primary',
   },

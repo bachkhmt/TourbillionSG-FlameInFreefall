@@ -43,7 +43,7 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       const workspaceLink = screen.getByRole('link', { name: /Enter Research Workspace/i });
       expect(workspaceLink.getAttribute('href')).toBe('/dashboard');
 
-      const explorerLink = screen.getByRole('link', { name: /Explore 20 PSI Studies/i });
+      const explorerLink = screen.getByRole('link', { name: /Explore 24 PSI Studies/i });
       expect(explorerLink.getAttribute('href')).toBe('/explorer');
 
       const scenarioLink = screen.getByRole('link', { name: /Run Scenario Simulation/i });
@@ -52,8 +52,8 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
 
     it('displays the 4 key telemetry overview badges', () => {
       render(<LandingHero />);
-      expect(screen.getByText('20 Studies')).toBeDefined();
-      expect(screen.getByText('148+ Runs')).toBeDefined();
+      expect(screen.getByText('24 Studies')).toBeDefined();
+      expect(screen.getByText('1,926 Runs')).toBeDefined();
       expect(screen.getByText('0g vs 1g')).toBeDefined();
       expect(screen.getByText('0 < g < 1')).toBeDefined();
     });
@@ -178,29 +178,11 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       expect(screen.getByText(/Guarded Predictive Physics/i)).toBeDefined();
     });
 
-    it('renders the interactive ignition inference workbench and defaults to hot-wire overload', () => {
+    it('displays the synchronized 24 studies and 1,926 empirical runs telemetry', () => {
       render(<CoreIntelligenceSection />);
-      expect(screen.getByTestId('ignition-inference-workbench')).toBeDefined();
-      expect(screen.getAllByText('Hot-Wire Overload').length).toBeGreaterThan(0);
-      expect(screen.getAllByText('1.8s – 4.5s').length).toBeGreaterThan(0);
-      expect(screen.getByText(/NASA SoFIE-MIST/i)).toBeDefined();
-    });
-
-    it('allows toggling between ignition modes to inspect electrical spark and quiescent smoldering', () => {
-      render(<CoreIntelligenceSection />);
-      
-      // Click Spark Ignition tab
-      const sparkTab = screen.getByTestId('ignition-tab-spark');
-      fireEvent.click(sparkTab);
-      expect(screen.getAllByText('Electrical Arc & Spark').length).toBeGreaterThan(0);
-      expect(screen.getByText(/Paschen’s Law/i)).toBeDefined();
-      expect(screen.getAllByText('< 0.05s (Instantaneous)').length).toBeGreaterThan(0);
-
-      // Click Smolder tab
-      const smolderTab = screen.getByTestId('ignition-tab-smolder');
-      fireEvent.click(smolderTab);
-      expect(screen.getAllByText('Quiescent Smoldering').length).toBeGreaterThan(0);
-      expect(screen.getByText(/The most insidious spacecraft fire hazard/i)).toBeDefined();
+      expect(screen.getByText('24 Studies / 1,926 Empirical Runs')).toBeDefined();
+      expect(screen.getByText('6-D Deterministic Gap Matrix')).toBeDefined();
+      expect(screen.getByText(/Moon \(0\.16g\) & Mars \(0\.38g\) CRITICAL GAPS/i)).toBeDefined();
     });
   });
 

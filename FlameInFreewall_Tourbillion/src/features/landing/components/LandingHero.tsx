@@ -72,7 +72,7 @@ export const LandingHero: React.FC = () => {
               Lunar Flammability Paradox
             </a>
             <a href="#core-intelligence" className="hover:text-[#D4FC02] transition-colors">
-              AI Engine &amp; Ignition
+              Core Architecture
             </a>
             <a href="#mission-modules" className="hover:text-[#D4FC02] transition-colors">
               Research Workspace
@@ -116,7 +116,7 @@ export const LandingHero: React.FC = () => {
 
           {/* Subheading */}
           <p className="text-base sm:text-lg md:text-xl text-zinc-600 max-w-2xl mx-auto leading-relaxed mb-10">
-            Evidence-first intelligence platform synthesizing 20 NASA Physical Sciences Informatics
+            Evidence-first intelligence platform synthesizing 24 NASA Physical Sciences Informatics
             (PSI) investigations. Discover why flames burn spherical and blue in freefall,
             and resolve the lethal flammability paradox of exploration habitats.
           </p>
@@ -137,7 +137,7 @@ export const LandingHero: React.FC = () => {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gray-200/70 hover:bg-gray-50 hover:border hover:border-gray-100 text-zinc-900 font-bold text-sm sm:text-base hover:border-gray-300 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <Layers className="w-5 h-5 text-[#0B2374]" />
-              <span>Explore 20 PSI Studies</span>
+              <span>Explore 24 PSI Studies</span>
             </Link>
 
             <Link
@@ -157,9 +157,9 @@ export const LandingHero: React.FC = () => {
                 <span>PSI Archive</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
-                20 Studies
+                24 Studies
               </div>
-              <p className="text-xs text-zinc-500 mt-1">BASS, ACME, CIR, SoFIE flight logs</p>
+              <p className="text-xs text-zinc-500 mt-1">BASS, ACME, SoFIE, Saffire flight logs</p>
             </div>
 
             <div className="rounded-3xl bg-gray-200/50 p-4 hover:shadow-xs hover:border-gray-300 transition-all">
@@ -168,9 +168,9 @@ export const LandingHero: React.FC = () => {
                 <span>Test Runs</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
-                148+ Runs
+                1,926 Runs
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Quench diameters &amp; spread rates</p>
+              <p className="text-xs text-zinc-500 mt-1">Empirical NASA flight test runs</p>
             </div>
 
             <div className="rounded-3xl bg-gray-200/50 p-4 hover:shadow-xs hover:border-gray-300 transition-all">
