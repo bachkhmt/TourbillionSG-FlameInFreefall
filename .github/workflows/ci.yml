@@ -1,0 +1,80 @@
+name: Pull request checks
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.paths.outputs.backend }}
+      frontend: ${{ steps.paths.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: paths
+        run: python deploy/azure/release.py changes >> "$GITHUB_OUTPUT"
+
+  backend:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    env:
+      DEBUG: 'false'
+      APP_ENV: test
+      POETRY_VIRTUALENVS_IN_PROJECT: 'true'
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: pip install poetry==2.2.1
+      - run: poetry -C flameguard-ai-backend install --no-root
+      - name: Backend unit and deployment tests
+        working-directory: flameguard-ai-backend
+        run: poetry run pytest -q tests/unit tests/test_migrations.py ../deploy/tests
+      - name: Offline NASA adapter tests
+        run: flameguard-ai-backend/.venv/bin/python -m pytest -q -m 'not integration' integration_tests
+      - name: Build the bound NASA bundle
+        run: flameguard-ai-backend/.venv/bin/python deploy/azure/prepare-bundle.py --output .demo/ci-bundle
+      - name: Build backend images
+        run: |
+          docker build --platform linux/amd64 -f deploy/backend.Dockerfile -t flameguard-api:base .
+          docker build --platform linux/amd64 -f deploy/backend-data.Dockerfile --build-arg NASA_BUNDLE_DIR=.demo/ci-bundle -t flameguard-api:ci .
+
+  frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: FlameInFreewall_Tourbillion/package-lock.json
+      - run: npm ci
+        working-directory: FlameInFreewall_Tourbillion
+      - run: npm test
+        working-directory: FlameInFreewall_Tourbillion
+      - run: npx tsc --noEmit
+        working-directory: FlameInFreewall_Tourbillion
+      - name: Build frontend image
+        run: |
+          BACKEND_URL=$(python -c "import json; print(json.load(open('deploy/azure/production.json'))['backend']['url'])")
+          docker build --platform linux/amd64 -f deploy/frontend.Dockerfile --build-arg BACKEND_INTERNAL_URL="$BACKEND_URL" -t flameguard-web:ci .

@@ -1,0 +1,26 @@
+{
+  "resourceGroup": "rg-flameguard",
+  "registry": "acrflameguard",
+  "registryServer": "acrflameguard.azurecr.io",
+  "backend": {
+    "app": "ca-flameguard-api",
+    "repository": "flameguard-api",
+    "url": "https://ca-flameguard-api.blackdune-0bd0a6fc.eastasia.azurecontainerapps.io"
+  },
+  "frontend": {
+    "app": "ca-flameguard-web",
+    "repository": "flameguard-web",
+    "url": "https://ca-flameguard-web.blackdune-0bd0a6fc.eastasia.azurecontainerapps.io"
+  },
+  "collection": {
+    "sourceRevision": "117e7ff954cd16fd88ad1e5a2e530d56871a355dee4285b595151595c3312cc0",
+    "snapshotContentSha256": "cca688e00a7213d2753523df6e1de17915b2636d72b05d5c0a4c3e9fa269e54f",
+    "target": {
+      "host": "pg-flameguard.postgres.database.azure.com",
+      "port": 5432,
+      "database": "flameguard",
+      "databaseOid": 24764,
+      "readRole": "flameguard_reader"
+    }
+  }
+}
