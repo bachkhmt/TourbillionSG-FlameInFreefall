@@ -1,50 +1,50 @@
-# Chatbot NASA (RAG extractive): luồng hoạt động và cách chạy
+# NASA Chatbot (Extractive RAG): Workflow and Execution Guide
 
-Cập nhật 2026-11-15.
+Updated 2026-11-15.
 
-**Kiến trúc:** chat chạy trong chính backend của repo này. RAG cắm vào qua extension point
-`RagProvider` của Phase 6 và bật bằng `CHAT_PROVIDER=extractive`. Quyết định được ghi tại:
+**Architecture:** Chat runs directly within this repository's backend. RAG plugs in via the
+Phase 6 `RagProvider` extension point and is enabled with `CHAT_PROVIDER=extractive`. Decisions are documented at:
 - [ADR-0005](../flameguard-ai-backend/docs/decisions/ADR-0005-real-corpus-extractive-chat.md)
-- [spec Phase 6b](../flameguard-ai-backend/specs/phase6b-real-corpus-chat/spec.md)
+- [Phase 6b spec](../flameguard-ai-backend/specs/phase6b-real-corpus-chat/spec.md)
 
-**Phạm vi trả lời:** chatbot chỉ trích **nguyên văn** chunk đã admit: nguồn PSI theo
-khai báo CC0 và NASA-authored article text theo policy quyền riêng của
-[ADR-0006](../flameguard-ai-backend/docs/decisions/ADR-0006-challenge-source-ownership.md).
-Citation gắn với một phiên bản corpus. Không tự gán CC0 cho trang NASA, ảnh hoặc transcript.
-Không có LLM và không có provider trả phí.
-`review_status` luôn là `unreviewed`; chatbot không đưa kết luận safe/unsafe.
+**Answer scope:** The chatbot only extracts **verbatim** chunks that have been admitted: PSI
+sources under their CC0 declaration, and NASA-authored article text under the separate rights
+policy of [ADR-0006](../flameguard-ai-backend/docs/decisions/ADR-0006-challenge-source-ownership.md).
+Citations are linked to a specific corpus version. CC0 is never assumed for NASA pages, images or
+transcripts. No LLMs and no paid providers.
+`review_status` is always `unreviewed`; the chatbot does not provide safe/unsafe conclusions.
 
-## Theo thao tác người dùng
+## User Interaction Flow
 
-1. **Mở chat.** Panel (style chat nghiên cứu kiểu NASA) mở trên nền mờ của app.
-   FE gọi `GET /chat/readiness`. Nếu chưa `ready`, nút Send bị khóa và có nút
-   "Retry connection".
-2. **Gửi câu hỏi.**
-   - Nếu tab chưa có session, FE gọi `POST /chat/sessions` rồi lưu session ID vào
+1. **Open chat.** The panel (NASA-style research chat) opens over the app's blurred backdrop.
+   FE calls `GET /chat/readiness`. If not `ready`, the Send button is disabled and a
+   "Retry connection" button is shown.
+2. **Send question.**
+   - If the tab has no session yet, FE calls `POST /chat/sessions` and saves the session ID into
      `sessionStorage`.
-   - Sau đó gửi `POST /chat/sessions/{id}/messages`.
-3. **Backend xử lý.**
-   - Đọc admission và corpus trong **cùng một snapshot**.
-   - Gọi `retrieve` của provider trên các passage đã admit (BM25, alias VI/EN, anchor
-     study/run, có deadline).
-   - **Tự kiểm từng hit**: nguồn thuộc corpus, excerpt là lát cắt nguyên văn của chunk.
-4. **Provider tạo câu trả lời** chỉ từ các hit đã kiểm, giữ mọi giá trị mâu thuẫn. Ví dụ
-   FLEX-007 D0: 1.87 mm theo CSV, 1.82 mm theo TestSheet. Provider từ chối các câu hỏi:
-   - đòi kết luận an toàn;
-   - về trọng lực Mặt Trăng/Sao Hỏa;
-   - ngoài phạm vi;
-   - trộn nhiều run.
-5. **Backend kiểm câu trả lời `real`**: đúng `corpus_version`, có `provider_version`,
-   citation nằm trong tập đã kiểm, và mọi số (token nguyên vẹn) trong text đều có trong excerpt. Sau đó
-   backend kiểm lại fingerprint rồi ghi user + assistant + citations trong một
-   transaction. Lỗi trả 502/409 và không lưu gì.
-6. **Hiển thị.** "View source n" gọi
-   `GET /chat/sources/{source_document_id}?locator=…&corpus_version=…`. Citation của
-   corpus cũ trả 409; excerpt gốc trong tin nhắn vẫn giữ nguyên.
-7. **Lịch sử nằm trên server.**
-   - Panel hiển thị một trang lịch sử (50 tin), cộng thêm các tin mới của lần xem này.
-   - "Conversation history" có Refresh / Previous / Next / Start new session.
-   - Reload tab vẫn khôi phục được lịch sử của session.
+   - Then it sends `POST /chat/sessions/{id}/messages`.
+3. **Backend processing.**
+   - Reads admission and corpus within the **same snapshot**.
+   - Calls the provider's `retrieve` on admitted passages (BM25, VI/EN aliases, study/run
+     anchors, with a deadline).
+   - **Self-checks each hit**: source belongs to the corpus, excerpt is a verbatim slice of the chunk.
+4. **Provider generates an answer** only from verified hits, preserving all conflicting values. For example,
+   FLEX-007 D0: 1.87 mm per CSV, 1.82 mm per TestSheet. The provider refuses questions that:
+   - demand safety conclusions;
+   - ask about Lunar/Martian gravity;
+   - are out of scope;
+   - mix multiple runs.
+5. **Backend validates `real` answer**: correct `corpus_version`, has `provider_version`,
+   citations belong to the verified set, and all numbers (intact tokens) in the text are present in the excerpt. Afterwards,
+   the backend re-checks the fingerprint and records user + assistant + citations in a single
+   transaction. Errors return 502/409 and save nothing.
+6. **Display.** "View source n" calls
+   `GET /chat/sources/{source_document_id}?locator=…&corpus_version=…`. Citations for an
+   outdated corpus return 409; the original excerpt in the message is preserved.
+7. **History resides on server.**
+   - The panel displays one history page (50 messages), plus new messages from this session.
+   - "Conversation history" has Refresh / Previous / Next / Start new session.
+   - Reloading the tab still recovers the session history.
 
 ```mermaid
 sequenceDiagram
@@ -53,69 +53,69 @@ sequenceDiagram
     participant API as FastAPI app.main (CHAT_PROVIDER=extractive)
     participant Reader as PostgreSQL reader (SELECT-only)
     participant RAG as app/integrations/rag (AI team)
-    participant Writer as PostgreSQL writer (3 bảng chat)
-    User->>FE: Mở chat
+    participant Writer as PostgreSQL writer (3 chat tables)
+    User->>FE: Open chat
     FE->>API: GET /api/v1/chat/readiness
     API->>Reader: admission + corpusPolicy + admit_passages
-    API->>Writer: kiểm role/quyền/OID
+    API->>Writer: check role/permissions/OID
     API-->>FE: ready, retrieval_only, passages=2574 (unified) or 2508 (psi)
     User->>FE: "FLEX-007 D0?"
-    FE->>API: POST /chat/sessions (lần đầu), POST /chat/sessions/{id}/messages
+    FE->>API: POST /chat/sessions (first time), POST /chat/sessions/{id}/messages
     API->>Reader: snapshot (admission + passages)
-    API->>RAG: retrieve(question, passages, câu hỏi trước)
-    API->>API: verify_hits (nguyên văn, thuộc corpus)
-    API->>RAG: answer(RagRequest với allowed_sources đã kiểm)
+    API->>RAG: retrieve(question, passages, previous questions)
+    API->>API: verify_hits (verbatim, belongs to corpus)
+    API->>RAG: answer(RagRequest with verified allowed_sources)
     API->>API: validate_citations + validate_real_answer
-    API->>Reader: kiểm lại fingerprint collection + corpus
+    API->>Reader: re-verify collection + corpus fingerprint
     API->>Writer: advisory lock + INSERT user/assistant/citations, COMMIT
     API-->>FE: Exchange (answer + citations + corpus_version)
 ```
 
-## Các lớp code
+## Code Layers
 
-| Lớp | File | Chủ sở hữu | Trách nhiệm |
+| Layer | File | Owner | Responsibility |
 | --- | --- | --- | --- |
-| UI | `FlameInFreewall_Tourbillion/src/components/ai/{AiDrawer,AiMessageItem,CitationBadge}.tsx` | FE | Panel kiểu NASA trên backdrop mờ, readiness, history phân trang, citations |
-| Hooks/Client | `src/hooks/api/useChatQueries.ts`, `src/api/{services/chatService,dto/chat,mappers/chatMapper}.ts` | FE | Đúng contract snake_case; gửi với timeout 30 s; xử lý unmount, timeout, reset |
+| UI | `FlameInFreewall_Tourbillion/src/components/ai/{AiDrawer,AiMessageItem,CitationBadge}.tsx` | FE | NASA-style panel on blurred backdrop, readiness, paginated history, citations |
+| Hooks/Client | `src/hooks/api/useChatQueries.ts`, `src/api/{services/chatService,dto/chat,mappers/chatMapper}.ts` | FE | Matches snake_case contract; sends with 30s timeout; handles unmount, timeout, reset |
 | Endpoint | `flameguard-ai-backend/app/api/v1/endpoints/chat.py` | BE | Sessions/messages, `/chat/readiness`, `/chat/sources/{id}` |
-| Service | `app/services/chat.py` | BE | Snapshot, kiểm hit, grounding, kiểm drift, ghi atomic |
-| Corpus admission | `app/services/corpus_policy.py`, `app/repositories/corpus.py` | BE | Registry CC0, hash, đối chiếu từng chunk/source |
+| Service | `app/services/chat.py` | BE | Snapshot, hit check, grounding, drift check, atomic write |
+| Corpus admission | `app/services/corpus_policy.py`, `app/repositories/corpus.py` | BE | CC0 registry, hash, chunk/source reconciliation |
 | Protocol | `app/integrations/chat.py` | BE | `RagProvider`, `CorpusRetriever`, `CorpusPassage`, `select_provider` |
-| RAG | `app/integrations/rag/{retrieval,bm25,provider}.py` | AI | BM25, alias, anchor, quy tắc từ chối, ghép trích đoạn |
-| Data | `integrations/nasa_data/{challenge,coverage,unified,xlsx,export,corpus_registry}.py` | Data | Release NASA offline (mặc định `unified`, chỉ nguồn chính thức), snapshot 21 bảng, registry + khai báo `corpusPolicy`. Xem `docs/DATA_HANDOFF.md` |
+| RAG | `app/integrations/rag/{retrieval,bm25,provider}.py` | AI | BM25, aliases, anchors, refusal rules, excerpt composition |
+| Data | `integrations/nasa_data/{challenge,coverage,unified,xlsx,export,corpus_registry}.py` | Data | Offline NASA release (default `unified`, official sources only), 21-table snapshot, registry + `corpusPolicy` declaration. See `docs/DATA_HANDOFF.md` |
 
-## Bảo đảm và giới hạn
+## Guarantees and Limitations
 
-- **Không đổi schema:** vẫn 21 bảng, không có migration mới. Collection không có
-  `corpusPolicy` và các provider `unavailable`/`mock` giữ nguyên hành vi Phase 6.
-- **Đồng thời (ADR-0004):** provider chạy ngoài transaction, commit tuần tự theo session
-  bằng advisory lock. Hai câu gửi cùng lúc có thể cùng thấy lịch sử cũ, nhưng các cặp
-  user/assistant luôn đầy đủ.
-- **Giới hạn kích thước:**
+- **No schema changes:** Still 21 tables, no new migrations. Collections without
+  `corpusPolicy` and `unavailable`/`mock` providers retain Phase 6 behavior.
+- **Concurrency (ADR-0004):** Provider runs outside transactions, committed sequentially per session
+  using advisory locks. Two concurrent questions may both see older history, but user/assistant
+  pairs are always complete.
+- **Size limits:**
 
-  | Đối tượng | Giới hạn |
+  | Target | Limit |
   | --- | --- |
-  | Câu hỏi | ≤ 4000 ký tự |
-  | History gửi cho provider | ≤ 12 tin / 12000 ký tự |
-  | Citations mỗi câu trả lời | ≤ 4 |
-  | Trang history (FE) | 50 tin |
+  | Question | ≤ 4000 characters |
+  | History sent to provider | ≤ 12 messages / 12,000 characters |
+  | Citations per answer | ≤ 4 |
+  | History page (FE) | 50 messages |
 
-  Retrieval và provider có deadline `CHAT_TIMEOUT_SECONDS`; quá hạn thì lưu `state=timeout`.
-- **Session:** session ID là token demo công khai, không phải đăng nhập. Access log HTTP được tắt.
+  Retrieval and provider have a deadline of `CHAT_TIMEOUT_SECONDS`; timeouts are saved as `state=timeout`.
+- **Session:** Session ID is a public demo token, not an authentication login. HTTP access logging is disabled.
 
-## Chạy lại (local)
+## Re-running Locally
 
-Chuẩn bị một lần:
+One-time setup:
 
 ```bash
-python3.12 -m venv flameguard-ai-backend/.venv   # cài deps theo flameguard-ai-backend/pyproject.toml
+python3.12 -m venv flameguard-ai-backend/.venv   # install deps according to flameguard-ai-backend/pyproject.toml
 python3 scripts/test_db.py create                  # container tourbillion-test-pg, 127.0.0.1:55435
 flameguard-ai-backend/.venv/bin/python scripts/prepare_chat_preview.py --prepare-new-test-target
 ```
 
-Lệnh cuối in ra `.demo/nasa-chat-preview-<db>.json` (quyền 0600). File này có `DATABASE_URL`,
-`RUNTIME_DATABASE_URL`, `CATALOG_COLLECTION_MANIFEST` và `CHAT_PROVIDER=extractive`.
-Launcher chạy `uvicorn app.main:app`:
+The last command prints `.demo/nasa-chat-preview-<db>.json` (permissions 0600). This file contains `DATABASE_URL`,
+`RUNTIME_DATABASE_URL`, `CATALOG_COLLECTION_MANIFEST`, and `CHAT_PROVIDER=extractive`.
+The launcher runs `uvicorn app.main:app`:
 
 ```bash
 flameguard-ai-backend/.venv/bin/python scripts/run_chat_backend.py --settings .demo/nasa-chat-preview-<db>.json --port 8112
@@ -125,11 +125,11 @@ flameguard-ai-backend/.venv/bin/python scripts/run_chat_backend.py --settings .d
 cd FlameInFreewall_Tourbillion && BACKEND_INTERNAL_URL=http://127.0.0.1:8112 npm run dev -- -p 3312
 ```
 
-Khi chạy trên môi trường thật: đặt `CHAT_PROVIDER=extractive` và dùng manifest v2 có
-`corpusPolicy` (do `integrations/nasa_data/corpus_registry.py` ghi). Muốn tắt thì bỏ một
-trong hai thứ đó.
+When running in a real environment: set `CHAT_PROVIDER=extractive` and use the v2 manifest with
+`corpusPolicy` (written by `integrations/nasa_data/corpus_registry.py`). To disable, remove either
+of those two settings.
 
-## Kiểm tra
+## Testing and Verification
 
 ```bash
 cd flameguard-ai-backend && python3 ../scripts/test_db.py run -- .venv/bin/python -m pytest -q
@@ -143,30 +143,38 @@ python3 scripts/test_db.py run -- flameguard-ai-backend/.venv/bin/python -m pyte
 cd FlameInFreewall_Tourbillion && npm test && npx tsc --noEmit && npm run build
 ```
 
-Kết quả ngày 2026-11-14:
+Results as of 2026-11-14:
 
-| Phần | Kết quả |
+| Component | Result |
 | --- | --- |
-| Backend (PostgreSQL) | 679 passed: 650 test cũ không phải sửa + 29 test mới (policy, grounding, provider) |
-| `integration_tests` (PostgreSQL, dữ liệu NASA thật) | 41 passed, 0 skip |
-| FE | vitest 279 passed; `tsc` và `next build` pass |
-| Smoke trên trình duyệt (`app.main:app` + FE qua proxy) | FLEX-007 ra 1.87/1.82 mm có citation; mở được CSV gốc (CC0-1.0); reload vẫn còn history; Enter gửi câu nối tiếp; Refresh history ra 2 cặp tin |
+| Backend (PostgreSQL) | 679 passed: 650 existing tests unchanged + 29 new tests (policy, grounding, provider) |
+| `integration_tests` (PostgreSQL, real NASA data) | 41 passed, 0 skip |
+| FE | vitest 279 passed; `tsc` and `next build` pass |
+| Browser smoke test (`app.main:app` + FE via proxy) | FLEX-007 returns 1.87/1.82 mm with citations; opens original CSV (CC0-1.0); reload preserves history; Enter sends follow-up question; Refresh history yields 2 message pairs |
 
-`integration_tests` bao gồm: citation giả và số liệu bịa (502), registry đổi giữa chừng
-(409), gửi đồng thời, timeout của provider và retrieval, provider không có retrieve,
-Advisor báo `PROVIDER_UNAVAILABLE`, nguồn lạ (404) và corpus cũ (409).
+`integration_tests` includes: fake citations and fabricated data (502), mid-session registry modification
+(409), concurrent requests, provider and retrieval timeouts, provider lacking retrieve,
+Advisor reporting `PROVIDER_UNAVAILABLE`, unknown sources (404), and outdated corpus (409).
 
-Đây là xác minh truy xuất và lưu trữ cho bản demo local, không phải đánh giá khoa học hay production.
+This is a retrieval and persistence verification for the local demo, not a scientific or production evaluation.
 
 
-## Sửa chất lượng ngày 2026-11-15
+## Quality fixes (2026-11-15)
 
-Provider `nasa-extractive-v3` dùng vocabulary song ngữ/hóa học có giới hạn, nhận diện họ study và cân bằng trích đoạn khi so sánh. Câu dẫn và từ chối theo ngôn ngữ câu hỏi; trích đoạn vẫn nguyên văn. Câu cần tổng hợp qua bản ghi (cao nhất/thấp nhất/bao nhiêu/range) sẽ abstain và hướng dẫn Explorer nếu không có mã run cụ thể. Không tính số tổng hợp rồi giả làm câu NASA.
+Provider `nasa-extractive-v3` uses a bounded bilingual/chemistry vocabulary, recognises study
+families and balances excerpts when comparing. Lead-in and refusal text follow the question's
+language; excerpts stay verbatim. Questions that need aggregation across records (highest/lowest/
+how many/range) abstain and point to Explorer unless a specific run code is named. Aggregate
+numbers are never computed and presented as NASA statements.
 
-Bộ đánh giá sản phẩm: `integration_tests/data/chat_eval.json` (40 câu, 20 EN/20 VI, khóa split/hash trước tuning). Chạy development:
+Product evaluation set: `integration_tests/data/chat_eval.json` (40 questions, 20 EN/20 VI, split
+and hash frozen before tuning). Development run:
 
 ```bash
 PYTHONPATH=.:flameguard-ai-backend flameguard-ai-backend/.venv/bin/python -m integrations.nasa_data.chat_evaluation --split development
 ```
 
-Mười câu holdout chỉ chạy sau khi đóng quy tắc retrieval; kết quả được báo riêng trong `flameguard-ai-backend/specs/phase6b-real-corpus-chat/evaluation.md`. Đây là benchmark nhỏ do nhóm tự soạn, không phải xác minh khoa học. Benchmark prototype `playbook-rag/` không áp dụng cho chatbot này.
+The ten holdout questions are run only after the retrieval rules are closed; results are reported
+separately in `flameguard-ai-backend/specs/phase6b-real-corpus-chat/evaluation.md`. This is a small
+team-authored benchmark, not scientific verification. The `playbook-rag/` prototype benchmark does
+not apply to this chatbot.

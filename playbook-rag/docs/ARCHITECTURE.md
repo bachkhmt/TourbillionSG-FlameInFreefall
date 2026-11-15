@@ -1,31 +1,31 @@
-# Kiến trúc playbook-rag
+# playbook-rag Architecture
 
-Tài liệu này mô tả đúng những gì có trong code ở thời điểm này. Chỗ nào repo khác thiết kế gốc của playbook (mục 4) thì có bảng riêng ở cuối.
+This document accurately describes what is currently implemented in the code. Where this repository differs from the original playbook design (section 4), a dedicated comparison table is provided at the end.
 
-## 1. Nguyên tắc thiết kế
+## 1. Design Principles
 
-1. **Không bịa.** Mọi câu trả lời phải trỏ về chunk có thật. Câu không có trích dẫn hợp lệ bị loại bởi code, không dựa vào việc LLM tự giác.
-2. **Biết từ chối.** Ngoài phạm vi, vùng chưa có dữ liệu và yêu cầu phán quyết an toàn được xử lý bằng quy tắc xác định, không phó mặc cho LLM.
-3. **Chạy được khi LLM hỏng.** Toàn bộ đường truy xuất và từ chối không cần mạng. LLM chỉ là lớp soạn văn tùy chọn.
-4. **Kho nhỏ, đơn giản.** Vài trăm chunk nên không cần vector DB: chỉ mục dựng trong bộ nhớ lúc khởi động.
+1. **No hallucinations.** Every answer must point to an actual chunk. Sentences without valid citations are eliminated by code, without relying on LLM compliance.
+2. **Know when to refuse.** Out-of-scope queries, data gap regions, and requests for safety verdicts are handled by deterministic rules, rather than left to the LLM.
+3. **Operable when LLM fails.** The entire retrieval and refusal pipeline requires no network access. The LLM is merely an optional drafting layer.
+4. **Small, simple store.** A few hundred chunks mean no vector DB is needed: indices are built in-memory at startup.
 
-## 2. Thành phần
+## 2. Components
 
 ```mermaid
 flowchart LR
-  subgraph Offline["Ngoại tuyến: python -m ragkit ingest"]
+  subgraph Offline["Offline: python -m ragkit ingest"]
     SRC[("Playbook .html")] --> ING[ingest.py]
     COR[("data/corpus/*.md .txt .html")] --> ING
     GAP[("gap_notes.json")] --> ING
     ING --> CH[("data/chunks.json")]
   end
-  subgraph Server["Tiến trình ragkit serve (một process)"]
-    API["api.py FastAPI<br/>rate limit theo IP"] --> PIPE[pipeline.py]
+  subgraph Server["ragkit serve process (single process)"]
+    API["api.py FastAPI<br/>IP-based rate limiting"] --> PIPE[pipeline.py]
     PIPE --> GRD[guard.py]
     PIPE --> RET["retrieve.py<br/>BM25 + vector + RRF"]
-    PIPE --> LLM["llm.py<br/>tùy chọn"]
+    PIPE --> LLM["llm.py<br/>optional"]
     PIPE --> VAL[validate.py]
-    PIPE --> CCH[("cache.py<br/>TTL 1 giờ, 256 mục")]
+    PIPE --> CCH[("cache.py<br/>1-hour TTL, 256 items")]
   end
   CH --> PIPE
   AL[("aliases.json<br/>scenarios.json")] --> PIPE
@@ -34,57 +34,57 @@ flowchart LR
   LLM -. "HTTPS, timeout 15s" .-> ANTH["Anthropic API"]
 ```
 
-Chỉ mục (BM25, vector) **không lưu ra đĩa**: `pipeline.py` dựng lại từ `chunks.json` mỗi lần khởi động, đo được khoảng 0,15 giây với 138 chunk trong lần đo ban đầu.
+Indices (BM25, vector) are **not saved to disk**: `pipeline.py` rebuilds them from `chunks.json` on each startup, taking approximately 0.15 seconds for 138 chunks in initial benchmarks.
 
-## 3. Pipeline ingest (ngoại tuyến)
+## 3. Ingest Pipeline (Offline)
 
 ```mermaid
 flowchart LR
-  A["HTML playbook"] --> B["html_blocks<br/>bỏ script, svg, nav, pre"]
-  A --> J["mảng JS: G, SRC, rows"]
-  B --> L["drop_eval_leak<br/>bỏ bảng câu hỏi mẫu"]
-  L --> C["chunk_blocks<br/>gom theo tiêu đề, tối đa 200 từ"]
+  A["HTML playbook"] --> B["html_blocks<br/>strip script, svg, nav, pre"]
+  A --> J["JS arrays: G, SRC, rows"]
+  B --> L["drop_eval_leak<br/>drop sample question table"]
+  L --> C["chunk_blocks<br/>group by headings, max 200 words"]
   J --> D["chunk glossary / source / plan"]
   M["corpus .md .txt .html"] --> C
-  C --> E["gắn contextual prefix<br/>và sourceRef"]
+  C --> E["attach contextual prefix<br/>and sourceRef"]
   D --> E
   G["gap_notes.json"] --> F
-  E --> F["kiểm id không trùng"] --> O[("chunks.json")]
+  E --> F["check unique IDs"] --> O[("chunks.json")]
 ```
 
-Điểm đáng chú ý:
+Notable points:
 
-- **Gom chunk:** các block cùng (section, h2, h3) được gom lại tới tối đa 200 từ. Block quá dài thì tách theo câu. Mẩu cuối dưới 40 từ thì nhập vào mẩu trước. Mẩu dưới 6 từ (nhãn lẻ) bị bỏ.
-- **Bảng:** mỗi ô cách nhau bằng ` | `, mỗi dòng là một block. Chunk từ bảng vì vậy bị "làm phẳng", mất tên cột.
-- **Contextual prefix:** `"Tên tài liệu > h2 > h3"`, sinh bằng quy tắc, không dùng LLM. Nó được ghép vào văn bản khi lập chỉ mục nhưng không hiện ra khi trả lời.
-- **Dữ liệu trong JS:** thuật ngữ (`G`), link nguồn (`SRC`) và kế hoạch (`rows`) được parse từ thẻ `<script>` bằng regex rồi `json.loads`. Nếu playbook đổi cách khai báo biến JS thì phần này im lặng trả về rỗng; `tests/test_ingest.py` kiểm số lượng từng loại chunk để bắt lỗi đó.
-- **Loại rò rỉ đánh giá:** bảng "Bộ câu hỏi mẫu" bị bỏ khỏi chỉ mục để Recall@5 không đẹp giả.
+- **Chunk grouping:** Blocks sharing the same (section, h2, h3) are grouped up to a maximum of 200 words. Blocks that are too long are split by sentence. Trailing fragments under 40 words are merged into the preceding fragment. Fragments under 6 words (stray labels) are dropped.
+- **Tables:** Cells are separated by ` | `, with each row being a block. Chunks from tables are therefore "flattened", losing column headers.
+- **Contextual prefix:** `"Document Title > h2 > h3"`, rule-generated, without using an LLM. It is prepended to text during indexing but does not appear in final answers.
+- **Data in JS:** Glossaries (`G`), source links (`SRC`), and plans (`rows`) are parsed from `<script>` tags using regex and `json.loads`. If the playbook changes how JS variables are declared, this section silently returns empty; `tests/test_ingest.py` checks chunk counts per type to catch such issues.
+- **Evaluation leak prevention:** The "Sample Questions" table is excluded from indexing to prevent artificially inflated Recall@5.
 
-## 4. Mô hình dữ liệu chunk
+## 4. Chunk Data Model
 
-Mỗi chunk là một dict trong `chunks.json`:
+Each chunk is a dict in `chunks.json`:
 
-| Trường | Ý nghĩa |
+| Field | Description |
 |---|---|
-| `id` | duy nhất, ví dụ `kien-truc-09`, `gl-rrf`, `src-17`, `plan-03`, `gap-moon-mars-gravity`, `corpus-...` |
+| `id` | unique, e.g. `kien-truc-09`, `gl-rrf`, `src-17`, `plan-03`, `gap-moon-mars-gravity`, `corpus-...` |
 | `type` | `passage`, `glossary`, `source`, `plan`, `gap_note` |
-| `section`, `heading` | vị trí trong tài liệu gốc (id section, tiêu đề h3 hoặc h2) |
-| `text` | nội dung hiển thị và dùng để trích dẫn |
-| `contextual` | tiền tố ngữ cảnh, chỉ dùng khi lập chỉ mục |
-| `sourceRef` | `{title, url}`; với `source` là link ngoài, còn lại trỏ `Flame_in_Freefall_Playbook.html#<section>` |
-| `status` | `source-text` (từ văn bản playbook) hoặc nhãn của playbook cho link: `link-confirmed`, `needs-check`, `unconfirmed` |
-| `storage` | chỉ có ở `source`: nhãn lưu trữ của playbook (`pub`, `meta`, `web`) |
-| `applies` | chỉ có ở `gap_note`: `moon_mars_gravity`, `safety_verdict`, `moon_base_conditions` |
+| `section`, `heading` | location in source document (section id, h3 or h2 heading) |
+| `text` | content displayed and used for citations |
+| `contextual` | contextual prefix, only used during indexing |
+| `sourceRef` | `{title, url}`; external link for `source`, otherwise points to `Flame_in_Freefall_Playbook.html#<section>` |
+| `status` | `source-text` (from playbook text) or playbook link label: `link-confirmed`, `needs-check`, `unconfirmed` |
+| `storage` | only in `source`: playbook storage label (`pub`, `meta`, `web`) |
+| `applies` | only in `gap_note`: `moon_mars_gravity`, `safety_verdict`, `moon_base_conditions` |
 
-Sau khi gộp danh mục nguồn vào Playbook gốc ngày 02/11/2026, có 162 chunk: 58 passage, 34 glossary, 55 source, 12 plan, 3 gap_note.
+Following the merge of source catalogs into the original Playbook on 2026-11-02, there are 162 chunks: 58 passage, 34 glossary, 55 source, 12 plan, 3 gap_note.
 
-`status` ở đây khác với `verified/unverified/placeholder` trong playbook: repo này không có bước người kiểm chứng số liệu, nên chỉ ghi lại nhãn mà chính playbook đã gắn.
+`status` here differs from `verified/unverified/placeholder` in the playbook: this repository does not include a human data verification step, so it merely records the labels assigned by the playbook itself.
 
-## 5. Luồng một câu hỏi
+## 5. Query Flow
 
 ```mermaid
 sequenceDiagram
-  participant U as Người dùng
+  participant U as User
   participant A as api.py
   participant P as pipeline.py
   participant G as guard.py
@@ -92,29 +92,29 @@ sequenceDiagram
   participant L as llm.py
   participant V as validate.py
   U->>A: POST /api/ask {question, scenarioId, mode}
-  A->>A: rate limit theo IP (20/phút)
+  A->>A: IP rate limit (20/min)
   A->>P: answer()
-  P->>P: tra cache (khóa = hash câu hỏi đã bỏ dấu + kịch bản + chế độ)
-  alt trúng cache
+  P->>P: check cache (key = hash of unaccented question + scenario + mode)
+  alt cache hit
     P-->>A: meta.mode = cached
-  else chưa có
+  else cache miss
     P->>G: classify()
-    alt ngoài phạm vi
+    alt out of scope
       P-->>A: refusal / off_topic
-    else trong phạm vi
-      P->>R: search(câu hỏi + gợi ý kịch bản)
-      alt hỏi trọng lực Mặt Trăng/Sao Hỏa
-        P-->>A: refusal / no_data_gap (trả gap_note)
+    else in scope
+      P->>R: search(question + scenario hint)
+      alt moon/mars gravity query
+        P-->>A: refusal / no_data_gap (return gap_note)
       else coverage heuristic = none
         P-->>A: refusal / insufficient_evidence
       else
-        P->>L: complete() nếu có khóa API
+        P->>L: complete() if API key present
         L-->>P: JSON segments
         P->>V: validate_answer()
-        alt hợp lệ
-          P-->>A: full (ghi cache)
-        else lỗi, hết 1 lần thử lại, hoặc timeout
-          P-->>A: retrieval_only (trích câu từ chunk)
+        alt valid
+          P-->>A: full (write cache)
+        else error, 1 retry exhausted, or timeout
+          P-->>A: retrieval_only (extract sentences from chunks)
         end
       end
     end
@@ -123,91 +123,91 @@ sequenceDiagram
 
 ### 5.1 Guard (`guard.py`)
 
-Chạy trên văn bản đã bỏ dấu, theo thứ tự:
+Operates on unaccented text, in the following order:
 
-1. **Ngoài phạm vi** nếu khớp danh sách chặn (tên lửa, thời tiết, cổ phiếu, bóng đá, nấu ăn) hoặc không chứa thuật ngữ miền nào (danh sách `DOMAIN` cộng tên các mục glossary).
-2. **Verdict** nếu có cụm như "có an toàn", "thì an toàn", "không an toàn". Cụm "an toàn cháy" (tên trụ cột) cố ý không bị tính.
-3. **Gap** nếu nhắc Mặt Trăng/Sao Hỏa/LUCI/FM2 **và** từ về trọng lực/dữ liệu/thí nghiệm. Hỏi về điều kiện của căn cứ Mặt Trăng (oxy, áp suất) không bị coi là gap.
+1. **Out of scope** if matching the blocklist (rockets, weather, stocks, football, cooking) or lacking any domain terminology (`DOMAIN` list plus glossary entry names).
+2. **Verdict** if containing phrases like "is safe", "then safe", "not safe" (matching unaccented patterns like `co an toan`, `thi an toan`, `khong an toan`). The phrase "fire safety" (`an toan chay`, a pillar name) is deliberately excluded.
+3. **Gap** if mentioning Moon/Mars/LUCI/FM2 **and** terms related to gravity/data/experiments. Asking about lunar base conditions (oxygen, pressure) is not considered a gap.
 
-Verdict và gap độc lập nhau: câu "Vật liệu qua bài thử 1g thì an toàn trên Mặt Trăng" kích hoạt cả hai.
+Verdict and gap are independent: a query like "Materials tested at 1g are safe on the Moon" triggers both.
 
-### 5.2 Truy xuất (`retrieve.py`)
+### 5.2 Retrieval (`retrieve.py`)
 
-| Bước | Chi tiết |
+| Step | Details |
 |---|---|
-| Mở rộng | nếu câu hỏi chứa khóa trong `aliases.json` (so sánh sau khi bỏ dấu, theo ranh giới từ) thì nối thêm các cụm tương ứng |
-| BM25 | k1 = 1.5, b = 0.75, lấy top 20. Token = từ đã bỏ dấu, từ có gạch nối giữ cả dạng đầy đủ lẫn từng phần, thêm bigram liền kề |
-| Vector | băm n-gram ký tự 3 đến 5 vào 1024 chiều, có dấu, trọng số log, chuẩn hóa L2, độ đo cosine, lấy top 20 |
-| RRF | điểm = Σ 1/(60 + hạng) trên hai danh sách |
-| Tăng điểm | nhân 1.5 cho chunk `gap_note` khi câu hỏi thuộc loại gap hoặc verdict |
-| Kết quả | top 6 (`RAG_TOP_K`) |
+| Expansion | If the query contains keys in `aliases.json` (matched after folding diacritics, on word boundaries), append the corresponding phrases |
+| BM25 | k1 = 1.5, b = 0.75, retrieve top 20. Token = unaccented words, hyphenated words kept both in full and split forms, plus adjacent bigrams |
+| Vector | Hashes character n-grams (3 to 5) into 1024 dimensions with diacritics, log weighting, L2 normalized, cosine similarity, retrieve top 20 |
+| RRF | Score = Σ 1/(60 + rank) across the two lists |
+| Boost | Multiply by 1.5 for `gap_note` chunks when the query is classified as gap or verdict |
+| Result | Top 6 (`RAG_TOP_K`) |
 
-Chỉ mục vector đổi được sang sentence-transformers bằng `RAG_EMBEDDER=st:<model>`, hoặc tắt hẳn bằng cách đặt rỗng (khi đó chỉ còn BM25).
+The vector index can be switched to sentence-transformers via `RAG_EMBEDDER=st:<model>`, or disabled entirely by setting it empty (falling back to BM25 only).
 
-### 5.3 Sinh câu trả lời
+### 5.3 Answer Generation
 
-- **Có LLM:** prompt hệ thống ép dùng đúng chunk được cấp, mỗi câu kèm id, không kết luận an toàn, trả JSON. Tối đa 2 lần gọi (1 lần thử lại), tổng thời gian không vượt `RAG_TIMEOUT_S` (15 giây). Mọi ngoại lệ (mạng, HTTP, timeout) đều dẫn tới retrieval-only.
-- **Validator** (`validate.py`): giữ segment nào có ít nhất một citation nằm trong tập chunk đã cấp, loại segment không có citation, citation lạ, hoặc chứa phán quyết như "là an toàn" / "không an toàn". Câu nói rõ "không kết luận" (ví dụ chính quy tắc của playbook) được miễn. Không segment nào sống sót thì coi như thất bại.
-- **Không có LLM (retrieval-only):** với 3 chunk đầu, chọn câu có nhiều từ trùng câu hỏi nhất (cắt ở 320 ký tự), mỗi câu trích dẫn chunk của nó.
-- **Coverage:** `heuristic` = tỷ lệ từ khóa của câu hỏi xuất hiện trong 3 chunk đầu (≥ 0.7 là full, ≥ 0.4 là partial, còn lại none). Với LLM thì lấy mức thấp hơn giữa heuristic và giá trị LLM tự khai. Câu verdict bị chặn ở tối đa partial. Heuristic ra none thì từ chối với lý do `insufficient_evidence`.
+- **With LLM:** The system prompt enforces using only the provided chunks, citing an id for each sentence, making no safety conclusions, and returning JSON. At most 2 calls (1 retry), total duration not exceeding `RAG_TIMEOUT_S` (15 seconds). Any exception (network, HTTP, timeout) falls back to retrieval-only.
+- **Validator** (`validate.py`): Keeps segments that have at least one citation within the provided chunk set; eliminates segments lacking citations, containing unknown citations, or containing verdicts like "is safe" / "unsafe". Sentences explicitly stating "no conclusion" (e.g. the playbook's own rule) are exempt. If no segments survive, it is considered a failure.
+- **Without LLM (retrieval-only):** From the top 3 chunks, selects the sentence with the highest word overlap with the query (truncated at 320 characters), with each sentence citing its chunk.
+- **Coverage:** `heuristic` = ratio of query keywords appearing in the top 3 chunks (≥ 0.7 is full, ≥ 0.4 is partial, otherwise none). With LLM, takes the lower of the heuristic and the self-reported LLM value. Verdict queries are capped at partial. If the heuristic yields none, the query is refused with reason `insufficient_evidence`.
 
-### 5.4 Chế độ và lý do trả về
+### 5.4 Return Modes and Reasons
 
 `meta.mode`: `full`, `retrieval_only`, `cached`, `refusal`.
-`meta.reason`: `off_topic`, `no_data_gap`, `safety_verdict`, `insufficient_evidence`, hoặc `null`.
+`meta.reason`: `off_topic`, `no_data_gap`, `safety_verdict`, `insufficient_evidence`, or `null`.
 
-Chỉ kết quả `full` được cache. Câu từ chối và retrieval-only tính lại mỗi lần vì rẻ.
+Only `full` results are cached. Refusals and retrieval-only responses are recomputed each time because they are inexpensive.
 
-## 6. Vận hành
+## 6. Operations
 
-| Mục | Hiện trạng |
+| Item | Current Status |
 |---|---|
-| Cấu hình | biến môi trường (xem `.env.example`, `config.py`) |
-| Rate limit | cửa sổ trượt 20 yêu cầu/phút/IP, **lưu trong bộ nhớ**, không chia sẻ giữa nhiều process |
-| Cache | TTL 1 giờ, tối đa 256 mục, cũng trong bộ nhớ |
-| Triển khai | một process `uvicorn`. Chưa có Dockerfile, Procfile hay cấu hình cloud |
-| Bảo mật | khóa API chỉ đọc từ biến môi trường ở server. Giao diện dựng DOM bằng `textContent`, không chèn HTML thô. Chưa có xác thực người dùng |
-| Quan sát | chưa có log có cấu trúc hay metric. Chỉ có `meta.latencyMs` trong mỗi phản hồi |
+| Configuration | Environment variables (see `.env.example`, `config.py`) |
+| Rate limit | Sliding window of 20 requests/minute/IP, **in-memory**, not shared across processes |
+| Cache | 1-hour TTL, up to 256 entries, also in-memory |
+| Deployment | Single `uvicorn` process. No Dockerfile, Procfile, or cloud configuration yet |
+| Security | API keys read only from server environment variables. UI constructs DOM using `textContent`, without inserting raw HTML. No user authentication yet |
+| Observability | No structured logs or metrics yet. Only `meta.latencyMs` in each response |
 
-## 7. Kiểm thử và đánh giá
+## 7. Testing and Evaluation
 
-- `pytest`: 23 test (chuẩn hóa, BM25, ingest, guard, validator, pipeline với LLM giả, API, ngưỡng đánh giá).
-- `python -m ragkit eval`: Recall@5, MRR trên 19 câu truy xuất và độ chính xác từ chối trên 5 câu. Kết quả ghi vào `reports/eval.json`. CI fail nếu Recall@5 < 0.85 hoặc từ chối đúng < 0.90.
+- `pytest`: 23 tests (normalization, BM25, ingest, guard, validator, pipeline with mock LLM, API, evaluation thresholds).
+- `python -m ragkit eval`: Recall@5, MRR across 19 retrieval queries, and refusal accuracy across 5 queries. Results written to `reports/eval.json`. CI fails if Recall@5 < 0.85 or correct refusal < 0.90.
 
-## 8. Khác với thiết kế gốc của playbook
+## 8. Differences from Original Playbook Design
 
-| Chủ đề | Playbook | Repo này | Lý do |
+| Topic | Playbook | This Repo | Reason |
 |---|---|---|---|
-| Ngôn ngữ, framework | Next.js, TypeScript, Vercel | Python, FastAPI | học và chạy local dễ hơn, không cần Node |
-| Lưu dữ liệu | JSON tĩnh kiểm bằng Zod | JSON tĩnh, kiểm id không trùng, chưa có schema validation đầy đủ | giữ gọn |
-| Tìm từ khóa | MiniSearch | BM25 tự viết | không phụ thuộc thư viện |
-| Vector | tùy chọn, embedding thật | băm n-gram (mặc định), sentence-transformers (tùy chọn) | chạy offline được |
-| Rerank | tùy chọn (Jev hoặc LLM) | **chưa có** | playbook cũng để tùy chọn |
-| Jev | tùy chọn | **không dùng** | đang early access |
-| Tiền tố ngữ cảnh | LLM sinh một lần lúc build | sinh bằng quy tắc | không cần LLM |
-| Phát hiện ý định, từ chối | LLM hoặc Jev | regex xác định | rẻ, tái lập được, nhưng cứng hơn |
-| Trạng thái dữ liệu | verified / unverified / placeholder | nhãn link của playbook | repo không có bước người kiểm chứng |
-| Phần ngoài RAG | Mission Brief, Evidence Map, Compare, xuất dữ liệu | **không có** | chỉ làm phần RAG |
-| Dữ liệu | thí nghiệm PSI đã tuyển chọn | chỉ nội dung playbook | không tải dữ liệu NASA |
+| Language, framework | Next.js, TypeScript, Vercel | Python, FastAPI | Easier to learn and run locally, no Node required |
+| Data storage | Static JSON validated with Zod | Static JSON, unique ID checks, full schema validation not yet implemented | Keep it lightweight |
+| Keyword search | MiniSearch | Custom BM25 | No library dependency |
+| Vector | Optional, real embeddings | Character n-gram hashing (default), sentence-transformers (optional) | Can run offline |
+| Rerank | Optional (Jev or LLM) | **Not yet implemented** | Playbook also keeps it optional |
+| Jev | Optional | **Not used** | Currently in early access |
+| Contextual prefix | LLM-generated once at build time | Rule-generated | No LLM needed |
+| Intent detection, refusal | LLM or Jev | Deterministic regex | Inexpensive, reproducible, but more rigid |
+| Data status | verified / unverified / placeholder | Playbook link labels | Repo lacks a human verification step |
+| Non-RAG components | Mission Brief, Evidence Map, Compare, data export | **None** | Focuses solely on RAG |
+| Data | Curated PSI experiments | Playbook content only | Does not download NASA data |
 
-## 9. Hạn chế và rủi ro thiết kế
+## 9. Design Limitations and Risks
 
-- **Dữ liệu chỉ đọc một lần:** `chunks.json` được đọc một lần lúc khởi động. Sửa dữ liệu thì phải chạy lại `ingest` và khởi động lại server.
-- **Quy tắc guard dễ bị lách và dễ chặn nhầm.** Ví dụ bỏ dấu làm "lửa" và "lúa" trùng nhau, nên guard phải bắt riêng "tên lửa". Câu hỏi diễn đạt lạ có thể lọt hoặc bị từ chối oan.
-- **Validator chỉ kiểm sự tồn tại của citation**, không kiểm chunk đó có thật sự ủng hộ câu hay không. Đó là việc của đánh giá thủ công (playbook đặt mục tiêu ≥ 0.95 và chưa có công cụ đo trong repo).
-- **Coverage là độ trùng từ**, không phải độ đủ bằng chứng theo nghĩa. Câu hỏi nhiều từ chung chung có thể ra "full" dù chunk chưa trả lời đúng ý.
-- **Retrieval-only có thể kéo thêm câu ít liên quan** (ví dụ định nghĩa PSI khi hỏi về oxy).
-- **Đường LLM chưa được thử với API thật.**
+- **Data read only once:** `chunks.json` is read once at startup. Modifying data requires re-running `ingest` and restarting the server.
+- **Guard rules are easily bypassed and prone to false positives.** For example, stripping diacritics collapses words for fire and rice into the same string ("lua"), so the guard must explicitly handle "rocket" ("ten lua"). Unusually phrased queries may slip through or be falsely rejected.
+- **Validator only checks citation existence**, not whether that chunk actually supports the statement. That requires manual evaluation (the playbook targets ≥ 0.95, and no measurement tool exists in this repo yet).
+- **Coverage is based on word overlap**, not semantic evidence sufficiency. Queries with many generic words may yield "full" even if chunks do not directly address the point.
+- **Retrieval-only may pull in less relevant sentences** (e.g. PSI definitions when asking about oxygen).
+- **LLM path has not been tested with the live API.**
 
-## 10. Điểm mở rộng
+## 10. Extension Points
 
-| Muốn làm | Sửa ở đâu |
+| Goal | Where to Edit |
 |---|---|
-| Nạp tài liệu mới | thả file vào `data/corpus/` rồi `ingest` |
-| Thêm vùng "chưa có dữ liệu" | thêm mục vào `gap_notes.json`, thêm nhánh nhận diện trong `guard.py` và `pipeline.py` |
-| Thêm viết tắt, từ đồng nghĩa | `aliases.json` |
-| Thêm kịch bản | `scenarios.json` (trường `hint` được nối vào truy vấn) |
-| Thêm câu hỏi đánh giá | `eval_questions.json` (`kind` là `retrieval` hoặc `refuse`) |
-| Đổi nhà cung cấp LLM | viết lớp có hàm `complete(system, user, timeout) -> str` như `AnthropicLLM` |
-| Thêm reranker | chèn bước giữa `Retriever.search` và `_try_llm` trong `pipeline.py` |
-| Đổi embedding | `RAG_EMBEDDER=st:<model>` hoặc thêm lớp trong `vector.py` |
+| Ingest new documents | Drop files into `data/corpus/` and run `ingest` |
+| Add a "no data" gap region | Add entry to `gap_notes.json`, add detection branch in `guard.py` and `pipeline.py` |
+| Add abbreviations, synonyms | `aliases.json` |
+| Add scenarios | `scenarios.json` (`hint` field is appended to query) |
+| Add evaluation questions | `eval_questions.json` (`kind` is `retrieval` or `refuse`) |
+| Switch LLM provider | Implement a class with `complete(system, user, timeout) -> str` like `AnthropicLLM` |
+| Add reranker | Insert a step between `Retriever.search` and `_try_llm` in `pipeline.py` |
+| Change embedding | `RAG_EMBEDDER=st:<model>` or add a class in `vector.py` |

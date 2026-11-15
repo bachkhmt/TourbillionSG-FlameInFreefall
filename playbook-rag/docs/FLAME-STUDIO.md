@@ -1,53 +1,53 @@
-# Phòng quan sát lửa 3D
+# 3D Flame Observation Chamber
 
-Mở `/flame` sau khi chạy `python -m ragkit serve`. Kho nghiên cứu có liên kết **Lửa 3D**.
-Trang dùng Three.js 0.186.1 và WebGL 2, không gọi API hay tải CDN lúc chạy.
+Open `/flame` after running `python -m ragkit serve`. The research repository contains a **3D Flame** link.
+The page uses Three.js 0.186.1 and WebGL 2, without runtime API calls or CDN downloads.
 
-## Cách dùng
+## Usage
 
-- **Giọt nước / Vòm cầu** chọn hai dáng tham chiếu; **Biến hình** chuyển tiếp liên tục.
-- Bốn màu có sẵn và dấu **+** để chọn màu bất kỳ, độc lập với hình dạng.
-- Kéo hoặc vuốt để xoay; cuộn/chụm để zoom. Phím mũi tên xoay, `+`/`-` zoom, `Home` đặt lại.
-- Chỉnh dao động, độ sáng, tự xoay; tạm dừng để quan sát và **Lưu ảnh PNG**.
-- **Tự động / Chi tiết / Nhẹ** thay đổi số bước lấy mẫu và độ phân giải dựng.
-- Trên điện thoại, **Điều chỉnh** mở bảng dưới; Escape đóng và trả focus.
+- **Teardrop / Dome** selects two reference shapes; **Morph** transitions continuously.
+- Four preset colors and a **+** button to choose any custom color, independent of shape.
+- Drag or swipe to rotate; scroll/pinch to zoom. Arrow keys rotate, `+`/`-` zoom, `Home` resets.
+- Adjust oscillation, brightness, auto-rotate; pause to observe and **Save PNG**.
+- **Auto / Detailed / Lightweight** changes the sample step count and rendering resolution.
+- On mobile, **Adjust** opens the bottom sheet; Escape closes it and restores focus.
 
-## Phạm vi khoa học
+## Scientific Scope
 
-Đây là minh họa hình ảnh thể tích, không phải bộ giải phản ứng cháy, CFD hay dự báo an toàn.
-Bản hiện tại tham chiếu ảnh lửa nến của NASA: vòm xanh trong vi trọng lực và dáng thuôn ở 1g;
-dòng khí và nhiên liệu vẫn ảnh hưởng hình dạng. Xem
+This is a volumetric visual illustration, not a combustion reaction solver, CFD, or safety forecast.
+The current version references NASA's candle flame images: a blue dome in microgravity and an elongated shape at 1g;
+gas flow and fuel still affect the shape. See
 [NASA: Candle Flame – 1g vs Microgravity](https://www.nasa.gov/image-article/candle-flame-1g-vs-microgravity/).
-Thanh biến hình **không** ánh xạ sang g, áp suất hay nồng độ oxy. Màu tùy chọn không biểu diễn
-nhiệt độ hoặc thành phần hóa học. Không đọc dữ liệu RAG vào shader và không tạo số đo giả.
+The morph slider does **not** map to g, pressure, or oxygen concentration. Custom colors do not represent
+temperature or chemical composition. It does not read RAG data into shaders and does not generate synthetic measurements.
 
-## Thiết kế và cấu trúc
+## Design and Structure
 
-Taste app direction **true-black-flat**, seed `699374517`, lưu trong `.taste-skill/flame/direction.json`.
-Câu hỏi trung tâm: “Ngọn lửa trông thế nào khi tôi đổi hình dạng và màu?”
-Đối tượng chính là thể tích sáng; nền và điều khiển dùng màu trung tính. Các màu bão hòa thuộc
-ngọn lửa và bảng chọn màu, theo yêu cầu người dùng. Không dùng gradient hoặc glow trang trí trên UI.
+Taste app direction **true-black-flat**, seed `699374517`, saved in `.taste-skill/flame/direction.json`.
+Central question: "What does the flame look like when I change shape and color?"
+The primary subject is the luminous volume; the background and controls use neutral tones. Saturated colors belong
+to the flame and color picker, per user request. No decorative gradients or glows on the UI.
 
-Inventory: một canvas chính; một bảng chỉnh; hai preset hình; một thanh morph; bốn màu và màu riêng;
-hai thanh dao động/độ sáng; một công tắc xoay; một chọn chất lượng; đặt lại góc nhìn; tạm dừng; lưu PNG;
-trạng thái tải, ảnh dự phòng khi WebGL lỗi, bố cục điện thoại và phím tắt.
+Inventory: one main canvas; one adjustment panel; two shape presets; one morph slider; four preset colors and custom color;
+two oscillation/brightness sliders; one auto-rotate toggle; one quality selector; reset view; pause; save PNG;
+loading state, fallback image on WebGL failure, mobile layout, and keyboard shortcuts.
 
-- `web/flame.html`: giao diện độc lập, `/flame` được FastAPI phục vụ.
-- `web/src/flame.js`: scene, OrbitControls, Timer, tương tác, xuất PNG và giải phóng tài nguyên.
-- `web/src/flame.frag.glsl`: raymarch phát xạ qua vỏ lửa mỏng và chuyển động nhẹ.
-- `web/assets/flame.css`: bố cục studio và bảng dưới trên điện thoại.
-- `web/assets/flame.js`: bundle có sẵn để chạy offline; sửa nguồn thì phải build lại.
-- `web/assets/flame-poster.png`: ảnh xuất từ chính renderer, dùng khi thiết bị thiếu WebGL 2.
-- `web/assets/THREE-LICENSE.txt`, `web/assets/fonts/OFL.txt`: giấy phép thư viện và font.
+- `web/flame.html`: standalone interface, `/flame` served by FastAPI.
+- `web/src/flame.js`: scene, OrbitControls, Timer, interactions, PNG export, and resource cleanup.
+- `web/src/flame.frag.glsl`: emission raymarching through a thin flame shell and gentle motion.
+- `web/assets/flame.css`: studio layout and mobile bottom sheet.
+- `web/assets/flame.js`: pre-built bundle for offline execution; rebuild required if source is modified.
+- `web/assets/flame-poster.png`: image exported directly from renderer, used when device lacks WebGL 2.
+- `web/assets/THREE-LICENSE.txt`, `web/assets/fonts/OFL.txt`: library and font licenses.
 
-Raymarch tích lũy phát xạ qua vỏ lửa mỏng, thêm vùng phát sáng của lửa nến 1g.
-Không dùng texture nhiễu dạng mây hoặc bệ trưng bày. Bấc nến che phần ánh sáng phía sau nó.
-Chuyển giữa trường khoảng cách giọt nước và vòm cầu; màu được quản lý trong linear space,
-ACES tone mapping và chuyển sang sRGB. Chế độ tự động giới hạn pixel ratio và giảm tải khi
-CPU gửi khung hình quá chậm; chưa đo GPU bằng timer query. Chất lượng chi tiết tốn GPU hơn.
-Ưu tiên reduced-motion khởi động ở trạng thái tạm dừng; tab ẩn không dựng khung hình.
+Raymarching accumulates emission through a thin flame shell, adding the luminous zone of a 1g candle flame.
+No cloud-like noise textures or display pedestals are used. The candle wick occludes light behind it.
+Transitions between teardrop and spherical dome signed distance fields; color is managed in linear space,
+ACES tone mapping, and converted to sRGB. Auto mode caps pixel ratio and sheds load when
+the CPU dispatches frames too slowly; GPU timer queries are not yet measured. Detailed quality requires more GPU.
+Reduced-motion preference starts paused; hidden tabs do not render frames.
 
-## Build và kiểm tra
+## Build and Testing
 
 ```powershell
 cd web
@@ -58,19 +58,19 @@ pytest -q
 ruff check src tests scripts/check_flame_studio.py
 ```
 
-QA trình duyệt dùng Edge cài sẵn, thêm `pip install playwright pillow` rồi chạy:
+Browser QA uses pre-installed Edge; add `pip install playwright pillow` and run:
 
 ```powershell
 python scripts/check_flame_studio.py --url http://127.0.0.1:8000
 ```
 
-Script kiểm tra WebGL thật, pixel màu và hình dạng, màu riêng, xoay bằng phím, tạm dừng/chuyển động,
-PNG tải được, chất lượng, các chiều rộng 768/390/320 và ảnh dự phòng khi WebGL không khả dụng.
-Ảnh QA mặc định nằm ở `.taste-skill/flame/qa`. Không cần cài Playwright để chạy sản phẩm.
+The script tests real WebGL, pixel color and shape, custom colors, keyboard rotation, pause/motion,
+downloadable PNG, quality settings, 768/390/320 widths, and fallback image when WebGL is unavailable.
+QA screenshots default to `.taste-skill/flame/qa`. Playwright is not required to run the product.
 
-## Sửa hình ảnh theo phản hồi
+## Visual Revisions from Feedback
 
-Bản đầu bị đánh giá giống quả cầu plasma/khói. Đã bỏ texture nhiễu 3D, bỏ bệ tròn,
-giảm cường độ vỏ xanh, làm tối phần giữa và thêm nến/bấc làm nguồn nhiên liệu.
-Preset vi trọng lực hiện là **vòm lửa nến** theo ảnh tham chiếu, không đại diện mọi loại lửa trong không gian.
-QA có kiểm tra vùng giữa tối hơn mép và không biến thành lõi trắng.
+The initial version was critiqued as resembling a plasma ball / smoke. Removed 3D noise textures, removed circular plinth,
+reduced blue shell intensity, darkened the center, and added candle/wick as the fuel source.
+The microgravity preset is now a **candle flame dome** based on reference photography, not representing all flame types in space.
+QA verifies that the center is darker than the rim and does not turn into a white core.

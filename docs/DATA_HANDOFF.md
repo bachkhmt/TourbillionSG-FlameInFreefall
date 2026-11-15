@@ -1,100 +1,100 @@
-# Bộ dữ liệu thống nhất NASA: bàn giao Data → Web/RAG
+# NASA Unified Dataset: Data → Web/RAG Handoff
 
-## Cập nhật Backend/Data — 2026-11-14, chỉ mục 1 và 2
+## Backend/Data Update — 2026-11-14, Items 1 and 2
 
-Nhánh `feat/data-backend-handoff-20261114` dựa trên PR #3. Đã chọn phương án A:
-migration `0004_challenge_source_scope`, vẫn21 bảng. Nguồn cấp challenge có
-`source_scope=challenge`, `investigation_id=NULL`; CHECK ngăn scope/ownership sai.
-Không tạo investigation hoặc run giả. Migration cũ giữ nguyên; snapshot cũ vẫn đọc được.
+Branch `feat/data-backend-handoff-20261114` is based on PR #3. Option A was selected:
+migration `0004_challenge_source_scope`, still 21 tables. Challenge-level sources have
+`source_scope=challenge`, `investigation_id=NULL`; a CHECK constraint prevents invalid scope/ownership.
+No mock investigations or runs are created. Existing migrations remain intact; older snapshots are still readable.
 
-| Profile hiện tại | Investigations | Records | Sources | Chunks |
+| Current Profile | Investigations | Records | Sources | Chunks |
 | --- | ---: | ---: | ---: | ---: |
-| `unified` (mặc định, thêm resources) | 24 | 1.926 | 81 | 2.574 |
-| `psi` (tái lập unified PSI trước đây) | 24 | 1.926 | 71 | 2.508 |
-| `coverage` | 24 | 1.535 | 68 | 1.811 |
-| `challenge` | 18 | 910 | 51 | 1.045 |
+| `unified` (default, adds resources) | 24 | 1,926 | 81 | 2,574 |
+| `psi` (reproduces previous unified PSI) | 24 | 1,926 | 71 | 2,508 |
+| `coverage` | 24 | 1,535 | 68 | 1,811 |
+| `challenge` | 18 | 910 | 51 | 1,045 |
 
-Đã import và kiểm cả `psi` và `unified` trên child DB mới riêng của server test
-`127.0.0.1:55435` được user duyệt. Không reset DB có sẵn. `GET /chat/readiness`
-báo2508/2574 tương ứng; `/chat/resources` trả0/10 nguồn tương ứng. Endpoint này
-cho biết `indexed`, `status`, quyền sử dụng và source ID để AI/FE tích hợp tiếp.
-Citation source metadata hỗ trợ investigation NULL và source scope.
+Both `psi` and `unified` have been imported and verified on a dedicated new child DB on the test server
+`127.0.0.1:55435` approved by the user. Existing DB was not reset. `GET /chat/readiness`
+reports 2508 / 2574 respectively; `/chat/resources` returns 0 / 10 sources respectively. This endpoint
+provides `indexed`, `status`, usage rights, and source ID for downstream AI/FE integration.
+Citation source metadata supports NULL investigation and source scope.
 
-10 resource entries đều được lưu. Sáu bài NASA có66 chunk narration với raw/hash/
-locator và quyền `NASA-public-use-text`, tách khỏi policy CC0 cũ. PSI search là link
-khám phá; video chưa có transcript xác minh; Apollo1/13 bị lỗi tải nên không index.
-Researcher's Guide hiện chỉ có landing article, chưa có toàn bộ PDF liên kết.
-Chi tiết raw và trạng thái: `integrations/nasa_data/research/challenge-resources-2026-11-14/`.
+All 10 resource entries are stored. Six NASA articles contain 66 narration chunks with raw/hash/
+locator and `NASA-public-use-text` rights, separate from the previous CC0 policy. PSI search is a discovery
+link; video lacks a verified transcript; Apollo 1/13 failed to download so they are not indexed.
+The Researcher's Guide currently only has the landing article, not the full linked PDF.
+Raw details and statuses: `integrations/nasa_data/research/challenge-resources-2026-11-14/`.
 
-Mục3 đánh giá AI và mục4 conflict FE của PR2 vẫn do AI/tác giả PR2 thực hiện.
+Item 3 (AI evaluation) and Item 4 (PR2 FE conflicts) remain the responsibility of AI / PR2 author.
 
-Checklist phần nội dung Apollo/video/full Guide PDF còn thiếu và chủ trì:
-[`RESOURCE_CONTENT_HANDOFF.md`](RESOURCE_CONTENT_HANDOFF.md). PSI search là discovery
-link có chủ đích, không phải lỗi thiếu tài liệu. Checklist chưa được gửi cho team.
+Checklist for missing Apollo/video/full Guide PDF content and leads:
+[`RESOURCE_CONTENT_HANDOFF.md`](RESOURCE_CONTENT_HANDOFF.md). PSI search is an intentional
+discovery link, not a missing document bug. The checklist has not yet been sent to the team.
 
-Xác nhận integration cuối ngày14/11: **80 passed,0 failed,0 skipped**,458.88s trên
-PostgreSQL test55435. Dòng77passed/2failed trong verification là lịch sử trước sửa
-fixture; kết quả full-run mới và JSON evidence đã được đưa lên đầu báo cáo.
-Nhánh này không sửa FE hay thuật toán `app/integrations/rag/`. Docker/deployment
-chưa review được cất riêng trên `wip/docker-deployment-20261114` (`b950300`).
+End-of-day integration confirmation on 2026-11-14: **80 passed, 0 failed, 0 skipped**, 458.88s on
+test PostgreSQL 55435. The 77 passed / 2 failed line in verification is historical from before the fixture
+fix; new full-run results and JSON evidence have been moved to the top of the report.
+This branch does not modify FE or the `app/integrations/rag/` algorithm. Unreviewed Docker/deployment
+work is stored separately on `wip/docker-deployment-20261114` (`b950300`).
 
-Lệnh kiểm tra/import tái lập: `scripts/verify_data_handoff.py` qua
-`scripts/test_db.py run`; chuẩn bị preview riêng bằng
+Commands for reproducible verification/import: `scripts/verify_data_handoff.py` via
+`scripts/test_db.py run`; prepare dedicated preview using
 `prepare_chat_preview.py --prepare-new-test-target --profile psi|unified`.
-Bằng chứng mới, migration impact và giới hạn ở
-`flameguard-ai-backend/specs/phase6c-challenge-resources/verification.md` và ADR-0006.
+New evidence, migration impact, and limitations are in
+`flameguard-ai-backend/specs/phase6c-challenge-resources/verification.md` and ADR-0006.
 
-## Bàn giao gốc PR #3 — lưu làm bằng chứng lịch sử
+## Original PR #3 Handoff — Preserved as Historical Record
 
-Phần dưới mô tả nhánh Data trước phần mở rộng Backend/A; số liệu và các việc
-pending ở phần này không thay thế trạng thái hiện tại bên trên.
+The section below describes the Data branch prior to the Backend/Option A extension; metrics and pending
+items in this section do not supersede the current status above.
 
-Cập nhật 2026-11-14, branch `data/unified-dataset`. Branch tạo từ `feat/rag-nasa-chat`.
+Updated 2026-11-14, branch `data/unified-dataset`. Branch branched from `feat/rag-nasa-chat`.
 
-## Tóm tắt
+## Summary
 
-`integrations/nasa_data/` build một **release thống nhất** dùng chung cho dashboard
-(snapshot 21 bảng) và chatbot RAG (chunk CC0 có hash). Release chạy offline, không gọi
-network và không ghi DB.
+`integrations/nasa_data/` builds a **unified release** shared between the dashboard
+(21-table snapshot) and RAG chatbot (hashed CC0 chunks). The release runs offline, makes no
+network calls, and writes no DB data.
 
-**Chỉ dùng nguồn chính thức.** Trang Resources của challenge ghi PSI là "source of the
-data". Release chỉ dùng **file PSI** và **metadata PSI**. Paper NTRS không có trong
-danh sách resources nên không được đưa vào.
+**Official sources only.** The challenge's Resources page designates PSI as the "source of the
+data". The release strictly uses **PSI files** and **PSI metadata**. NTRS papers are not in
+the resource list, so they are not included.
 
 | Release (`--profile`) | Parser | Investigations | Source records | Sources | Chunks |
 | --- | --- | ---: | ---: | ---: | ---: |
-| `unified` (mặc định) | `nasa-unified-v1` | 24 | 1.926 | 71 | 2.508 |
-| `coverage` | `nasa-challenge-v2` | 24 | 1.535 | 68 | 1.811 |
-| `challenge` | `nasa-challenge-v1` | 18 | 910 | 51 | 1.045 |
+| `unified` (default) | `nasa-unified-v1` | 24 | 1,926 | 71 | 2,508 |
+| `coverage` | `nasa-challenge-v2` | 24 | 1,535 | 68 | 1,811 |
+| `challenge` | `nasa-challenge-v1` | 18 | 910 | 51 | 1,045 |
 
-Release sau xây chồng lên release trước. Release trước vẫn tái lập được byte-for-byte.
-Ví dụ `challenge` vẫn ra revision `91e41126…`.
+Subsequent releases build upon prior releases. Earlier releases remain byte-for-byte reproducible.
+For example, `challenge` still produces revision `91e41126…`.
 
-Số source record **không phải** số thí nghiệm độc lập. Lý do: có key trùng, có test
-point trong ngày, và cùng một test có thể có hai nguồn. Có **0** record được thẩm định
-khoa học độc lập.
+The source record count is **not** the number of independent experiments. Reasons: duplicate keys exist, test
+points occurred on the same day, and a single test may come from two sources. There are **0** records that have
+been independently peer-reviewed / scientifically validated.
 
-## Có gì trong `unified`
+## What is in `unified`
 
-| Lớp | Nội dung | Nguồn |
+| Layer | Content | Source |
 | --- | --- | --- |
-| v1 (Bach) | FLEX, BASS-II, CFI-G normal, BASS, Saffire-II/III, CFI (CSV), SAME-R; SAME/BRE thành configuration; context PSI của 18 study | `research/nasa-combustion-2026-11-10`, `…-11-13` |
-| v2 (`coverage.py`) | CFI-G inverse 154, SPICE 469 set points, Saffire-I 2. FLEX-2/SLICE/CLD/E-FIELD/s-Flame chỉ là configuration. FLEX calibration, Saffire ReadMe. Chunk ≤ 900 ký tự | Bytes đã có trong snapshot 10/11 |
-| v2 | 6 study PSI combustion còn thiếu: PSI-47 DAFT, PSI-60/62/115/117/142. Chỉ metadata; ground investigation được gắn nhãn modeling | `research/nasa-combustion-2026-11-14/context` |
-| unified (`unified.py`) | **ACME BRE**: 243 chamber test point từ 2 workbook Chamber Calculator (PSI-20). **CFI**: 227 Flex Number từ Data Summary Spreadsheet (PSI-39), liên kết với 87 dòng CSV cũ | `research/nasa-combustion-2026-11-14/psi-files` |
+| v1 (Bach) | FLEX, BASS-II, CFI-G normal, BASS, Saffire-II/III, CFI (CSV), SAME-R; SAME/BRE converted to configuration; PSI context for 18 studies | `research/nasa-combustion-2026-11-10`, `…-11-13` |
+| v2 (`coverage.py`) | CFI-G inverse 154, SPICE 469 set points, Saffire-I 2. FLEX-2/SLICE/CLD/E-FIELD/s-Flame are configuration only. FLEX calibration, Saffire ReadMe. Chunks ≤ 900 characters | Bytes already in 11/10 snapshot |
+| v2 | 6 missing PSI combustion studies: PSI-47 DAFT, PSI-60/62/115/117/142. Metadata only; ground investigations labeled modeling | `research/nasa-combustion-2026-11-14/context` |
+| unified (`unified.py`) | **ACME BRE**: 243 chamber test points from 2 Chamber Calculator workbooks (PSI-20). **CFI**: 227 Flex Numbers from Data Summary Spreadsheet (PSI-39), linked to 87 old CSV rows | `research/nasa-combustion-2026-11-14/psi-files` |
 
-Quy tắc đọc workbook chi tiết nằm trong `research/nasa-combustion-2026-11-14/psi-files/README.md`.
+Detailed workbook parsing rules are in `research/nasa-combustion-2026-11-14/psi-files/README.md`.
 
-**Những điều phía Web/RAG cần biết:**
-- Thành phần khí và Burn Fraction của BRE là **giá trị calculator**, có status
-  `needs_review`. Chúng không bao giờ thành điều kiện O₂ của run.
-- 40 test point BRE không khớp ngày trong bảng tổng hợp được **gắn cờ**, không bị xóa.
-- CFI không có giá trị nào lệch giữa CSV và spreadsheet. Cột không khai báo đơn vị và
-  cột công thức được giữ raw.
-- Mọi observation từ workbook có locator `xlsx '<sheet>'!<ô>` trỏ đúng ô gốc. Test kiểm
-  tra điều này.
+**What Web/RAG needs to know:**
+- Gas composition and Burn Fraction for BRE are **calculator values** with status
+  `needs_review`. They are never converted into run O₂ conditions.
+- 40 BRE test points with mismatched dates in summary sheets are **flagged**, not deleted.
+- CFI has no conflicting values between CSV and spreadsheet. Columns without declared units and
+  formula columns are preserved raw.
+- Every observation from workbooks has locator `xlsx '<sheet>'!<cell>` pointing to the exact original cell. Tests verify
+  this behavior.
 
-## Cách build và kiểm tra
+## How to Build and Test
 
 ```bash
 PYTHONPATH=.:flameguard-ai-backend flameguard-ai-backend/.venv/bin/python -m integrations.nasa_data.export --output /tmp/nasa-bundle
@@ -104,48 +104,48 @@ PYTHONPATH=.:flameguard-ai-backend flameguard-ai-backend/.venv/bin/python -m int
 flameguard-ai-backend/.venv/bin/python -m pytest -q
 ```
 
-Kết quả ngày 2026-11-14 (không có DB):
-- `integration_tests`: 59 passed, 9 skipped. Test HTTP/PostgreSQL chưa chạy.
-- Ruff pass cho `integrations/` và `integration_tests/`.
-- Suite BE upstream (`flameguard-ai-backend`) có 18 test fail vì thiếu
-  `PHASE4_ADMIN_URL`. Đây là test PostgreSQL không tự skip, không do branch này gây ra:
-  branch không sửa file nào trong `flameguard-ai-backend/`.
+Results as of 2026-11-14 (without DB):
+- `integration_tests`: 59 passed, 9 skipped. HTTP/PostgreSQL tests were not run.
+- Ruff passed for `integrations/` and `integration_tests/`.
+- Upstream BE suite (`flameguard-ai-backend`) had 18 failed tests due to missing
+  `PHASE4_ADMIN_URL`. These are PostgreSQL tests that do not auto-skip and were not caused by this branch:
+  the branch did not modify any files in `flameguard-ai-backend/`.
 
-## Cần người khác làm
+## Action Items for Other Teams
 
-### 1. Import bundle mới vào DB — **DB team**
+### 1. Import new bundle into DB — **DB team**
 
-- Chạy `scripts/prepare_chat_preview.py --prepare-new-test-target` (container test
-  `tourbillion-test-pg`) hoặc import lên target khác đã được duyệt. Script tự export bằng
-  profile mặc định `unified`.
-- Không cần migration mới: vẫn 21 bảng, `0001`–`0003`. Snapshot đã qua `snapshot_rows`.
-- Sau khi import, chạy `python3 scripts/test_db.py run -- … pytest -q` để chạy cả test
-  HTTP/PostgreSQL. Chat readiness phải báo `passages=2508`.
-- Bundle khoảng 40 MB (artifacts gốc + `release.json`).
+- Run `scripts/prepare_chat_preview.py --prepare-new-test-target` (test container
+  `tourbillion-test-pg`) or import into another approved target. The script automatically exports using the
+  default `unified` profile.
+- No new migrations required: still 21 tables, `0001`–`0003`. Snapshot has passed `snapshot_rows`.
+- After importing, run `python3 scripts/test_db.py run -- … pytest -q` to execute HTTP/PostgreSQL tests as well.
+  Chat readiness must report `passages=2508`.
+- Bundle is approximately 40 MB (original artifacts + `release.json`).
 
-### 2. Lưu 10 resources chính thức không thuộc investigation — **Backend + DB quyết**
+### 2. Storing 10 official resources not belonging to an investigation — **Backend + DB Decision**
 
-Hiện `source_document.investigation_id` là NOT NULL, nên Researcher's Guide, Apollo 1/13,
-Mir và 3 spinoff chưa có chỗ lưu hợp lệ. Các phương án:
+Currently `source_document.investigation_id` is NOT NULL, so Researcher's Guide, Apollo 1/13,
+Mir, and 3 spinoffs have no valid place to be stored. Evaluated options:
 
-| # | Phương án | Ưu | Nhược |
+| # | Option | Pros | Cons |
 | --- | --- | --- | --- |
-| A (đề xuất) | Migration additive `0004`: cho `investigation_id` nullable, thêm cột phân loại nguồn cấp challenge | Ít bảng, đúng ngữ nghĩa | Phải rà publish/API/FE chỗ nào giả định source luôn có investigation |
-| B | Bảng `resource_document` riêng + bảng liên kết resource↔investigation | Không đụng bảng cũ | Nhiều thay đổi hơn |
-| C | Chỉ lưu trong `release.json`, không vào bảng quan hệ | Không đổi schema | Khó truy vấn; chat không dùng được |
+| A (recommended) | Additive migration `0004`: make `investigation_id` nullable, add classification column for challenge-level sources | Fewer tables, semantically accurate | Must audit publish/API/FE code wherever it assumes a source always has an investigation |
+| B | Dedicated `resource_document` table + link table resource↔investigation | Does not touch existing tables | More widespread changes |
+| C | Store only in `release.json`, not in relational tables | No schema changes | Difficult to query; chat cannot use it |
 
-**Không nên** tạo investigation giả hoặc gán resource vào study "gần nhất".
+**Do not** create dummy investigations or assign resources to the "closest" study.
 
 ### 3. Retrieval — **AI team**
 
-- Đã có test retrieval cho BRE, CFI, SPICE, CFI-G inverse và DAFT.
-- Chưa có bộ câu hỏi đánh giá lớn trên corpus mới. Ở repo NASA tham chiếu, gold set 59 câu
-  chạy trên `AnswerService` và phát hiện 4 known gap ở tầng trả lời. Bộ đó chưa được port
-  sang `nasa_chat`.
+- Retrieval tests are in place for BRE, CFI, SPICE, CFI-G inverse, and DAFT.
+- No large evaluation question benchmark exists yet on the new corpus. In the reference NASA repo, a 59-question gold set
+  ran against `AnswerService` and identified 4 known gaps at the answering layer. That test set has not been ported
+  to `nasa_chat`.
 
-## Ngoài phạm vi branch này
+## Out of Scope for This Branch
 
-- Paper NTRS (kể cả FLEX TP Table IX) và dữ liệu luận văn (SPICE DeBold/Dotson).
-- PSI-10 (license unknown, không index).
-- `facts`/`rankings`/`ml_*` của repo Data cũ: không có hash/locator theo dòng.
-- Mọi thay đổi schema, import DB, push.
+- NTRS papers (including FLEX TP Table IX) and thesis datasets (SPICE DeBold/Dotson).
+- PSI-10 (license unknown, not indexed).
+- `facts`/`rankings`/`ml_*` from the legacy Data repo: no per-row hash/locator.
+- All schema changes, DB imports, and pushes.

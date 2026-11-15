@@ -1,4 +1,4 @@
-"""FastAPI: POST /api/ask theo hợp đồng của playbook (answer.segments, coverage, missing, meta)."""
+"""FastAPI: POST /api/ask per playbook contract (answer.segments, coverage, missing, meta)."""
 from __future__ import annotations
 
 import json
@@ -27,7 +27,7 @@ def create_app(pipeline: RagPipeline | None = None, limiter: RateLimiter | None 
     app = FastAPI(title="ragkit", version="0.1.0")
     app.mount("/assets", StaticFiles(directory=Path(ROOT) / "web" / "assets"), name="assets")
 
-    # Cho phép CORS cho frontend tĩnh hoặc live demo
+    # Allow CORS for static frontend or live demo
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -66,7 +66,7 @@ def create_app(pipeline: RagPipeline | None = None, limiter: RateLimiter | None 
     def ask(body: AskIn, request: Request) -> dict:
         ip = request.client.host if request.client else "unknown"
         if not state["limiter"].allow(ip):
-            raise HTTPException(429, "Quá nhiều yêu cầu, thử lại sau một phút.")
+            raise HTTPException(429, "Too many requests, try again in a minute.")
         return pipe().answer(body.question, body.scenarioId, body.mode)
 
     @app.get("/")
@@ -83,12 +83,12 @@ def create_app(pipeline: RagPipeline | None = None, limiter: RateLimiter | None 
         if filename == settings.source_html.name and settings.source_html.is_file():
             return FileResponse(settings.source_html)
         if any(char in filename for char in ("/", "\\", ":")):
-            raise HTTPException(404, "Không tìm thấy tài liệu nguồn.")
+            raise HTTPException(404, "Source document not found.")
         corpus = settings.corpus_dir.resolve()
         candidate = (corpus / filename).resolve()
         if (candidate.parent != corpus or candidate.suffix.lower() not in {".html", ".md", ".txt"}
                 or not candidate.is_file()):
-            raise HTTPException(404, "Không tìm thấy tài liệu nguồn.")
+            raise HTTPException(404, "Source document not found.")
         return FileResponse(candidate)
 
     return app

@@ -33,7 +33,7 @@ class TTLCache:
 
 
 class RateLimiter:
-    """Cửa sổ trượt theo khóa (IP). allow() trả False khi vượt limit trong window_s giây."""
+    """Sliding window per key (IP). allow() returns False when exceeding limit within window_s seconds."""
 
     def __init__(self, limit: int = 20, window_s: float = 60):
         self.limit, self.window = limit, window_s

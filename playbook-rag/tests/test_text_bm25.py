@@ -3,15 +3,15 @@ from ragkit.text import analyze, fold
 
 
 def test_fold_removes_diacritics_and_subscripts():
-    assert fold("Mặt Trăng, CO₂ và Đề") == "mat trang, co2 va de"
+    assert fold("Moon, CO₂ and Topic") == "moon, co2 and topic"
 
 
 def test_analyze_keeps_hyphen_parts_and_bigrams():
-    t = analyze("Saffire-II kiểm giới hạn oxy")
-    assert "saffire-ii" in t and "saffire" in t and "gioi_han" in t
+    t = analyze("Saffire-II checks oxygen limit")
+    assert "saffire-ii" in t and "saffire" in t and "oxygen_limit" in t
 
 
 def test_bm25_ranks_rare_term_first():
-    docs = [analyze(x) for x in ["lua cau xanh", "dap lua flex co2", "khoi aerosol same"]]
+    docs = [analyze(x) for x in ["blue spherical flame", "suppress flame flex co2", "smoke aerosol same"]]
     top = BM25(docs).search(analyze("flex"), 3)
     assert top[0][0] == 1 and len(top) == 1

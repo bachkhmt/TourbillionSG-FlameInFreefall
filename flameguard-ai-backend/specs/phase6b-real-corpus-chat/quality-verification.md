@@ -58,3 +58,16 @@ Manual HTTP review found "What is ACME?" abstaining, a regression from v2. Cause
 | HTTP smoke on the existing preview test target (55435) | "What is ACME?" / "ACME là gì?" answered with four ACME investigations; "What is ACME BRE?" only BRE; "Compare ACME and FLEX" both sides; "What is ACME Flame Design?" abstained; CO2, BASS/Saffire, SAME, FLEX-007 follow-up and safety abstention unchanged |
 
 Provider version remains `nasa-extractive-v3` (unreleased). No deployment, migration or shared DB change.
+
+## Merge with main b9bc971 — 2026-11-15
+
+`origin/main` at `b9bc971` translated the v2 Vietnamese strings in `retrieval.py`, `provider.py`, the retrieval tests and `docs/CHATBOT_FLOW.md` to English, which conflicted with this branch. Resolution: the RAG code and the conflicting test hunk keep this branch's version, because the bilingual `message()` table and provider already return English text for English questions; `retrieval.py` is byte-identical to the family-scope fix (SHA-256 `5bf3b595…`), so the pre-existing E501 on main disappears. `CHATBOT_FLOW.md` keeps main's English text with this branch's scope and quality sections added in English. Main's English test questions were auto-merged.
+
+| Check | Result |
+| --- | --- |
+| `integration_tests/test_nasa_chat_retrieval.py` | 57 passed |
+| Benchmark development / holdout | all metrics 1.0, unchanged |
+| Root full suite (55435) | **137 passed, 0 skipped** |
+| Backend full suite (55435) | **700 passed, 0 skipped** |
+| BE `ruff check .` / `ruff format --check .` | Passed |
+| FE `vitest` / `tsc --noEmit` / `npm run build` | 310 passed / passed / passed |

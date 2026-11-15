@@ -8,7 +8,7 @@ Caps applied: app-screen rules apply; this is a visualization editor, not a phot
 Top three problems (most visible first), each with the screenshot it shows in and the fix:
 1. mobile-fold.jpg: the sphere and pedestal are cropped horizontally; widen the vertical FOV on portrait screens.
 2. desktop-fold.jpg: supporting copy is small; increase instructional text to 13px.
-3. first desktop render: “Tham chiếu 1g” wraps inside a shape button; widen inspector to 352px.
+3. first desktop render: “1g reference” wraps inside a shape button; widen inspector to 352px.
 
 ROUND 2
 Seen in one second: a complete glowing flame volume, with shape controls beside it.

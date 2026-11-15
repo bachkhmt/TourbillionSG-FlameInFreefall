@@ -4,9 +4,9 @@
     "name": "BASS",
     "fullName": "Burning and Suppression of Solids",
     "fuelType": "solid",
-    "fuelDetail": "PMMA, Cotton, Nomex tấm phẳng và thanh trụ",
+    "fuelDetail": "PMMA, Cotton, Nomex flat sheets and cylindrical rods",
     "apparatus": "MSG (Microgravity Science Glovebox)",
-    "chamber": "Glovebox kín",
+    "chamber": "Sealed Glovebox",
     "pillars": ["prevention", "suppression"],
     "o2Range": [15, 21],
     "airflowRange": [0, 53],
@@ -15,17 +15,17 @@
     "habitatRelevance": 5,
     "status": "verified",
     "ntrsId": "20160000593",
-    "summary": "Đốt mẫu vật liệu rắn tấm phẳng và que hình trụ trong buồng MSG. Khảo sát giới hạn dập tắt bằng luồng khí đối lưu cưỡng bức và chất dập khí trơ.",
-    "keyFindings": "Ở luồng khí dưới 1 cm/s ngọn lửa rất mờ nhưng ổn định. Khi luồng khí tăng đột ngột, lửa bùng phát nhanh do được nạp dưỡng khí kịp thời."
+    "summary": "Combustion of flat sheet and cylindrical rod solid material samples in the MSG chamber. Investigation of extinction limits using forced convective airflow and inert gas suppressants.",
+    "keyFindings": "At airflow below 1 cm/s, the flame is very dim but stable. When airflow increases abruptly, the fire flares up rapidly due to timely replenishment of oxygen."
   },
   {
     "id": "bass-ii",
     "name": "BASS-II",
     "fullName": "Burning and Suppression of Solids - II",
     "fuelType": "solid",
-    "fuelDetail": "Acrylic, Cotton blend, Nomex hình học phức tạp",
+    "fuelDetail": "Acrylic, Cotton blend, Nomex complex geometries",
     "apparatus": "MSG (Microgravity Science Glovebox)",
-    "chamber": "Glovebox kín",
+    "chamber": "Sealed Glovebox",
     "pillars": ["prevention", "suppression"],
     "o2Range": [16, 21],
     "airflowRange": [0, 55],
@@ -34,15 +34,15 @@
     "habitatRelevance": 5,
     "status": "verified",
     "ntrsId": "20160000593",
-    "summary": "Hơn 100 lần thử nghiệm đốt và dập tắt vật liệu rắn tấm dày trong các luồng khí cưỡng bức từ 0 đến 55 cm/s.",
-    "keyFindings": "Vận tốc thông gió cabin (5-20 cm/s) là yếu tố quyết định tốc độ lan truyền ngọn lửa trong vi trọng lực; loại trừ giả định lửa tự tắt khi không có gió."
+    "summary": "Over 100 combustion and extinction tests on thick solid materials in forced airflows from 0 to 55 cm/s.",
+    "keyFindings": "Cabin ventilation velocity (5-20 cm/s) is the decisive factor for flame spread rate in microgravity; eliminates the assumption that fire self-extinguishes in the absence of airflow."
   },
   {
     "id": "flex",
     "name": "FLEX",
     "fullName": "Flame Extinguishment Experiment",
     "fuelType": "liquid",
-    "fuelDetail": "Methanol, Heptane, Decane dạng giọt tự do",
+    "fuelDetail": "Methanol, Heptane, Decane free droplets",
     "apparatus": "CIR / MDCA",
     "chamber": "Combustion Integrated Rack",
     "pillars": ["suppression"],
@@ -53,8 +53,8 @@
     "habitatRelevance": 4,
     "status": "verified",
     "ntrsId": "20150023456",
-    "summary": "284 thử nghiệm đốt giọt nhiên liệu hình cầu đối xứng, đo giới hạn oxy tối thiểu để dập lửa bằng cách pha loãng CO₂ và Heli.",
-    "keyFindings": "Heli dập tắt lửa qua cơ chế dẫn nhiệt cao, trong khi CO₂ dập tắt qua làm lạnh bức xạ và pha loãng nhiệt dung khí quyển."
+    "summary": "284 spherically symmetric fuel droplet combustion tests, measuring the minimum limiting oxygen concentration for flame extinction via CO₂ and Helium dilution.",
+    "keyFindings": "Helium extinguishes fire through a high thermal conductivity mechanism, while CO₂ extinguishes fire through radiative cooling and atmospheric heat capacity dilution."
   },
   {
     "id": "flex-2",
@@ -72,15 +72,15 @@
     "habitatRelevance": 4,
     "status": "verified",
     "ntrsId": "20140009372",
-    "summary": "Mở rộng FLEX với các mảng giọt lỏng tương tác và khảo sát nồng độ oxy giới hạn (LOI) trong áp suất cabin thấp.",
-    "keyFindings": "Khám phá hiện tượng cháy mát (cool flame) tiếp diễn tự phát sau khi ngọn lửa nhìn thấy được bằng mắt thường đã tắt hoàn toàn."
+    "summary": "Extension of FLEX with interacting droplet arrays and investigation of limiting oxygen index (LOI) at low cabin pressures.",
+    "keyFindings": "Discovery of the cool flame phenomenon spontaneously continuing after the flame visible to the naked eye has completely extinguished."
   },
   {
     "id": "cfi",
     "name": "CFI",
     "fullName": "Cool Flames Investigation",
     "fuelType": "liquid",
-    "fuelDetail": "Alkanes lỏng phân tử lớn",
+    "fuelDetail": "Large-molecule liquid alkanes",
     "apparatus": "CIR / MDCA",
     "chamber": "Combustion Integrated Rack",
     "pillars": ["prevention", "suppression"],
@@ -91,15 +91,15 @@
     "habitatRelevance": 3,
     "status": "verified",
     "ntrsId": "20170009414",
-    "summary": "Nghiên cứu cơ chế đốt cháy ở nhiệt độ thấp (400-600°C) không phát xạ ánh sáng nhìn thấy, không tạo muội than.",
-    "keyFindings": "Nguy cơ cháy ngầm vô hình trong khoang kín: phản ứng oxy hóa bậc thấp vẫn giải phóng CO và chất độc hại dù không thấy lửa."
+    "summary": "Investigation of low-temperature combustion mechanisms (400-600°C) without visible light emission and without soot formation.",
+    "keyFindings": "Risk of invisible smoldering combustion in enclosed compartments: low-temperature oxidation reactions continue to release CO and toxic substances even when no flame is visible."
   },
   {
     "id": "cfi-g",
     "name": "CFI-G",
     "fullName": "Cool Flames Investigation with Gaseous Fuels (ACME)",
     "fuelType": "gas",
-    "fuelDetail": "Ethylene, Propane pha loãng khí trơ",
+    "fuelDetail": "Ethylene, Propane diluted with inert gas",
     "apparatus": "CIR / ACME",
     "chamber": "Combustion Integrated Rack",
     "pillars": ["prevention"],
@@ -110,15 +110,15 @@
     "habitatRelevance": 4,
     "status": "verified",
     "ntrsId": "20210022542",
-    "summary": "Khảo sát ngọn lửa mát với nhiên liệu thể khí trong buồng ACME với luồng nồng độ oxy cực cao (tới 85%).",
-    "keyFindings": "Xác định ranh giới duy trì phản ứng nhiệt độ thấp trong môi trường giàu dưỡng khí (rich oxygen environments)."
+    "summary": "Investigation of cool flames with gaseous fuels in the ACME chamber under extremely high oxygen concentration flows (up to 85%).",
+    "keyFindings": "Identification of boundaries for sustaining low-temperature reactions in rich oxygen environments."
   },
   {
     "id": "acme-bre",
     "name": "ACME BRE",
     "fullName": "Burning Rate Emulator (ACME)",
     "fuelType": "gas",
-    "fuelDetail": "Béc đốt xốp phẳng mô phỏng chất rắn bốc hơi",
+    "fuelDetail": "Flat porous burner simulating evaporating solids",
     "apparatus": "CIR / ACME",
     "chamber": "Combustion Integrated Rack",
     "pillars": ["prevention", "suppression"],
@@ -129,15 +129,15 @@
     "habitatRelevance": 5,
     "status": "verified",
     "ntrsId": "20210022542",
-    "summary": "Mô phỏng tốc độ bốc hơi và cháy của vật liệu rắn trong không khí tĩnh và luồng khí đối lưu cực nhẹ bằng béc đốt xốp phẳng.",
-    "keyFindings": "Vật liệu vẫn có thể duy trì cháy âm ỉ hàng chục phút trong môi trường hoàn toàn tĩnh nếu có nồng độ oxy cao."
+    "summary": "Simulation of vaporization and burning rates of solid materials in quiescent air and very low convective airflow using a flat porous burner.",
+    "keyFindings": "Materials can still sustain smoldering combustion for tens of minutes in completely quiescent environments if oxygen concentration is high."
   },
   {
     "id": "acme-efield",
     "name": "ACME E-FIELD",
     "fullName": "Electric-Field Effects on Flames",
     "fuelType": "gas",
-    "fuelDetail": "Methane, Ethylene kèm điện cực cao thế",
+    "fuelDetail": "Methane, Ethylene with high-voltage electrodes",
     "apparatus": "CIR / ACME",
     "chamber": "Combustion Integrated Rack",
     "pillars": ["suppression", "prevention"],
@@ -148,15 +148,15 @@
     "habitatRelevance": 3,
     "status": "verified",
     "ntrsId": "20210022542",
-    "summary": "Dùng điện trường cao thế tác động lên các ion tự do trong ngọn lửa vi trọng lực để mô phỏng một phần hiệu ứng của trọng lực.",
-    "keyFindings": "Điện trường có thể làm phân tán hoặc dập tắt ngọn lửa từ xa, gợi ý công nghệ dập lửa vật lý không dùng hóa chất trên trạm."
+    "summary": "Application of high-voltage electric fields to free ions in microgravity flames to partially simulate the effects of gravity.",
+    "keyFindings": "Electric fields can disperse or extinguish flames remotely, suggesting physical non-chemical fire suppression technology for spacecraft."
   },
   {
     "id": "same",
     "name": "SAME / SAME-R",
     "fullName": "Smoke and Aerosol Measurement Experiment",
     "fuelType": "solid",
-    "fuelDetail": "Dây điện quá nhiệt, vỏ bọc Teflon, mẫu vải Cotton",
+    "fuelDetail": "Overheated electrical wire, Teflon insulation, Cotton fabric samples",
     "apparatus": "MSG",
     "chamber": "Microgravity Science Glovebox",
     "pillars": ["detection"],
@@ -167,15 +167,15 @@
     "habitatRelevance": 5,
     "status": "verified",
     "ntrsId": "20130000422",
-    "summary": "Đo kích thước và sự phân bố mật độ hạt khói sinh ra từ sự cố quá nhiệt dây điện và vật liệu cabin trong vi trọng lực.",
-    "keyFindings": "Hạt khói trong 0g nhỏ hơn đáng kể (<500 nm) so với Trái Đất do thiếu đối lưu nhiệt kết tụ; cảm biến quang điện truyền thống dễ báo động trễ."
+    "summary": "Measurement of smoke particle size and number density distribution produced from electrical wire overheating incidents and cabin materials in microgravity.",
+    "keyFindings": "Smoke particles in 0g are significantly smaller (<500 nm) than on Earth due to lack of thermal convective agglomeration; traditional photoelectric smoke detectors are prone to delayed alarms."
   },
   {
     "id": "daft",
     "name": "DAFT / DAFT-2",
     "fullName": "Dust and Aerosol Measurement Feasibility Test",
     "fuelType": "aerosol",
-    "fuelDetail": "Hạt khói và sol khí lơ lửng trong vi trọng lực",
+    "fuelDetail": "Smoke particles and suspended aerosols in microgravity",
     "apparatus": "P-Trak counter in MSG",
     "chamber": "Glovebox & cabin",
     "pillars": ["detection"],
@@ -186,17 +186,17 @@
     "habitatRelevance": 4,
     "status": "verified",
     "ntrsId": "20050215648",
-    "summary": "Đánh giá thiết bị đo hạt bụi siêu mịn P-Trak (từ thí nghiệm SAME) trong môi trường dài ngày trên trạm ISS.",
-    "keyFindings": "Máy đếm hạt ngưng tụ siêu mịn phát hiện được tiền chất cháy trước khi mắt thường hoặc cảm biến khói tiêu chuẩn nhận biết được."
+    "summary": "Evaluation of the P-Trak ultrafine particle counter (from the SAME experiment) during long-duration operations aboard the ISS.",
+    "keyFindings": "Ultrafine condensation particle counters can detect fire precursors before they are discernible by the naked eye or standard smoke detectors."
   },
   {
     "id": "saffire-1",
     "name": "Saffire I-III",
     "fullName": "Spacecraft Fire Safety Demonstration I–III",
     "fuelType": "solid",
-    "fuelDetail": "Mẫu PMMA và SIBAL khổ lớn 0,4m × 1,0m",
+    "fuelDetail": "Large-scale PMMA and SIBAL samples (0.4m × 1.0m)",
     "apparatus": "Cygnus Cargo Vehicle",
-    "chamber": "Khoang hàng Cygnus kín",
+    "chamber": "Sealed Cygnus cargo bay",
     "pillars": ["prevention", "detection", "suppression"],
     "o2Range": [15, 21],
     "airflowRange": [10, 30],
@@ -205,17 +205,17 @@
     "habitatRelevance": 5,
     "status": "verified",
     "ntrsId": "20170008805",
-    "summary": "Thử nghiệm đốt cháy mẫu vật liệu kích thước thật trên tàu tiếp tế Cygnus tự hành sau khi tách khỏi ISS, trước khi tái nhập khí quyển.",
-    "keyFindings": "Lửa quy mô lớn phát triển công suất nhiệt tới 10 kW; tốc độ suy giảm oxy trong khoang và sản sinh CO là mối đe dọa sinh tử."
+    "summary": "Full-scale material combustion testing aboard the autonomous Cygnus resupply vehicle after unberthing from the ISS, prior to atmospheric reentry.",
+    "keyFindings": "Large-scale fires develop heat release rates up to 10 kW; rapid cabin oxygen depletion and CO generation pose a critical life-safety threat."
   },
   {
     "id": "saffire-4",
     "name": "Saffire IV-VI",
     "fullName": "Spacecraft Fire Safety IV, V, VI",
     "fuelType": "solid",
-    "fuelDetail": "Vải cabin, composite Nomex, mẫu vật liệu kỹ thuật",
+    "fuelDetail": "Cabin fabrics, Nomex composites, engineering material samples",
     "apparatus": "Cygnus Cargo Vehicle",
-    "chamber": "Khoang hàng Cygnus áp suất biến thiên",
+    "chamber": "Cygnus cargo bay with variable pressure",
     "pillars": ["prevention", "detection", "suppression"],
     "o2Range": [14, 28],
     "airflowRange": [10, 40],
@@ -224,17 +224,17 @@
     "habitatRelevance": 5,
     "status": "verified",
     "ntrsId": "20240002981",
-    "summary": "Thử nghiệm cháy trong điều kiện khí quyển khám phá (áp suất thấp, tăng % oxy) và dập tắt bằng vòi phun chữa cháy tự động.",
-    "keyFindings": "Xác nhận tính dễ cháy gia tăng mạnh trong khí quyển giảm áp (8.2 psi) dù % oxy chỉ tăng nhẹ; kiểm nghiệm hệ thống lọc khói hậu chữa cháy."
+    "summary": "Combustion testing under exploration atmospheric conditions (reduced pressure, elevated % O₂) and suppression using automated fire extinguishing nozzles.",
+    "keyFindings": "Confirmed significant increase in flammability in reduced-pressure atmospheres (8.2 psi) even with modest oxygen percentage increases; validated post-suppression smoke filtration systems."
   },
   {
     "id": "luci",
     "name": "LUCI",
     "fullName": "Lunar Combustion Investigation",
     "fuelType": "solid",
-    "fuelDetail": "Vật liệu polyme chuẩn mẫu phẳng",
-    "apparatus": "Sounding Rocket (quay ly tâm)",
-    "chamber": "Payload ly tâm tạo gia tốc",
+    "fuelDetail": "Standard flat polymer material samples",
+    "apparatus": "Sounding Rocket (centrifuge)",
+    "chamber": "Centrifugal payload generating acceleration",
     "pillars": ["prevention"],
     "o2Range": [21, 35],
     "airflowRange": [0, 15],
@@ -243,17 +243,17 @@
     "habitatRelevance": 5,
     "status": "verified",
     "ntrsId": "20250010653",
-    "summary": "Thí nghiệm bay tên lửa thăm dò tạo lực ly tâm tương đương trọng lực Mặt Trăng 0.16g trong hơn 25 giây.",
-    "keyFindings": "Bằng chứng thực nghiệm đầu tiên xác nhận đối lưu nhiệt yếu ở 0.16g vẫn tạo luồng cấp oxy cục bộ, khiến lửa không tự ngạt như 0g."
+    "summary": "Sounding rocket flight experiment generating centrifugal acceleration equivalent to lunar gravity (0.16g) for over 25 seconds.",
+    "keyFindings": "First experimental evidence confirming that weak thermal convection at 0.16g still induces local oxygen supply flows, preventing flame from self-extinguishing as in 0g."
   },
   {
     "id": "fm2",
     "name": "FM2",
     "fullName": "Fire and Materials in Microgravity (Lunar Mission)",
     "fuelType": "solid",
-    "fuelDetail": "Vải cabin thế hệ mới, cách điện tàu đổ bộ Artemis",
-    "apparatus": "Module hạ cánh Mặt Trăng tương lai",
-    "chamber": "Khoang thử nghiệm tự hành",
+    "fuelDetail": "Next-generation cabin fabrics, Artemis lander electrical insulation",
+    "apparatus": "Future Lunar Lander Module",
+    "chamber": "Autonomous test chamber",
     "pillars": ["prevention", "suppression"],
     "o2Range": [30, 34],
     "airflowRange": [0, 20],
@@ -262,17 +262,17 @@
     "habitatRelevance": 5,
     "status": "unverified",
     "ntrsId": "20240015307",
-    "summary": "Dự án nghiên cứu khả năng bắt cháy của vật liệu trong khí quyển căn cứ Mặt Trăng (8.2 psi, 34% O₂). Đang chuẩn bị tích hợp dữ liệu vào PSI.",
-    "keyFindings": "Đưa ra giả thuyết rằng giới hạn oxy bắt cháy cực tiểu (LOI) có thể rơi vào vùng nguy hiểm nhất ở gần mức trọng lực Mặt Trăng."
+    "summary": "Research project investigating material flammability in lunar base atmospheres (8.2 psi, 34% O₂). Currently preparing for data integration into PSI.",
+    "keyFindings": "Hypothesizes that the minimum limiting oxygen index (LOI) may fall into the most hazardous regime near lunar gravity levels."
   },
   {
     "id": "sofie",
     "name": "SoFIE",
     "fullName": "Solid Fuel Ignition and Extinction",
     "fuelType": "solid",
-    "fuelDetail": "PMMA dày, vải dệt đa lớp, màng mỏng",
+    "fuelDetail": "Thick PMMA, multilayer woven fabrics, thin films",
     "apparatus": "CIR (Combustion Integrated Rack)",
-    "chamber": "Buồng CIR cải tiến",
+    "chamber": "Enhanced CIR chamber",
     "pillars": ["prevention", "suppression"],
     "o2Range": [15, 30],
     "airflowRange": [0, 25],
@@ -281,7 +281,7 @@
     "habitatRelevance": 5,
     "status": "verified",
     "ntrsId": "20200000361",
-    "summary": "Bộ 5 thí nghiệm đốt và dập vật liệu rắn thế hệ mới nhất trên CIR (chạy từ 2023). Khảo sát độ dày mẫu, hướng gió và vật liệu đa lớp.",
-    "keyFindings": "Cung cấp số liệu cập nhật thay thế cho các tiêu chuẩn thử nghiệm 1g truyền thống, xây dựng dữ liệu nền cho chương trình Artemis."
+    "summary": "Suite of 5 next-generation solid material combustion and extinction experiments on CIR (operational since 2023). Investigating sample thickness, airflow direction, and multilayer materials.",
+    "keyFindings": "Provides updated benchmark data to replace traditional 1g test standards, establishing baseline data for the Artemis program."
   }
 ]

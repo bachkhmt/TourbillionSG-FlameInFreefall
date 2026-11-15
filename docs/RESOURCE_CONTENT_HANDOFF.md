@@ -1,34 +1,34 @@
-# Bàn giao phần nội dung resource còn thiếu — 2026-11-14
+# Missing Resource Content Handoff — 2026-11-14
 
-Backend đã có chỗ lưu nguồn cấp challenge và importer/admission cho phương án A.
-Việc còn lại ở đây là bổ sung/kiểm tra nội dung nguồn; không phải sửa schema thêm.
-Đây là checklist để user giao việc, chưa gửi thông điệp hoặc tự gán task cho team.
+The backend already has storage for challenge-level sources and an importer/admission mechanism for option A.
+The remaining work here is to supplement/verify source content; no further schema modifications are needed.
+This is a checklist for the user to assign tasks, not for sending messages or self-assigning tasks to the team.
 
-| Nguồn | Hiện trạng | Chủ trì | Bàn giao cần có |
+| Source | Current Status | Lead | Required Deliverables |
 | --- | --- | --- | --- |
-| Apollo 1 | Chỉ metadata/link; tải từ máy hiện tại lỗi | Data | Bytes nguồn chính thức tải thành công, URL gốc/final, hash, ngày tải, quyền sử dụng, text và locator |
-| Apollo 13 | Chỉ metadata/link; tải lỗi | Data | Tương tự Apollo 1; không bỏ xác minh TLS hoặc tự thay bằng bài không thuộc nguồn được duyệt |
-| ScienceCasts video | Lưu link/page; chưa có transcript xác minh | Data, AI phối hợp kiểm tra | Transcript có nguồn và quyền rõ, đối chiếu video, locator theo mốc thời gian; giữ chỗ chưa nghe rõ |
-| Researcher's Guide | Đã có landing article; chưa có nội dung PDF đầy đủ | Data | PDF gốc/hash/phiên bản, quyền sử dụng, text theo trang; tách các phần hình ảnh/nguồn bên thứ ba nếu chưa được phép |
+| Apollo 1 | Metadata/link only; download fails from the current machine | Data | Successfully downloaded official source bytes, original/final URL, hash, download date, usage rights, text, and locators |
+| Apollo 13 | Metadata/link only; download fails | Data | Similar to Apollo 1; do not skip TLS verification or substitute with articles outside the approved sources |
+| ScienceCasts video | Link/page saved; no verified transcript yet | Data, AI co-reviewing | Transcript with clear source and rights, aligned with video, timestamp-based locators; preserve placeholders for inaudible segments |
+| Researcher's Guide | Landing article available; full PDF content missing | Data | Original PDF/hash/version, usage rights, page-by-page text; isolate images/third-party sources if not permitted |
 
-PSI search là link khám phá dữ liệu, không phải tài liệu cần ép thành chunk. Các file
-thí nghiệm PSI đã được xử lý riêng. Sáu resource đang index gồm NASA Combustion Science,
-Guide landing article, Mir và ba bài Spinoff. Bốn entry chưa index là PSI search,
-video và hai trang Apollo; Guide đã index một phần nhưng chưa phải toàn bộ PDF.
+PSI search is a data discovery link, not a document that needs to be forced into chunks. The
+PSI experiment files have already been handled separately. The six indexed resources consist of NASA Combustion Science,
+Guide landing article, Mir, and three Spinoff articles. The four unindexed entries are PSI search,
+the video, and the two Apollo pages; the Guide is partially indexed but does not yet include the complete PDF.
 
-## Điều kiện nhận bàn giao
+## Handoff Acceptance Criteria
 
-- Giữ raw bytes độc lập, original/stored SHA256, URL, phiên bản/ngày tải và original units.
-- Text/chunk có locator kiểm chứng được: HTML section/paragraph, PDF page hoặc video timestamp.
-- Quyền sử dụng khai báo riêng từng nguồn; không tự đổi unknown thành CC0.
-- Không ghi đè bản đã công bố. Tạo release revision mới và cập nhật raw/manifest/registry.
-- Nguồn lỗi/chưa rõ quyền/chưa xác minh tiếp tục có status thật và không tự tạo nội dung.
-- Data cung cấp bundle và báo cáo nguồn; Backend chạy kiểm tra/import trên target được
-  duyệt; AI thực hiện chất lượng retrieval/citation/abstention thuộc mục3. PR2/FE xử lý mục4.
+- Preserve independent raw bytes, original/stored SHA256, URL, version/download date, and original units.
+- Text/chunks must have verifiable locators: HTML section/paragraph, PDF page, or video timestamp.
+- Usage rights must be declared separately for each source; do not unilaterally convert unknown to CC0.
+- Do not overwrite published versions. Create a new release revision and update raw/manifest/registry.
+- Sources with errors, unclear rights, or unverified status must retain their true status without fabricated content.
+- Data provides the bundle and source reports; Backend runs verification/import against approved
+  targets; AI handles retrieval/citation/abstention quality under item 3. PR2/FE handles item 4.
 
-Adapter hiện tại chỉ xử lý narration của HTML article. Khi bổ sung PDF/transcript,
-Data cần bàn giao parser/chunks tương ứng; Backend rà mapping và rights policy theo
-bằng chứng mới rồi mới import. Schema A lưu được các nguồn này, nhưng không tự làm
-cho PDF/video đọc được hoặc được phép index. Không gán nhãn article/CC0 để vượt gate.
+The current adapter only processes narration from HTML articles. When adding PDFs/transcripts,
+Data needs to hand over the corresponding parser/chunks; Backend reviews mapping and rights policy against
+the new evidence prior to import. Schema A can store these sources, but does not automatically make
+PDFs/videos readable or permitted for indexing. Do not assign article/CC0 labels to bypass gates.
 
-Việc có source row hoặc kiểm tra kỹ thuật pass không phải thẩm định khoa học.
+Having a source row or passing technical checks does not constitute scientific validation.

@@ -1,4 +1,4 @@
-"""Cổng phạm vi: ngoài chủ đề, đòi kết luận an toàn, hay hỏi vùng chưa có dữ liệu."""
+"""Scope guard: out of scope, demanding safety verdict, or asking about data gaps."""
 from __future__ import annotations
 
 import re

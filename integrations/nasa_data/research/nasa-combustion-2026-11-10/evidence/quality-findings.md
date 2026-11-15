@@ -1,91 +1,91 @@
-# Phát hiện chất lượng có locator
+# Located Quality Findings
 
-Các CSV dưới samples/ giữ nguyên bytes. “Dòng CSV” bên dưới tính header là dòng 1; các file được nêu không có multiline quoted records ảnh hưởng những locator này. Artifact URLs, file version và hash ở [artifacts.json](artifacts.json).
+CSVs under samples/ preserve original bytes. "CSV row" below treats the header as line 1; the referenced files do not contain multiline quoted records that would affect these locators. Artifact URLs, file versions, and hashes are in [artifacts.json](artifacts.json).
 
-## Q1. FLEX: cùng run, giá trị khác nhau
+## Q1. FLEX: same run, conflicting values
 
-Nguồn: PSI-69 v5, `PSI-69_Experimental table_FLEX.csv`, dòng 8/test 7/CIR `20CAL13`; `PSI-69_Raw Data_FLEX-007_TestSheet.txt`, mục TEST PARAMETERS / TEST CONDITIONS.
+Source: PSI-69 v5, `PSI-69_Experimental table_FLEX.csv`, row 8 / test 7 / CIR `20CAL13`; `PSI-69_Raw Data_FLEX-007_TestSheet.txt`, section TEST PARAMETERS / TEST CONDITIONS.
 
-| Trường | CSV | Test sheet |
+| Field | CSV | Test sheet |
 | --- | --- | --- |
 | Initial diameter | 1.87 mm | 1.82 mm |
-| Burning-rate value | 0.67, header không đủ đơn vị | 0.68 mm2/s |
+| Burning-rate value | 0.67, header lacks unit | 0.68 mm2/s |
 
-Test date/time và CIR key xác nhận hai record cùng test. Chưa xác minh lý do khác nhau hoặc nguồn nào ưu tiên. Khuyến nghị: giữ cả hai, liên kết locators, mở issue; không lấy trung bình.
+Test date/time and CIR key confirm that both records belong to the same test. The reason for the discrepancy and which source takes precedence have not been verified. Recommendation: preserve both, link locators, open an issue; do not average.
 
-## Q2. FLEX: đơn vị và độ bao phủ
+## Q2. FLEX: units and coverage
 
-CSV header ghi `Burning rate; mm`; test sheet ghi `kavg (mm2/s)`. [NTRS 20150023456](https://ntrs.nasa.gov/citations/20150023456), Appendix A.1 và A.2/Table IX, giải thích burning-rate constant từ fit đường kính bình phương theo thời gian, đơn vị mm2/s.
+CSV header states `Burning rate; mm`; test sheet states `kavg (mm2/s)`. [NTRS 20150023456](https://ntrs.nasa.gov/citations/20150023456), Appendix A.1 and A.2/Table IX, explains the burning-rate constant from fitting squared diameter over time, with units of mm2/s.
 
-Bảng CSV tải về có 274 data rows, trong khi abstract báo cáo nói 284 tests. Chưa giải thích discrepancy và không tuyên bố CSV đại diện toàn bộ test trong báo cáo. Web UI từng hiển thị tổng 275, nên không dùng UI row count làm số run.
+The downloaded CSV table contains 274 data rows, whereas the report abstract states 284 tests. The discrepancy is unexplained, and there is no claim that the CSV represents all tests in the report. The web UI once displayed a total of 275, so do not use the UI row count as the run count.
 
-## Q3. FLEX: time series và missingness
+## Q3. FLEX: time series and missingness
 
-Nguồn: `PSI-69_Raw Data_FLEX-007_DropletData.txt` và `PSI-69_Raw Data_FLEX-007_LLUVData.txt`, header và các hàng đầu.
+Source: `PSI-69_Raw Data_FLEX-007_DropletData.txt` and `PSI-69_Raw Data_FLEX-007_LLUVData.txt`, header and initial rows.
 
-- Phân cách tab, line endings có carriage return.
-- Thời gian âm có trong nguồn; không tự bỏ hay clamp thành zero.
-- Vị trí hoặc flame-standoff có ô trống; không nội suy khi chưa có chính sách.
-- Channel time/axis khác nhau. Không mặc định dữ liệu camera đồng bộ từng hàng.
+- Tab-separated, line endings contain carriage returns.
+- Negative time values are present in the source; do not discard or clamp to zero on your own.
+- Position or flame-standoff fields have blanks; do not interpolate without a policy.
+- Channel time/axis differ. Do not assume camera data are synchronized row by row.
 
-Các quan sát không xác nhận frame rate/uncertainty cho toàn dataset. Time origin phải kiểm tra theo phương pháp từng run; không suy ra epoch timestamps từ time-series offset.
+These observations do not confirm frame rate/uncertainty across the entire dataset. Time origin must be verified according to per-run methodology; do not infer epoch timestamps from time-series offsets.
 
-## Q4. BASS-II: cần README để hiểu số đo
+## Q4. BASS-II: README needed to interpret measurements
 
-Nguồn: PSI-25 v4, `PSI-25_Science Documents_BASS-II_ReadMe.docx`; các đoạn dưới Test Matrix explanation / Columns in test matrix.
+Source: PSI-25 v4, `PSI-25_Science Documents_BASS-II_ReadMe.docx`; sections under Test Matrix explanation / Columns in test matrix.
 
-- Cùng sample có thể dùng nhiều runs; suffix `a/b` phân biệt lần thử.
-- Ngày video lệch ngày thực một ngày do phần mềm không xử lý leap year đúng; GMT là day-of-year.
-- Fan display là điện áp nhân 10 hoặc có thể là pot setting; không phải airflow.
-- Air display đo cm/s nhưng đáp ứng chậm khoảng một phút.
-- Radiometer gain chưa calibrated tuyệt đối; có thể dùng cho mức tương đối theo hướng dẫn, không đổi thẳng thành physical heat flux.
-- O2 sensor được hiệu chỉnh offset theo MCA trong ngày.
-- `OR` có nghĩa trên 1000 ppm, không phải số chính xác hoặc null thông thường.
+- The same sample can be used across multiple runs; suffix `a/b` distinguishes attempts.
+- Video date differs from actual date by one day because software did not handle leap years correctly; GMT is day-of-year.
+- Fan display is voltage times 10 or possibly pot setting; not airflow.
+- Air display measures cm/s but has a slow response time of approximately one minute.
+- Radiometer gain is not absolutely calibrated; can be used for relative levels per instructions, do not convert directly to physical heat flux.
+- O2 sensor offset is calibrated daily against MCA.
+- `OR` means over 1000 ppm, not an exact number or standard null.
 
-Đây là quy tắc riêng của bộ dữ liệu được hướng dẫn, không áp cho sensor khác chỉ vì trùng tên cột.
+These are dataset-specific rules documented in the instructions; do not apply them to other sensors merely due to matching column names.
 
-## Q5. BASS-II: anomaly và trạng thái định tính
+## Q5. BASS-II: anomalies and qualitative states
 
-Nguồn: `PSI-25_Experimental table_BASS-II.csv`:
+Source: `PSI-25_Experimental table_BASS-II.csv`:
 
-- Dòng 52, test O4: air display có text về giảm flow đến extinction, final CO là `OR`.
-- Dòng 62, test O12: air display mô tả không ignition ở các flow đã thử.
-- Dòng 129, T28b: final O2 = `40.4`; initial CO2 và CO là `none`.
-- Dòng 130, T29: fan/air display chứa nhiều mức; initial CO = `-1`.
+- Row 52, test O4: air display contains text regarding flow reduction to extinction, final CO is `OR`.
+- Row 62, test O12: air display describes no ignition across tested flows.
+- Row 129, T28b: final O2 = `40.4`; initial CO2 and CO are `none`.
+- Row 130, T29: fan/air display contains multiple levels; initial CO = `-1`.
 
-[NTRS 20210011385](https://ntrs.nasa.gov/citations/20210011385), Appendix B/test T28b trong fulltext, cũng chứa `40.4`. Xác nhận số xuất hiện ở hai biểu diễn không xác nhận nó đúng về mặt đo lường. Không sửa hoặc xóa dựa riêng trên trực giác/range UI.
+[NTRS 20210011385](https://ntrs.nasa.gov/citations/20210011385), Appendix B/test T28b in full text, also contains `40.4`. Confirming that a number appears in two representations does not confirm that it is metrologically valid. Do not alter or delete based solely on intuition or UI range checks.
 
-## Q6. Summary rows không phải run
+## Q6. Summary rows are not runs
 
-- PSI-68 FLEX-2, 8 dòng: fuel/mixed-fuel và ranges/sets của diameter/O2/pressure/flow; không có ID từng ignition.
-- PSI-20 BRE: ngày thử + `Flames Ignited`, có note pressure thay đổi nhưng không liệt kê trong summary.
-- PSI-21 CLD: `Test Day`, MFC maxima, fuel-concentration range và số flames; MFC maximum không phải flow thực của mọi run.
-- PSI-22 E-FIELD: các dòng 4/7 và nhiều dòng cuối chỉ tiếp diễn fuel concentration, không có test-day. Không tự forward-fill rồi tạo run mới.
+- PSI-68 FLEX-2, 8 rows: fuel/mixed-fuel and ranges/sets of diameter/O2/pressure/flow; no per-ignition ID.
+- PSI-20 BRE: test date + `Flames Ignited`, contains note about pressure changes but does not enumerate them in the summary.
+- PSI-21 CLD: `Test Day`, MFC maxima, fuel-concentration range, and number of flames; MFC maximum is not the actual flow of every run.
+- PSI-22 E-FIELD: rows 4/7 and several trailing rows only continue fuel concentration, lacking test-day. Do not forward-fill on your own and create new runs.
 
-Khuyến nghị: phân cấp staging và dùng raw logs/test sheets để phục hồi run; không đưa summary vào `TestRun` nhằm lấp dữ liệu.
+Recommendation: tier staging and use raw logs/test sheets to reconstruct runs; do not insert summary rows into `TestRun` to pad data.
 
-## Q7. Saffire: notes, images và units
+## Q7. Saffire: notes, images, and units
 
-Nguồn: PSI-99 v5, `PSI-99_Experimental table_SAFFIRE-2.csv`:
+Source: PSI-99 v5, `PSI-99_Experimental table_SAFFIRE-2.csv`:
 
-- Dòng 2-10 là chín sample; dòng 11-12 là flow records; dòng 13-16 là notes.
-- Có đơn vị trong ô, giá trị approximate, kết quả định tính và tham chiếu hình thay số thickness.
-- Không điền material trống từ dòng phía trên nếu chưa có bằng chứng.
+- Rows 2-10 are nine samples; rows 11-12 are flow records; rows 13-16 are notes.
+- Units appear inside cells, approximate values, qualitative outcomes, and figure references instead of thickness numbers.
+- Do not fill empty material from the row above without evidence.
 
-Nguồn bổ sung: PSI-98 v4, `PSI-98_Science Documents_SAFFIRE-I and SAFFIRE-III Readme.docx`, Table 1 / Table 3 và đoạn raw data. File giải thích camera/sample identities, telemetry Excel, image transformations và RAW có offset trước color interpolation. Một phần bảng diagnostics là hình trong DOCX, chưa đọc trực quan; không trích đầy đủ sensor list từ XML extraction.
+Supplementary source: PSI-98 v4, `PSI-98_Science Documents_SAFFIRE-I and SAFFIRE-III Readme.docx`, Table 1 / Table 3 and raw data section. The file explains camera/sample identities, telemetry Excel, image transformations, and RAW having offsets prior to color interpolation. Part of the diagnostics table is an image within the DOCX, not visually read; do not extract an exhaustive sensor list from XML extraction alone.
 
-## Q8. Blanks, encoding và derived variables
+## Q8. Blanks, encoding, and derived variables
 
-- PSI-159 inverse CSV: 1.015 rows sau header, chỉ 154 nonempty; 861 rows rỗng không được tạo `TestRun`.
-- PSI-69 CSV: UTF-8 decoding lỗi tại byte `0x96` offset 2389; CP1252 decoding thành công. Đây là encoding observation, chưa phải khai báo chính thức của nhà cung cấp.
-- PSI-10/159 có `Tad`, `Zst` và các cột mixture/flow. Cần phương pháp để phân biệt input, measured và derived values; không coi mọi numeric field là sensor output.
+- PSI-159 inverse CSV: 1,015 rows after header, only 154 nonempty; 861 empty rows must not generate `TestRun`.
+- PSI-69 CSV: UTF-8 decoding fails at byte `0x96` offset 2389; CP1252 decoding succeeds. This is an encoding observation, not an official provider declaration.
+- PSI-10/159 contain `Tad`, `Zst`, and mixture/flow columns. A methodology is needed to distinguish input, measured, and derived values; do not treat every numeric field as a sensor output.
 
-## Q9. Phạm vi suy luận khoa học
+## Q9. Scope of scientific inference
 
-[NTRS 20220005205](https://ntrs.nasa.gov/citations/20220005205), phần 2-3: ACME có chamber constant-volume, diagnostics quang học và các cấu hình burner khác nhau. BRE emulates condensed-phase burning bằng gas-fed burner. Khuyến nghị retrieval phải giữ experiment configuration và observation type, không dùng hai kết quả cùng keyword như hai phép đo tương đương.
+[NTRS 20220005205](https://ntrs.nasa.gov/citations/20220005205), sections 2-3: ACME features a constant-volume chamber, optical diagnostics, and varying burner configurations. BRE emulates condensed-phase burning using a gas-fed burner. Recommendation: retrieval must retain experiment configuration and observation type, and not treat two results sharing a keyword as equivalent measurements.
 
-[NTRS 20240008602](https://ntrs.nasa.gov/citations/20240008602): nghiên cứu Saffire V kết hợp sensor data với vehicle modeling. Đây là nguồn về phương pháp/kết quả mô hình; chưa tìm được raw package Saffire V bằng các PSI query đã thử. Không gắn output model thành flight observation mới.
+[NTRS 20240008602](https://ntrs.nasa.gov/citations/20240008602): Saffire V study combining sensor data with vehicle modeling. This is a source for methodology/modeling results; the raw Saffire V package has not been located through attempted PSI queries. Do not assign model outputs as new flight observations.
 
-## Q10. Accession cũ trong filename
+## Q10. Legacy accessions in filenames
 
-Manifest PSI-25 v4 có metadata ZIP tên `PSI-25_metadata_PSI_metadata_PSI-101_BASS-II.zip`; manifest PSI-69 v5 có `PSI-69_metadata_PSI-133_FLEX.zip`. Trong catalog hiện tại đã kiểm tra, PSI-101 là SAME-R. Không dùng regex lấy mọi chuỗi `PSI-<number>` trong filename để gán investigation. Giữ raw filename, canonical accession và legacy alias cùng ngữ cảnh/version, không ghi đè identity theo tên file.
+PSI-25 v4 manifest contains a metadata ZIP named `PSI-25_metadata_PSI_metadata_PSI-101_BASS-II.zip`; PSI-69 v5 manifest contains `PSI-69_metadata_PSI-133_FLEX.zip`. In the checked catalog, PSI-101 is SAME-R. Do not use regex to match every `PSI-<number>` string in filenames to assign investigations. Preserve raw filenames, canonical accessions, and legacy aliases alongside context/version; do not overwrite identity based on file names.

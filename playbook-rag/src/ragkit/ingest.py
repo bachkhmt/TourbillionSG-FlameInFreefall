@@ -1,8 +1,8 @@
 """HTML/Markdown/TXT -> chunks.json.
 
-Chunk loại: passage (đoạn văn), glossary, source, plan (lấy từ mảng JS của playbook),
-gap_note (viết tay trong data/gap_notes.json). Mỗi chunk có id, section, heading, text,
-contextual (tiền tố ngữ cảnh sinh bằng quy tắc, không cần LLM) và sourceRef.
+Chunk types: passage, glossary, source, plan (extracted from playbook JS arrays),
+gap_note (handwritten in data/gap_notes.json). Each chunk has id, section, heading, text,
+contextual (rule-generated context prefix, no LLM required), and sourceRef.
 """
 from __future__ import annotations
 
@@ -108,7 +108,7 @@ def text_blocks(text: str, sec: str, markdown: bool) -> list[Block]:
 
 
 def chunk_blocks(blocks: list[Block], doc_title: str, doc_url: str) -> list[dict]:
-    """Gom các block cùng tiêu đề thành chunk ~100-200 từ, tách theo câu nếu quá dài."""
+    """Group blocks with the same heading into ~100-200 word chunks, splitting by sentence if too long."""
     groups: dict[tuple, list[str]] = {}
     for sec, h2, h3, text in blocks:
         groups.setdefault((sec, h2, h3), []).append(text)
@@ -130,7 +130,7 @@ def chunk_blocks(blocks: list[Block], doc_title: str, doc_url: str) -> list[dict
             else:
                 parts.append(cur)
         for part in parts:
-            if sum(len(x.split()) for x in part) < 6:  # nhãn/eyebrow lẻ, không đáng làm chunk
+            if sum(len(x.split()) for x in part) < 6:  # stray label/eyebrow, not worth making into a chunk
                 continue
             counter[sec] = counter.get(sec, 0) + 1
             heading = h3 or h2
@@ -161,7 +161,7 @@ def _split_long(text: str) -> list[str]:
 
 
 def _js_array(js: str, name: str) -> list:
-    """Lấy `var NAME=[ ... ];` trong script của playbook và parse bằng JSON."""
+    """Extract `var NAME=[ ... ];` from playbook script and parse with JSON."""
     m = re.search(rf"var {name}=\[(.*?)\n\];", js, re.DOTALL)
     if not m:
         return []
@@ -176,15 +176,15 @@ def _js_array(js: str, name: str) -> list:
 
 
 def drop_eval_leak(blocks: list[Block]) -> list[Block]:
-    """Bảng "Bộ câu hỏi mẫu" chứa cả câu hỏi lẫn đáp án. Để nó trong chỉ mục thì Recall@5 đẹp giả
-    (truy xuất ra đúng câu hỏi chứ không phải nội dung). Bỏ các dòng bảng cho tới "Chỉ số và mục tiêu"."""
+    """The "Sample Questions" table contains both questions and answers. Keeping it in the index yields artificially high Recall@5
+    (retrieving the exact question rather than actual content). Drop table rows until "Metrics and Goals"."""
     out, in_qa = [], False
     for b in blocks:
-        if b[2] == "Bộ câu hỏi mẫu":
-            if b[3].startswith("Chỉ số và mục tiêu"):
+        if b[2] in ("Sample Questions", "Bộ câu hỏi mẫu"):
+            if b[3].startswith(("Metrics and Goals", "Chỉ số và mục tiêu")):
                 in_qa = False
-            elif "|" in b[3] and not b[3].startswith("Chỉ số |"):
-                in_qa = True if b[3].startswith("Câu hỏi mẫu") or in_qa else in_qa
+            elif "|" in b[3] and not b[3].startswith(("Metrics |", "Chỉ số |")):
+                in_qa = True if b[3].startswith(("Sample Questions", "Câu hỏi mẫu")) or in_qa else in_qa
             if in_qa and "|" in b[3]:
                 continue
         out.append(b)
@@ -203,24 +203,24 @@ def playbook_chunks(path: Path) -> list[dict]:
         suffix = "" if seen[slug(term)] == 1 else f"-{seen[slug(term)]}"
         chunks.append({
             "id": f"gl-{slug(term)}{suffix}", "type": "glossary", "section": "de-bai", "heading": term,
-            "text": f"{term}: {desc}", "contextual": f"{title} > Từ điển các từ viết tắt",
-            "sourceRef": {"title": f"{title}: Từ điển ({term})", "url": f"{path.name}#de-bai"},
+            "text": f"{term}: {desc}", "contextual": f"{title} > Glossary of abbreviations",
+            "sourceRef": {"title": f"{title}: Glossary ({term})", "url": f"{path.name}#de-bai"},
             "status": "source-text"})
     for i, row in enumerate(_js_array(js, "SRC"), 1):
         group, name, url, kind, st, note = (list(row) + [""] * 6)[:6]
         chunks.append({
             "id": f"src-{i:02d}", "type": "source", "section": "du-lieu", "heading": name,
-            "text": f"{name} (nhóm {group}). {note}".strip(),
-            "contextual": f"{title} > Danh sách link nguồn > {group}",
+            "text": f"{name} (group {group}). {note}".strip(),
+            "contextual": f"{title} > Source link list > {group}",
             "sourceRef": {"title": name, "url": url}, "status": status.get(st, "unconfirmed"),
             "storage": kind})
     for i, (level, feat, hours, people) in enumerate(_js_array(js, "rows"), 1):
-        who = "; ".join(f"{p} {r}".strip() for p, r in people) or "chưa giao"
+        who = "; ".join(f"{p} {r}".strip() for p, r in people) or "unassigned"
         chunks.append({
             "id": f"plan-{i:02d}", "type": "plan", "section": "ke-hoach", "heading": feat,
-            "text": f"[{level}] {feat}. Giờ công ước lượng: {hours}. Người làm: {who}.",
-            "contextual": f"{title} > Kế hoạch 48 giờ > Danh sách tính năng",
-            "sourceRef": {"title": f"{title}: Kế hoạch", "url": f"{path.name}#ke-hoach"},
+            "text": f"[{level}] {feat}. Estimated hours: {hours}. Assignee: {who}.",
+            "contextual": f"{title} > 48-Hour Plan > Feature List",
+            "sourceRef": {"title": f"{title}: Plan", "url": f"{path.name}#ke-hoach"},
             "status": "source-text"})
     return chunks
 
@@ -253,7 +253,7 @@ def build(settings: Settings | None = None) -> list[dict]:
     chunks += load_gap_notes(s.data_dir)
     chunks += corpus_chunks(s.corpus_dir)
     ids = [c["id"] for c in chunks]
-    assert len(ids) == len(set(ids)), "id chunk bị trùng"
+    assert len(ids) == len(set(ids)), "duplicate chunk IDs"
     return chunks
 
 

@@ -1,4 +1,4 @@
-"""BM25 Okapi thuần Python, không phụ thuộc thư viện."""
+"""Pure Python BM25 Okapi, no external dependencies."""
 from __future__ import annotations
 
 import math
