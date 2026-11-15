@@ -72,15 +72,21 @@ export const LandingHero: React.FC = () => {
           </Link>
 
           {/* Nav Links */}
-          <div className="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-100">
+          <div className="hidden lg:flex items-center gap-5 text-sm font-semibold text-slate-100">
             <a href="#flame-physics" className="hover:text-[#D4FC02] transition-colors">
               Flame Physics (0g vs 1g)
             </a>
             <a href="#lunar-paradox" className="hover:text-[#D4FC02] transition-colors">
               Lunar Flammability Paradox
             </a>
+            <a href="#core-intelligence" className="hover:text-[#D4FC02] transition-colors">
+              AI Engine &amp; Ignition
+            </a>
+            <a href="#terrestrial-spinoffs" className="hover:text-[#D4FC02] transition-colors">
+              Earth Spinoffs
+            </a>
             <a href="#mission-modules" className="hover:text-[#D4FC02] transition-colors">
-              Research Workspace
+              Workspace
             </a>
             <Link href="/explorer" className="hover:text-[#D4FC02] transition-colors">
               PSI Studies

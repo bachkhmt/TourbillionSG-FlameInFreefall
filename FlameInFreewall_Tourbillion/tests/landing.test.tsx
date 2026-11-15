@@ -5,6 +5,8 @@ import {
   LandingHero,
   KurzgesagtFlameScene,
   AtmosphericPhysics,
+  CoreIntelligenceSection,
+  TerrestrialSpinoffsSection,
   MissionControlCTA,
   LandingFooter,
 } from '@/features/landing';
@@ -196,12 +198,67 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
     });
   });
 
+  describe('CoreIntelligenceSection Component', () => {
+    it('renders all 3 core innovation cards beyond raw NASA data', () => {
+      render(<CoreIntelligenceSection />);
+      expect(screen.getByTestId('core-intelligence-section')).toBeDefined();
+      expect(screen.getByTestId('contribution-card-harmonization')).toBeDefined();
+      expect(screen.getByTestId('contribution-card-gap-matrix')).toBeDefined();
+      expect(screen.getByTestId('contribution-card-guarded-physics')).toBeDefined();
+      expect(screen.getByText(/Đồng bộ hóa Đa nghiên cứu/i)).toBeDefined();
+      expect(screen.getByText(/Bản đồ Lỗ hổng Thực nghiệm/i)).toBeDefined();
+      expect(screen.getByText(/Cỗ máy Dự đoán Có Rào chắn/i)).toBeDefined();
+    });
+
+    it('renders the interactive ignition inference workbench and defaults to hot-wire overload', () => {
+      render(<CoreIntelligenceSection />);
+      expect(screen.getByTestId('ignition-inference-workbench')).toBeDefined();
+      expect(screen.getAllByText('Dây dẫn quá nhiệt & Tiếp xúc nóng').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('1.8s – 4.5s').length).toBeGreaterThan(0);
+      expect(screen.getByText(/NASA SoFIE-MIST/i)).toBeDefined();
+    });
+
+    it('allows toggling between ignition modes to inspect electrical spark and quiescent smoldering', () => {
+      render(<CoreIntelligenceSection />);
+      
+      // Click Spark Ignition tab
+      const sparkTab = screen.getByTestId('ignition-tab-spark');
+      fireEvent.click(sparkTab);
+      expect(screen.getAllByText('Tia lửa hồ quang & Phóng điện áp thấp').length).toBeGreaterThan(0);
+      expect(screen.getByText(/Định luật Paschen/i)).toBeDefined();
+      expect(screen.getAllByText('< 0.05s (Tức thì)').length).toBeGreaterThan(0);
+
+      // Click Smolder tab
+      const smolderTab = screen.getByTestId('ignition-tab-smolder');
+      fireEvent.click(smolderTab);
+      expect(screen.getAllByText('Cháy âm ỉ trong khoang không đối lưu').length).toBeGreaterThan(0);
+      expect(screen.getByText(/Nguy cơ chết người nhất trong trạm không gian/i)).toBeDefined();
+    });
+  });
+
+  describe('TerrestrialSpinoffsSection Component', () => {
+    it('renders all 3 terrestrial spinoff applications and impact callout banner', () => {
+      render(<TerrestrialSpinoffsSection />);
+      expect(screen.getByTestId('terrestrial-spinoffs-section')).toBeDefined();
+      expect(screen.getByTestId('spinoff-card-water-mist')).toBeDefined();
+      expect(screen.getByTestId('spinoff-card-smoke-sensor')).toBeDefined();
+      expect(screen.getByTestId('spinoff-card-firefighter-gear')).toBeDefined();
+      expect(screen.getByTestId('spinoff-impact-banner')).toBeDefined();
+
+      expect(screen.getByText(/Van Phun Sương Áp Suất Cao Không Dẫn Điện/i)).toBeDefined();
+      expect(screen.getByText(/Cảm Biến Khói Quang Học Phát Hiện Hạt Muội Sớm/i)).toBeDefined();
+      expect(screen.getByText(/Bình Dưỡng Khí & Trang Phục Chống Flashover/i)).toBeDefined();
+    });
+  });
+
   describe('Full Landing Page Integration', () => {
     it('assembles all sections smoothly within the main landing route', () => {
       render(<LandingPage />);
       expect(screen.getByTestId('landing-hero')).toBeDefined();
       expect(screen.getByTestId('kurzgesagt-flame-scene')).toBeDefined();
       expect(screen.getByTestId('atmospheric-physics')).toBeDefined();
+      expect(screen.getByTestId('core-intelligence-section')).toBeDefined();
+      expect(screen.getByTestId('terrestrial-spinoffs-section')).toBeDefined();
       expect(screen.getByTestId('mission-control-cta')).toBeDefined();
       expect(screen.getByTestId('landing-footer')).toBeDefined();
     });

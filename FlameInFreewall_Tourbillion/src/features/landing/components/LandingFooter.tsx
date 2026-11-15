@@ -108,6 +108,16 @@ export const LandingFooter: React.FC = () => {
                 </a>
               </li>
               <li>
+                <a href="#core-intelligence" className="text-zinc-600 hover:text-zinc-950 transition-colors">
+                  Ignition Source Inference &amp; AI Guardrails
+                </a>
+              </li>
+              <li>
+                <a href="#terrestrial-spinoffs" className="text-zinc-600 hover:text-zinc-950 transition-colors">
+                  Next-Gen Terrestrial Spinoffs
+                </a>
+              </li>
+              <li>
                 <a href="#mission-modules" className="text-zinc-600 hover:text-zinc-950 transition-colors">
                   Spaceflight Modules
                 </a>
