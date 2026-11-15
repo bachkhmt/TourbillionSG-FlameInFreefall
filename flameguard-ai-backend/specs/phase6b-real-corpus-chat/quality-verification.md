@@ -35,3 +35,10 @@ The provider remains lexical/extractive and unreviewed. Cross-record aggregates 
 ## Deployed version
 
 A read-only GET to the user-provided Azure frontend's `/api/proxy/api/v1/chat/readiness` returned200, `ready`, `nasa-extractive-v2`,2574 passages on2026-11-15. No deployment was performed; the public site does not yet run this v3 branch.
+
+
+## Main/UI integration confirmation — 2026-11-15
+
+Pulled `origin/main` at `5ad0413` (Mission API integration / Predictive Lab removal) into the RAG branch with merge commit `39d7fae`. Git merged automatically with no conflict entries; upstream UI/mission changes remain intact. The four RAG algorithm file hashes and the frozen evaluation question hash are unchanged.
+
+Fresh combined-branch checks: root PostgreSQL **128 passed, 0 skipped**, exit0 (124.43s); backend PostgreSQL **700 passed, 0 skipped**, exit0 (61.52s); frontend **310 tests passed**, TypeScript `npx tsc --noEmit` passed and production `npm run build` passed, exit0. Only the approved test PostgreSQL55435 target was used. No deployment or shared DB import. PR7 updated with the merge and verification.
