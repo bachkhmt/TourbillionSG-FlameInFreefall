@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from httpx import AsyncClient
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.core.database import get_db_session
+from app.core.database import get_db_session, get_probe_session
 
 
 async def test_health_does_not_request_a_database_session(
@@ -23,7 +23,7 @@ async def test_health_does_not_request_a_database_session(
 
 async def test_ready_checks_select_one(application: FastAPI, client: AsyncClient) -> None:
     session = AsyncMock()
-    application.dependency_overrides[get_db_session] = lambda: session
+    application.dependency_overrides[get_probe_session] = lambda: session
     response = await client.get("/api/v1/ready")
     assert response.status_code == 200
     assert response.json() == {
@@ -41,7 +41,7 @@ async def test_ready_unavailable_is_sanitized(
 ) -> None:
     session = AsyncMock()
     session.execute.side_effect = error_type("postgresql://user:secret-password@private-host/db")
-    application.dependency_overrides[get_db_session] = lambda: session
+    application.dependency_overrides[get_probe_session] = lambda: session
     response = await client.get("/api/v1/ready")
     assert response.status_code == 503
     assert response.json() == {
@@ -65,7 +65,30 @@ async def test_ready_times_out_a_stalled_query(application: FastAPI, client: Asy
 
     session = AsyncMock()
     session.execute.side_effect = stalled_query
-    application.dependency_overrides[get_db_session] = lambda: session
+    application.dependency_overrides[get_probe_session] = lambda: session
     response = await asyncio.wait_for(client.get("/api/v1/ready"), timeout=1)
     assert response.status_code == 503
     assert cancelled.is_set()
+
+
+async def test_ready_does_not_compete_for_the_request_pool(
+    application: FastAPI, client: AsyncClient
+) -> None:
+    # A busy request pool must not take the only replica out of traffic.
+    def forbidden_session() -> None:
+        pytest.fail("Readiness must not wait for a request-pool connection")
+
+    application.dependency_overrides[get_db_session] = forbidden_session
+    application.dependency_overrides[get_probe_session] = lambda: AsyncMock()
+    response = await client.get("/api/v1/ready")
+    assert response.status_code == 200 and response.json()["database"] == "ok"
+
+
+def test_probe_engine_opens_a_fresh_connection_per_check(settings) -> None:
+    from sqlalchemy.pool import NullPool
+
+    from app.core.database import Database
+
+    database = Database(settings)
+    assert isinstance(database.probe_engine.sync_engine.pool, NullPool)
+    assert database.probe_engine is not database.engine
