@@ -12,6 +12,7 @@ import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import { ComparisonColumn } from './ComparisonColumn';
 import { ComparisonMatrixTable } from './ComparisonMatrixTable';
 import { ParameterDeltaSummary } from './ParameterDeltaSummary';
+import { ComparisonModalShimmer } from './ComparisonModalShimmer';
 
 export interface ComparisonModalProps {
   isOpen?: boolean;
@@ -170,10 +171,7 @@ const ComparisonModalDialog: React.FC<ComparisonModalDialogProps> = ({
               </p>
             </div>
           ) : comparisonQuery.isLoading ? (
-            <div data-testid="comparison-loading-shimmer" className="space-y-4">
-              <div className="h-28 rounded-3xl bg-gray-200/70" />
-              <div className="h-64 rounded-3xl bg-gray-200/70" />
-            </div>
+            <ComparisonModalShimmer />
           ) : comparisonQuery.isError ? (
             <ApiErrorBanner
               title="Unable to load study comparison"

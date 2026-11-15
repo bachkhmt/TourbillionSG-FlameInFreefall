@@ -2,6 +2,7 @@ export * from './ComparisonBar';
 export * from './ComparisonColumn';
 export * from './ComparisonMatrixTable';
 export * from './ComparisonModal';
+export * from './ComparisonModalShimmer';
 export * from './ExplorerComparisonBar';
 export * from './ExplorerFiltersBar';
 export * from './InvestigationCard';
