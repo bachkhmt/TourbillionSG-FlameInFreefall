@@ -31,6 +31,44 @@ from app.services.demo_manifest import snapshot_rows  # noqa: E402
 GENERATED_FILES = ("corpus-registry.json", "mission-release.json", "collection.json")
 
 
+def deployment_config(args):
+    path = getattr(args, "activate_config", None)
+    if path is None:
+        return None
+    config = json.loads(path.read_text("utf-8"))
+    target = config["collection"]["target"]
+    requested = {
+        "host": args.host,
+        "port": args.port,
+        "database": args.database,
+        "readRole": args.reader_role,
+    }
+    if any(target.get(key) != value for key, value in requested.items()):
+        raise ValueError("Deployment config targets another database or reader")
+    return config
+
+
+def activate_config(path, config, bundle, manifest, release):
+    snapshot = json.loads((bundle / "snapshot.json").read_text("utf-8"))
+    canonical = json.dumps(snapshot, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    config["collection"] = {
+        "sourceRevision": release["revision"],
+        "snapshotContentSha256": hashlib.sha256(canonical.encode()).hexdigest(),
+        "target": manifest["target"],
+    }
+    # Publish only after the import transaction and bundle metadata succeed.
+    with tempfile.NamedTemporaryFile(
+        mode="w", encoding="utf-8", dir=path.parent, delete=False
+    ) as f:
+        staged = Path(f.name)
+        json.dump(config, f, indent=2)
+        f.write("\n")
+    try:
+        os.replace(staged, path)
+    finally:
+        staged.unlink(missing_ok=True)
+
+
 def read_bundle(bundle):
     bundle = bundle.resolve(strict=True)
     checksums = json.loads((bundle / "checksums.json").read_text("utf-8"))
@@ -124,6 +162,7 @@ def write_manifest(bundle, config, release):
 async def import_bundle(args, password):
     bundle = args.bundle.resolve(strict=True)
     snapshot, release = read_bundle(bundle)
+    deployment = deployment_config(args)
     url = URL.create(
         "postgresql+asyncpg",
         username=args.owner,
@@ -155,6 +194,8 @@ async def import_bundle(args, password):
             database_oid = await connection.scalar(
                 text("SELECT oid::bigint FROM pg_database WHERE datname = current_database()")
             )
+            if deployment and database_oid != deployment["collection"]["target"]["databaseOid"]:
+                raise ValueError("Database OID differs from the deployment config")
             config = {
                 "collectionId": snapshot["collectionId"],
                 "origin": "real",
@@ -189,6 +230,8 @@ async def import_bundle(args, password):
     finally:
         await engine.dispose()
     write_manifest(bundle, config, release)
+    if deployment is not None:
+        activate_config(args.activate_config, deployment, bundle, config, release)
     print(
         json.dumps(
             {
@@ -214,11 +257,17 @@ def main():
     parser.add_argument("--owner", required=True)
     parser.add_argument("--reader-role", required=True)
     parser.add_argument("--chat-role", required=True)
+    parser.add_argument(
+        "--activate-config",
+        type=Path,
+        help="Update this deployment config only after the database import succeeds",
+    )
     args = parser.parse_args()
     if args.reader_role == args.chat_role or args.owner in {args.reader_role, args.chat_role}:
         parser.error("Owner, reader and chat roles must be distinct")
     # Check local files before prompting for credentials or opening a connection.
     read_bundle(args.bundle)
+    deployment_config(args)
     print(f"Target: {args.host}:{args.port}/{args.database}; owner: {args.owner}")
     password = getpass.getpass("PostgreSQL owner password (hidden): ")
     if not password:

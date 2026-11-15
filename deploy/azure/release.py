@@ -78,6 +78,13 @@ def check_deployment(config, component):
     studies = request(base + prefix + "/investigations?limit=1")
     if studies.get("total", 0) < 1 or studies.get("context", {}).get("origin") != "real":
         raise ValueError("NASA collection admission failed")
+    descriptive = request(base + prefix + "/catalog/descriptive")
+    if descriptive.get("recordCount", 0) < 1:
+        raise ValueError("Descriptive evidence records are unavailable")
+    identity = studies["items"][0]["id"]
+    overview = request(base + prefix + f"/investigations/{identity}/overview")
+    if not overview.get("passages"):
+        raise ValueError("Study source overview is unavailable")
     chat = request(base + prefix + "/chat/readiness")
     if (
         chat.get("state") != "ready"

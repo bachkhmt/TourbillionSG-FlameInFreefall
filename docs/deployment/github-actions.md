@@ -1,5 +1,9 @@
 # GitHub Actions và Azure deployment
 
+PR #8 cần cập nhật dữ liệu trước khi kích hoạt deployment. Xem
+[quy trình import và rollout PR #8](pr8-data-rollout.md). Checksum production chỉ
+được cập nhật sau khi database import thành công bằng `--activate-config`.
+
 Workflow deployment được kích hoạt sau khi các file trong PR này được merge vào `main`.
 
 ```mermaid

@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -112,3 +113,77 @@ def test_importer_publishes_mission_release_with_the_manifest(tmp_path, monkeypa
     importer.write_manifest(tmp_path, {"snapshot": "snapshot.json"}, {})
     assert (tmp_path / "collection.json").exists()
     assert json.loads((tmp_path / "mission-release.json").read_text())["revision"] == "source-v1"
+
+
+def test_config_activation_rejects_another_database_before_connecting(tmp_path):
+    config = tmp_path / "production.json"
+    config.write_text(json.dumps({"collection": {"target": {"database": "other"}}}))
+    args = SimpleNamespace(
+        activate_config=config,
+        host="server",
+        port=5432,
+        database="flameguard",
+        reader_role="reader",
+    )
+    with pytest.raises(ValueError, match="another database or reader"):
+        importer.deployment_config(args)
+
+
+def test_config_activation_publishes_the_verified_snapshot_binding(tmp_path):
+    snapshot = {"collectionId": "real", "tables": {"tag": [{"id": "new-tag"}]}}
+    (tmp_path / "snapshot.json").write_text(json.dumps(snapshot))
+    path = tmp_path / "production.json"
+    config = {"backend": {"app": "existing-api"}, "collection": {"target": {}}}
+    path.write_text(json.dumps(config))
+    target = {"databaseOid": 24764, "database": "flameguard"}
+    importer.activate_config(path, config, tmp_path, {"target": target}, {"revision": "source-v1"})
+    actual = json.loads(path.read_text())
+    canonical = json.dumps(snapshot, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    assert actual["collection"] == {
+        "sourceRevision": "source-v1",
+        "snapshotContentSha256": hashlib.sha256(canonical.encode()).hexdigest(),
+        "target": target,
+    }
+    assert actual["backend"] == {"app": "existing-api"}
+
+
+def test_failed_atomic_config_publish_preserves_previous_binding(tmp_path, monkeypatch):
+    (tmp_path / "snapshot.json").write_text("{}")
+    path = tmp_path / "production.json"
+    path.write_text('{"previous": true}')
+
+    def fail(*_):
+        raise OSError("Cannot replace config")
+
+    monkeypatch.setattr(importer.os, "replace", fail)
+    with pytest.raises(OSError, match="Cannot replace config"):
+        importer.activate_config(path, {}, tmp_path, {"target": {}}, {"revision": "v2"})
+    assert json.loads(path.read_text()) == {"previous": True}
+
+
+@pytest.mark.parametrize("component", ["backend", "frontend"])
+def test_smoke_requires_new_navigation_endpoints(component, monkeypatch):
+    urls = []
+
+    def request(url, payload=None):
+        urls.append(url)
+        if url.endswith("/ready"):
+            return {"database": "ok"}
+        if url.endswith("/investigations?limit=1"):
+            return {"total": 24, "items": [{"id": "study-id"}], "context": {"origin": "real"}}
+        if url.endswith("/catalog/descriptive"):
+            return {"recordCount": 1926}
+        if url.endswith("/overview"):
+            return {"passages": [{"text": "Source passage"}]}
+        if url.endswith("/chat/readiness"):
+            return {"state": "ready", "source_revision": "v1", "passages": 2574}
+        if url.endswith("/mission/research"):
+            return {"rows": [1], "citations": [1]}
+        return "FlameGuard"
+
+    monkeypatch.setattr(release, "request", request)
+    config = {component: {"url": "https://app"}, "collection": {"sourceRevision": "v1"}}
+    release.check_deployment(config, component)
+    prefix = "/api/v1" if component == "backend" else "/api/proxy/api/v1"
+    assert "https://app" + prefix + "/catalog/descriptive" in urls
+    assert "https://app" + prefix + "/investigations/study-id/overview" in urls
