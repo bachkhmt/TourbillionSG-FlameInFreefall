@@ -53,11 +53,17 @@ async def evaluate(split="development"):
     # binds DB snapshot content; this is deliberately not presented as its serving fingerprint.
     corpus_version = registry_sha256
     provider = ExtractiveProvider()
+    # Mirror the serving backend: catalog slugs plus registry slugs, including cataloged
+    # studies that have no admitted passage (they must not silence family questions).
+    study_slugs = tuple(
+        sorted(
+            {s["id"] for s in release["investigations"]}
+            | {s["slug"] for s in registry["sources"].values()}
+        )
+    )
     results = []
     for case in cases:
-        citations = provider.retrieve(
-            case["question"], passages, (), tuple(s["slug"] for s in registry["sources"].values())
-        )
+        citations = provider.retrieve(case["question"], passages, (), study_slugs)
         verify_hits(citations, passages)
         answer = await provider.answer(
             RagRequest(

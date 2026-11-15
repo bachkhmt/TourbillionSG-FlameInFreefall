@@ -98,6 +98,16 @@ class Hit:
 
 
 def anchors(question, study_slugs):
+    named, family, run = anchor_scope(question, study_slugs)
+    return named | family, run
+
+
+def anchor_scope(question, study_slugs):
+    """Return (explicitly named slugs, slugs added only by a family name, run id).
+
+    A family name ("ACME", "Saffire") widens to its cataloged members unless the
+    question already names one of those members ("ACME BRE" stays BRE).
+    """
     query = fold(question)
     run = re.search(r"\bflex[- ]?(\d{3})\b", query)
     slugs = set()
@@ -117,6 +127,7 @@ def anchors(question, study_slugs):
                 if not any(start < right and end > left for left, right in covered):
                     slugs.add(slug)
                     covered.append((start, end))
+    widened = set()
     for family, members in FAMILIES.items():
         if (
             family == "same"
@@ -124,11 +135,14 @@ def anchors(question, study_slugs):
             and not re.search(r"smoke|aerosol|khoi|^same$", query)
         ):
             continue
+        if (slugs & members) - {family}:
+            continue
         if re.search(rf"(?<![a-z0-9-]){family}(?![a-z0-9-]| (?:ii|iii|r)\b)", query):
-            slugs.update(members & set(study_slugs))
+            widened.update(members & set(study_slugs))
+    widened -= slugs
     if run:
-        return slugs | {"flex"}, f"flex-{int(run.group(1)):03d}"
-    return slugs, None
+        return slugs | {"flex"}, widened, f"flex-{int(run.group(1)):03d}"
+    return slugs, widened, None
 
 
 def explicit_records(question, slugs):
@@ -149,8 +163,20 @@ def explicit_records(question, slugs):
 def select_passages(question, passages, history=(), study_slugs=()):
     if refusal(question):
         return ()
-    study_slugs = set(study_slugs) | {p.slug for p in passages}
-    slugs, run = anchors(question, study_slugs)
+    indexed = {p.slug for p in passages}
+    study_slugs = set(study_slugs) | indexed
+
+    def scope(text):
+        named, family, run = anchor_scope(text, study_slugs)
+        # Named studies must all be answerable; a family name needs at least one
+        # indexed member, and cataloged members without passages are skipped.
+        if family and not family & indexed:
+            return None, run
+        return named | (family & indexed), run
+
+    slugs, run = scope(question)
+    if slugs is None:
+        return ()
     previous_ids = set()
     if (
         not slugs
@@ -158,7 +184,9 @@ def select_passages(question, passages, history=(), study_slugs=()):
         and re.search(r"\b(con|the|no|do|it|its|those|nguon|source|what about)\b", fold(question))
     ):
         for previous in reversed(history):
-            slugs, previous_run = anchors(previous, study_slugs)
+            slugs, previous_run = scope(previous)
+            if slugs is None:
+                return ()
             if slugs:
                 if refusal(previous):
                     return ()

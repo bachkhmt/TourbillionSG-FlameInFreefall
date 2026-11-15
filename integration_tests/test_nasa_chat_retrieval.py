@@ -3,14 +3,24 @@ from uuid import UUID
 import pytest
 from app.integrations.chat import CorpusPassage, RagRequest
 from app.integrations.rag.provider import ExtractiveProvider
-from app.integrations.rag.retrieval import refusal, select_passages, terms
+from app.integrations.rag.retrieval import FAMILIES, refusal, select_passages, terms
 
 from integrations.nasa_data.unified import build_unified_release
 
 
 @pytest.fixture(scope="module")
-def passages():
-    release = build_unified_release()
+def release():
+    return build_unified_release()
+
+
+@pytest.fixture(scope="module")
+def catalog_slugs(release):
+    # The serving backend passes every catalog slug, including studies without passages.
+    return tuple(sorted(s["id"] for s in release["investigations"]))
+
+
+@pytest.fixture(scope="module")
+def passages(release):
     sources = {s["id"]: s for s in release["sources"]}
     studies = {s["id"]: s for s in release["investigations"]}
     return tuple(
@@ -306,6 +316,50 @@ def test_v3_same_word_in_followup_keeps_flex_record(passages):
 )
 def test_v3_comparison_does_not_bypass_topic_grounding(passages, question):
     assert not select_passages(question, passages)
+
+
+def test_catalog_has_a_family_member_without_passages(passages, catalog_slugs):
+    # Precondition for the regressions below: ACME Flame Design is cataloged but unindexed.
+    assert "flame-design" in catalog_slugs
+    assert not any(p.slug == "flame-design" for p in passages)
+
+
+@pytest.mark.parametrize(
+    "question", ["What is ACME?", "ACME là gì?", "Tell me about the ACME project"]
+)
+def test_family_question_survives_member_without_passages(passages, catalog_slugs, question):
+    hits = select_passages(question, passages, study_slugs=catalog_slugs)
+    assert hits and {h.passage.slug for h in hits} <= FAMILIES["acme"]
+
+
+def test_family_comparison_survives_member_without_passages(passages, catalog_slugs):
+    hits = select_passages("Compare ACME and FLEX", passages, study_slugs=catalog_slugs)
+    slugs = {h.passage.slug for h in hits}
+    assert slugs & FAMILIES["acme"] and "flex" in slugs
+
+
+@pytest.mark.parametrize("question", ["What is ACME BRE?", "ACME BRE là gì?"])
+def test_named_family_member_is_not_widened_to_its_family(passages, catalog_slugs, question):
+    hits = select_passages(question, passages, study_slugs=catalog_slugs)
+    assert hits and {h.passage.slug for h in hits} == {"bre"}
+
+
+def test_explicitly_named_study_without_passages_still_abstains(passages, catalog_slugs):
+    assert not select_passages("What is ACME Flame Design?", passages, study_slugs=catalog_slugs)
+
+
+async def test_provider_answers_family_question_with_backend_slugs(passages, catalog_slugs):
+    provider = ExtractiveProvider()
+    citations = provider.retrieve("What is ACME?", passages, (), catalog_slugs)
+    answer = await provider.answer(
+        RagRequest(
+            question="What is ACME?",
+            corpus_version="a" * 64,
+            collection_fingerprint="b" * 64,
+            allowed_sources=citations,
+        )
+    )
+    assert answer.state == "answered" and answer.citations
 
 
 def test_v3_language_keeps_scientific_unicode_in_english():
