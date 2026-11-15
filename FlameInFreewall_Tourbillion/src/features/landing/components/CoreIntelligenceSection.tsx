@@ -107,12 +107,6 @@ export const CoreIntelligenceSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header - Concise & Direct */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-bold text-[#0B2374] shadow-2xs mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-[#0B2374]" />
-            <span>Beyond Raw NASA Data</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#D4FC02]" />
-            <span>AI Safety Guardrails &amp; Ignition Inference</span>
-          </div>
 
           <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight mb-3">
             How FlameGuard AI Bridges Data to Decision
@@ -125,10 +119,10 @@ export const CoreIntelligenceSection: React.FC = () => {
         </div>
 
         {/* 3 Core Pillars - Concise Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-12">
           {/* Pillar 01 */}
           <div
-            className="rounded-3xl border border-gray-200/80 bg-white p-6 shadow-2xs hover:border-[#0B2374]/30 transition-all flex flex-col justify-between"
+            className="rounded-[36px] bg-gray-200/50 p-6 hover:border-[#0B2374]/30 transition-all flex flex-col justify-between"
             data-testid="contribution-card-harmonization"
           >
             <div>
@@ -155,7 +149,7 @@ export const CoreIntelligenceSection: React.FC = () => {
 
           {/* Pillar 02 */}
           <div
-            className="rounded-3xl border border-gray-200/80 bg-white p-6 shadow-2xs hover:border-amber-300 transition-all flex flex-col justify-between"
+            className="rounded-[36px] bg-gray-200/50 p-6 hover:border-amber-300 transition-all flex flex-col justify-between"
             data-testid="contribution-card-gap-matrix"
           >
             <div>
@@ -182,7 +176,7 @@ export const CoreIntelligenceSection: React.FC = () => {
 
           {/* Pillar 03 */}
           <div
-            className="rounded-3xl border border-gray-200/80 bg-white p-6 shadow-2xs hover:border-lime-400 transition-all flex flex-col justify-between"
+            className="rounded-[36px] bg-gray-200/50 p-6 hover:border-lime-400 transition-all flex flex-col justify-between"
             data-testid="contribution-card-guarded-physics"
           >
             <div>
@@ -223,7 +217,7 @@ export const CoreIntelligenceSection: React.FC = () => {
               </h3>
             </div>
             <div className="text-xs text-zinc-500 font-semibold">
-              Direct Multi-Mechanism Comparison
+              
             </div>
           </div>
 

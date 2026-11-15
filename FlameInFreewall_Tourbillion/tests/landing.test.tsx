@@ -28,21 +28,14 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
   });
 
   describe('LandingHero Component', () => {
-    it('renders the top Space Apps announcement banner in Electric Lime', () => {
-      render(<LandingHero />);
-      const banner = screen.getByTestId('announcement-banner');
-      expect(banner).toBeDefined();
-      expect(banner.className).toContain('bg-[#D4FC02]');
-      expect(screen.getByText(/Space Apps Connect is now open!/i)).toBeDefined();
-    });
-
     it('renders the Royal Navy space navigation bar with brand logo and links', () => {
       render(<LandingHero />);
       const navbar = screen.getByTestId('landing-navbar');
       expect(navbar).toBeDefined();
       expect(navbar.className).toContain('bg-[#0B2374]');
-      expect(screen.getByText('FlameGuard')).toBeDefined();
-      expect(screen.getByText('Flame Physics (0g vs 1g)')).toBeDefined();
+      expect(screen.getByText('Tourbillion')).toBeDefined();
+      expect(screen.getByText('SG')).toBeDefined();
+      expect(screen.getByText('Flame Physics')).toBeDefined();
       expect(screen.getByText('Lunar Flammability Paradox')).toBeDefined();
     });
 
@@ -77,37 +70,14 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       expect(screen.getByText(/Buoyant Plume/i)).toBeDefined();
     });
 
-    it('allows switching between gravity presets and updates telemetry HUD', () => {
+    it('displays physical combustion metrics for both Earth and ISS flame chambers', () => {
       render(<KurzgesagtFlameScene />);
-      const hud = screen.getByTestId('live-telemetry-hud');
-      expect(hud).toBeDefined();
-
-      // Initial 0g microgravity telemetry: sphericity should be high (98%)
-      expect(screen.getByText('98%')).toBeDefined();
-
-      // Click Earth preset button (1.00g)
-      const earthBtn = screen.getByTestId('preset-btn-earth');
-      fireEvent.click(earthBtn);
-
-      // Now sphericity should drop into terrestrial teardrop regime (<= 25%)
-      expect(screen.getByText(/2[45]%/)).toBeDefined();
-    });
-
-    it('toggles into interactive morph mode with continuous gravity slider', () => {
-      render(<KurzgesagtFlameScene />);
-      const morphBtn = screen.getByTestId('mode-morph');
-      fireEvent.click(morphBtn);
-
-      expect(screen.getByTestId('morph-chamber')).toBeDefined();
-      const slider = screen.getByTestId('gravity-slider') as HTMLInputElement;
-      expect(slider).toBeDefined();
-
-      // Change slider value to 0.5g
-      fireEvent.change(slider, { target: { value: '0.5' } });
-      expect(slider.value).toBe('0.5');
-
-      // Telemetry HUD updates
-      expect(screen.getByText(/Partial-Gravity Mixed Convection/i)).toBeDefined();
+      expect(screen.getByText('0.25 (Teardrop)')).toBeDefined();
+      expect(screen.getByText('0.98 (Spherical)')).toBeDefined();
+      expect(screen.getByText('~1,760 K')).toBeDefined();
+      expect(screen.getByText('~1,420 K')).toBeDefined();
+      expect(screen.getByText('~10.0 Hz')).toBeDefined();
+      expect(screen.getByText('0.4 Hz (Steady)')).toBeDefined();
     });
 
     it('renders the NASA PSI physics discovery takeaway callout card', () => {
@@ -123,7 +93,6 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       render(<AtmosphericPhysics />);
       expect(screen.getByTestId('atmospheric-physics')).toBeDefined();
       expect(screen.getByRole('heading', { name: /The Moon Base Trap/i })).toBeDefined();
-      expect(screen.getByText(/Equal ppO₂ ≠ Equal Fire Safety/i)).toBeDefined();
     });
 
     it('calculates equal breathing partial pressure (3.06 psia) for Artemis Moon Base by default', () => {

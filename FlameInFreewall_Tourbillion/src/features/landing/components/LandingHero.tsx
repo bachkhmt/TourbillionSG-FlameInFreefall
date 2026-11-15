@@ -34,39 +34,14 @@ export const LandingHero: React.FC = () => {
 
   return (
     <section className="relative w-full bg-[#F8F9FA] font-sans" data-testid="landing-hero">
-      {/* Top Space Apps Announcement Banner */}
-      <div
-        data-testid="announcement-banner"
-        className="w-full bg-[#D4FC02] text-zinc-950 py-2.5 px-4 font-semibold text-xs sm:text-sm tracking-wide shadow-xs border-b border-lime-300"
-      >
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-zinc-950 text-[#D4FC02] px-2.5 py-0.5 text-xs font-black uppercase tracking-wider">
-              Space Apps 2026
-            </span>
-            <span className="font-bold text-zinc-950">
-              Space Apps Connect is now open!
-            </span>
-            <span className="hidden md:inline text-zinc-800">
-              Join the global collaboration for Flame in Freefall.
-            </span>
-          </div>
-          <a
-            href="#flame-physics"
-            className="inline-flex items-center gap-1 text-xs font-bold text-zinc-950 underline underline-offset-4 hover:opacity-80 transition-opacity"
-          >
-            <span>Explore Science Story</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </a>
-        </div>
-      </div>
+
 
       {/* Space Apps Navigation Bar - Sticks to screen across all sections with backdrop-blur-sm */}
       <nav
         data-testid="landing-navbar"
         className={`${
           isScrolled
-            ? 'fixed top-0 left-0 right-0 z-50 bg-[#0B2374]/85 backdrop-blur-sm border-b border-white/10 shadow-md h-14'
+            ? 'fixed top-0 left-0 right-0 z-50 bg-[#0B2374]/70 backdrop-blur-sm border-b border-white/10 shadow-md h-14'
             : 'relative z-40 bg-[#0B2374] border-b border-white/10 shadow-xs h-16'
         } w-full transition-all duration-300`}
       >
@@ -80,7 +55,7 @@ export const LandingHero: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
-                FlameGuard <span className="text-[#D4FC02]">AI</span>
+                <span>Tourbillion</span><span className="text-[#D4FC02]">SG</span>
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-200">
                 NASA Space Apps 2026
@@ -91,7 +66,7 @@ export const LandingHero: React.FC = () => {
           {/* Nav Links */}
           <div className="hidden lg:flex items-center gap-5 text-sm font-semibold text-slate-100">
             <a href="#flame-physics" className="hover:text-[#D4FC02] transition-colors">
-              Flame Physics (0g vs 1g)
+              Flame Physics
             </a>
             <a href="#lunar-paradox" className="hover:text-[#D4FC02] transition-colors">
               Lunar Flammability Paradox
@@ -132,13 +107,7 @@ export const LandingHero: React.FC = () => {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[320px] bg-gradient-to-tr from-[#D4FC02]/15 via-blue-50/60 to-purple-50/30 blur-3xl pointer-events-none rounded-full" />
 
         <div className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-zinc-900 shadow-2xs mb-6">
-            <Sparkles className="w-3.5 h-3.5 text-[#0B2374]" />
-            <span>NASA Space Apps Challenge 2026</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#D4FC02]" />
-            <span className="text-zinc-600">Flame in Freefall</span>
-          </div>
+          
 
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] text-zinc-950 mb-6">
@@ -168,7 +137,7 @@ export const LandingHero: React.FC = () => {
 
             <Link
               href="/explorer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-zinc-900 font-bold text-sm sm:text-base border border-gray-200/90 hover:border-gray-300 shadow-2xs hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gray-200/70 hover:bg-gray-50 hover:border hover:border-gray-100 text-zinc-900 font-bold text-sm sm:text-base hover:border-gray-300 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <Layers className="w-5 h-5 text-[#0B2374]" />
               <span>Explore 20 PSI Studies</span>
@@ -176,7 +145,7 @@ export const LandingHero: React.FC = () => {
 
             <Link
               href="/mission"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-zinc-900 font-bold text-sm sm:text-base border border-gray-200/90 hover:border-gray-300 shadow-2xs hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gray-200/70 hover:bg-gray-50 hover:border hover:border-gray-100 text-zinc-900 font-bold text-sm sm:text-base hover:border-gray-300 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <Flame className="w-5 h-5 text-amber-500" />
               <span>Run Scenario Simulation</span>
@@ -184,8 +153,8 @@ export const LandingHero: React.FC = () => {
           </div>
 
           {/* Telemetry Highlight Badges in StructPaper Light Cards */}
-          <div className="mt-14 w-full grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-left">
-            <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
+          <div className="mt-14 w-full grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-2 text-left">
+            <div className="rounded-3xl bg-gray-200/50 p-4 hover:shadow-xs hover:border-gray-300 transition-all">
               <div className="flex items-center gap-1.5 text-[#0B2374] text-xs font-bold uppercase mb-1">
                 <Activity className="w-3.5 h-3.5 text-[#0B2374]" />
                 <span>PSI Archive</span>
@@ -196,8 +165,8 @@ export const LandingHero: React.FC = () => {
               <p className="text-xs text-zinc-500 mt-1">BASS, ACME, CIR, SoFIE flight logs</p>
             </div>
 
-            <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-amber-600 text-xs font-bold uppercase mb-1">
+            <div className="rounded-3xl bg-gray-200/50 p-4 hover:shadow-xs hover:border-gray-300 transition-all">
+              <div className="flex items-center gap-1.5 text-[#0B2374] text-xs font-bold uppercase mb-1">
                 <Flame className="w-3.5 h-3.5 text-amber-500" />
                 <span>Test Runs</span>
               </div>
@@ -207,8 +176,8 @@ export const LandingHero: React.FC = () => {
               <p className="text-xs text-zinc-500 mt-1">Quench diameters &amp; spread rates</p>
             </div>
 
-            <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-purple-700 text-xs font-bold uppercase mb-1">
+            <div className="rounded-3xl bg-gray-200/50 p-4 hover:shadow-xs hover:border-gray-300 transition-all">
+              <div className="flex items-center gap-1.5 text-[#0B2374] text-xs font-bold uppercase mb-1">
                 <Compass className="w-3.5 h-3.5 text-purple-600" />
                 <span>Physics Model</span>
               </div>
@@ -218,8 +187,8 @@ export const LandingHero: React.FC = () => {
               <p className="text-xs text-zinc-500 mt-1">Pure diffusion vs buoyant plume</p>
             </div>
 
-            <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-rose-600 text-xs font-bold uppercase mb-1">
+            <div className="rounded-3xl bg-gray-200/50 p-4 hover:shadow-xs hover:border-gray-300 transition-all">
+              <div className="flex items-center gap-1.5 text-[#0B2374] text-xs font-bold uppercase mb-1">
                 <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
                 <span>Exploration Gap</span>
               </div>

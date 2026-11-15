@@ -98,12 +98,6 @@ export const TerrestrialSpinoffsSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-bold text-[#0B2374] shadow-2xs mb-3">
-            <Globe className="w-3.5 h-3.5 text-[#0B2374]" />
-            <span>Earth Spinoff Heritage</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#D4FC02]" />
-            <span>NASA Technology Transfer</span>
-          </div>
 
           <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight mb-3 leading-tight">
             From Orbit to Earth:{' '}

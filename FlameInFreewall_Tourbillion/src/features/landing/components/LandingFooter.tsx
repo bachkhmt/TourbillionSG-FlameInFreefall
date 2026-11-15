@@ -15,7 +15,7 @@ export const LandingFooter: React.FC = () => {
     <footer className="w-full bg-white border-t border-gray-200 text-zinc-600 text-xs" data-testid="landing-footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         {/* Top 4 Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {/* Brand Info */}
           <div className="md:col-span-1 space-y-3">
             <div className="flex items-center gap-2">
@@ -23,17 +23,13 @@ export const LandingFooter: React.FC = () => {
                 <Flame className="w-5 h-5 text-zinc-950" />
               </div>
               <span className="font-black text-base text-zinc-950 tracking-tight">
-                FlameGuard <span className="text-[#0B2374]">AI</span>
+                Tourbillion<span className="text-[#0B2374]">SG</span>
               </span>
             </div>
             <p className="text-xs text-zinc-500 leading-relaxed">
               NASA Space Apps Challenge 2026: Flame in Freefall. Microgravity combustion &amp; spacecraft
               fire safety intelligence platform.
             </p>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-[10px] font-bold text-[#0B2374]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0B2374] animate-ping" />
-              <span>Telemetry Active • PSI 20 Studies</span>
-            </div>
           </div>
 
           {/* Core Modules */}
@@ -84,44 +80,6 @@ export const LandingFooter: React.FC = () => {
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </li>
-              <li>
-                <span className="text-zinc-500 font-normal">NASA-STD-6001 Test 1 Upward Flammability</span>
-              </li>
-              <li>
-                <span className="text-zinc-500 font-normal">BASS / ACME / FLEX / SoFIE Investigations</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Visual Story Navigation */}
-          <div>
-            <h4 className="font-black text-sm text-zinc-950 mb-3">Visual Story</h4>
-            <ul className="space-y-2 font-semibold">
-              <li>
-                <a href="#flame-physics" className="text-zinc-600 hover:text-zinc-950 transition-colors">
-                  Earth 1g vs ISS 0g Flame
-                </a>
-              </li>
-              <li>
-                <a href="#lunar-paradox" className="text-zinc-600 hover:text-zinc-950 transition-colors">
-                  Lunar Flammability Paradox
-                </a>
-              </li>
-              <li>
-                <a href="#core-intelligence" className="text-zinc-600 hover:text-zinc-950 transition-colors">
-                  Ignition Source Inference &amp; AI Guardrails
-                </a>
-              </li>
-              <li>
-                <a href="#terrestrial-spinoffs" className="text-zinc-600 hover:text-zinc-950 transition-colors">
-                  Next-Gen Terrestrial Spinoffs
-                </a>
-              </li>
-              <li>
-                <a href="#mission-modules" className="text-zinc-600 hover:text-zinc-950 transition-colors">
-                  Spaceflight Modules
-                </a>
-              </li>
             </ul>
           </div>
         </div>
@@ -129,14 +87,14 @@ export const LandingFooter: React.FC = () => {
         {/* Mandatory NASA Fire Safety Disclaimer Box - Concise */}
         <div
           data-testid="safety-disclaimer"
-          className="rounded-2xl border border-amber-200 bg-amber-50/70 p-3.5 mb-8 flex items-start gap-3 shadow-2xs"
+          className="p-3.5 mb-8 flex items-start gap-3"
         >
           <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           <div className="text-xs text-amber-950 leading-relaxed">
             <span className="font-bold text-amber-900 block mb-0.5">
               NASA Physical Sciences Fire Safety Protocol &amp; Disclaimer
             </span>
-            FlameGuard AI synthesizes empirical datasets from NASA Physical Sciences Informatics (PSI).
+            Project synthesizes empirical datasets from NASA Physical Sciences Informatics (PSI).
             Spaceflight certification requires certified chamber qualification under NASA-STD-6001 standards.
             Partial-gravity regimes ($0 &lt; g &lt; 1$) represent open empirical knowledge voids.
           </div>
@@ -145,7 +103,7 @@ export const LandingFooter: React.FC = () => {
         {/* Bottom Bar */}
         <div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-semibold text-zinc-500">
           <div>
-            © 2026 FlameGuard AI Team • Built for NASA Space Apps Challenge 2026 (Flame in Freefall)
+            © 2026 TourbillionSG Team • Built for NASA Space Apps Challenge 2026 (Flame in Freefall)
           </div>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-zinc-600">
