@@ -39,7 +39,7 @@ Identity `id-flameguard-github` có federated credential với các giá trị s
 | Thuộc tính | Giá trị |
 | --- | --- |
 | Issuer | `https://token.actions.githubusercontent.com` |
-| Subject | `repo:hieuduong1810/TourbillionSG-FlameInFreefall:ref:refs/heads/main` |
+| Subject | `repo:hieuduong1810@143063635/TourbillionSG-FlameInFreefall@1456870755:ref:refs/heads/main` |
 | Audience | `api://AzureADTokenExchange` |
 | ACR role | `AcrPush`, scope `acrflameguard` |
 | Deployment role | `Container Apps Contributor`, scope từng app `ca-flameguard-api` và `ca-flameguard-web` |
@@ -50,8 +50,13 @@ Các Actions chính thức được pin bằng commit SHA.
 
 Repo hiện có tên chính thức `hieuduong1810/TourbillionSG-FlameInFreefall`.
 Đã cập nhật federated credential `github-main` theo tên này; URL `bachkhmt/...`
-chuyển hướng sang repo hiện tại. Nếu repo đổi tên/chủ sở hữu lần nữa, phải kiểm tra
-lại subject OIDC trước khi deploy.
+chuyển hướng sang repo hiện tại. Repository bật immutable subject: prefix gồm cả
+owner ID và repository ID. Đọc `sub_claim_prefix` từ GitHub API
+`GET /repos/OWNER/REPO/actions/oidc/customization/sub`, rồi thêm
+`:ref:refs/heads/main`; không suy ra subject chỉ từ tên repo. Subject trên đã được
+đối chiếu với annotation Azure Login của lần chạy đầu tiên và cập nhật trên Azure.
+Nếu repo đổi tên/chủ sở hữu hoặc template OIDC thay đổi, phải kiểm tra lại subject.
+Xem [GitHub OIDC reference](https://docs.github.com/en/actions/reference/security/oidc).
 
 ## Bundle NASA
 
