@@ -455,12 +455,15 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
       variants={pageContainerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full max-w-[1600px] mx-auto py-2 pb-24"
+      className="w-full max-w-[1600px] mx-auto py-2 pb-24 lg:pb-2 lg:h-full lg:overflow-hidden flex flex-col"
     >
-      {/* 2-Column Responsive Split Layout (Exact StructPaper Extracted Content Drawer Pattern) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[38%_62%] xl:grid-cols-[420px_1fr] 2xl:grid-cols-[450px_1fr] gap-6 items-start">
-        {/* LEFT COLUMN: Entire Study Header Card (Sticky) */}
-        <motion.div variants={columnVariants} className="lg:sticky lg:top-4">
+      {/* 2-Column Responsive Split Layout with Independent Column Scrolling */}
+      <div className="grid grid-cols-1 lg:grid-cols-[38%_62%] xl:grid-cols-[420px_1fr] 2xl:grid-cols-[450px_1fr] gap-6 items-start lg:flex-1 lg:min-h-0 lg:h-full lg:overflow-hidden">
+        {/* LEFT COLUMN: Entire Study Header Card (Independent Scroll Container) */}
+        <motion.div
+          variants={columnVariants}
+          className="lg:h-full lg:overflow-y-auto lg:pr-2 pb-8 lg:pb-6"
+        >
           <StudyHeader
             study={study}
             sources={sources}
@@ -469,13 +472,16 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
           />
         </motion.div>
 
-        {/* RIGHT COLUMN: Segmented Tabs & Active Tab Data Explorer */}
-        <motion.div variants={columnVariants} className="space-y-4 min-w-0">
-          {/* Segmented Filter Control Navigation Bar */}
+        {/* RIGHT COLUMN: Segmented Tabs & Active Tab Data Explorer (Independent Scroll Container) */}
+        <motion.div
+          variants={columnVariants}
+          className="space-y-4 min-w-0 lg:h-full lg:overflow-y-auto lg:pr-2 pb-8 lg:pb-6"
+        >
+          {/* Segmented Filter Control Navigation Bar (Sticky at top of right column) */}
           <div
             role="tablist"
             aria-label="Investigation Detail Views"
-            className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-gray-200/80 shadow-2xs overflow-x-auto scrollbar-none"
+            className="sticky top-0 z-20 flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-2xs overflow-x-auto scrollbar-none"
           >
             {tabs.map((tab) => {
               const Icon = tab.icon;

@@ -41,12 +41,12 @@ export const StudyDetailShimmer: React.FC = () => {
   return (
     <div
       data-testid="study-detail-shimmer"
-      className="w-full max-w-[1600px] mx-auto py-2 pb-24 select-none"
+      className="w-full max-w-[1600px] mx-auto py-2 pb-24 lg:pb-2 lg:h-full lg:overflow-hidden flex flex-col select-none"
     >
       {/* 2-Column Responsive Split Layout Shimmer (Left Header Card, Right Tab Bar & Content) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[38%_62%] xl:grid-cols-[420px_1fr] 2xl:grid-cols-[450px_1fr] gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[38%_62%] xl:grid-cols-[420px_1fr] 2xl:grid-cols-[450px_1fr] gap-6 items-start lg:flex-1 lg:min-h-0 lg:h-full lg:overflow-hidden">
         {/* Left Column Header Shimmer */}
-        <div className="w-full bg-white border border-gray-100 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xs">
+        <div className="w-full bg-white border border-gray-100 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xs lg:h-full lg:overflow-y-auto lg:pr-2">
           <div className="flex items-center justify-between gap-3">
             <ShimmerBar className="h-4 w-32 rounded-full" />
             <ShimmerBar className="h-7 w-28 rounded-xl" />

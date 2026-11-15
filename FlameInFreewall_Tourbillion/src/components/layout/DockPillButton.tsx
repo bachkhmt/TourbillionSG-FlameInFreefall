@@ -4,8 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const MotionLink = motion.create(Link);
-
 export interface DockPillButtonProps {
   id?: string;
   icon: React.ReactNode;
@@ -118,33 +116,28 @@ export const DockPillButton: React.FC<DockPillButtonProps> = ({
     >
       {/* Conditionally render single interactive control: Link if href exists, button otherwise */}
       {href ? (
-        <MotionLink
+        <Link
           id={id}
           href={href}
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.96 }}
-          transition={{ type: 'spring', stiffness: 160, damping: 18 }}
-          className={controlClasses}
+          prefetch={true}
+          className={`${controlClasses} hover:scale-[1.03] active:scale-[0.96] transition-transform duration-100 ease-out`}
           aria-label={label}
           data-testid={testId}
         >
           {innerContent}
-        </MotionLink>
+        </Link>
       ) : (
-        <motion.button
+        <button
           id={id}
           type="button"
           onClick={onClick}
           disabled={disabled}
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.96 }}
-          transition={{ type: 'spring', stiffness: 160, damping: 15 }}
-          className={controlClasses}
+          className={`${controlClasses} hover:scale-[1.03] active:scale-[0.96] transition-transform duration-100 ease-out`}
           aria-label={label}
           data-testid={testId}
         >
           {innerContent}
-        </motion.button>
+        </button>
       )}
 
       {/* Liquid Glass Tooltip on Hover in Collapsed State */}

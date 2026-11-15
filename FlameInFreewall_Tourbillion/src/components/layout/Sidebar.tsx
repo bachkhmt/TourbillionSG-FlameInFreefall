@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, type Variants } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -82,9 +82,17 @@ const dockItemVariants: Variants = {
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { activeScenario, resetWorkspace } = useWorkspaceStore();
+
+  React.useEffect(() => {
+    NAV_ITEMS.forEach((item) => {
+      router.prefetch(item.path);
+    });
+    router.prefetch('/studio');
+  }, [router]);
 
   const isNavActive = (path: string): boolean => {
     if (path === '/dashboard' && pathname === '/') return true;
