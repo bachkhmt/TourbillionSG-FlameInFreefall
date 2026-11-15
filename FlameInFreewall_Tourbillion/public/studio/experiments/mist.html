@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="vi" data-theme="dark" data-studio-demo="mist"><head><meta charset="utf-8">
+<html lang="en" data-theme="dark" data-studio-demo="mist"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>MIST – Mô phỏng mồi lửa và dập tắt</title>
+<title>MIST · Material Ignition and Suppression Test (NASA SoFIE)</title>
 <style>
 :root{--bg:#f3f1ee;--fg:#1b1d22;--mut:#5f6672;--card:#fff;--bd:#d8d4cd;--acc:#c2410c;--ok:#2f855a;--bad:#c53030;--chip:#e9e5df;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--fg:#e9e7e3;--mut:#9aa1ad;--card:#1d2026;--bd:#31353d;--acc:#fb923c;--ok:#68d391;--bad:#fc8181;--chip:#262a31}}
 :root[data-theme="dark"]{--bg:#14161a;--fg:#e9e7e3;--mut:#9aa1ad;--card:#1d2026;--bd:#31353d;--acc:#fb923c;--ok:#68d391;--bad:#fc8181;--chip:#262a31}
 html{color-scheme:light dark;scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 'Plus Jakarta Sans',Inter,system-ui,sans-serif}
 .wrap{max-width:1020px;margin:0 auto;padding:16px 14px 40px}
 h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
 .sub{color:var(--mut);margin:0 0 12px;max-width:74ch}
@@ -41,23 +41,23 @@ th,td{text-align:left;padding:4px 8px;border-bottom:1px solid var(--bd)}th{color
 .note{font-size:12px;color:var(--mut);margin-top:12px;max-width:90ch}
 .ok{color:var(--ok)}.bad{color:var(--bad)}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
-</style><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body><div class="wrap">
-<h1>MIST: mồi lửa và dập tắt trên que PMMA</h1>
-<p class="sub">Thí nghiệm của C. Fernandez-Pello (UC Berkeley) và M. Gollner. Mẫu nằm giữa ống trong suốt, tấm đốt gốm bao quanh, dây Kanthal mồi lửa ở hạ nguồn, lửa lan ngược chiều dòng. Các đường biên là số liệu giả định, chỉ giữ đúng xu hướng: bức xạ cao thì O₂ giới hạn thấp hơn.</p>
-<div class="steps" id="steps"><span>1 Gia nhiệt</span><span>2 Mồi lửa</span><span>3 Lan ngược dòng</span><span>4 Kết thúc hoặc dập</span></div>
+</style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body><div class="wrap">
+<h1>MIST: Ignition and Extinction on PMMA Rod</h1>
+<p class="sub">NASA SoFIE Investigation by C. Fernandez-Pello (UC Berkeley) & M. Gollner. Sample is mounted centrally within a transparent duct, surrounded by radiant heaters with a downstream Kanthal igniter wire; flame spreads opposed to forced flow. Boundary curves represent illustrative trends from reference literature (higher radiant flux lowers the limiting oxygen index).</p>
+<div class="steps" id="steps"><span>1 Preheating</span><span>2 Wire Ignition</span><span>3 Opposed Spread</span><span>4 Extinction / Burnout</span></div>
 <div class="stage"><canvas id="rig" aria-label="Sơ đồ ống thí nghiệm MIST"></canvas><canvas id="fx" aria-hidden="true"></canvas></div>
 <div class="card">
 <div class="grid">
-<label>Thông lượng bức xạ ngoài <b id="vq"></b><input type="range" id="q" min="0" max="3.3" step="0.1" value="1.5"></label>
+<label>External Radiant Flux <b id="vq"></b><input type="range" id="q" min="0" max="3.3" step="0.1" value="1.5"></label>
 <label>O₂ <b id="vo2"></b><input type="range" id="o2" min="15" max="40" step="1" value="21"></label>
-<label>Vận tốc dòng <b id="vv"></b><input type="range" id="v" min="0" max="40" step="1" value="10"></label>
-<label>Đường kính que <b id="vd"></b><input type="range" id="d" min="4" max="20" step="0.1" value="12.7"></label>
+<label>Forced Airflow <b id="vv"></b><input type="range" id="v" min="0" max="40" step="1" value="10"></label>
+<label>Rod Diameter <b id="vd"></b><input type="range" id="d" min="4" max="20" step="0.1" value="12.7"></label>
 </div>
 <div class="row">
 <div class="seg" role="group" aria-label="Mức trọng lực"><button id="g0" class="on">μg</button><button id="g1">1g</button></div>
 <select id="sp" aria-label="Tốc độ mô phỏng"><option value="10">Chậm ×10</option><option value="30" selected>Vừa ×30</option><option value="100">Nhanh ×100</option></select>
 <label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="dep" checked>Buồng kín, O₂ giảm tự nhiên như trên ISS</label>
-<button id="go" class="pri">Chạy thí nghiệm</button><button id="rs">Đặt lại ống</button><button id="cl">Xóa bản đồ</button>
+<button id="go" class="pri">Chạy thí nghiệm</button><button id="rs">Reset ống</button><button id="cl">Xóa bản đồ</button>
 </div></div>
 <div class="card"><div class="ro">
 <div>Giai đoạn<b id="rp"></b></div><div>Thời gian mô phỏng<b id="rt"></b></div><div>Công suất tấm đốt<b id="rpw"></b></div><div>T bề mặt (ước lượng)<b id="rts"></b></div>
@@ -66,14 +66,14 @@ th,td{text-align:left;padding:4px 8px;border-bottom:1px solid var(--bd)}th{color
 <div class="card"><h2>Dập lửa: ba cách độc lập, bấm khi lửa đang lan</h2>
 <div class="sup">
 <div><button id="bn">Pha loãng N₂</button><p id="mn">—</p></div>
-<div><button id="bf">Giảm dòng</button><p id="mf">—</p></div>
-<div><button id="bv">Xả khí</button><p id="mv">—</p></div></div></div>
+<div><button id="bf">Cut Flow</button><p id="mf">—</p></div>
+<div><button id="bv">Depressurize</button><p id="mv">—</p></div></div></div>
 <div class="maps">
-<div class="card"><h2>Bản đồ mồi lửa: thông lượng × O₂</h2><canvas id="m1"></canvas></div>
-<div class="card"><h2>Bản đồ duy trì: dòng × O₂</h2><canvas id="m2"></canvas><p class="note" style="margin:6px 0 0">Đường cam là LOC-FS (lan lửa dừng). Hình thoi vàng: LOC-FS trong mô phỏng. Hình thoi đỏ: LOC-FR (lửa tắt hẳn). Chấm xanh hoặc đỏ: duy trì hoặc không, khi O₂ cố định.</p></div></div>
-<div class="card"><h2>Các lần chạy (thời gian mồi lửa theo thông lượng)</h2>
-<table><thead><tr><th>#</th><th>q (kW/m²)</th><th>O₂ (%)</th><th>Dòng (cm/s)</th><th>g</th><th>t mồi (s)</th><th>Kết quả</th></tr></thead><tbody id="lg"></tbody></table></div>
-<p class="note">Neo theo nguồn: LOC khoảng 15 % ở μg và khoảng 18 % ở 1g (que 12,7 mm, không bức xạ); bức xạ ngoài và áp suất cao hạ LOC; biên theo dòng có dạng chữ U; có hai điểm tắt LOC-FS và LOC-FR; lan lửa ở μg nhanh hơn 1g và nhanh hơn với que nhỏ; O₂ trong buồng kín giảm dần khi cháy. Giả định vì nguồn không nêu số: độ dốc theo bức xạ, thời gian mồi, độ lớn tốc độ lan, tốc độ dập, ngưỡng áp suất, số tấm đốt, kích thước ống. Chấm trên bản đồ giữ nguyên khi đổi đường kính hoặc g. Chỉ để minh họa, không dùng cho phân tích định lượng.</p>
+<div class="card"><h2>Ignition Regime Map: Flux × O₂</h2><canvas id="m1"></canvas></div>
+<div class="card"><h2>Sustained Flame Map: Flow × O₂</h2><canvas id="m2"></canvas><p class="note" style="margin:6px 0 0">Orange boundary marks LOC-FS (flame spread ceases). Yellow diamond: simulated LOC-FS arrest. Red diamond: LOC-FR (complete flame extinction). Green/red dots indicate sustained combustion vs extinction.</p></div></div>
+<div class="card"><h2>Experiment Run History (Ignition Delay vs Radiant Flux)</h2>
+<table><thead><tr><th>#</th><th>q (kW/m²)</th><th>O₂ (%)</th><th>Flow (cm/s)</th><th>g</th><th>t ign (s)</th><th>Result</th></tr></thead><tbody id="lg"></tbody></table></div>
+<p class="note">NASA Reference Baseline: Limiting Oxygen Concentration (LOC) is ~15% in μg and ~18% in 1g (12.7 mm PMMA rod, no external flux); external radiant flux and elevated pressure reduce LOC; flow extinction boundary exhibits characteristic U-curve; distinct LOC-FS (spread arrest) and LOC-FR (flame blowoff/quench) thresholds; opposed spread in μg is faster than 1g and faster on thinner rods; chamber O₂ depletes during closed combustion. Assumed model parameters: flux sensitivity slope, ignition delay constants, numerical spread rate scaling, suppression dynamics, pressure thresholds. Illustrative phenomenological simulation for educational exploration.</p>
 </div>
 <script>
 const $=id=>document.getElementById(id),cl=(x,a,b)=>Math.max(a,Math.min(b,x)),f=(x,n=1)=>x.toFixed(n).replace(".",",");
@@ -87,16 +87,16 @@ const ext=()=>extLim(S.R.q,S.v,S.R.g,S.R.d)+8*Math.pow(1-S.p/100,1.5)+2.5*Math.m
 function setM(k,t){$("m"+k).textContent=t}
 function fin(k){
  const R=S.R,a=[];S.ph="done";S.kind=k;S.ig=0;S.fl=0;let r;
- if(k=="noign"){S.msg="Không mồi được: O₂ thấp hơn giới hạn mồi lửa ở thông lượng này.";maps.ign.push([R.q,R.o2,0]);r="Không mồi được"}
+ if(k=="noign"){S.msg="Ignition failed: O₂ below ignition threshold at this radiant flux.";maps.ign.push([R.q,R.o2,0]);r="No ignition"}
  else{maps.ign.push([R.q,R.o2,1]);
-  if(k=="fr"){if(!S.fsd)S.o2fs=S.o2;maps.ext.push([R.v,S.o2fs,2],[R.v,S.o2,3]);S.msg="O₂ giảm tự nhiên: lan lửa dừng ở LOC-FS = "+f(S.o2fs)+" %, lửa tắt hẳn ở LOC-FR = "+f(S.o2)+" %.";r="Tắt tự nhiên, LOC-FS "+f(S.o2fs)+" %"}else if(k=="nosus"){S.msg="Mồi được nhưng lửa không duy trì: O₂ dưới giới hạn tắt ở dòng này.";maps.ext.push([R.v,R.o2,0]);r="Mồi được, không lan"}
-  else if(k=="burn"){S.xf=150;S.msg="Lửa lan hết đoạn mẫu 15 cm.";if(!S.used)maps.ext.push([R.v,S.o2,1]);r=S.used?"Cháy hết dù có can thiệp":"Duy trì, cháy hết";
-   if(S.sup.n)setM("n","Không dập được, mẫu cháy hết");if(S.sup.v)setM("v","Không dập được, mẫu cháy hết");if(S.sup.f&&!S.fz)setM("f","Không dập được, mẫu cháy hết")}
+  if(k=="fr"){if(!S.fsd)S.o2fs=S.o2;maps.ext.push([R.v,S.o2fs,2],[R.v,S.o2,3]);S.msg="Natural O₂ depletion: Spread ceased at LOC-FS = "+f(S.o2fs)+" %, extinguished at LOC-FR = "+f(S.o2)+" %.";r="Extinct (LOC-FS "+f(S.o2fs)+" %)"}else if(k=="nosus"){S.msg="Ignition achieved but flame failed to sustain: O₂ below extinction limit.";maps.ext.push([R.v,R.o2,0]);r="Ignited, unsustained"}
+  else if(k=="burn"){S.xf=150;S.msg="Burnout: Flame spread across full 15 cm sample.";if(!S.used)maps.ext.push([R.v,S.o2,1]);r=S.used?"Burned through":"Sustained burnout";
+   if(S.sup.n)setM("n","Failed to suppress, burned out");if(S.sup.v)setM("v","Failed to suppress, burned out");if(S.sup.f&&!S.fz)setM("f","Failed to suppress, burned out")}
   else{const t=f(S.t,0)+" s";
-   if(S.sup.n){a.push("N₂");setM("n","Tắt khi O₂ = "+f(S.o2)+" % (sau "+t+")")}
-   if(S.sup.f){a.push("giảm dòng");setM("f","Tắt khi dòng = "+f(S.v)+" cm/s (sau "+t+")")}
-   if(S.sup.v){a.push("xả khí");setM("v","Tắt khi P = "+f(S.p,0)+" kPa (sau "+t+")")}
-   S.msg="Lửa tắt nhờ "+a.join(" kết hợp ")+".";r="Dập bằng "+a.join(" + ")}}
+   if(S.sup.n){a.push("N₂ dilution");setM("n","Extinguished at O₂ = "+f(S.o2)+" % ("+t+")")}
+   if(S.sup.f){a.push("flow cutoff");setM("f","Extinguished at flow = "+f(S.v)+" cm/s ("+t+")")}
+   if(S.sup.v){a.push("depressurization");setM("v","Extinguished at P = "+f(S.p,0)+" kPa ("+t+")")}
+   S.msg="Flame extinguished via "+a.join(" + ")+".";r="Suppressed ("+a.join(" + ")+")"}}
  logs.unshift({n:++cnt,q:R.q,o2:R.o2,v:R.v,g:R.g,ti:k=="noign"?null:R.ti,r});rl();drawMaps();
 }
 function step(dt){
@@ -117,7 +117,7 @@ function step(dt){
   if(mg<0){if(!S.fsd){S.fsd=1;S.o2fs=S.o2}S.st+=dt;if(S.st>60&&!R.dep&&!S.used){fin("nosus");return}}
   S.fl+=(cl(.4+mr/10,.2,1)-S.fl)*Math.min(1,dt*.03);
   S.vf=mg>=0?(.015+.004*Math.pow(Math.min(mg,25),2))*(1+.35*R.q)*Math.sqrt(12.7/R.d)*(R.g?.8:1):0;S.xf+=S.vf*dt;
-  if(S.sup.f&&S.v<=0&&!S.fz){S.fz=1;setM("f","Dòng về 0 nhưng lửa vẫn cháy (O₂ còn cao)")}
+  if(S.sup.f&&S.v<=0&&!S.fz){S.fz=1;setM("f","Flow reached 0 but flame persists (O₂ still high)")}
   if(S.xf>=150)fin("burn")}
 }
 function rl(){$("lg").innerHTML=logs.slice(0,8).map(l=>`<tr><td>${l.n}</td><td>${f(l.q)}</td><td>${l.o2}</td><td>${l.v}</td><td>${l.g?"1g":"μg"}</td><td>${l.ti==null?"—":f(l.ti,0)}</td><td>${l.r}</td></tr>`).join("")}
@@ -154,10 +154,10 @@ function draw(now,dtr){
  const ix=716,iy=150;c.lineWidth=1.2;c.strokeStyle="rgba(140,190,230,.6)";c.beginPath();c.arc(ix,iy,38,0,6.283);c.stroke();
  for(let k=0;k<6;k++){const a=k*Math.PI/3;c.beginPath();c.arc(ix,iy,46,a-.38,a+.38);c.strokeStyle=gc(hot);c.lineWidth=7;c.stroke()}
  c.beginPath();c.arc(ix,iy,Math.max(2,rr*.9),0,6.283);c.fillStyle="rgba(200,225,255,.6)";c.fill();
- txt("tấm đốt gốm",150,40);txt("que PMMA",134,cy-rr-8);txt("dây Kanthal",566,cy-rr-14);txt("mặt cắt, 6 tấm đốt",ix,iy+66,"center");
- txt("thượng nguồn",45,262);txt("hạ nguồn",650,262,"right");
- c.strokeStyle="#7fb2ff";c.fillStyle="#7fb2ff";c.lineWidth=1.5;c.beginPath();c.moveTo(70,280);c.lineTo(160,280);c.stroke();c.beginPath();c.moveTo(160,280);c.lineTo(152,275);c.lineTo(152,285);c.fill();txt("dòng khí",170,284);
- c.strokeStyle="#ffa94d";c.fillStyle="#ffa94d";c.beginPath();c.moveTo(600,280);c.lineTo(500,280);c.stroke();c.beginPath();c.moveTo(500,280);c.lineTo(508,275);c.lineTo(508,285);c.fill();txt("lan lửa ngược dòng",340,284);
+ txt("ceramic radiant heaters",150,40);txt("PMMA solid rod",134,cy-rr-8);txt("Kanthal igniter wire",566,cy-rr-14);txt("cross-section (6 heaters)",ix,iy+66,"center");
+ txt("upstream",45,262);txt("downstream",650,262,"right");
+ c.strokeStyle="#7fb2ff";c.fillStyle="#7fb2ff";c.lineWidth=1.5;c.beginPath();c.moveTo(70,280);c.lineTo(160,280);c.stroke();c.beginPath();c.moveTo(160,280);c.lineTo(152,275);c.lineTo(152,285);c.fill();txt("forced flow",170,284);
+ c.strokeStyle="#ffa94d";c.fillStyle="#ffa94d";c.beginPath();c.moveTo(600,280);c.lineTo(500,280);c.stroke();c.beginPath();c.moveTo(500,280);c.lineTo(508,275);c.lineTo(508,285);c.fill();txt("opposed flame spread",340,284);
 }
 /* ---- flame: WebGL raymarching thể tích, nhìn ngang như ống thật ---- */
 const taperL=(rr,q,xf)=>Math.min(rr*(3+.7*q),3*xf+4);
@@ -279,12 +279,12 @@ function drawMap(cvs,o){
  k.beginPath();k.arc(X(o.cur[0]),Y(o.cur[1]),8,0,6.283);k.strokeStyle="#fff";k.setLineDash([3,3]);k.stroke();k.setLineDash([]);
 }
 function drawMaps(){
- drawMap($("m1"),{x0:0,x1:3.3,xl:"Thông lượng bức xạ (kW/m²)",fn:x=>ignLim(x,P.v,P.g,P.d),pts:maps.ign,cur:[P.q,P.o2],lab:["Mồi lửa","Không mồi"],fmt:x=>f(x)});
- drawMap($("m2"),{x0:0,x1:40,xl:"Vận tốc dòng (cm/s)",fn:x=>extLim(P.q,x,P.g,P.d),pts:maps.ext,cur:[P.v,P.o2],lab:["Duy trì","Tắt"],fmt:x=>f(x,0)});
+ drawMap($("m1"),{x0:0,x1:3.3,xl:"Radiant Flux (kW/m²)",fn:x=>ignLim(x,P.v,P.g,P.d),pts:maps.ign,cur:[P.q,P.o2],lab:["Ignited","No Ignition"],fmt:x=>f(x)});
+ drawMap($("m2"),{x0:0,x1:40,xl:"Flow Velocity (cm/s)",fn:x=>extLim(P.q,x,P.g,P.d),pts:maps.ext,cur:[P.v,P.o2],lab:["Sustained","Extinct"],fmt:x=>f(x,0)});
 }
 /* ---- ui ---- */
-const names={idle:"Sẵn sàng",heat:"1 Gia nhiệt",ign:"2 Mồi lửa",spread:"3 Lan ngược dòng",done:"4 Kết thúc"},idx={heat:0,ign:1,spread:2,done:3};
-const hints={heat:"Tấm đốt sáng dần, bề mặt que nóng lên.",ign:"Dây Kanthal đỏ sáng ở hạ nguồn, đang chờ mồi lửa.",spread:"Lửa lan ngược dòng. Bấm một hoặc nhiều cách dập bên dưới."};
+const names={idle:"Ready",heat:"1 Preheating",ign:"2 Igniter Active",spread:"3 Opposed Spread",done:"4 Finished"},idx={heat:0,ign:1,spread:2,done:3};
+const hints={heat:"Radiant heaters active, warming fuel surface.",ign:"Kanthal wire glowing downstream, awaiting ignition.",spread:"Opposed flame spreading. Test suppression actions below."};
 function ui(){
  const R=S.R,busy=S.ph!="idle"&&S.ph!="done";
  $("rp").textContent=names[S.ph];$("rt").textContent=f(S.T,0)+" s";$("rpw").textContent=f(R.q/3.3*800,0)+" W";$("rts").textContent=f(S.Ts,0)+" °C";

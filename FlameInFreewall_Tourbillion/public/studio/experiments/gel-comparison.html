@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="vi" data-theme="dark" data-studio-demo="gel-comparison"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GEL — Lửa 1g và vi trọng lực</title>
+<html lang="en" data-theme="dark" data-studio-demo="gel-comparison"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GEL · 1g vs Microgravity Dual Comparison (NASA SoFIE)</title>
 <style>
 :root{--bg:#04070d;--fg:#c9d6ea}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:12px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;font-variant-numeric:tabular-nums}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:12px/1.45 'Plus Jakarta Sans',Inter,system-ui,sans-serif;overflow:hidden;font-variant-numeric:tabular-nums}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 canvas:active{cursor:grabbing}
 .sep{position:fixed;left:50%;top:0;bottom:0;width:1px;background:#ffffff14}
@@ -24,18 +24,18 @@ button:hover{background:#ffffff22}
 #info:hover,#info[open]{opacity:.95}
 #info summary{cursor:pointer}
 #info p{margin:.4em 0;background:#04070dd9;padding:6px 8px;border-radius:6px}
-</style><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body>
+</style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body>
 <canvas id="c"></canvas><div class="sep"></div>
 <div class="lab" id="l1"><b>1g</b><span id="s1"></span></div>
 <div class="lab" id="l2"><b>μg</b><span id="s2"></span></div>
-<details id="info"><summary>Chú thích</summary>
-<p>Quả cầu PMMA cháy trong môi trường tĩnh. Chuỗi mô phỏng: mồi lửa → tăng trưởng → đạt đỉnh → suy giảm → tắt dần khi bán kính còn khoảng 40% ban đầu hoặc khi O₂ quá thấp. Lửa μg tăng trưởng chậm hơn và tắt gọn hơn; lửa 1g bùng nhanh hơn và tắt trong lúc nhiễu động.</p>
-<p>Mô phỏng minh họa định tính, không phải CFD và không phải số đo NASA. Kéo chuột để xoay, cuộn để zoom, phím cách để tạm dừng.</p></details>
+<details id="info"><summary>Scientific Notes & Assumptions</summary>
+<p>PMMA sphere combustion under quiescent conditions. Simulated sequence: ignition → growth → peak intensity → decay → extinction when radius reaches ~40% initial size or when local O₂ is depleted. Microgravity (μg) flames grow slower and extinguish smoothly; Earth (1g) flames flare up rapidly and extinguish amidst turbulent buoyant fluctuation.</p>
+<p>Qualitative phenomenological simulation, not raw CFD or direct PSI sensor streams. Drag to rotate, scroll to zoom, Space to pause.</p></details>
 <div id="bar">
 <label>O₂ <input id="o2" type="range" min="21" max="85" value="21"><output id="o2v">21%</output></label>
-<label>Đường kính <input id="dm" type="range" min="2" max="5" step=".1" value="4.5"><output id="dmv">4.5 cm</output></label>
-<label>Tốc độ <input id="sp" type="range" min="1" max="20" value="4"><output id="spv">4×</output></label>
-<button id="ig">Mồi lửa / Chạy lại</button><button id="n2">Xả N₂</button><button id="shot">Chụp ảnh</button>
+<label>Diameter <input id="dm" type="range" min="2" max="5" step=".1" value="4.5"><output id="dmv">4.5 cm</output></label>
+<label>Speed <input id="sp" type="range" min="1" max="20" value="4"><output id="spv">4×</output></label>
+<button id="ig">Ignite / Restart</button><button id="n2">Flush N₂</button><button id="shot">Save PNG</button>
 </div>
 <script src="/assets/vendor/three-r128.min.js"></script>
 <script>
@@ -177,7 +177,7 @@ function step(s,dt){
   s.R=Math.max(s.R-c.k*s.I*Math.pow(s.o2/21,.6)*dt*CONFIG.cmPerSec,s.R0*.38);
   s.o2=Math.max(8,s.o2-.012*s.I*dt-(flushing?.8*dt:0));
   s.out=s.t>1&&s.I<.012&&tgt<.012;
-  s.st=s.out?'đã tắt':s.t<.8?'mồi lửa':(fuel<.97||tgt<s.I-.01)?'suy giảm':s.I>.9*c.peak?'đang cháy':'tăng trưởng';
+  s.st=s.out?'extinct':s.t<.8?'igniting':(fuel<.97||tgt<s.I-.01)?'decaying':s.I>.9*c.peak?'flaming':'growing';
 }
 // camera chung
 const cam={th:.35,ph:.1,d:27,ty:1.6};
@@ -199,7 +199,7 @@ function update(){
     p.glow.position.set(0,cy,0).addScaledVector(dir,7);
     p.glow.quaternion.copy(p.cam.quaternion);
     p.glow.scale.set(i?13*sz:12*sz,i?13*sz:17*sz,1);
-    $('s'+(i+1)).textContent=`r ${s.R.toFixed(2)} cm · cường độ ${Math.round(clamp(s.I,0,1)*100)}% · ${s.st}`;
+    $('s'+(i+1)).textContent=`r ${s.R.toFixed(2)} cm · intensity ${Math.round(clamp(s.I,0,1)*100)}% · ${s.st}`;
   });
   $('o2v').textContent=Math.round(S[0].o2)+'%';
 }

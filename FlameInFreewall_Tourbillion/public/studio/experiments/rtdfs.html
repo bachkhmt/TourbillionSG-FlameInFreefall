@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="vi" data-theme="dark" data-studio-demo="rtdfs"><head><meta charset="utf-8">
+<html lang="en" data-theme="dark" data-studio-demo="rtdfs"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>RTDFS – lan lửa ngược dòng trên PMMA mỏng (3D)</title>
+<title>RTDFS · Residence Time Driven Flame Spread (NASA SoFIE)</title>
 <style>
 :root{--bg:#04070d;--fg:#c9d6ea;--bh:96px;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:12px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;font-variant-numeric:tabular-nums}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:12px/1.45 'Plus Jakarta Sans',Inter,system-ui,sans-serif;overflow:hidden;font-variant-numeric:tabular-nums}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 #c:active{cursor:grabbing}
 #main{position:fixed;left:0;right:0;top:0;bottom:var(--bh);display:grid;grid-template-columns:1fr 1fr;pointer-events:none}
@@ -31,20 +31,20 @@ button:hover{background:#ffffff22}
 #info:hover,#info[open]{opacity:.95}
 #info summary{cursor:pointer}
 #info p{margin:.4em 0;background:#04070dd9;padding:6px 8px;border-radius:6px}
-</style><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body>
+</style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body>
 <canvas id="c"></canvas>
 <div id="main"></div>
-<details id="info"><summary>Chú thích</summary>
-<p><b>Có nguồn:</b> PMMA mỏng 30×5 cm (ví dụ 0,1 mm), lan ngược dòng; ở 0,1 mm dòng dưới ~2 cm/s thì dập do bức xạ, trên ~40 cm/s thì tiến gần thổi tắt.</p>
-<p><b>Assumed:</b> δ 0,05–1,0 mm; O₂ 21–35%; quench biến mất ở ~35% O₂ và blowoff dời lên theo O₂ (hệ số giả định); δc ≈ 0,6 mm chỉ là giả thuyết cho δ > 0,4 mm; 1g có đối lưu tự nhiên ~4 cm/s; tốc độ lan ~1,5 mm/s ở 0,1 mm chưa xác minh; thang thời gian. Minh hoạ định tính, không phải CFD. Camera bám theo mũi lửa; kéo chuột để xoay, cuộn để zoom, phím cách để tạm dừng.</p></details>
+<details id="info"><summary>Scientific Notes & Assumptions</summary>
+<p><b>NASA Reference Baseline:</b> Thin PMMA sheet (30 × 5 cm, ~0.1 mm nominal), opposed flame spread; at 0.1 mm thickness, flow velocity below ~2 cm/s leads to radiative quench extinction, while flow above ~40 cm/s approaches kinetic blowoff.</p>
+<p><b>Assumed Parameters (Illustrative Phenomenological Model):</b> Thickness δ 0.05–1.0 mm; O₂ 21–35%; low-flow quench boundary diminishes near ~35% O₂ and blowoff boundary shifts higher with oxygen; critical thickness δc ≈ 0.6 mm is a qualitative hypothesis for δ > 0.4 mm; 1g natural convective drift ~4 cm/s; ~1.5 mm/s spread rate scaling at 0.1 mm. Qualitative 3D visualization, not direct CFD. Drag mouse to rotate, scroll to zoom, Space to pause.</p></details>
 <div id="bar">
 <label>V <input id="sV" type="range" min="0" max="60" step="0.5" value="8"><output id="vV"></output></label>
 <label>δ <input id="sD" type="range" min="0.05" max="1" step="0.01" value="0.1"><output id="vD"></output></label>
 <label>O₂ <input id="sO" type="range" min="21" max="35" value="21"><output id="vO"></output></label>
-<label>Tốc độ <input id="sp" type="range" min="5" max="60" value="20"><output id="vS"></output></label>
-<button id="bR">Mồi lửa lại</button><button id="bP">Tạm dừng</button>
+<label>Speed <input id="sp" type="range" min="5" max="60" value="20"><output id="vS"></output></label>
+<button id="bR">Reignite</button><button id="bP">Pause</button>
 <button data-v="1">V=1</button><button data-v="8">V=8</button><button data-v="50">V=50</button>
-<label><input type="checkbox" id="cA" checked> tự mồi lại</label>
+<label><input type="checkbox" id="cA" checked> Auto-reignite</label>
 <div id="rd"></div></div>
 <script src="/assets/vendor/three-r128.min.js"></script>
 <script>
@@ -144,16 +144,16 @@ function step(p,dt){
  p.xb+=p.Vf*dt;p.L=(p.g1?40:22)*Math.pow(p.I,0.8);
  if(p.xb>=PL){p.xb=PL;p.out='done';}else if(p.I<0.04)p.out=R.k;}
 function modeOf(p){const R=p.R||{k:'spread',e:1,nb:0};
- if(p.out==='done')return['Cháy hết tấm','#8a8f99'];
- if(p.out==='quench')return['Đã tắt: quench bức xạ','#6f9bf0'];
- if(p.out==='blow')return['Đã tắt: blowoff','#ef7a5e'];
- if(p.out==='thick')return['Đã tắt: quá dày','#8097d8'];
- if(R.k==='quench')return['Quench: lửa co lại, nhạt dần','#6f9bf0'];
- if(R.k==='blow')return['Blowoff: bị đẩy lùi, nhấp nháy','#ef7a5e'];
- if(R.k==='thick')return['Quá dày: lan chậm rồi tắt','#8097d8'];
- return[R.e<0.35?'Lan yếu (sát ranh giới)':'Lan ổn định','#37b57c'];}
+ if(p.out==='done')return['Burnout: Full sample consumed','#8a8f99'];
+ if(p.out==='quench')return['Extinguished: Radiative quench','#6f9bf0'];
+ if(p.out==='blow')return['Extinguished: Flow blowoff','#ef7a5e'];
+ if(p.out==='thick')return['Extinguished: Thermally thick','#8097d8'];
+ if(R.k==='quench')return['Radiative quench: Flame shrinks','#6f9bf0'];
+ if(R.k==='blow')return['Blowoff: Blown downstream, flickering','#ef7a5e'];
+ if(R.k==='thick')return['Thermally thick: Flame dies','#8097d8'];
+ return[R.e<0.35?'Weak spread (near boundary)':'Steady opposed spread','#37b57c'];}
 // ---------- DOM ----------
-$('main').innerHTML=['1g','μg'].map((t,i)=>`<div class="pa" id="pa${i}"><div class="pt"><b>${t}</b><div id="hm${i}"></div></div><div class="hud"><div>Tốc độ lan<b id="hv${i}"></b></div><div>Chiều dài lửa<b id="hl${i}"></b></div><div>Đã cháy<b id="hb${i}"></b></div><div class="pb"><i id="pb${i}"></i></div></div><canvas class="mp" id="m${i}" width="${MW*MS}" height="${MH*MS}"></canvas></div>`).join('');
+$('main').innerHTML=['1g','μg'].map((t,i)=>`<div class="pa" id="pa${i}"><div class="pt"><b>${t}</b><div id="hm${i}"></div></div><div class="hud"><div>Spread Rate<b id="hv${i}"></b></div><div>Flame Length<b id="hl${i}"></b></div><div>Burned Length<b id="hb${i}"></b></div><div class="pb"><i id="pb${i}"></i></div></div><canvas class="mp" id="m${i}" width="${MW*MS}" height="${MH*MS}"></canvas></div>`).join('');
 const pa=[$('pa0'),$('pa1')],mp=[$('m0'),$('m1')],mapC=[];
 function buildMap(i){const c=mapC[i]||(mapC[i]=document.createElement('canvas'));c.width=MW*MS;c.height=MH*MS;const x=c.getContext('2d');x.scale(MS,MS);
  x.fillStyle='#0c0f14';x.fillRect(0,0,MW,MH);
@@ -163,7 +163,7 @@ function buildMap(i){const c=mapC[i]||(mapC[i]=document.createElement('canvas'))
  [0,2,10,40,60].forEach(v=>x.fillText(v,ML+pw*Math.sqrt(v/60),MH-10));
  x.fillText('V (cm/s)',ML+pw/2,MH-1);
  x.textAlign='right';[[0.05,'0,05'],[0.1,'0,1'],[0.5,'0,5'],[1,'1,0']].forEach(([d,t])=>x.fillText(t,ML-3,MT+ph*(1-(d-0.05)/0.95)+3));
- x.fillStyle='rgba(255,255,255,.85)';x.textAlign='left';x.font='bold 9px system-ui';x.fillText('lan',ML+pw*0.3,MT+ph*0.8);
+ x.fillStyle='rgba(255,255,255,.85)';x.textAlign='left';x.font='bold 9px system-ui';x.fillText('spread',ML+pw*0.3,MT+ph*0.8);
  x.font='8px system-ui';x.fillText('quench',ML+1,MT+ph*0.5);x.fillText('blowoff',ML+pw*0.8,MT+ph*0.5);
  if(!Q[i].g1){x.strokeStyle='#fff';x.lineWidth=1.2;[2,40].forEach(v=>{x.beginPath();x.arc(ML+pw*Math.sqrt(v/60),MT+ph*(1-(0.1-0.05)/0.95),2.5,0,6.283);x.stroke();});}}
 function drawMap(i){const x=mp[i].getContext('2d');x.setTransform(MS,0,0,MS,0,0);x.drawImage(mapC[i],0,0,MW,MH);
