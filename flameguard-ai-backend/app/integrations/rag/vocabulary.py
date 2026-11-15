@@ -175,5 +175,6 @@ MESSAGES = {
 }
 
 
-def message(key, question):
-    return MESSAGES[key][language(question)]
+def message(key, question, lang=None):
+    """Framing text in the requested language; detect from the question when unset."""
+    return MESSAGES[key][lang or language(question)]

@@ -26,6 +26,7 @@ import type {
   MappedChatSource,
 } from '@/types/api';
 import type { ApiQueryOptions } from '@/hooks/api/queryHelpers';
+import type { ChatAnswerLanguage } from '@/lib/chatLanguage';
 import { apiQueryKeys } from '@/hooks/api/queryKeys';
 
 /** Conversation history page size (backend allows up to 100). */
@@ -125,6 +126,8 @@ export function useChatSourceQuery(
 
 export interface SendChatVariables {
   question: string;
+  /** Language of the assistant's framing text; omitted → backend detects per question. */
+  language?: ChatAnswerLanguage;
   /** Existing server session, or `null` to create one. */
   sessionId: string | null;
   /** Canonical investigation UUID scoping a new session, if any. */
@@ -170,7 +173,7 @@ export function useSendChatMessageMutation(): UseMutationResult<
   return useMutation<SendChatResult, Error, SendChatVariables>({
     retry: 0,
     mutationFn: async (variables) => {
-      const { question, sessionId, investigationId } = variables;
+      const { question, sessionId, investigationId, language } = variables;
       const create = async () => {
         const created = await newSession(investigationId);
         // Record the session before sending so a lost response never orphans it.
@@ -181,11 +184,11 @@ export function useSendChatMessageMutation(): UseMutationResult<
       let exchange;
       try {
         try {
-          exchange = await sendChatMessage(id, question);
+          exchange = await sendChatMessage(id, question, language);
         } catch (error) {
           if (!sessionId || !isNotFound(error)) throw error;
           id = await create();
-          exchange = await sendChatMessage(id, question);
+          exchange = await sendChatMessage(id, question, language);
         }
       } catch (error) {
         if (isOutcomeUnknown(error)) variables.onOutcomeUnknown?.(id);

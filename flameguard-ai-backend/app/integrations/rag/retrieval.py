@@ -49,7 +49,7 @@ PLANETARY_CONDITIONS = re.compile(
 )
 
 
-def refusal(question):
+def refusal(question, lang=None):
     query = fold(question)
     mixed = (
         len(set(re.findall(r"\bflex[- ]?(\d{3})\b", query))) > 1
@@ -64,22 +64,22 @@ def refusal(question):
         > 1
     )
     if mixed:
-        return message("mixed", question)
+        return message("mixed", question, lang)
     if re.search(r"\b(safe|unsafe|an toan|certify|certified|xac suat chay)\b", query):
-        return message("safety", question)
+        return message("safety", question, lang)
     if re.search(r"\b(bitcoin|weather|thoi tiet|propulsion|stock price|gia co phieu)\b", query):
-        return message("outside", question)
+        return message("outside", question, lang)
     if (
         PLANETARY_CONDITIONS.search(query)
         or GRAVITY_UNIT.search(query)
         or (PLANETARY_GRAVITY.search(query) and not MASS_CONTEXT.search(query))
     ):
-        return message("gravity", question)
+        return message("gravity", question, lang)
     named_run = re.search(
         r"\bflex[- ]?\d{3}\b|\b(?:run|test|record)\s*#?\s*[a-z]*\d|\bb\d{1,5}\b", query
     )
     if AGGREGATE.search(query) and not named_run:
-        return message("aggregate", question)
+        return message("aggregate", question, lang)
     return None
 
 

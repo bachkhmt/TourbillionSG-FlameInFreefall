@@ -27,6 +27,10 @@ Input:
 }
 ```
 
+Implemented addition (ADR-0009): the chat message body accepts an optional
+`"language": "en" | "vi" | null`, forwarded to providers as `RagRequest.language`.
+`null`/absent keeps per-question detection; providers may ignore it.
+
 Output must include an answer or explicit abstention/evidence gap, a backend
 session ID, provenance/model version and an array of original-source citations.
 Every citation needs an actual known `source_document_id` plus source locator;

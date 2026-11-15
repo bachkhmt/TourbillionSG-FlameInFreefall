@@ -9,7 +9,7 @@ from app.integrations.rag.vocabulary import language, message
 from app.schemas.api.chat import Answer, Citation
 
 # Answer-composition version; bump when the text/selection rules change.
-VERSION = "nasa-extractive-v3"
+VERSION = "nasa-extractive-v4"
 MAX_CITATIONS = 4
 
 FLEX_RUN = re.compile(r"\bflex[- ]?(\d{3})\b")
@@ -18,7 +18,7 @@ TABLE_D0 = re.compile(r"(?:^|; )Droplet initial diameter; mm: (\d+(?:\.\d+)?)(?=
 SHEET_D0 = re.compile(r"^\s*D0\s*\(mm\)\s*=\s*(\d+(?:\.\d+)?)\s*$", re.MULTILINE)
 
 
-def flex_diameter_comparison(question, citations):
+def flex_diameter_comparison(question, citations, lang=None):
     query = fold(question)
     run = FLEX_RUN.search(query)
     if not run or not INITIAL_DIAMETER.search(query):
@@ -39,7 +39,7 @@ def flex_diameter_comparison(question, citations):
             values.setdefault(citation.source_document_id, (index, label, match[1]))
     if len({Decimal(value) for _, _, value in values.values()}) < 2:
         return None
-    if language(question) == "en":
+    if (lang or language(question)) == "en":
         lines = "\n".join(
             f"• {'CSV table' if label == 'Bảng CSV' else 'Test sheet'}: {value} mm [{index}]."
             for index, label, value in values.values()
@@ -81,13 +81,14 @@ class ExtractiveProvider:
         return Answer(state="unavailable", text="Advisor provider unavailable.")
 
     async def answer(self, request):
-        reason = refusal(request.question)
+        lang = request.language
+        reason = refusal(request.question, lang)
         citations = () if reason else request.allowed_sources[:MAX_CITATIONS]
-        text = reason or flex_diameter_comparison(request.question, citations)
+        text = reason or flex_diameter_comparison(request.question, citations, lang)
         if text is None:
             text = (
                 (
-                    message("found", request.question)
+                    message("found", request.question, lang)
                     + "\n\n"
                     + "\n\n".join(
                         f"[{index}] {citation.source_excerpt}"
@@ -95,7 +96,7 @@ class ExtractiveProvider:
                     )
                 )
                 if citations
-                else message("missing", request.question)
+                else message("missing", request.question, lang)
             )
         return Answer(
             state="answered" if citations else "abstained",

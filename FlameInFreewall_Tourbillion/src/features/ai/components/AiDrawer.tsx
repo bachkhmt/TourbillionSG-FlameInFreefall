@@ -13,10 +13,15 @@ import {
 import { CHAT_HISTORY_LIMIT } from '../hooks/useChatQueries';
 import { CHAT_QUICK_PROMPTS } from '@/lib/chatPrompts';
 import { isUuidLike, readChatSessionId, writeChatSessionId } from '@/lib/chatSession';
+import type { ChatAnswerLanguage } from '@/lib/chatLanguage';
 import { useAiAssistantStore } from '@/store/useAiAssistantStore';
 import { AiMessageItem } from './AiMessageItem';
 import { chatButton, chatField } from './chatStyles';
 
+const LANGUAGES: { code: ChatAnswerLanguage; label: string; name: string }[] = [
+  { code: 'en', label: 'EN', name: 'English' },
+  { code: 'vi', label: 'VI', name: 'Vietnamese' },
+];
 const DEFAULT_PRIVACY = 'Anyone with the session ID can view the chat for 24 hours.';
 const disclosureSummary = 'flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 font-semibold text-[#0B2374] hover:border-[#0B2374] [&::-webkit-details-marker]:hidden';
 const disclosureChevron = 'ml-auto size-4 shrink-0 group-open:rotate-180';
@@ -68,6 +73,14 @@ const AiDrawerPanel: React.FC = () => {
   const appendRecent = useAiAssistantStore((s) => s.appendRecent);
   const markHistoryStale = useAiAssistantStore((s) => s.markHistoryStale);
   const resetConversation = useAiAssistantStore((s) => s.resetConversation);
+  const answerLanguage = useAiAssistantStore((s) => s.answerLanguage);
+  const setAnswerLanguage = useAiAssistantStore((s) => s.setAnswerLanguage);
+  const hydrateAnswerLanguage = useAiAssistantStore((s) => s.hydrateAnswerLanguage);
+
+  // Client-only read of the stored choice; the store itself starts at English for SSR.
+  useEffect(() => {
+    hydrateAnswerLanguage();
+  }, [hydrateAnswerLanguage]);
 
   const [question, setQuestion] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -151,6 +164,7 @@ const AiDrawerPanel: React.FC = () => {
     send.mutate(
       {
         question: query,
+        language: answerLanguage,
         sessionId,
         investigationId: isUuidLike(activeContextStudyId) ? activeContextStudyId : null,
         // These run inside the mutation, so they still apply if the drawer is closed meanwhile.
@@ -229,15 +243,43 @@ const AiDrawerPanel: React.FC = () => {
       <aside className="absolute inset-y-4 right-4 flex w-[calc(100%_-_2rem)] max-w-lg flex-col overflow-hidden rounded-[48px] border border-slate-200 bg-white shadow-2xl">
         <header className="flex shrink-0 items-center justify-between gap-3 bg-[#0B2374] px-5 py-4 text-white">
           <h2 className="font-bold text-[#D4FC02]">FlameGuard AI</h2>
-          <button
-            type="button"
-            className="rounded-lg border border-white/30 px-3 py-1.5 text-sm hover:bg-white/10 cursor-pointer"
-            onClick={() => setOpen(false)}
-            aria-label="Close assistant drawer"
-          >
-            Close
-          </button>
+          <div className="flex items-center gap-2">
+            <div
+              role="group"
+              aria-label="Answer language"
+              className="flex rounded-lg border border-white/30 p-0.5"
+            >
+              {LANGUAGES.map(({ code, label, name }) => (
+                <button
+                  key={code}
+                  type="button"
+                  aria-pressed={answerLanguage === code}
+                  onClick={() => setAnswerLanguage(code)}
+                  className={`min-h-8 min-w-9 rounded-md px-2 text-xs font-bold cursor-pointer ${
+                    answerLanguage === code
+                      ? 'bg-[#D4FC02] text-[#0B2374]'
+                      : 'text-white hover:bg-white/10'
+                  }`}
+                >
+                  {label}
+                  <span className="sr-only"> {name} answers</span>
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="rounded-lg border border-white/30 px-3 py-1.5 text-sm hover:bg-white/10 cursor-pointer"
+              onClick={() => setOpen(false)}
+              aria-label="Close assistant drawer"
+            >
+              Close
+            </button>
+          </div>
         </header>
+        <p className="mx-5 mt-2 shrink-0 text-[11px] leading-5 text-slate-500">
+          Answers in {answerLanguage === 'vi' ? 'Vietnamese' : 'English'}. Source excerpts stay in
+          their original language.
+        </p>
 
         <details className="group mx-5 my-2 shrink-0 text-xs text-slate-600">
           <summary className={disclosureSummary}>

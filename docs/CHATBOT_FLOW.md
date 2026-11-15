@@ -178,3 +178,12 @@ The ten holdout questions are run only after the retrieval rules are closed; res
 separately in `flameguard-ai-backend/specs/phase6b-real-corpus-chat/evaluation.md`. This is a small
 team-authored benchmark, not scientific verification. The `playbook-rag/` prototype benchmark does
 not apply to this chatbot.
+
+## Answer language (2026-11-15)
+
+Provider `nasa-extractive-v4` accepts an explicit language. The chat drawer shows an `EN | VI`
+switch (English by default, remembered per browser) and sends `language` with each question.
+Only the provider's framing text (found/missing, refusals, FLEX D0 conflict summary) follows it;
+excerpts stay verbatim and citations are identical in both languages. Requests without
+`language` keep per-question detection. `timeout`/`unavailable` messages stay English. See
+`flameguard-ai-backend/specs/chat-answer-language/spec.md` and ADR-0009.
