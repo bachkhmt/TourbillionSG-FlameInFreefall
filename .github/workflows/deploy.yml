@@ -1,0 +1,65 @@
+name: Deploy Azure
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: azure-production
+  cancel-in-progress: false
+
+jobs:
+  changes:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.paths.outputs.backend }}
+      frontend: ${{ steps.paths.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: paths
+        run: python deploy/azure/release.py changes >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      RELEASE_TAG: git-${{ github.sha }}-${{ github.run_number }}-${{ github.run_attempt }}
+      POETRY_VIRTUALENVS_IN_PROJECT: 'true'
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Install bundle builder dependencies
+        if: needs.changes.outputs.backend == 'true'
+        run: |
+          pip install poetry==2.2.1
+          poetry -C flameguard-ai-backend install --only main --no-root
+      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Install Container Apps extension
+        run: az extension add --name containerapp --upgrade --allow-preview true --yes
+      - name: Deploy backend
+        if: needs.changes.outputs.backend == 'true'
+        run: flameguard-ai-backend/.venv/bin/python deploy/azure/release.py deploy backend --tag "$RELEASE_TAG"
+      - name: Deploy frontend
+        if: needs.changes.outputs.frontend == 'true'
+        run: python deploy/azure/release.py deploy frontend --tag "$RELEASE_TAG"

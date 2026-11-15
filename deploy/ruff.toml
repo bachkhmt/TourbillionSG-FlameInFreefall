@@ -1,0 +1,2 @@
+extend = "../flameguard-ai-backend/pyproject.toml"
+src = ["../flameguard-ai-backend"]
