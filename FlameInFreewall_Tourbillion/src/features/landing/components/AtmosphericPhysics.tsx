@@ -201,29 +201,28 @@ export const AtmosphericPhysics: React.FC = () => {
 
               <div className="space-y-4 text-xs sm:text-sm">
                 <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-zinc-900">Human Respiration Impact</span>
-                    <span className="text-xs text-lime-800 font-black flex items-center gap-1 bg-lime-100/80 px-2 py-0.5 rounded-md">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-zinc-900">Human Respiration</span>
+                    <span className="text-xs text-lime-800 font-bold flex items-center gap-1 bg-lime-100/80 px-2 py-0.5 rounded-md">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Nominal Oxygenation
                     </span>
                   </div>
                   <p className="text-xs text-zinc-600">
-                    At {ppO2} psia oxygen partial pressure, blood hemoglobin saturation is identical to sea-level Earth.
-                    Astronauts suffer no hypoxia and can transition to low-pressure spacesuits rapidly.
+                    At {ppO2} psia oxygen partial pressure, astronaut respiration is safe and identical to Earth sea level.
                   </p>
                 </div>
 
                 <div className="bg-rose-50/50 p-4 rounded-2xl border border-rose-200">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-rose-950">Spacecraft Fire Spread Multiplier</span>
-                    <span className="text-xs text-rose-800 font-black flex items-center gap-1 bg-rose-100 px-2 py-0.5 rounded-md">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-rose-950">Fire Spread Multiplier</span>
+                    <span className="text-xs text-rose-800 font-bold flex items-center gap-1 bg-rose-100 px-2 py-0.5 rounded-md">
                       <Flame className="w-3.5 h-3.5" /> {current.flammabilityIndex.toFixed(1)}x Spread Rate
                     </span>
                   </div>
                   <p className="text-xs text-rose-900/80">
                     {current.id === 'earth'
-                      ? 'Standard 1.0x flammability index. Nitrogen absorbs 79% of gas thermal energy.'
-                      : `Oxygen mole fraction is ${o2MoleDiff}% higher than Earth! Inert nitrogen heat absorption drops by 38%, causing polymer combustion temperatures to spike by ~300 K.`}
+                      ? 'Baseline 1.0x spread. Dense nitrogen absorbs 79% of gas thermal energy.'
+                      : `Oxygen mole fraction is ${o2MoleDiff}% higher than Earth. Inert nitrogen heat sink drops by 38%, accelerating polymer flame spread.`}
                   </p>
                 </div>
               </div>

@@ -24,7 +24,7 @@ export const LandingHero: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 32);
+      setIsScrolled(window.scrollY > 20);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -33,7 +33,7 @@ export const LandingHero: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#F8F9FA] font-sans" data-testid="landing-hero">
+    <section className="relative w-full bg-[#F8F9FA] font-sans" data-testid="landing-hero">
       {/* Top Space Apps Announcement Banner */}
       <div
         data-testid="announcement-banner"
@@ -41,7 +41,7 @@ export const LandingHero: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-zinc-950 text-[#D4FC02] px-2.5 py-0.5 text-xs font-black uppercase tracking-wider font-mono">
+            <span className="inline-flex items-center rounded-full bg-zinc-950 text-[#D4FC02] px-2.5 py-0.5 text-xs font-black uppercase tracking-wider">
               Space Apps 2026
             </span>
             <span className="font-bold text-zinc-950">
@@ -51,24 +51,24 @@ export const LandingHero: React.FC = () => {
               Join the global collaboration for Flame in Freefall.
             </span>
           </div>
-          <Link
-            href="/dashboard"
+          <a
+            href="#flame-physics"
             className="inline-flex items-center gap-1 text-xs font-bold text-zinc-950 underline underline-offset-4 hover:opacity-80 transition-opacity"
           >
-            <span>Explore Telemetry</span>
+            <span>Explore Science Story</span>
             <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          </a>
         </div>
       </div>
 
-      {/* Space Apps Navigation Bar - Sticky with scroll-reactive translucency and backdrop-blur-sm */}
+      {/* Space Apps Navigation Bar - Sticks to screen across all sections with backdrop-blur-sm */}
       <nav
         data-testid="landing-navbar"
-        className={`sticky top-0 z-50 w-full transition-all duration-300 border-b ${
+        className={`${
           isScrolled
-            ? 'bg-[#0B2374]/85 backdrop-blur-sm border-white/10 shadow-md h-14'
-            : 'bg-[#0B2374] border-gray-200/40 shadow-xs h-16'
-        }`}
+            ? 'fixed top-0 left-0 right-0 z-50 bg-[#0B2374]/85 backdrop-blur-sm border-b border-white/10 shadow-md h-14'
+            : 'relative z-40 bg-[#0B2374] border-b border-white/10 shadow-xs h-16'
+        } w-full transition-all duration-300`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
           {/* Logo & Space Apps Identity */}
@@ -82,7 +82,7 @@ export const LandingHero: React.FC = () => {
               <span className="font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
                 FlameGuard <span className="text-[#D4FC02]">AI</span>
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-200 font-mono">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-200">
                 NASA Space Apps 2026
               </span>
             </div>
@@ -105,26 +105,29 @@ export const LandingHero: React.FC = () => {
             <a href="#mission-modules" className="hover:text-[#D4FC02] transition-colors">
               Research Workspace
             </a>
-            <Link href="/explorer" className="hover:text-[#D4FC02] transition-colors">
+            <a href="#mission-modules" className="hover:text-[#D4FC02] transition-colors">
               PSI Studies
-            </Link>
+            </a>
           </div>
 
-          {/* Quick CTA */}
+          {/* Quick CTA - Smoothly anchors down to research modules without leaving page */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
+            <a
+              href="#mission-modules"
               className="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-2xl bg-[#D4FC02] hover:bg-[#c3e802] text-zinc-950 text-xs sm:text-sm font-bold shadow-xs hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <span>Launch Console</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            </a>
           </div>
         </div>
       </nav>
 
+      {/* Spacer to prevent content jump when navbar becomes fixed on scroll */}
+      {isScrolled && <div className="h-16 w-full" aria-hidden="true" />}
+
       {/* Hero Visual Area with StructPaper Light Backdrop */}
-      <div className="relative pt-12 pb-16 md:pt-18 md:pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative overflow-hidden pt-12 pb-16 md:pt-18 md:pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Soft Ambient Light Glow */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[320px] bg-gradient-to-tr from-[#D4FC02]/15 via-blue-50/60 to-purple-50/30 blur-3xl pointer-events-none rounded-full" />
 
@@ -183,7 +186,7 @@ export const LandingHero: React.FC = () => {
           {/* Telemetry Highlight Badges in StructPaper Light Cards */}
           <div className="mt-14 w-full grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-left">
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-[#0B2374] text-xs font-bold uppercase mb-1 font-mono">
+              <div className="flex items-center gap-1.5 text-[#0B2374] text-xs font-bold uppercase mb-1">
                 <Activity className="w-3.5 h-3.5 text-[#0B2374]" />
                 <span>PSI Archive</span>
               </div>
@@ -194,7 +197,7 @@ export const LandingHero: React.FC = () => {
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-amber-600 text-xs font-bold uppercase mb-1 font-mono">
+              <div className="flex items-center gap-1.5 text-amber-600 text-xs font-bold uppercase mb-1">
                 <Flame className="w-3.5 h-3.5 text-amber-500" />
                 <span>Test Runs</span>
               </div>
@@ -205,7 +208,7 @@ export const LandingHero: React.FC = () => {
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-purple-700 text-xs font-bold uppercase mb-1 font-mono">
+              <div className="flex items-center gap-1.5 text-purple-700 text-xs font-bold uppercase mb-1">
                 <Compass className="w-3.5 h-3.5 text-purple-600" />
                 <span>Physics Model</span>
               </div>
@@ -216,7 +219,7 @@ export const LandingHero: React.FC = () => {
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-rose-600 text-xs font-bold uppercase mb-1 font-mono">
+              <div className="flex items-center gap-1.5 text-rose-600 text-xs font-bold uppercase mb-1">
                 <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
                 <span>Exploration Gap</span>
               </div>

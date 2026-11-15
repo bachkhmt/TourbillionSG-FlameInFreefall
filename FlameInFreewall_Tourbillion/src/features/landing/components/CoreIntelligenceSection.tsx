@@ -3,11 +3,8 @@
 /**
  * CoreIntelligenceSection Component
  * Synchronized with StructPaper light & Kurzgesagt aesthetic.
- * Highlights the 3 core technological contributions of FlameGuard AI beyond raw NASA data:
- * 1. Cross-Study Data Harmonization (20 PSI flight studies unified)
- * 2. Evidence Gap Matrix (Mapping unverified partial-g regimes like Lunar 0.16g)
- * 3. Guarded Predictive Physics (Zero-hallucination safety interlocks)
- * And provides a directly visible, concise 4-part Ignition Source & Mechanism layout.
+ * Concise, scannable layout communicating the 3 core innovations beyond raw NASA data
+ * and direct 4-mechanism ignition inference with zero midway exit distractions.
  */
 
 import React, { useState } from 'react';
@@ -22,7 +19,6 @@ import {
   Sliders,
   CheckCircle2,
   Lock,
-  Info,
 } from 'lucide-react';
 
 export type IgnitionModeId = 'hot-wire' | 'spark' | 'radiant' | 'smolder';
@@ -38,75 +34,69 @@ export interface IgnitionMode {
   dangerLevel: 'Elevated' | 'High' | 'Critical Flashover Risk';
   mechanism: string;
   guardrailInsight: string;
-  flightAnalog: string;
 }
 
 const IGNITION_MODES: Record<IgnitionModeId, IgnitionMode> = {
   'hot-wire': {
     id: 'hot-wire',
     name: 'Hot-Wire Overload',
-    tagline: 'Conductor Overheating & Contact Ignition',
+    tagline: 'Conductor Overheating & Pyrolysis',
     icon: Flame,
-    psiStudyMatch: 'NASA SoFIE-MIST (Material Ignition and Suppression Test)',
+    psiStudyMatch: 'NASA SoFIE-MIST',
     delayRange: '1.8s – 4.5s',
     minEnergy: '12 – 18 Joules',
     dangerLevel: 'High',
     mechanism:
-      'Without buoyant airflow cooling, overcurrent conductors experience a 2.2x faster temperature spike, triggering rapid polymer insulation pyrolysis.',
+      'Lacking buoyant air cooling, overcurrent conductors spike 2.2x faster in temperature, triggering rapid polymer insulation pyrolysis.',
     guardrailInsight:
-      'Correlates wiring bundle amperage with cabin ventilation velocities (0.05–0.1 m/s) to flag thermal runaway before smoke develops.',
-    flightAnalog: 'SoFIE-MIST Flight Run #14 (34% O₂ / 56 kPa / PMMA)',
+      'Cross-checks bundle amperage with cabin airflow (0.05 m/s) to flag thermal runaway before smoke appears.',
   },
   'spark': {
     id: 'spark',
     name: 'Electrical Arc & Spark',
-    tagline: 'Low-Pressure Dielectric Breakdown',
+    tagline: 'Low-Pressure Breakdown',
     icon: Zap,
-    psiStudyMatch: 'NASA ACME (Advanced Combustion via Microgravity Experiments)',
+    psiStudyMatch: 'NASA ACME',
     delayRange: '< 0.05s (Instantaneous)',
     minEnergy: '0.2 – 0.8 mJ',
     dangerLevel: 'Critical Flashover Risk',
     mechanism:
-      'Governed by Paschen’s Law, dielectric breakdown voltage drops sharply in reduced pressure (56–70 kPa). Low-energy static sparks trigger instant flashovers in 34% O₂.',
+      'Governed by Paschen’s Law, breakdown voltage plunges in reduced pressures (56–70 kPa). Low-energy static sparks trigger instant flashovers in 34% O₂.',
     guardrailInsight:
-      'Automated interlocks evaluate oxygen mole fractions and surface static charge, flagging hazard zones before relay switching occurs.',
-    flightAnalog: 'ACME Spark Ignition Calibration Matrix (0.00g chamber)',
+      'Automated interlocks evaluate oxygen fractions and static charge, flagging hazard zones before relays switch.',
   },
   'radiant': {
     id: 'radiant',
     name: 'Radiant Heat Flashover',
-    tagline: 'Surface Thermal Flux & Flashover',
+    tagline: 'Surface Thermal Flux Buildup',
     icon: Radio,
-    psiStudyMatch: 'NASA BASS-II (Burning and Suppression of Solids - II)',
+    psiStudyMatch: 'NASA BASS-II',
     delayRange: '12s – 25s',
     minEnergy: '25 – 40 kW/m²',
     dangerLevel: 'Elevated',
     mechanism:
-      'Thermal radiation from heaters or avionics impinges on fabrics. Without convective chimney heat dispersal, fuel temperatures accumulate unchecked.',
+      'Thermal radiation from avionics impinges on fabrics. Without chimney draft dispersal, temperatures accumulate unchecked.',
     guardrailInsight:
-      'Radiant flux models calculate temperature curves across Nomex/polycarbonate, predicting flashover thresholds and safe equipment spacing.',
-    flightAnalog: 'BASS-II Radiant Heating Curve #09 (Flat fabric in quiescent air)',
+      'Radiant flux models calculate temperature curves across Nomex panels, predicting safe equipment spacing.',
   },
   'smolder': {
     id: 'smolder',
     name: 'Quiescent Smoldering',
-    tagline: 'Non-Convective Incubation & Fan Rush',
+    tagline: 'Silent Incubation & Fan Rush',
     icon: Sliders,
-    psiStudyMatch: 'NASA SAME / CIR (Sensors & Droplet Extinction Investigations)',
+    psiStudyMatch: 'NASA SAME / CIR',
     delayRange: '15 min – 2 hours',
     minEnergy: 'Ultra-Low (Cumulative Heat)',
     dangerLevel: 'Critical Flashover Risk',
     mechanism:
-      'The most insidious spacecraft fire hazard: porous fuels smolder quietly for hours with zero buoyant plumes. When HVAC fans kick in, the sudden oxygen rush causes explosive flaming.',
+      'The most insidious spacecraft fire hazard: porous fuels smolder quietly for hours with zero buoyant smoke plumes. When HVAC fans engage, the oxygen rush triggers explosive deflagration.',
     guardrailInsight:
-      'Employs sub-micron particulate and CO/CO₂ ratiometric algorithms from NASA SAME to identify non-flaming oxidation hours in advance.',
-    flightAnalog: 'SAME Particulate Telemetry Series (ISS Cupola & Destiny module)',
+      'Sub-micron soot and CO/CO₂ ratiometrics from NASA SAME detect non-flaming oxidation hours in advance.',
   },
 };
 
 export const CoreIntelligenceSection: React.FC = () => {
   const [selectedIgnition, setSelectedIgnition] = useState<IgnitionModeId>('hot-wire');
-  const activeMode = IGNITION_MODES[selectedIgnition];
 
   return (
     <section
@@ -115,219 +105,177 @@ export const CoreIntelligenceSection: React.FC = () => {
       data-testid="core-intelligence-section"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-bold text-[#0B2374] shadow-2xs mb-4 font-mono">
+        {/* Section Header - Concise & Direct */}
+        <div className="text-center max-w-3xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-bold text-[#0B2374] shadow-2xs mb-3">
             <Sparkles className="w-3.5 h-3.5 text-[#0B2374]" />
             <span>Beyond Raw NASA Data</span>
             <span className="h-1.5 w-1.5 rounded-full bg-[#D4FC02]" />
-            <span>Ignition Inference &amp; AI Safety Guardrails</span>
+            <span>AI Safety Guardrails &amp; Ignition Inference</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-black text-zinc-950 tracking-tight mb-4 leading-tight">
-            How FlameGuard AI Bridges Data to Decision:{' '}
-            <span className="text-[#0B2374]">3 Core Innovations</span>
+          <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight mb-3">
+            How FlameGuard AI Bridges Data to Decision
           </h2>
 
           <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
-            NASA PSI archives provide raw flight logs, but unstructured data alone cannot protect crew lives.
-            FlameGuard AI introduces three foundational pillars to convert raw tests into predictive safety guardrails.
+            Raw NASA logs cannot prevent spacecraft fires on their own. FlameGuard AI introduces three foundational pillars
+            to convert fragmented experiments into verified, zero-hallucination safety guardrails.
           </p>
         </div>
 
-        {/* 3 Core Contributions Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        {/* 3 Core Pillars - Concise Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
           {/* Pillar 01 */}
           <div
-            className="rounded-3xl border border-gray-200/80 bg-white p-6 sm:p-7 shadow-2xs hover:shadow-xs hover:border-[#0B2374]/30 transition-all flex flex-col justify-between"
+            className="rounded-3xl border border-gray-200/80 bg-white p-6 shadow-2xs hover:border-[#0B2374]/30 transition-all flex flex-col justify-between"
             data-testid="contribution-card-harmonization"
           >
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0B2374]">
-                  <Layers className="w-5 h-5 text-[#0B2374]" />
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0B2374]">
+                  <Layers className="w-4 h-4 text-[#0B2374]" />
                 </div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-[#0B2374]/5 text-[#0B2374]">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#0B2374]/5 text-[#0B2374]">
                   Pillar 01
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-zinc-950 mb-2">
+              <h3 className="text-base font-bold text-zinc-950 mb-1.5">
                 Cross-Study Data Harmonization
               </h3>
-              <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mb-4">
-                Normalizes 20 independent NASA investigations (BASS, ACME, CIR, FLEX, SoFIE) into a unified multi-variable schema for rigorous apples-to-apples solid, droplet, and gas flame comparisons.
+              <p className="text-xs text-zinc-600 leading-relaxed mb-4">
+                Unifies 20 disparate NASA flight studies (BASS, ACME, SoFIE) into a synchronized schema for solid, droplet, and gaseous fuel comparisons.
               </p>
             </div>
-            <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-mono">
-              <span className="text-zinc-500">Indexed Flight Scale:</span>
-              <span className="font-bold text-[#0B2374]">20 Studies / 1,200+ Runs</span>
+            <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+              <span className="text-zinc-500">Indexed Catalog:</span>
+              <span className="font-bold text-[#0B2374]">20 Studies / 148+ Runs</span>
             </div>
           </div>
 
           {/* Pillar 02 */}
           <div
-            className="rounded-3xl border border-gray-200/80 bg-white p-6 sm:p-7 shadow-2xs hover:shadow-xs hover:border-amber-300 transition-all flex flex-col justify-between"
+            className="rounded-3xl border border-gray-200/80 bg-white p-6 shadow-2xs hover:border-amber-300 transition-all flex flex-col justify-between"
             data-testid="contribution-card-gap-matrix"
           >
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
-                  <AlertTriangle className="w-5 h-5 text-amber-600" />
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+                  <AlertTriangle className="w-4 h-4 text-amber-600" />
                 </div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
                   Pillar 02
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-zinc-950 mb-2">
+              <h3 className="text-base font-bold text-zinc-950 mb-1.5">
                 Evidence Gap Matrix Engine
               </h3>
-              <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mb-4">
-                Audits partial-gravity knowledge voids ($0 &lt; g &lt; 1$). Highlights the Moon ($0.16g$) and Mars ($0.38g$) as critical gaps where zero direct burn runs exist, preventing blind extrapolation.
+              <p className="text-xs text-zinc-600 leading-relaxed mb-4">
+                Audits partial-gravity knowledge voids ($0 &lt; g &lt; 1$). Flags the Moon ($0.16g$) and Mars ($0.38g$) as critical empirical gaps lacking direct burn tests.
               </p>
             </div>
-            <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-mono">
-              <span className="text-zinc-500">Unverified Gravity Void:</span>
+            <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+              <span className="text-zinc-500">Knowledge Void:</span>
               <span className="font-bold text-rose-600">Moon (0.16g) CRITICAL GAP</span>
             </div>
           </div>
 
           {/* Pillar 03 */}
           <div
-            className="rounded-3xl border border-gray-200/80 bg-white p-6 sm:p-7 shadow-2xs hover:shadow-xs hover:border-lime-400 transition-all flex flex-col justify-between"
+            className="rounded-3xl border border-gray-200/80 bg-white p-6 shadow-2xs hover:border-lime-400 transition-all flex flex-col justify-between"
             data-testid="contribution-card-guarded-physics"
           >
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-2xl bg-lime-50 border border-lime-300 flex items-center justify-center text-lime-700">
-                  <ShieldCheck className="w-5 h-5 text-lime-700" />
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-9 h-9 rounded-xl bg-lime-50 border border-lime-300 flex items-center justify-center text-lime-700">
+                  <ShieldCheck className="w-4 h-4 text-lime-700" />
                 </div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-[#D4FC02]/20 text-zinc-950 border border-lime-300">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#D4FC02]/20 text-zinc-950 border border-lime-300">
                   Pillar 03
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-zinc-950 mb-2">
+              <h3 className="text-base font-bold text-zinc-950 mb-1.5">
                 Guarded Predictive Physics
               </h3>
-              <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mb-4">
-                Replaces AI hallucinations with deterministic guardrails. When empirical flight runs are insufficient (&lt;3 runs), predictions are locked and the system routes to verified analogues (SoFIE-MIST 94.2% match).
+              <p className="text-xs text-zinc-600 leading-relaxed mb-4">
+                Replaces AI hallucinations with deterministic safety interlocks. When empirical flight runs are &lt;3, predictions lock and route to verified NASA analogues.
               </p>
             </div>
-            <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-mono">
-              <span className="text-zinc-500">Aerospace Reliability:</span>
+            <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+              <span className="text-zinc-500">Reliability:</span>
               <span className="font-bold text-lime-700">Zero-Hallucination Interlocks</span>
             </div>
           </div>
         </div>
 
-        {/* Directly Visible Ignition Source Inference Workbench */}
+        {/* 4 Direct Ignition Mechanism Cards - All in Plain Sight */}
         <div
           className="rounded-3xl border border-gray-200/80 bg-white p-6 sm:p-8 shadow-xs"
           data-testid="ignition-inference-workbench"
         >
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-5 border-b border-gray-200/80 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-gray-200/80 mb-6">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="px-2 py-0.5 rounded-full bg-[#0B2374] text-[#D4FC02] font-mono text-[11px] font-bold uppercase tracking-wider">
-                  Physics Inference Engine
-                </span>
-                <span className="text-xs font-mono text-zinc-500">
-                  Direct Multi-Mechanism Comparison
-                </span>
-              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#0B2374] block mb-0.5">
+                Scenario Physics Inference
+              </span>
               <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight">
-                Ignition Source &amp; Mechanism Inference
+                4 Primary Microgravity Ignition Triggers
               </h3>
             </div>
-            <p className="text-xs text-zinc-500 max-w-md font-sans">
-              Click any mechanism card below to highlight its physical activation dynamics and calibrated NASA PSI flight benchmark:
-            </p>
+            <div className="text-xs text-zinc-500 font-semibold">
+              Direct Multi-Mechanism Comparison
+            </div>
           </div>
 
-          {/* 4 Cards Grid - Directly Visible */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          {/* 4 Cards Grid - Fully Visible Directly */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {(Object.keys(IGNITION_MODES) as IgnitionModeId[]).map((modeKey) => {
               const item = IGNITION_MODES[modeKey];
               const isSelected = selectedIgnition === modeKey;
               const ModeIcon = item.icon;
               return (
-                <button
+                <div
                   key={modeKey}
-                  type="button"
                   onClick={() => setSelectedIgnition(modeKey)}
-                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  className={`p-5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                     isSelected
-                      ? 'bg-[#0B2374] text-white border-[#0B2374] shadow-md ring-2 ring-[#0B2374]/20'
-                      : 'bg-gray-50/70 hover:bg-gray-100 text-zinc-800 border-gray-200/80'
+                      ? 'border-[#0B2374] bg-blue-50/40 ring-2 ring-[#0B2374]/20 shadow-xs'
+                      : 'border-gray-200/80 bg-gray-50/50 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   data-testid={`ignition-tab-${modeKey}`}
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <ModeIcon
-                        className={`w-5 h-5 ${
-                          isSelected ? 'text-[#D4FC02]' : 'text-[#0B2374]'
-                        }`}
-                      />
-                      <span
-                        className={`text-[10px] font-mono font-bold uppercase px-1.5 py-0.5 rounded ${
-                          isSelected
-                            ? 'bg-white/20 text-[#D4FC02]'
-                            : 'bg-zinc-200/80 text-zinc-700'
-                        }`}
-                      >
+                    {/* Top Tag & Delay */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-[#0B2374] shadow-2xs">
+                        <ModeIcon className="w-4 h-4 text-[#0B2374]" />
+                      </div>
+                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#0B2374] text-[#D4FC02]">
                         {item.delayRange}
                       </span>
                     </div>
-                    <div className="font-bold text-sm line-clamp-1">{item.name}</div>
-                    <div
-                      className={`text-[11px] mt-0.5 line-clamp-1 ${
-                        isSelected ? 'text-blue-100' : 'text-zinc-500'
-                      }`}
-                    >
-                      {item.tagline}
+
+                    <h4 className="font-bold text-sm text-zinc-950 mb-0.5">{item.name}</h4>
+                    <p className="text-[11px] text-zinc-500 mb-2 font-medium">{item.tagline}</p>
+
+                    <p className="text-xs text-zinc-600 leading-relaxed mb-3">
+                      {item.mechanism}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-gray-200/80 space-y-1.5 text-[11px]">
+                    <div className="flex justify-between items-center text-zinc-500">
+                      <span>MIE:</span>
+                      <span className="font-bold text-zinc-900">{item.minEnergy}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-zinc-500">
+                      <span>Study:</span>
+                      <span className="font-bold text-[#0B2374]">{item.psiStudyMatch}</span>
                     </div>
                   </div>
-                  <div className="mt-3 pt-2 border-t border-black/10 flex items-center justify-between text-[11px] font-mono">
-                    <span className={isSelected ? 'text-blue-200' : 'text-zinc-500'}>MIE:</span>
-                    <span className="font-bold">{item.minEnergy}</span>
-                  </div>
-                </button>
+                </div>
               );
             })}
-          </div>
-
-          {/* Active Detail Breakdown Banner */}
-          <div className="rounded-2xl bg-gray-50/80 border border-gray-200/80 p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
-            <div className="lg:col-span-8 space-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-black text-lg sm:text-xl text-[#0B2374]">
-                  {activeMode.name}
-                </span>
-                <span className="px-2 py-0.5 rounded font-mono text-[11px] font-bold uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-200">
-                  Risk: {activeMode.dangerLevel}
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-sans">
-                <span className="font-bold text-zinc-900">Dynamics: </span>
-                {activeMode.mechanism}
-              </p>
-              <p className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-sans">
-                <span className="font-bold text-lime-900">Guardrail: </span>
-                {activeMode.guardrailInsight}
-              </p>
-            </div>
-
-            <div className="lg:col-span-4 bg-white p-4 rounded-xl border border-gray-200/80 font-mono text-xs space-y-2">
-              <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                NASA PSI Flight Anchor:
-              </div>
-              <div className="font-bold text-[#0B2374] text-xs font-sans line-clamp-2">
-                {activeMode.psiStudyMatch}
-              </div>
-              <div className="text-[11px] text-zinc-600 border-t border-gray-100 pt-1.5">
-                Benchmark: <span className="font-semibold text-zinc-900">{activeMode.flightAnalog}</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>

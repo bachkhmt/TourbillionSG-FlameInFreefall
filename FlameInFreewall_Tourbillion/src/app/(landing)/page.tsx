@@ -22,7 +22,7 @@ export const metadata = {
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen flex flex-col bg-[#F8F9FA] text-[#1A1A1A] overflow-x-hidden font-sans scroll-smooth">
+    <main className="min-h-screen flex flex-col bg-[#F8F9FA] text-[#1A1A1A] overflow-x-clip font-sans scroll-smooth">
       <LandingHero />
       <KurzgesagtFlameScene />
       <AtmosphericPhysics />
