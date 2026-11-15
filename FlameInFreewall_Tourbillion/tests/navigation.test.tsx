@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { Sidebar, NAV_ITEMS } from '@/components/layout/Sidebar';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { Sidebar } from '@/components/layout/Sidebar';
 import { DockPillButton } from '@/components/layout/DockPillButton';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
@@ -16,7 +16,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 describe('Sidebar Navigation Dock & Layout System', () => {
-  it('renders sticky navigation dock with 4 PSI modules and no settings', () => {
+  it('renders Studio between Mission and Resources in the sticky dock', () => {
     const { container } = render(<Sidebar />);
 
     // Sticky dock container check
@@ -27,25 +27,41 @@ describe('Sidebar Navigation Dock & Layout System', () => {
     expect(aside?.className).toContain('top-3');
     expect(aside?.className).toContain('ml-3.5');
 
-    // 4 modules in NAV_ITEMS
-    expect(NAV_ITEMS).toHaveLength(4);
-    expect(NAV_ITEMS.map((item) => item.path)).toEqual([
+    const links = Array.from(aside?.querySelectorAll('a') ?? []);
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
       '/dashboard',
       '/explorer',
       '/mission',
+      '/studio',
       '/resources',
     ]);
 
-    // 4 PSI modules rendered
     expect(screen.getByLabelText(/Research Dashboard/i)).toBeTruthy();
     expect(screen.getByLabelText(/Experiment Explorer/i)).toBeTruthy();
     expect(screen.getByLabelText(/Mission Scenario/i)).toBeTruthy();
+    expect(screen.getByLabelText(/3D Flame Studio/i)).toBeTruthy();
     expect(screen.getByLabelText(/Official Resources/i)).toBeTruthy();
 
     // No settings
     expect(screen.queryByLabelText(/Settings/i)).toBeNull();
     expect(screen.queryByLabelText(/Cài đặt/i)).toBeNull();
     expect(screen.queryByTestId('nav-pill-settings')).toBeNull();
+  });
+
+  it('renders Studio in the same order in the mobile menu', () => {
+    render(<Sidebar />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open mobile navigation menu' }));
+
+    const menu = within(screen.getByTestId('mobile-drawer-backdrop'));
+    const routes = menu.getAllByRole('link').map((link) => link.getAttribute('href'));
+    expect(routes).toEqual([
+      '/dashboard',
+      '/explorer',
+      '/mission',
+      '/studio',
+      '/resources',
+      'https://psi.nasa.gov/',
+    ]);
   });
 
   it('DockPillButton applies light glass inactive styling and electric lime active styling', () => {
