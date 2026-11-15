@@ -42,6 +42,10 @@ Fix: a family name widens only to indexed members (named studies stay strict, so
 
 Re-run after the fix: development and holdout results are identical case by case to the published JSON (0 changed slugs or states; metrics unchanged). New `retrieval.py` SHA-256: `5bf3b5959efb8e1d5f405c85560314cf51b5d76a531452758177f9db190322d9`; the other three algorithm files are unchanged. No frozen question covers a family-only name, so the regression is guarded by dedicated tests in `integration_tests/test_nasa_chat_retrieval.py`, not by the benchmark.
 
+### Post-freeze amendment — explicit answer language (2026-11-15)
+
+`provider.py`, `retrieval.py` and `vocabulary.py` changed so framing text can follow an explicit request language ([ADR-0009](../../docs/decisions/ADR-0009-chat-answer-language.md)); provider version is now `nasa-extractive-v4`. Retrieval and ranking code paths are unchanged and the evaluator sends no language, so detection is unchanged; `integration_tests/test_chat_evaluation.py` (development and holdout) passes unchanged. New SHA-256: `provider.py` `f17fe7ba60701a885af7c3d3a14eac2f286c1fb2eb7288a030c9e1d66c52487d`, `retrieval.py` `9950dfc9bbb4195e45b5956dfdf69ea805a6d2510b9ba2af8fa6104a8aff1052`, `vocabulary.py` `4600a06c5a1b349f258b6c5e4d657e16d4552c80474522406627fefb067d5a4c`; `bm25.py` unchanged from main.
+
 After publication, these questions are regression cases, not a permanently fresh test set. Future tuning requires a new held-out set for any new generalization claim. The pairs share topics and include related run/hardware queries, so ten holdout questions provide limited evidence beyond those topics.
 
 ## Preserved behavior and remaining limits
