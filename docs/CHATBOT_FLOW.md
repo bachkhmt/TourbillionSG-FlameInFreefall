@@ -7,8 +7,11 @@ Cập nhật 2026-11-15.
 - [ADR-0005](../flameguard-ai-backend/docs/decisions/ADR-0005-real-corpus-extractive-chat.md)
 - [spec Phase 6b](../flameguard-ai-backend/specs/phase6b-real-corpus-chat/spec.md)
 
-**Phạm vi trả lời:** chatbot chỉ trích **nguyên văn** chunk của nguồn CC0 đã admit, kèm
-citation gắn với một phiên bản corpus. Không có LLM và không có provider trả phí.
+**Phạm vi trả lời:** chatbot chỉ trích **nguyên văn** chunk đã admit: nguồn PSI theo
+khai báo CC0 và NASA-authored article text theo policy quyền riêng của
+[ADR-0006](../flameguard-ai-backend/docs/decisions/ADR-0006-challenge-source-ownership.md).
+Citation gắn với một phiên bản corpus. Không tự gán CC0 cho trang NASA, ảnh hoặc transcript.
+Không có LLM và không có provider trả phí.
 `review_status` luôn là `unreviewed`; chatbot không đưa kết luận safe/unsafe.
 
 ## Theo thao tác người dùng
