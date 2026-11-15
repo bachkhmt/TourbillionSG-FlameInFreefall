@@ -119,6 +119,19 @@ describe('Task 5 - Ember Zero Act III & Page Integration', () => {
       expect(hud.textContent).toMatch(/scene3-quiet/i); // activeScene
     });
 
+    it('stays off in production builds: no key listener, no panel', () => {
+      vi.stubEnv('NODE_ENV', 'production');
+      try {
+        render(<DebugHUD />);
+        fireEvent.keyDown(window, { key: 'd' });
+        expect(useEmberStore.getState().isDebugOpen).toBe(false);
+        act(() => useEmberStore.getState().toggleDebug());
+        expect(screen.queryByTestId('debug-hud')).not.toBeInTheDocument();
+      } finally {
+        vi.unstubAllEnvs();
+      }
+    });
+
     it('toggles debug HUD visibility on pressing keyboard "d"', () => {
       render(<DebugHUD />);
       expect(useEmberStore.getState().isDebugOpen).toBe(false);
