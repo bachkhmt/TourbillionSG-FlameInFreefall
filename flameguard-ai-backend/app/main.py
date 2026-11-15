@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import TimeoutError as PoolTimeout
 
 from app.api.v1.router import api_router
 from app.core.config import Settings, get_settings
@@ -54,6 +55,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_headers=["Content-Type", "Authorization"],
     )
     application.include_router(api_router, prefix=settings.api_v1_prefix)
+
+    @application.exception_handler(PoolTimeout)
+    async def database_busy(request: Request, exc: PoolTimeout) -> JSONResponse:
+        # Connection pool exhausted: transient overload, not a server bug.
+        logger.warning("Database connection pool exhausted")
+        return JSONResponse(
+            status_code=503,
+            content={"detail": "Database busy; retry shortly"},
+            headers={"Retry-After": "2"},
+        )
 
     @application.exception_handler(Exception)
     async def unexpected_error(request: Request, exc: Exception) -> JSONResponse:

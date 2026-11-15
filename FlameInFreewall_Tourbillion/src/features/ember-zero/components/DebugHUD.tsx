@@ -21,7 +21,11 @@ export const DebugHUD: React.FC<DebugHUDProps> = ({ className = '' }) => {
   const ignite = useEmberStore((state) => state.ignite);
   const reset = useEmberStore((state) => state.reset);
 
+  // Developer tool only: production builds register no shortcut and render nothing.
+  const enabled = process.env.NODE_ENV !== 'production';
+
   useEffect(() => {
+    if (!enabled) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if user is typing in an input, textarea, or contentEditable
       const target = e.target as HTMLElement | null;
@@ -44,9 +48,9 @@ export const DebugHUD: React.FC<DebugHUDProps> = ({ className = '' }) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [enabled]);
 
-  if (!isDebugOpen) {
+  if (!enabled || !isDebugOpen) {
     return null;
   }
 

@@ -31,6 +31,15 @@ class Settings(BaseSettings):
     )
     db_connect_timeout_seconds: float = Field(default=3, gt=0, le=30)
     db_ready_timeout_seconds: float = Field(default=3, gt=0, le=30)
+    # Request-scoped read sessions hold one connection each; a page issues several reads in
+    # parallel. Keep (pool + overflow) x replicas within the PostgreSQL connection limit.
+    # Budget per replica: reader (5 + 5) + runtime writer (2 + 3) = 15. During a Container Apps
+    # revision rollover two replicas overlap (30), leaving headroom on a 50-connection server.
+    db_pool_size: int = Field(default=5, ge=1, le=50)
+    db_max_overflow: int = Field(default=5, ge=0, le=50)
+    db_runtime_pool_size: int = Field(default=2, ge=1, le=50)
+    db_runtime_max_overflow: int = Field(default=3, ge=0, le=50)
+    db_pool_timeout_seconds: float = Field(default=5, gt=0, le=60)
     catalog_collection_manifest: str | None = None
     scenario_test_providers: bool = False
     runtime_database_url: SecretStr | None = None

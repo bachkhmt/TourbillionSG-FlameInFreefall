@@ -133,6 +133,9 @@ recreated. Use actual private values locally; do not expose secrets in public fr
 | `LOG_LEVEL` | Application logging level |
 | `DB_CONNECT_TIMEOUT_SECONDS` | Database connection timeout |
 | `DB_READY_TIMEOUT_SECONDS` | Database readiness deadline |
+| `DB_POOL_SIZE` / `DB_MAX_OVERFLOW` | Read connections per replica (default 5 + 5) |
+| `DB_RUNTIME_POOL_SIZE` / `DB_RUNTIME_MAX_OVERFLOW` | Chat-writer connections per replica (default 2 + 3). Reader + writer = 15 per replica; a revision rollover briefly doubles it, so keep the total plus migration/ingestion jobs under the PostgreSQL limit (Burstable B1ms: 50) |
+| `DB_POOL_TIMEOUT_SECONDS` | Wait for a pooled connection before answering 503 with `Retry-After` (default 5) |
 
 Use `.env.example` and the settings definitions for configuration details. Configure CORS for
 explicit frontend origins, including localhost:3000 for local integration and the appropriate
