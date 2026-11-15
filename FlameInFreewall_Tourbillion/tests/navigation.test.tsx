@@ -32,6 +32,7 @@ describe('Sidebar Navigation Dock & Layout System', () => {
       '/dashboard',
       '/explorer',
       '/mission',
+      '/predictive-lab',
       '/studio',
       '/resources',
     ]);
@@ -39,6 +40,7 @@ describe('Sidebar Navigation Dock & Layout System', () => {
     expect(screen.getByLabelText(/Research Dashboard/i)).toBeTruthy();
     expect(screen.getByLabelText(/Experiment Explorer/i)).toBeTruthy();
     expect(screen.getByLabelText(/Mission Scenario/i)).toBeTruthy();
+    expect(screen.getByLabelText(/Predictive Lab/i)).toBeTruthy();
     expect(screen.getByLabelText(/3D Flame Studio/i)).toBeTruthy();
     expect(screen.getByLabelText(/Official Resources/i)).toBeTruthy();
 
@@ -58,6 +60,7 @@ describe('Sidebar Navigation Dock & Layout System', () => {
       '/dashboard',
       '/explorer',
       '/mission',
+      '/predictive-lab',
       '/studio',
       '/resources',
       'https://psi.nasa.gov/',

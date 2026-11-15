@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Layers,
   Rocket,
+  FlaskConical,
   ChevronRight,
   ChevronLeft,
   Flame,
@@ -46,6 +47,12 @@ export const NAV_ITEMS: NavItemConfig[] = [
     label: 'Mission Scenario',
     description: 'Research evidence & condition gaps',
     icon: Rocket,
+  },
+  {
+    path: "/predictive-lab",
+    label: "Predictive Lab",
+    description: "Exploratory model evaluations & readiness",
+    icon: FlaskConical,
   },
   {
     path: "/studio",
