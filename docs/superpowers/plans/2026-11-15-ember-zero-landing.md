@@ -136,4 +136,4 @@
 - [x] **Step 1:** Run full test suite: `npx vitest run tests/ember-zero*.test.ts*` to verify 100% test pass rate.
 - [x] **Step 2:** Run typecheck and lint: `npm run lint` or `npx tsc --noEmit` to ensure clean compile.
 - [x] **Step 3:** Launch browser subagent to navigate to `http://localhost:3000/ember-zero`, interact with igniter, scroll through Acts I, II, III, test 60s demo mode, and capture visual proof screenshots.
-- [ ] **Step 4:** Push commit to origin/frontend.
+- [x] **Step 4:** Push commit to origin/frontend.
