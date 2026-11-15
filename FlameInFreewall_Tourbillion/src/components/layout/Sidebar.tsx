@@ -44,7 +44,7 @@ export const NAV_ITEMS: NavItemConfig[] = [
   {
     path: '/mission',
     label: 'Mission Scenario',
-    description: 'Gap matrix & predictive lab',
+    description: 'Research evidence & condition gaps',
     icon: Rocket,
   },
   {

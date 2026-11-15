@@ -24,16 +24,8 @@ export const ScenarioConfigForm: React.FC = () => {
   const ppO2Val = activeScenario.pressurePsi * (activeScenario.oxygenPct / 100);
   const ppO2Display = ppO2Val.toFixed(2);
 
-  // Classify ppO2 status
-  let ppO2Status = 'Normoxic Alveolar Target';
-  let ppO2Color = 'text-lime-900 border-lime-300 bg-lime-50';
-  if (ppO2Val < 2.3) {
-    ppO2Status = 'Hypoxic Hazard (< 2.3 psi)';
-    ppO2Color = 'text-amber-700 border-amber-200 bg-amber-50';
-  } else if (ppO2Val > 3.6) {
-    ppO2Status = 'Hyperoxic / Flammability Surge (> 3.6 psi)';
-    ppO2Color = 'text-rose-700 border-rose-200 bg-rose-50';
-  }
+  const ppO2Status = 'Derived value; not a safety rating';
+  const ppO2Color = 'text-slate-700 border-slate-200 bg-slate-50';
 
   const handlePresetSelect = (presetId: string) => {
     const preset = SCENARIO_PRESETS.find((p) => p.id === presetId);

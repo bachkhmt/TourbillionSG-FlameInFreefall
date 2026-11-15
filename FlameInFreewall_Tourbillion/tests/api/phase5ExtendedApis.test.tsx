@@ -115,7 +115,7 @@ describe('Phase 5 Extended Backend APIs Integration', () => {
       expect(evaluation.pillarEvidence.groups?.length).toBe(3);
     });
 
-    it('useScenarioEvaluationQuery falls back gracefully when backend fails', async () => {
+    it('useScenarioEvaluationQuery exposes backend errors without sample evaluation', async () => {
       vi.spyOn(httpClient, 'apiPost').mockRejectedValueOnce(new Error('Connection refused'));
 
       const { result } = renderHook(
@@ -132,11 +132,10 @@ describe('Phase 5 Extended Backend APIs Integration', () => {
       );
 
       await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
+        expect(result.current.isError).toBe(true);
       });
 
-      expect(result.current.data?.coverage.state).toBe('evaluated');
-      expect(result.current.data?.rankings.items?.length).toBeGreaterThan(0);
+      expect(result.current.data).toBeUndefined();
     });
   });
 

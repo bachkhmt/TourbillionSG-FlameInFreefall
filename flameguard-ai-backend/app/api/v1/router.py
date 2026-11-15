@@ -7,6 +7,7 @@ from app.api.v1.endpoints import (
     dashboard,
     evidence,
     health,
+    mission_research,
     predictions,
     runs,
     scenarios,
@@ -28,3 +29,5 @@ for phase4_router in (
 api_router.include_router(scenarios.router)
 api_router.include_router(chat.router)
 api_router.include_router(predictions.router)
+
+api_router.include_router(mission_research.router)

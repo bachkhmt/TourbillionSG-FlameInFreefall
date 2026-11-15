@@ -64,10 +64,10 @@ const MISSION_CARDS: MissionCard[] = [
     badge: 'Fire Safety Guardrails',
     badgeColor: 'text-amber-800 border-amber-200 bg-amber-50',
     description:
-      'Evaluate habitat risk envelopes for ISS, Artemis Moon Base, and Mars. Enforce NASA PSI safety guardrails against unverified partial-gravity extrapolations.',
+      'Explore investigations relevant to crew habitats. Compare reported conditions and identify where experimental evidence is missing.',
     icon: ShieldAlert,
-    features: ['6-Dimension Condition Gap Matrix', 'NASA Safety Disclaimer Enforcement', 'Predictive Lab Readiness Audit'],
-    ctaText: 'Run Risk Evaluation',
+    features: ['6-Dimension Condition Gap Matrix', 'Source Context & Research Limits', 'Investigation Relevance'],
+    ctaText: 'Explore Mission Evidence',
     ctaStyle: 'secondary',
   },
 ];
@@ -89,7 +89,7 @@ export const MissionControlCTA: React.FC = () => {
           </h2>
           <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
             Transition seamlessly between high-level NASA telemetry, deep cross-study empirical synthesis,
-            and mission-critical fire safety hazard evaluation.
+            and investigation of experimental evidence gaps.
           </p>
         </div>
 

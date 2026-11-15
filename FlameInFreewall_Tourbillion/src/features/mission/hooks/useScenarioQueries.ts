@@ -7,19 +7,16 @@ import {
 } from '@tanstack/react-query';
 import type { EvaluationDto, EvaluationRequestDto } from '@/api/dto';
 import { evaluateMissionScenario } from '@/api/services';
-import { getMockScenarioEvaluation } from '@/api/mockFallback';
 import type { ApiQueryOptions } from '@/hooks/api/queryHelpers';
-import { handleTimeoutFallback, shouldFallback } from '@/hooks/api/queryHelpers';
 import { apiQueryKeys } from '@/hooks/api/queryKeys';
 
 function computeScenarioKey(request: EvaluationRequestDto): string {
-  const sc = request.scenario;
-  return `${sc.gravity?.value ?? '0g'}-${sc.oxygen?.value ?? '21%'}-${sc.pressure?.value ?? '14.7'}-${sc.material?.key ?? 'all'}`;
+  return JSON.stringify(request);
 }
 
 /**
- * Queries mission scenario evaluation across the 4 pillars (`POST /mission/scenarios/evaluate`).
- * Gracefully falls back to NASA PSI empirical baseline if backend is unavailable.
+ * Queries mission scenario evaluation for the selected research purpose (`POST /mission/scenarios/evaluate`).
+ * Backend failures remain errors; no sample evidence is substituted.
  */
 export function useScenarioEvaluationQuery(
   request: EvaluationRequestDto,
@@ -30,17 +27,7 @@ export function useScenarioEvaluationQuery(
   return useQuery<EvaluationDto, Error>({
     ...options,
     queryKey: apiQueryKeys.scenarioEvaluation(key),
-    queryFn: async ({ signal }) => {
-      try {
-        return await evaluateMissionScenario(request, signal);
-      } catch (err) {
-        if (shouldFallback(options?.enableFallback)) {
-          handleTimeoutFallback(err);
-          return getMockScenarioEvaluation(request);
-        }
-        throw err;
-      }
-    },
+    queryFn: ({ signal }) => evaluateMissionScenario(request, signal),
     enabled: options?.enabled ?? true,
   });
 }
@@ -53,12 +40,6 @@ export function useEvaluateScenarioMutation(
 ): UseMutationResult<EvaluationDto, Error, EvaluationRequestDto> {
   return useMutation<EvaluationDto, Error, EvaluationRequestDto>({
     ...options,
-    mutationFn: async (payload) => {
-      try {
-        return await evaluateMissionScenario(payload);
-      } catch (err) {
-        return getMockScenarioEvaluation(payload);
-      }
-    },
+    mutationFn: (payload) => evaluateMissionScenario(payload),
   });
 }

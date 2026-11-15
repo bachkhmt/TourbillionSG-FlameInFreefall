@@ -226,30 +226,6 @@ export interface RankedInvestigation {
 }
 
 // ---------------------------------------------------------------------------
-// 7. Predictive Lab Readiness Audit
-// ---------------------------------------------------------------------------
-
-export interface PredictiveLabRequirement {
-  id: string;
-  code: string; // e.g. 'REQ-01'
-  title: string;
-  description: string;
-  isMet: boolean;
-  auditDetail: string;
-}
-
-export interface PredictiveLabAudit {
-  isLocked: boolean; // Locked when outside applicability domain (e.g. 0 < g < 1)
-  lockReason: string;
-  modelVersion: string;
-  modelApplicabilityDomain: string;
-  requirements: PredictiveLabRequirement[];
-  predictedSpreadRateMmS?: number;
-  uncertaintyBoundMmS?: [number, number];
-  disclaimer: string;
-}
-
-// ---------------------------------------------------------------------------
 // 8. Grounded AI Assistant (RAG Dock)
 // ---------------------------------------------------------------------------
 // Chat types come from the backend contract: see MappedChat* in ./api.ts.

@@ -91,6 +91,22 @@ For data and resources related to this challenge, refer to the [Resources tab](h
 
 ## Mã nguồn trong repo
 
+### Phạm vi sản phẩm hiện tại
+
+Theo quyết định ngày 15/11/2026, giao diện tập trung vào khám phá, tóm tắt,
+so sánh và diễn giải bằng chứng nghiên cứu cháy của NASA cho ba mục đích
+prevention, detection và suppression. Predictive Lab và engine dự đoán cục bộ
+đã được gỡ khỏi sản phẩm. Link Mission cũ có `view=prediction` mở luồng bằng chứng.
+
+Mission lấy kết quả từ `POST /api/v1/mission/research`, không tự tạo kết quả
+bằng seed engines hoặc thay dữ liệu mẫu khi API lỗi. API tra cứu bản release
+đầy đủ được hash-bind với snapshot đã nhập và được backend admit. Target cũ cần
+khai báo policy mới bằng Data helper trước khi dùng Mission; thiếu policy trả lỗi
+rõ ràng. Xem [hướng dẫn tích hợp Mission](docs/MISSION_API.md).
+API prediction upstream chỉ còn là contract tương thích, không có màn hình dự đoán.
+
+Kiểm tra và phạm vi thay đổi: [bản ghi](docs/EVIDENCE_ONLY_SCOPE.md).
+
 | Thư mục | Nội dung |
 | --- | --- |
 | `flameguard-ai-backend/` | Backend FastAPI (catalog, evidence, scenario, chat, prediction readiness); RAG extractive ở `app/integrations/rag/` (`CHAT_PROVIDER=extractive`) |
