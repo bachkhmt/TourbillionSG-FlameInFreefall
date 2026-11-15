@@ -106,7 +106,7 @@ describe('Task 3 - Ember Zero Atmospheric Dials & Story Overlay', () => {
     });
 
     it('shows prologue text with simplified scene name "prologue"', () => {
-      render(<EmberStoryOverlay scene="prologue" as any />);
+      render(<EmberStoryOverlay scene={"prologue" as any} />);
       expect(screen.getByText(/Trước khi có trọng lực/i)).toBeInTheDocument();
       expect(screen.getByText(/Chạm để đánh lửa/i)).toBeInTheDocument();
     });
