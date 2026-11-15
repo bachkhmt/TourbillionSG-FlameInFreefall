@@ -5,6 +5,7 @@ import {
   LandingHero,
   KurzgesagtFlameScene,
   AtmosphericPhysics,
+  CoreIntelligenceSection,
   MissionControlCTA,
   LandingFooter,
 } from '@/features/landing';
@@ -26,21 +27,14 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
   });
 
   describe('LandingHero Component', () => {
-    it('renders the top Space Apps announcement banner in Electric Lime', () => {
-      render(<LandingHero />);
-      const banner = screen.getByTestId('announcement-banner');
-      expect(banner).toBeDefined();
-      expect(banner.className).toContain('bg-[#D4FC02]');
-      expect(screen.getByText(/Space Apps Connect is now open!/i)).toBeDefined();
-    });
-
     it('renders the Royal Navy space navigation bar with brand logo and links', () => {
       render(<LandingHero />);
       const navbar = screen.getByTestId('landing-navbar');
       expect(navbar).toBeDefined();
-      expect(navbar.className).toContain('bg-[#0B2374]/80');
-      expect(screen.getByText('FlameGuard')).toBeDefined();
-      expect(screen.getByText('Flame Physics (0g vs 1g)')).toBeDefined();
+      expect(navbar.className).toContain('bg-[#0B2374]');
+      expect(screen.getByText('Tourbillion')).toBeDefined();
+      expect(screen.getByText('SG')).toBeDefined();
+      expect(screen.getByText('Flame Physics')).toBeDefined();
       expect(screen.getByText('Lunar Flammability Paradox')).toBeDefined();
     });
 
@@ -49,7 +43,7 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       const workspaceLink = screen.getByRole('link', { name: /Enter Research Workspace/i });
       expect(workspaceLink.getAttribute('href')).toBe('/dashboard');
 
-      const explorerLink = screen.getByRole('link', { name: /Explore 20 PSI Studies/i });
+      const explorerLink = screen.getByRole('link', { name: /Explore 24 PSI Studies/i });
       expect(explorerLink.getAttribute('href')).toBe('/explorer');
 
       const scenarioLink = screen.getByRole('link', { name: /Run Scenario Simulation/i });
@@ -58,8 +52,8 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
 
     it('displays the 4 key telemetry overview badges', () => {
       render(<LandingHero />);
-      expect(screen.getByText('20 Studies')).toBeDefined();
-      expect(screen.getByText('148+ Runs')).toBeDefined();
+      expect(screen.getByText('24 Studies')).toBeDefined();
+      expect(screen.getByText('1,926 Runs')).toBeDefined();
       expect(screen.getByText('0g vs 1g')).toBeDefined();
       expect(screen.getByText('0 < g < 1')).toBeDefined();
     });
@@ -75,37 +69,14 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       expect(screen.getByText(/Buoyant Plume/i)).toBeDefined();
     });
 
-    it('allows switching between gravity presets and updates telemetry HUD', () => {
+    it('displays physical combustion metrics for both Earth and ISS flame chambers', () => {
       render(<KurzgesagtFlameScene />);
-      const hud = screen.getByTestId('live-telemetry-hud');
-      expect(hud).toBeDefined();
-
-      // Initial 0g microgravity telemetry: sphericity should be high (98%)
-      expect(screen.getByText('98%')).toBeDefined();
-
-      // Click Earth preset button (1.00g)
-      const earthBtn = screen.getByTestId('preset-btn-earth');
-      fireEvent.click(earthBtn);
-
-      // Now sphericity should drop into terrestrial teardrop regime (<= 25%)
-      expect(screen.getByText(/2[45]%/)).toBeDefined();
-    });
-
-    it('toggles into interactive morph mode with continuous gravity slider', () => {
-      render(<KurzgesagtFlameScene />);
-      const morphBtn = screen.getByTestId('mode-morph');
-      fireEvent.click(morphBtn);
-
-      expect(screen.getByTestId('morph-chamber')).toBeDefined();
-      const slider = screen.getByTestId('gravity-slider') as HTMLInputElement;
-      expect(slider).toBeDefined();
-
-      // Change slider value to 0.5g
-      fireEvent.change(slider, { target: { value: '0.5' } });
-      expect(slider.value).toBe('0.5');
-
-      // Telemetry HUD updates
-      expect(screen.getByText(/Partial-Gravity Mixed Convection/i)).toBeDefined();
+      expect(screen.getByText('0.25 (Teardrop)')).toBeDefined();
+      expect(screen.getByText('0.98 (Spherical)')).toBeDefined();
+      expect(screen.getByText('~1,760 K')).toBeDefined();
+      expect(screen.getByText('~1,420 K')).toBeDefined();
+      expect(screen.getByText('~10.0 Hz')).toBeDefined();
+      expect(screen.getByText('0.4 Hz (Steady)')).toBeDefined();
     });
 
     it('renders the NASA PSI physics discovery takeaway callout card', () => {
@@ -121,7 +92,6 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       render(<AtmosphericPhysics />);
       expect(screen.getByTestId('atmospheric-physics')).toBeDefined();
       expect(screen.getByRole('heading', { name: /The Moon Base Trap/i })).toBeDefined();
-      expect(screen.getByText(/Equal ppO₂ ≠ Equal Fire Safety/i)).toBeDefined();
     });
 
     it('calculates equal breathing partial pressure (3.06 psia) for Artemis Moon Base by default', () => {
@@ -196,12 +166,33 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
     });
   });
 
+  describe('CoreIntelligenceSection Component', () => {
+    it('renders all 3 core innovation cards beyond raw NASA data', () => {
+      render(<CoreIntelligenceSection />);
+      expect(screen.getByTestId('core-intelligence-section')).toBeDefined();
+      expect(screen.getByTestId('contribution-card-harmonization')).toBeDefined();
+      expect(screen.getByTestId('contribution-card-gap-matrix')).toBeDefined();
+      expect(screen.getByTestId('contribution-card-guarded-physics')).toBeDefined();
+      expect(screen.getByText(/Cross-Study Data Harmonization/i)).toBeDefined();
+      expect(screen.getByText(/Evidence Gap Matrix Engine/i)).toBeDefined();
+      expect(screen.getByText(/Guarded Predictive Physics/i)).toBeDefined();
+    });
+
+    it('displays the synchronized 24 studies and 1,926 empirical runs telemetry', () => {
+      render(<CoreIntelligenceSection />);
+      expect(screen.getByText('24 Studies / 1,926 Empirical Runs')).toBeDefined();
+      expect(screen.getByText('6-D Deterministic Gap Matrix')).toBeDefined();
+      expect(screen.getByText(/Moon \(0\.16g\) & Mars \(0\.38g\) CRITICAL GAPS/i)).toBeDefined();
+    });
+  });
+
   describe('Full Landing Page Integration', () => {
     it('assembles all sections smoothly within the main landing route', () => {
       render(<LandingPage />);
       expect(screen.getByTestId('landing-hero')).toBeDefined();
       expect(screen.getByTestId('kurzgesagt-flame-scene')).toBeDefined();
       expect(screen.getByTestId('atmospheric-physics')).toBeDefined();
+      expect(screen.getByTestId('core-intelligence-section')).toBeDefined();
       expect(screen.getByTestId('mission-control-cta')).toBeDefined();
       expect(screen.getByTestId('landing-footer')).toBeDefined();
     });

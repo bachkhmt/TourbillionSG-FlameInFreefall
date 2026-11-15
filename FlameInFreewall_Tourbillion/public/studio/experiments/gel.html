@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="vi" data-theme="dark" data-studio-demo="gel"><head><meta charset="utf-8">
+<title>GEL – Mô phỏng dập tắt lửa quanh quả cầu PMMA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#eef0f3;--fg:#13161b;--mut:#596270;--card:#fff;--bd:#cfd5de;--ac:#c2410c;--on:#13161b;--onfg:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0e13;--fg:#e6e9ef;--mut:#929bab;--card:#141922;--bd:#272e3b;--ac:#ff8a4c;--on:#e6e9ef;--onfg:#0b0e13}}
+:root[data-theme="dark"]{--bg:#0b0e13;--fg:#e6e9ef;--mut:#929bab;--card:#141922;--bd:#272e3b;--ac:#ff8a4c;--on:#e6e9ef;--onfg:#0b0e13}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}}
+h1{font-size:18px;margin:0 0 2px}.sub{color:var(--mut);font-size:12.5px;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:12px}
+.stage{position:relative}
+#cv{display:block;width:100%;aspect-ratio:16/10;border-radius:6px;background:#04070d;cursor:grab;touch-action:none}
+#mp{display:block;width:100%;height:auto;border-radius:6px}
+.ov{position:absolute;font-size:12px;color:#9fb0cc;pointer-events:none}
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+@media(max-width:600px){.hud{grid-template-columns:1fr 1fr}}
+.hud div{border:1px solid var(--bd);border-radius:6px;padding:6px 8px}
+.hud small{display:block;color:var(--mut);font-size:11.5px}.hud b{font-size:15px;font-variant-numeric:tabular-nums}
+.col{display:flex;flex-direction:column;gap:12px}
+label{display:flex;justify-content:space-between;font-size:13px;margin-top:8px}
+label span{font-variant-numeric:tabular-nums;color:var(--mut)}
+input[type=range]{width:100%;accent-color:var(--ac)}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+button,select{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--bd);border-radius:6px;padding:6px 10px;cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+button.on{background:var(--on);color:var(--onfg);border-color:var(--on)}
+.pre{flex:1 1 45%;text-align:left}.pre b{display:block}.pre i{font-style:normal;font-size:11.5px;opacity:.75}
+.chk{display:flex;gap:8px;justify-content:flex-start;align-items:center}
+.note{font-size:11.5px;color:var(--mut);margin:6px 0 0}
+h2{font-size:13px;margin:0 0 6px}
+</style><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body>
+<div class="wrap">
+<div>
+ <h1>GEL – lửa quanh quả cầu PMMA ở vùng giới hạn dập tắt</h1>
+ <p class="sub">Cầu PMMA Ø4 cm trên ống thép Ø6,35 mm trong ống dòng vuông 13,3×13,3 cm. Dòng chảy từ trái sang phải; điểm trì trệ ở mép trái quả cầu. Kéo để xoay, cuộn để zoom.</p>
+ <div class="card"><div class="stage"><canvas id="cv" aria-label="Mô phỏng 3D ngọn lửa quanh quả cầu PMMA"></canvas>
+  <span class="ov" style="left:12px;top:8px" id="oU"></span><span class="ov" style="right:12px;top:8px" id="oG"></span></div>
+  <div class="hud">
+   <div><small>Chế độ</small><b id="hMode">–</b></div>
+   <div><small>O₂ hiện tại</small><b id="hO2">–</b></div>
+   <div><small id="hAL">Vị trí đuôi lửa (từ điểm trì trệ)</small><b id="hAng">–</b></div>
+   <div><small>Khoảng cách lửa–bề mặt</small><b id="hD">–</b></div>
+  </div>
+  <p class="note" id="hSt"></p>
+ </div>
+</div>
+<div class="col">
+ <div class="card"><h2>Kịch bản</h2>
+  <div class="row" id="pres">
+   <button class="pre" data-p="A"><b>A · Quench</b><i>Case 1 · 4,83 cm/s: xung đuôi lửa</i></button>
+   <button class="pre" data-p="B"><b>B · Blowoff</b><i>Case 2 · 34,3 cm/s: lỗ → mảnh xoay</i></button>
+   <button class="pre" data-p="C"><b>C · Trung gian</b><i>Case 3 · 11,5 cm/s: co mượt</i></button>
+   <button class="pre" data-p="D"><b>D · Dòng cực thấp</b><i>Case 4 · 0,44 cm/s: xung tự duy trì</i></button>
+  </div>
+ </div>
+ <div class="card"><h2>Điều kiện</h2>
+  <label for="sU">Dòng chảy <span id="vU"></span></label><input id="sU" type="range" min="0" max="100" step="0.1">
+  <label for="sO"><b id="lO" style="font-weight:400">O₂</b> <span id="vO"></span></label><input id="sO" type="range" min="13" max="28" step="0.1">
+  <label for="sH">Gia nhiệt mẫu (q_c thấp hơn) <span id="vH"></span></label><input id="sH" type="range" min="0" max="1" step="0.01">
+  <label class="chk"><input id="cDep" type="checkbox" checked> O₂ giảm tự nhiên (cháy tiêu thụ O₂, dòng giữ cố định)</label>
+  <label class="chk"><input id="cExit" type="checkbox"> Mẫu ở cửa ra ống (lửa trong yếu phía sau)</label>
+  <div class="row"><button id="g0" class="on">μg</button><button id="g1">1g</button>
+   <select id="sp" aria-label="Tốc độ mô phỏng"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+   <button id="rst">Mồi lửa lại</button></div>
+ </div>
+ <div class="card"><h2>Mặt phẳng dòng × O₂</h2>
+  <canvas id="mp" aria-label="Bản đồ giới hạn dập tắt"></canvas>
+  <p class="note">Nhấn vào bản đồ để đặt điều kiện đầu. ○ = điểm hiệu chỉnh (paper:GEL). Gia nhiệt mẫu dịch đường giới hạn ≈4,6 %O₂ trên mỗi W/cm² q_c (từ hai điểm 1409B và 1410A; áp sang nhánh blowoff là giả định). O₂ giảm nhanh hơn thật ~10–25×; chuỗi tắt chạy theo thời gian thật. Hình ảnh là minh hoạ định tính, không phải CFD.</p>
+ </div>
+</div></div>
+<script src="/assets/vendor/three-r128.min.js"></script>
+<script>
+const $=id=>document.getElementById(id),clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),lerp=(a,b,t)=>a+(b-a)*t,ease=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
+const dpr=Math.min(2,window.devicePixelRatio||1);
+const mp=$('mp'),mx=mp.getContext('2d'),MW=300,MH=210;mp.width=MW*dpr;mp.height=MH*dpr;
+// ---------- mô hình GEL ----------
+const CAL=[[0.44,20.77],[4.83,14.21],[11.5,13.54],[34.28,14.99],[49.68,14.37]]; // paper:GEL
+const PTS=[[0.2,22.9],...CAL,[80,14.0]].map(p=>[Math.log10(p[0]),p[1]]);
+function limit(U,h){const x=Math.log10(U),n=PTS.length;let i=0;while(i<n-2&&x>PTS[i+1][0])i++;
+ const sl=k=>{if(k==3)return 0;const a=Math.max(0,k-1),b=Math.min(n-1,k+1);return(PTS[b][1]-PTS[a][1])/(PTS[b][0]-PTS[a][0])};
+ const x0=PTS[i][0],hh=PTS[i+1][0]-x0,t=clamp((x-x0)/hh,0,1),t2=t*t,t3=t2*t;
+ return(2*t3-3*t2+1)*PTS[i][1]+(t3-2*t2+t)*hh*sl(i)+(-2*t3+3*t2)*PTS[i+1][1]+(t3-t2)*hh*sl(i+1)-(h-.5)*3.7}
+const UB=20; // GIẢ ĐỊNH: dòng đối lưu tự nhiên quanh cầu ở 1g (cm/s); paper: quench cần dòng thấp hơn mức này nên không đo được ở 1g
+const Ue=()=>S.g?Math.hypot(S.U,UB):S.U;
+const regime=U=>U<1?'D':U<9?'A':U<13?'C':'B'; // hợp nhất nhánh ở ~10 cm/s (a≈7,5 s⁻¹)
+const NAMES={A:'Quench · đuôi dao động',B:'Blowoff · lỗ → mảnh xoay',C:'Trung gian · co mượt',D:'Quench dòng cực thấp'};
+// thời lượng chuỗi tắt: B 5,02 s (Case 2), C 1,5 s; A/D theo lịch xung (sched)
+const PRE={A:[4.83,17.5],B:[34.28,17],C:[11.5,17],D:[0.44,26.2]}; // = Case 1,2,3,4 của paper
+const S={U:5,o2s:17.5,o2:17.5,dep:true,h:.5,g:0,exit:false,sp:1,st:'burn',tb:0,te:0,bt:0,mode:'A',ph:0,fq:1.4,frag:[]};
+const U2v=U=>100*Math.log(U/.2)/Math.log(400),v2U=v=>.2*Math.pow(400,v/100);
+const fU=U=>U<10?U.toFixed(2).replace('.',','):U.toFixed(1).replace('.',',');
+const f1=x=>x.toFixed(1).replace('.',',');
+function reset(){S.st='burn';S.tb=S.te=S.bt=0;S.o2=S.o2s;S.ph=0}
+function sync(){$('sU').value=U2v(S.U);$('sO').value=S.o2s;$('sH').value=S.h;lab()}
+function lab(){$('vU').textContent=fU(S.U)+' cm/s';$('vO').textContent=f1(S.o2s)+' %';$('vH').textContent='Δq_c '+(((.5-S.h)*.8>=0)?'+':'')+((.5-S.h)*.8).toFixed(2).replace('.',',')+' W/cm²';
+ $('lO').textContent=S.dep?'O₂ ban đầu':'O₂ (trực tiếp)';$('oU').textContent='Dòng → '+fU(S.U)+' cm/s';$('oG').textContent=S.g?'1g: lực nổi hướng lên':'μg: không lực nổi'}
+function clr(){document.querySelectorAll('.pre').forEach(b=>b.classList.remove('on'))}
+function preset(k){S.U=PRE[k][0];S.o2s=PRE[k][1];S.h=.5;reset();sync();document.querySelectorAll('.pre').forEach(b=>b.classList.toggle('on',b.dataset.p==k))}
+$('pres').onclick=e=>{const b=e.target.closest('button');if(b)preset(b.dataset.p)};
+$('sU').oninput=e=>{S.U=v2U(+e.target.value);lab();clr()};
+$('sO').oninput=e=>{S.o2s=+e.target.value;if(S.st=='burn')S.o2=S.o2s;lab()};
+$('sH').oninput=e=>{S.h=+e.target.value;lab()};
+$('cDep').onchange=e=>{S.dep=e.target.checked;lab();if(S.st=='burn')S.o2=S.o2s};
+$('cExit').onchange=e=>{S.exit=e.target.checked;duct.position.x=(S.exit?3:12)-12.3};
+$('sp').onchange=e=>S.sp=+e.target.value;
+$('rst').onclick=reset;
+function setG(g){S.g=g;$('g0').classList.toggle('on',!g);$('g1').classList.toggle('on',!!g);lab()}
+$('g0').onclick=()=>setG(0);$('g1').onclick=()=>setG(1);
+const mpX=U=>30+(Math.log10(U)-Math.log10(.2))/Math.log10(400)*(MW-42),mpY=o=>MH-26-(o-13)/15*(MH-40);
+mp.onclick=e=>{const r=mp.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*MW,y=(e.clientY-r.top)/r.height*MH;
+ S.U=clamp(v2U((x-30)/(MW-42)*100),.2,80);S.o2s=Math.round(clamp(13+(MH-26-y)/(MH-40)*15,13,28)*10)/10;reset();sync();clr()};
+const dBase=U=>Math.min(12,5.16/Math.sqrt(U));   // mm: δ=√(D/a), a=1,5·U/R; D chuẩn theo Case 4 (7–10 mm ở 0,44 cm/s)
+const Lfull=U=>8+40*U/(U+6);                        // mm (minh hoạ)
+const far=lim=>clamp((S.o2-lim)/(regime(Ue())=='D'?Math.max(1,S.o2s-lim):6),0,1);
+const sstep=(a,b,x)=>ease((x-a)/(b-a)),seg=(x,a,b)=>ease((x-a)/(b-a));
+const tip0=(fr,Uf)=>lerp(100,180,Math.max(ease((fr-.25)/.75),ease((Uf-8)/12))); // góc đuôi lửa ổn định (°): ~100° gần giới hạn (Case 1)
+// Quench: xung xuôi dòng NGẮN (~0,4 s, lan truyền tiền trộn) rồi co ngược dòng CHẬM (0,8–1,5 s); đáy mỗi chu kỳ thấp dần
+function sched(){const m=S.mode,U=Ue();S.sch=[];
+ if(m=='B'||m=='C'){S.dur=m=='B'?5.02:1.5;return}
+ if(m=='D')S.sch=Array.from({length:3},(_,k)=>({tp:.31,T:1.25,b:110*(1-k/3),b1:110*(1-(k+1)/3),P:178}));
+ else{const Dq=U>=4.83?18.84*Math.max(.1,(9.5-U)/4.67):18.84+(4.83-U)*4.5,Ta=clamp(.7+.25*U,.9,2),N=clamp(Math.round(Dq/Ta),1,40),tp=Ta<1.2?.3:.4;
+  S.sch=Array.from({length:N},(_,k)=>{const f=N>1?k/(N-1):0,p=tp*(k==0?1.75:k==1?1.4:1);return{tp:p,T:p+(Ta-tp)*lerp(1.3,.7,f),b:100*(1-k/N),b1:100*(1-(k+1)/N),P:lerp(125,175,f)}})}
+ S.dur=S.sch.reduce((a,c)=>a+c.T,0)}
+function cyc(t){let t0=0;for(const c of S.sch){if(t<t0+c.T){const f=t-t0;
+  if(f<c.tp)return{deg:c.b+(c.P-c.b)*ease(f/c.tp),bo:Math.sin(Math.PI*f/c.tp)};
+  return{deg:c.b1+(c.P-c.b1)*Math.pow(1-(f-c.tp)/(c.T-c.tp),2.2),bo:0}}t0+=c.T}return{deg:0,bo:0}}
+function step(dt){
+ const lim=limit(Ue(),S.h);
+ if(S.st=='burn'){S.tb+=dt;S.bt+=dt;if(S.dep)S.o2-=.25*dt;
+  if(regime(Ue())=='D'){const p=1-far(lim);S.fq=p<.35?lerp(1.4,1,p/.35):p<.95?1:.8;S.ph+=S.fq*dt} // 1,4→1→0,8 Hz (Case 4)
+  if(S.o2<=lim){S.o2=Math.max(S.o2,lim-.01);S.st='ext';S.te=0;S.mode=regime(Ue());sched();
+   S.frag=Array.from({length:5},(_,i)=>({p:1.55+i*.1+Math.random()*.08,psi:Math.random()*6.28,w:6.28*(2+1.5*Math.random()),r:1.5-.15*i}))}}
+ else if(S.st=='ext'){S.te+=dt;S.bt+=dt;if(S.dep)S.o2-=.03*dt;if(S.mode=='B')S.frag.forEach(f=>f.psi+=f.w*dt);if(S.te>=S.dur)S.st='out'}}
+function flame(){
+ if(S.st=='out')return null;
+ const Uf=Ue(),lim=limit(Uf,S.h),fr=far(lim),D=regime(Uf)=='D';
+ let d=dBase(Uf)*(1+(D?.45:.15)*(1-fr)),ta=0,tb=1,al=1,pale=0,frg=0,az=0;
+ if(S.st=='burn'){
+  if(D){const f=S.ph%1,pf=.28,P=lerp(135,178,1-fr),b=110,w=f<pf?ease(f/pf):Math.pow(1-(f-pf)/(1-pf),2.2); // dao động giãn (không hình sin)
+   tb=(b+(P-b)*w)/180;al=1+.6*(f<pf?Math.sin(Math.PI*f/pf):0);d*=1+.05*Math.sin(2*Math.PI*S.ph)}
+  else{tb=tip0(fr,Uf)/180+Math.max(0,1-fr/.35)*.03*Math.sin(S.tb*4.4);d*=1+.03*Math.sin(S.tb*3)}
+  return{ta,tb:clamp(tb,.05,1),al,pale,d,fr:frg,az}}
+ const t=S.te,m=S.mode;d=dBase(Uf)*(D?1.45:1.15);
+ if(m=='A'||m=='D'){const c=cyc(t);tb=clamp(c.deg/180,.01,1);al=(1+.6*c.bo)*(1-.6*clamp((t-S.dur+.5)/.5,0,1))}
+ else if(m=='B'){let a,bo=0;
+  if(t<.5)a=145*seg(t,0,.5);
+  else if(t<.91){a=lerp(145,10,seg(t,.5,.91));bo=Math.sin(Math.PI*(t-.5)/.41)}
+  else if(t<1.12)a=lerp(10,145,seg(t,.91,1.12));
+  else if(t<1.53){a=lerp(145,10,seg(t,1.12,1.53));bo=Math.sin(Math.PI*(t-1.12)/.41)}
+  else if(t<1.84)a=lerp(10,145,seg(t,1.53,1.84));
+  else a=lerp(145,100,seg(t,1.84,2.4));
+  ta=a/180;az=t<1.84?.07:.1;al=(1+.5*bo)*(t<3.3?1:1-seg(t,3.3,4.2));frg=t<3.3?0:clamp(1-Math.pow((t-3.3)/1.7,1.4),0,1)}
+ else{const p=t/S.dur;tb=clamp(tip0(0,Uf)/180,.05,1);pale=p;al=1-.45*p} // C: đuôi co từ từ, gốc nhạt màu rồi tắt trong 1 khung hình
+ return{ta,tb,al,pale,d,fr:frg,az}}
+// ---------- bản đồ + HUD ----------
+function drawMap(){
+ mx.setTransform(dpr,0,0,dpr,0,0);mx.fillStyle='#0b0e13';mx.fillRect(0,0,MW,MH);
+ const x0=30,x1=MW-12,yb=MH-26,yt=14,vx=px=>v2U((px-x0)/(MW-42)*100);
+ for(let px=x0;px<=x1;px++){const U=vx(px),y=clamp(mpY(limit(U,S.h)),yt,yb);
+  mx.fillStyle=U<9?'rgba(70,130,255,.42)':U<13?'rgba(255,190,70,.45)':'rgba(255,90,70,.42)';mx.fillRect(px,y,1,yb-y);
+  mx.fillStyle='rgba(120,230,160,.08)';mx.fillRect(px,yt,1,y-yt)}
+ mx.strokeStyle='#e6e9ef';mx.lineWidth=1.6;mx.beginPath();
+ for(let px=x0;px<=x1;px++){const y=mpY(limit(vx(px),S.h));px==x0?mx.moveTo(px,y):mx.lineTo(px,y)}mx.stroke();
+ mx.fillStyle='#929bab';mx.font='10px system-ui,sans-serif';mx.strokeStyle='#929bab';mx.lineWidth=1;
+ for(const u of[.2,1,10,80])mx.fillText(String(u).replace('.',','),mpX(u)-6,MH-14);
+ for(const o of[13,20,28])mx.fillText(o,6,mpY(o)+3);
+ mx.fillText('Dòng (cm/s, log)',x0+60,MH-3);mx.fillText('O₂ %',4,10);
+ mx.fillText('Quench',x0+10,yb-6);mx.fillText('Blowoff',x1-44,yb-6);mx.fillText('Cháy bền',x0+70,yt+12);
+ mx.beginPath();for(const u of[9,13]){mx.moveTo(mpX(u),yb);mx.lineTo(mpX(u),yb-10)}mx.stroke();
+ mx.strokeStyle='#fff';for(const c of CAL){mx.beginPath();mx.arc(mpX(c[0]),mpY(c[1]),3.2,0,7);mx.stroke()}
+ const cxp=mpX(Ue());
+ if(S.dep){mx.strokeStyle='rgba(255,255,255,.35)';mx.setLineDash([3,3]);mx.beginPath();mx.moveTo(cxp,mpY(S.o2s));mx.lineTo(cxp,mpY(S.o2));mx.stroke();mx.setLineDash([])}
+ mx.fillStyle=S.st=='out'?'#ff5a4a':S.st=='ext'?'#ffb340':'#7ff0a8';mx.beginPath();mx.arc(cxp,mpY(S.o2),5,0,7);mx.fill()}
+function hud(F){const U=Ue(),m=S.st=='burn'?regime(U):S.mode,blow=S.st=='ext'&&S.mode=='B';
+ $('hMode').textContent=NAMES[m];$('hO2').textContent=f1(S.o2)+' %  (giới hạn '+f1(limit(U,S.h))+')';
+ $('hAL').textContent=blow?'Vị trí gốc lửa (từ điểm trì trệ)':'Vị trí đuôi lửa (từ điểm trì trệ)';
+ if(!F){$('hAng').textContent='–';$('hD').textContent='–'}
+ else{$('hAng').textContent=Math.round(180*(blow?F.ta:F.tb))+'°';
+  const h=blow&&F.ta>.02;$('hD').textContent=f1(h?F.d*(1+.8*Math.sin(Math.PI*F.ta/2)):F.d)+' mm'+(h?' (tại gốc lửa)':'')}
+ $('hSt').textContent=S.st=='burn'?'Cháy ổn định (a = '+f1(.75*S.U)+' s⁻¹, Re = '+Math.round(26.7*S.U)+(S.g?'; 1g: lực nổi ≈'+UB+' cm/s, giả định, không có nhánh quench':'')+')'+(S.dep?'; O₂ đang giảm.':'.')+(regime(U)=='D'?' Dao động tự duy trì '+f1(S.fq)+' Hz.':''):S.st=='ext'?'Đang tắt…':'Đã tắt. Nhấn “Mồi lửa lại” hoặc chọn kịch bản.'}
+// ---------- Three.js: ngọn lửa raymarching thể tích ----------
+const NOISE=`
+float h31(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
+ return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){return .5*vn(p)+.25*vn(p*2.03+7.1)+.125*vn(p*4.07+3.3);}`;
+const VS=`varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`;
+// Dòng theo +x. Mặt lửa: τ∈[0,.5] cung quanh cầu từ điểm trì trệ (φ=πτ), τ∈(.5,1] đuôi giọt nước; mặt nạ [uTa,uTb]
+const FF=NOISE+`
+uniform float uT,uR,uI,uO,uTurb,uMode,uGain,uScroll,uTa,uTb,uD0,uLt,uLift,uInner,uAz,uAzP;
+uniform int uSteps;uniform vec3 uBoxC,uBoxH,uCa,uCb,uCc,uCd;uniform vec4 uF[6];
+varying vec3 vW;
+vec3 ramp(float t){vec3 c=mix(uCa,uCb,smoothstep(0.,.35,t));c=mix(c,uCc,smoothstep(.35,.7,t));return mix(c,uCd,smoothstep(.7,1.,t));}
+vec3 shade(vec3 p){
+ float r=length(p);if(r<uR)return vec3(0);
+ float lf=uLift*uR*.35*pow(max(p.x+uR,0.)/(2.*uR),1.6);
+ vec3 q=vec3(p.x,p.y-lf,p.z);
+ float n1=fbm(vec3(q.x*.7,q.y*.7-uT*uScroll,q.z*.7)),n2=vn(q*1.6+vec3(4.,uT*uScroll*.6,9.));
+ float d1=uD0*1.8,rq=length(q),sd,tau;
+ if(q.x<0.){float ph=acos(clamp(-q.x/rq,0.,1.));sd=rq-(uR+uD0+(d1-uD0)*sin(ph*.5));tau=ph/3.14159;}
+ else{float v=q.x/uLt;if(v>1.)return vec3(0);
+  float yt=(uR+uD0*(1.+.8*.7071))*pow(max(1.-pow(v,1.5),0.),.8);
+  sd=length(q.yz)-yt;tau=.5+.5*v;}
+ float tA=uTa>0.?uTa+uAz*cos(atan(q.z,q.y)-uAzP):uTa;float msk=smoothstep(tA-.04,tA+.04,tau)*(1.-smoothstep(uTb-.04,uTb+.04,tau));
+ sd+=(n1-.5)*uTurb*(.25+1.2*tau);
+ float w=(.16+.22*uD0)*(uMode>.5?1.:1.5*(1.+tau));
+ float dens=exp(-sd*sd/(w*w))+.22*exp(-max(sd,0.)/(2.2*w))*smoothstep(-w,w,sd);
+ dens*=msk*(uMode>.5?1.+(n2-.5)*.15:.55+.9*n1);
+ float s=r/uR-1.;
+ dens+=msk*.12*exp(-s/.25)*step(sd,0.);
+ dens+=uInner*exp(-dot(q.yz,q.yz)/.16)*smoothstep(uR*1.05,uR*1.7,q.x)*(1.-smoothstep(.35*uLt,.85*uLt,q.x));
+ for(int i=0;i<6;i++){float rad=.25+.45*uF[i].w,dd=length(p-uF[i].xyz);dens+=uF[i].w*1.6*exp(-dd*dd/(rad*rad));}
+ dens=max(dens,0.);
+ return ramp(clamp(dens*.85,0.,1.))*dens;
+}
+void main(){
+ vec3 ro=cameraPosition,rd=normalize(vW-ro),inv=1./rd,t0=(uBoxC-uBoxH-ro)*inv,t1=(uBoxC+uBoxH-ro)*inv;
+ vec3 mn=min(t0,t1),mx=max(t0,t1);
+ float tn=max(max(mn.x,mn.y),max(mn.z,0.)),tf=min(min(mx.x,mx.y),mx.z);
+ if(tf<=tn)discard;
+ float b=dot(ro,rd),d=b*b-dot(ro,ro)+uR*uR;
+ if(d>0.){float ts=-b-sqrt(d);if(ts>0.)tf=min(tf,ts);}
+ if(tf<=tn)discard;
+ float dt=(tf-tn)/float(uSteps),j=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+ vec3 acc=vec3(0.);
+ for(int i=0;i<48;i++){if(i>=uSteps)break;acc+=shade(ro+rd*(tn+(float(i)+j)*dt))*dt;}
+ acc*=uGain*pow(max(uI,0.),.7)*pow(uO,.3);
+ gl_FragColor=vec4(1.-exp(-acc),1.);
+}`;
+const SVS=`varying vec3 vP,vN,vW;void main(){vP=position;vN=normalize(mat3(modelMatrix)*normal);vW=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(vW,1.);}`;
+const SFF=NOISE+`
+uniform float uT,uBurn,uI,uMode;uniform vec3 uLC;varying vec3 vP,vN,vW;
+void main(){
+ vec3 n=normalize(vN),v=normalize(cameraPosition-vW);
+ float a=vn(vP*3.+3.),b=vn(vP*10.),ch=clamp(uBurn*1.6+(a-.5)*.9,0.,1.);
+ vec3 cream=vec3(.92,.88,.74)*(.82+.25*b),base=mix(cream,vec3(.025,.02,.02),smoothstep(.3,.65,ch));
+ float em=smoothstep(.62,.82,vn(vP*7.+vec3(0.,uT*.25,0.)))*smoothstep(.35,.7,ch)*uI;
+ float lit=mix(.55+.45*n.y,1.,uMode),rim=pow(1.-max(dot(n,v),0.),2.5);
+ vec3 L=uLC*uI*(.5+1.1*lit);
+ vec3 col=base*(vec3(.05,.06,.09)+L)+cream*uLC*rim*.25*uI*(1.-ch)+vec3(1.,.22,.25)*em*1.6;
+ gl_FragColor=vec4(1.-exp(-col*1.1),1.);
+}`;
+const GVS=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+const GFF=`uniform vec3 uCol;uniform float uK;varying vec2 vUv;void main(){vec2 p=(vUv-.5)*2.;float r2=dot(p,p);gl_FragColor=vec4(uCol*(exp(-r2*4.)*.6+exp(-r2*12.)*.4)*uK,1.);}`;
+const V3=(a)=>new THREE.Vector3(...a);
+const cv=$('cv'),rd=new THREE.WebGLRenderer({canvas:cv,antialias:false});rd.setClearColor(0x04070d,1);
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(32,1.6,.5,200);
+let steps=48;
+const U={uT:{value:0},uR:{value:2},uI:{value:0},uO:{value:1},uTurb:{value:.03},uMode:{value:1},uGain:{value:1.5},uScroll:{value:.1},uTa:{value:-1},uTb:{value:2},uD0:{value:.5},uLt:{value:5},uLift:{value:0},uInner:{value:0},uAz:{value:0},uAzP:{value:0},
+ uSteps:{value:steps},uBoxC:{value:V3([1.5,2,0])},uBoxH:{value:V3([5.6,7,5])},
+ uCa:{value:V3([0,0,0])},uCb:{value:V3([0,0,0])},uCc:{value:V3([0,0,0])},uCd:{value:V3([0,0,0])},uF:{value:Array.from({length:6},()=>new THREE.Vector4(0,0,0,0))}};
+const fire=new THREE.Mesh(new THREE.BoxGeometry(2,2,2),new THREE.ShaderMaterial({uniforms:U,vertexShader:VS,fragmentShader:FF,side:THREE.BackSide,transparent:true,blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false}));
+fire.scale.copy(U.uBoxH.value);fire.position.copy(U.uBoxC.value);fire.renderOrder=2;fire.frustumCulled=false;
+const SU={uT:U.uT,uI:U.uI,uMode:U.uMode,uBurn:{value:0},uLC:{value:V3([.15,.35,1])}};
+const sph=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),new THREE.ShaderMaterial({uniforms:SU,vertexShader:SVS,fragmentShader:SFF}));
+const stick=new THREE.Mesh(new THREE.CylinderGeometry(.3175,.3175,12,12),new THREE.MeshBasicMaterial({color:0x56606e}));
+const GU={uCol:{value:V3([.15,.35,1])},uK:{value:0}};
+const glow=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.ShaderMaterial({uniforms:GU,vertexShader:GVS,fragmentShader:GFF,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
+glow.renderOrder=1;glow.frustumCulled=false;
+const duct=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(24.6,13.3,13.3)),new THREE.LineBasicMaterial({color:0x2a3a58,transparent:true,opacity:.7}));duct.position.x=12-12.3;
+const arrow=new THREE.ArrowHelper(new THREE.Vector3(1,0,0),new THREE.Vector3(-10,6,0),3,0x8fa2c4,.7,.4);
+scene.add(sph,stick,glow,duct,arrow,fire);
+const BLUE=[[.03,.12,.9],[.25,.58,1],[.7,.9,1],[.92,.97,1]],ORG=[[.45,.04,0],[1,.36,.03],[1,.78,.22],[1,.95,.72]];
+const cm={th:0,ph:.08,d:26},TG=new THREE.Vector3(1.6,1.1,0);
+let drag=0;cv.onpointerdown=e=>{drag=1;cv.setPointerCapture(e.pointerId)};cv.onpointerup=()=>drag=0;
+cv.onpointermove=e=>{if(drag){cm.th=clamp(cm.th-e.movementX*.006,-1.4,1.4);cm.ph=clamp(cm.ph+e.movementY*.004,-.5,1.1)}};
+cv.addEventListener('wheel',e=>{e.preventDefault();cm.d=clamp(cm.d*Math.exp(e.deltaY*.001),14,50)},{passive:false});
+function size(){const w=cv.clientWidth,h=Math.round(w*.625);rd.setPixelRatio(Math.min(dpr,1.5));rd.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+addEventListener('resize',size);
+function update(F){
+ const R=2*(1-.05*Math.min(1,S.bt/90)),lim=limit(Ue(),S.h),near=clamp((S.o2-lim)/4,0,1),g=S.g;
+ const c=Math.cos(cm.ph);cam.position.set(TG.x+cm.d*c*Math.sin(cm.th),TG.y+cm.d*Math.sin(cm.ph),cm.d*c*Math.cos(cm.th));cam.lookAt(TG);
+ let soot=sstep(15,18,S.o2)*sstep(6,20,Ue());if(g)soot=Math.max(soot,.6); // vàng (bồ hóng) khi O₂ & dòng cao, xanh khi thấp
+ const pl=F?F.pale*.5:0,cols=[U.uCa,U.uCb,U.uCc,U.uCd];
+ for(let i=0;i<4;i++){const a=BLUE[i].map((v,k)=>lerp(v,ORG[i][k],soot));cols[i].value.set(lerp(a[0],.8,pl),lerp(a[1],.85,pl),lerp(a[2],.95,pl))}
+ U.uT.value+=.016;U.uR.value=R;U.uMode.value=g?0:1;U.uGain.value=g?1:1.5;U.uScroll.value=g?1.9:.12;
+ U.uLift.value=g?1+4/(1+S.U/3):0;U.uTurb.value=g?.45*(1+(S.st=='ext'?1:(1-near)*.8)):.03;
+ U.uO.value=S.o2/21;U.uLt.value=R+Lfull(Ue())/10;
+ const on=!!F&&F.al>.004;fire.visible=on;
+ if(on){U.uI.value=F.al;U.uD0.value=Math.max(F.d,1.2)/10;U.uTa.value=F.ta>.001?F.ta:-1;U.uTb.value=F.tb<.999?F.tb:2;
+  const fs=U.uF.value;fs.forEach(v=>v.set(0,0,0,0));
+  if(F.fr)S.frag.forEach((f,i)=>{const r=R+dBase(S.U)*.12+.3;fs[i].set(-r*Math.cos(f.p),r*Math.sin(f.p)*Math.cos(f.psi),r*Math.sin(f.p)*Math.sin(f.psi),F.fr*f.r/1.5)});
+  U.uInner.value=sstep(15,35,Ue())*(S.exit?.5:.15)*((S.st=='burn'||(S.mode=='B'&&S.te<3))?1:0);U.uAz.value=F.az;U.uAzP.value=S.te*2.5}
+ else U.uI.value=0;
+ sph.scale.setScalar(R);SU.uBurn.value=clamp(S.bt/22,0,1);stick.position.y=-R*.9-6+.1;
+ GU.uCol.value.set(U.uCb.value.x,U.uCb.value.y,U.uCb.value.z);SU.uLC.value.copy(GU.uCol.value);
+ GU.uK.value=on?F.al*(g?.55:.7)*Math.min(1.4,S.o2/21)*(1-pl):0;
+ const gc=new THREE.Vector3(1.2,g?1.4:.3,0),dir=gc.clone().sub(cam.position).normalize();
+ glow.position.copy(gc).addScaledVector(dir,6);glow.quaternion.copy(cam.quaternion);glow.scale.set(14,g?17:14,1);
+}
+// ---------- vòng lặp ----------
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let last=performance.now(),fn=0,ft=last;
+function loop(now){requestAnimationFrame(loop);
+ const dt=Math.min(.05,(now-last)/1000);last=now;step(dt*S.sp*(reduce?.5:1));
+ const F=flame();update(F);rd.render(scene,cam);hud(F);drawMap();
+ fn++;if(now-ft>1000){const fps=fn*1000/(now-ft);fn=0;ft=now;if(fps<30&&steps>24){steps=steps>32?32:24;U.uSteps.value=steps}}}
+size();preset('A');requestAnimationFrame(loop);
+</script></body></html>

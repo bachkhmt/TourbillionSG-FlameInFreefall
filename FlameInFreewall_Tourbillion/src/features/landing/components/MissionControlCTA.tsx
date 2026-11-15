@@ -38,9 +38,9 @@ const MISSION_CARDS: MissionCard[] = [
     badge: 'Telemetry & Catalog',
     badgeColor: 'text-zinc-950 border-lime-300 bg-[#D4FC02]',
     description:
-      'High-density telemetry overview across 20 NASA PSI investigations. Access 148+ flight test runs, peak flame spread rates, and fuel category distributions.',
+      'High-density telemetry overview across 24 NASA PSI investigations with 1,926 empirical flight test runs.',
     icon: Compass,
-    features: ['20 Microgravity Flight Studies', '148+ Verified Ignition Events', 'Interactive KPI Telemetry'],
+    features: ['24 Microgravity Flight Studies', '1,926 Empirical Test Runs'],
     ctaText: 'Enter Dashboard',
     ctaStyle: 'primary',
   },
@@ -51,9 +51,9 @@ const MISSION_CARDS: MissionCard[] = [
     badge: 'Cross-Study Synthesis',
     badgeColor: 'text-blue-900 border-blue-200 bg-blue-50',
     description:
-      'Filter investigations across droplet, solid, and gaseous fuels. Inspect Limiting Oxygen Indexes (LOI) and launch synchronized multi-study comparison modals.',
+      'Faceted multi-parametric search and side-by-side comparison across solid, droplet, and gaseous fuel regimes.',
     icon: Layers,
-    features: ['Faceted Multi-Parametric Search', 'Side-by-Side Study Comparison', 'Empirical Telemetry Curves'],
+    features: ['Faceted Multi-Parametric Search', 'Side-by-Side Study Comparison'],
     ctaText: 'Explore Studies',
     ctaStyle: 'secondary',
   },
@@ -64,10 +64,10 @@ const MISSION_CARDS: MissionCard[] = [
     badge: 'Fire Safety Guardrails',
     badgeColor: 'text-amber-800 border-amber-200 bg-amber-50',
     description:
-      'Explore investigations relevant to crew habitats. Compare reported conditions and identify where experimental evidence is missing.',
+      'Habitat fire risk envelopes and condition gap matrix auditing ISS, Lunar Base (0.16g), and Mars (0.38g).',
     icon: ShieldAlert,
-    features: ['6-Dimension Condition Gap Matrix', 'Source Context & Research Limits', 'Investigation Relevance'],
-    ctaText: 'Explore Mission Evidence',
+    features: ['6-Dimension Condition Gap Matrix', 'NASA Safety Disclaimer Guardrails'],
+    ctaText: 'Run Risk Evaluation',
     ctaStyle: 'secondary',
   },
 ];
@@ -78,30 +78,24 @@ export const MissionControlCTA: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/70 px-3 py-1 text-xs font-bold text-[#0B2374] shadow-2xs mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-[#0B2374]" />
-            <span>Mission Control Workspace</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#D4FC02]" />
-            <span>Interactive Spaceflight Intelligence</span>
-          </div>
           <h2 className="text-3xl sm:text-5xl font-black text-zinc-950 tracking-tight mb-4">
             Explore the <span className="text-[#0B2374]">Three Core Pillars</span>
           </h2>
           <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
             Transition seamlessly between high-level NASA telemetry, deep cross-study empirical synthesis,
-            and investigation of experimental evidence gaps.
+            and mission-critical fire safety hazard evaluation.
           </p>
         </div>
 
         {/* 3 Interactive Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {MISSION_CARDS.map((card) => {
             const Icon = card.icon;
             const isPrimary = card.ctaStyle === 'primary';
             return (
               <div
                 key={card.id}
-                className="group rounded-3xl border border-gray-200/80 bg-white p-6 sm:p-7 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-gray-300 transition-all duration-300"
+                className="group rounded-[36px] bg-gray-200/50 p-6 sm:p-7 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-gray-300 transition-all duration-300"
                 data-testid={`card-${card.id}`}
               >
                 <div>
@@ -142,7 +136,7 @@ export const MissionControlCTA: React.FC = () => {
                   className={`w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
                     isPrimary
                       ? 'bg-[#D4FC02] hover:bg-[#c3e802] text-zinc-950 shadow-xs hover:scale-[1.02] active:scale-[0.98]'
-                      : 'bg-gray-100 hover:bg-gray-200 text-zinc-800 border border-gray-200 shadow-2xs hover:scale-[1.02] active:scale-[0.98]'
+                      : 'bg-white hover:bg-gray-200 text-zinc-800 hover:scale-[1.02] active:scale-[0.98]'
                   }`}
                   data-testid={`cta-btn-${card.id}`}
                 >

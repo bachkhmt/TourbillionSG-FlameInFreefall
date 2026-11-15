@@ -8,6 +8,7 @@ import {
   LandingHero,
   KurzgesagtFlameScene,
   AtmosphericPhysics,
+  CoreIntelligenceSection,
   MissionControlCTA,
   LandingFooter,
 } from '@/features/landing';
@@ -20,10 +21,11 @@ export const metadata = {
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen flex flex-col bg-[#F8F9FA] text-[#1A1A1A] overflow-x-hidden">
+    <main className="min-h-screen flex flex-col bg-[#F8F9FA] text-[#1A1A1A] overflow-x-clip font-sans scroll-smooth">
       <LandingHero />
       <KurzgesagtFlameScene />
       <AtmosphericPhysics />
+      <CoreIntelligenceSection />
       <MissionControlCTA />
       <LandingFooter />
     </main>
