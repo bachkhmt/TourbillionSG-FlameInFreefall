@@ -381,7 +381,7 @@ async def test_v3_http_navigation_and_aggregation(client, target, question):
         assert "Explorer" in answer["text"]
     else:
         assert answer["state"] == "answered" and answer["citations"]
-    assert answer["provider_version"] == "nasa-extractive-v3"
+    assert answer["provider_version"] == "nasa-extractive-v4"
     registry = json.loads((target["collection"].parent / "corpus-registry.json").read_text())
     slugs = [registry["sources"][c["source_document_id"]]["slug"] for c in answer["citations"]]
     if "dioxide" in question or "CO2" in question:

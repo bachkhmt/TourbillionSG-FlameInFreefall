@@ -23,6 +23,8 @@ class SessionInput(ChatInput):
 
 class Question(ChatInput):
     question: str = Field(min_length=1, max_length=4000, pattern=r"\S")
+    # Optional answer-framing language; omitted/null keeps per-question detection.
+    language: Literal["en", "vi"] | None = None
 
 
 class SessionOutput(BaseModel):
