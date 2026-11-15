@@ -60,29 +60,29 @@ def terms(text):
 def refusal(question):
     query = fold(question)
     if len(set(re.findall(r"\bflex[- ]?(\d{3})\b", query))) > 1:
-        return "Hãy hỏi từng mã FLEX một để tôi không trộn bằng chứng của hai lượt thử."
+        return "Please ask about one FLEX code at a time so I don't mix evidence from two runs."
     if re.search(r"\bbass[- ]ii\b", query) and len(set(re.findall(r"\bb\d{1,5}\b", query))) > 1:
-        return "Hãy hỏi từng mã BASS-II một để tôi không trộn bằng chứng của hai lượt thử."
+        return "Please ask about one BASS-II code at a time so I don't mix evidence from two runs."
     if re.search(r"\bsaffire[- ]iii\b", query) and len(set(re.findall(r"\bs\d{1,5}\b", query))) > 1:
-        return "Hãy hỏi từng mã Saffire-III một để tôi không trộn bằng chứng của hai lượt thử."
+        return "Please ask about one Saffire-III code at a time so I don't mix evidence from two runs."
     if len(set(re.findall(r"\b(?:run|test|record)\s*(?:#\s*)?([a-z]*\d[a-z0-9-]*)\b", query))) > 1:
-        return "Hãy hỏi từng mã bản ghi một để tôi không trộn bằng chứng của hai lượt thử."
+        return "Please ask about one record code at a time so I don't mix evidence from two runs."
     if re.search(r"\b(safe|unsafe|an toan|certify|certified|xac suat chay)\b", query):
         return (
-            "Không thể đưa ra kết luận an toàn hoặc chứng nhận từ bộ dữ liệu nghiên cứu này. "
-            "Hãy hỏi về điều kiện thử hoặc nội dung nguồn cụ thể."
+            "Cannot draw safety conclusions or certifications from this research dataset. "
+            "Please ask about test conditions or specific source content."
         )
     if re.search(r"\b(bitcoin|weather|thoi tiet|propulsion|stock price|gia co phieu)\b", query):
-        return "Câu hỏi nằm ngoài bộ tài liệu nghiên cứu cháy NASA đang được kết nối."
+        return "The question is outside the connected NASA combustion research document set."
     if (
         PLANETARY_CONDITIONS.search(query)
         or GRAVITY_UNIT.search(query)
         or (PLANETARY_GRAVITY.search(query) and not MASS_CONTEXT.search(query))
     ):
         return (
-            "Không tìm thấy số đo phù hợp ở điều kiện trọng lực Sao Hỏa hoặc Mặt Trăng "
-            "trong bộ dữ liệu đang kết nối. "
-            "Có thể tra cứu các thí nghiệm vi trọng lực trong bộ này."
+            "No matching measurements found for Mars or Moon gravity conditions "
+            "in the connected dataset. "
+            "Microgravity experiments in this dataset can be queried."
         )
     return None
 

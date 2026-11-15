@@ -1,25 +1,26 @@
-# Kế hoạch nghiên cứu dữ liệu NASA combustion
+# NASA Combustion Data Research Plan
 
-Ngày: 2026-11-10. Phạm vi: nghiên cứu nguồn và đặc điểm đầu vào cho backend FlameGuard AI; không sửa ứng dụng, ERD, migrations, README hay frontend.
+Date: 2026-11-10. Scope: investigate input sources and characteristics for the FlameGuard AI backend; do not modify application, ERD, migrations, README, or frontend.
 
-## Câu hỏi và tiêu chí hoàn thành
+## Questions and Completion Criteria
 
-1. Xác minh các cổng dữ liệu chính thức, yêu cầu truy cập và cách lấy dữ liệu; phân biệt metadata, bài báo, dữ liệu gốc và nội dung truyền thông.
-2. Lập bản đồ các họ thí nghiệm combustion tiêu biểu (droplet, gaseous flames, solid fuels và large-scale spacecraft fires), ưu tiên nguồn NASA và công bố gốc.
-3. Kiểm tra trực tiếp một số artifact/manifest để mô tả format, granularity, đơn vị, provenance và giới hạn; không suy ra file tồn tại chỉ từ trang giới thiệu.
-4. Đề xuất pipeline ingestion/RAG phù hợp với 21 entities hiện tại; ghi rõ khoảng trống cần quyết định, không tự thay đổi hợp đồng.
-5. Lưu báo cáo tiếng Việt và evidence notes có URL/locator, tách quan sát đã xác minh khỏi suy luận/khuyến nghị.
+1. Verify official data portals, access requirements, and retrieval mechanisms; distinguish metadata, papers, raw data, and media content.
+2. Map representative combustion experiment families (droplets, gaseous flames, solid fuels, and large-scale spacecraft fires), prioritizing NASA sources and original publications.
+3. Directly inspect selected artifacts/manifests to describe format, granularity, units, provenance, and limitations; do not infer file existence solely from introductory pages.
+4. Propose an ingestion/RAG pipeline compatible with the existing 21 entities; clearly document gaps requiring decisions without unilaterally changing contracts.
+5. Save report and evidence notes with URLs/locators, separating verified observations from inferences/recommendations.
 
-## Cách nghiên cứu
+## Research Methodology
 
-- Tìm và mở nguồn primary: NASA PSI/OSDR, NASA experiment pages, NASA NTRS, publications/datasets của tác giả.
-- Ưu tiên đọc metadata và tài liệu hướng dẫn trước; chỉ tải mẫu nhỏ khi cần, không tải toàn bộ video/archive lớn.
-- Tìm phản chứng: login/data request, dữ liệu thiếu conditions, cấu trúc khác nhau giữa campaigns, nguồn review không phải raw data, giới hạn provenance/uncertainty.
-- Không gọi NASA discovery endpoint chưa xác minh như một API contract ổn định; ghi rõ ngày kiểm tra và hạn chế môi trường.
+- Locate and access primary sources: NASA PSI/OSDR, NASA experiment pages, NASA NTRS, author publications/datasets.
+- Prioritize reading metadata and guidance documentation first; download small samples only when necessary, avoiding large videos/archives.
+- Look for counter-evidence: login/data requests, data lacking conditions, structural discrepancies across campaigns, review sources vs. raw data, provenance/uncertainty limitations.
+- Do not treat unverified NASA discovery endpoints as stable API contracts; explicitly document testing dates and environmental constraints.
 
-## Đầu ra và kiểm tra
+## Outputs and Verification
 
-- `report.md`: tổng hợp, ma trận dữ liệu, mapping và đề xuất thứ tự triển khai.
-- `evidence/`: ghi chú nguồn và mẫu manifest/metadata nhỏ đã kiểm tra khi phù hợp.
-- `sources.json`: nguồn đã đọc và phân loại khả năng truy cập.
-- Rà lại mỗi khẳng định quan trọng với nguồn, kiểm tra link/citation trong tài liệu và Git diff. Không tuyên bố kiểm thử backend hay kiểm chứng khoa học ngoài phạm vi nghiên cứu.
+- `report.md`: synthesis, data matrix, mappings, and proposed implementation sequence.
+- `evidence/`: source notes and small inspected manifest/metadata samples where appropriate.
+- `sources.json`: consulted sources and accessibility classification.
+- Cross-check every key claim against sources; verify links/citations in documentation and Git diff. Do not claim backend testing or scientific verification outside the research scope.
+

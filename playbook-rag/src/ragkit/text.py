@@ -1,4 +1,4 @@
-"""Chuẩn hóa và tách từ tiếng Việt (bỏ dấu, bigram) dùng chung cho BM25 và vector."""
+"""Normalize and tokenize Vietnamese text (strip diacritics, bigrams) shared across BM25 and vector."""
 from __future__ import annotations
 
 import itertools
@@ -10,13 +10,13 @@ STOP = {
     "co", "duoc", "khi", "nhu", "tu", "den", "bang", "de", "ve", "ra", "vao", "the", "nao", "gi",
     "sao", "hay", "hoac", "neu", "ma", "da", "dang", "cung", "rat", "hon", "nhat",
     "of", "and", "is", "a", "to", "in",
-    "bao", "lau", "nhieu", "dau",  # từ nghi vấn chung chung: "bao lâu", "bao nhiêu", "ở đâu"
+    "bao", "lau", "nhieu", "dau",  # generic question words: "how long", "how many", "where"
 }
 _TOK = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 
 
 def fold(s: str) -> str:
-    """Bỏ dấu, đ -> d, ₂ -> 2, chữ thường. 'Mặt Trăng' -> 'mat trang'."""
+    """Strip diacritics, đ -> d, ₂ -> 2, lowercase. 'Mặt Trăng' -> 'mat trang'."""
     s = s.replace("đ", "d").replace("Đ", "D")
     s = unicodedata.normalize("NFKD", s)
     s = "".join(c for c in s if unicodedata.category(c) != "Mn")
@@ -28,7 +28,7 @@ def base_tokens(text: str) -> list[str]:
 
 
 def analyze(text: str) -> list[str]:
-    """Unigram + phần của từ có gạch nối + bigram liền kề (bắt cụm như 'trong luc')."""
+    """Unigrams + parts of hyphenated words + adjacent bigrams (captures phrases like 'trong luc')."""
     base = [t for t in base_tokens(text) if t not in STOP]
     out: list[str] = []
     for t in base:

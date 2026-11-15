@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ragkit"
 version = "0.1.0"
-description = "RAG học tập: BM25 + vector + RRF, trích dẫn có kiểm chứng, biết từ chối"
+description = "Educational RAG: BM25 + vector + RRF, verified citations, handles refusals"
 requires-python = ">=3.10"
 dependencies = ["fastapi>=0.110", "uvicorn>=0.29"]
 

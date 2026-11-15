@@ -1,4 +1,4 @@
-"""Luồng xử lý một câu hỏi: guard -> truy xuất -> (LLM + validator | trích câu) -> coverage."""
+"""Question processing flow: guard -> retrieve -> (LLM + validator | extract sentences) -> coverage."""
 from __future__ import annotations
 
 import json
@@ -13,11 +13,11 @@ from .retrieve import Hit, Retriever
 from .text import STOP, base_tokens, fold, split_sentences
 from .validate import COVERAGE, parse_json, validate_answer
 
-OFF_TOPIC_NOTE = ("Câu hỏi này nằm ngoài phạm vi kho tài liệu hiện có nên tôi không trả lời. "
-                  "Bạn có thể hỏi về thí nghiệm cháy, điều kiện thử, kiến trúc hay kế hoạch trong playbook.")
-NO_EVIDENCE_NOTE = "Kho tài liệu chưa có đủ bằng chứng để trả lời câu này. Dưới đây là các đoạn gần nhất."
-VERDICT_MISSING = "Kết luận an toàn hoặc không an toàn nằm ngoài phạm vi công cụ"
-GAP_MISSING = "Dữ liệu cháy đo ở trọng lực Mặt Trăng (0,16g) hoặc Sao Hỏa (0,38g)"
+OFF_TOPIC_NOTE = ("This question is outside the scope of the available document repository, so I cannot answer it. "
+                  "You can ask about combustion experiments, test conditions, architecture, or plans in the playbook.")
+NO_EVIDENCE_NOTE = "The document repository does not have enough evidence to answer this question. Below are the closest excerpts."
+VERDICT_MISSING = "Conclusions of safe or unsafe are outside the scope of this tool"
+GAP_MISSING = "Combustion data measured in Lunar gravity (0.16g) or Mars gravity (0.38g)"
 
 
 def _sys(text: str, cites: list[str] | None = None) -> dict:
@@ -73,8 +73,8 @@ class RagPipeline:
         segments: list[dict] = []
         if intent.verdict and "safety_verdict" in notes:
             n = notes["safety_verdict"]
-            segments.append(_sys("Công cụ này không kết luận 'an toàn' hay 'không an toàn'. "
-                                 "Chỉ trình bày bằng chứng đã có và điều kiện đã thử.", [n["id"]]))
+            segments.append(_sys("This tool does not conclude 'safe' or 'unsafe'. "
+                                 "Only presents available evidence and tested conditions.", [n["id"]]))
 
         if intent.gap and "moon_mars_gravity" in notes:
             n = notes["moon_mars_gravity"]
@@ -110,13 +110,13 @@ class RagPipeline:
             return None
         allowed = {c["id"] for c in chunks}
         prompt = llm_mod.build_prompt(question, chunks, mode, scenario_id)
-        for _ in range(2):  # thử lại đúng 1 lần
+        for _ in range(2):  # retry exactly once
             remaining = self.timeout_s - (time.perf_counter() - t0)
             if remaining <= 1:
                 return None
             try:
                 raw = self.llm.complete(llm_mod.SYSTEM, prompt, remaining)
-            except Exception:  # noqa: BLE001  # timeout, mạng, HTTP lỗi -> lùi về retrieval-only
+            except Exception:  # noqa: BLE001  # timeout, network, HTTP error -> fall back to retrieval-only
                 return None
             res = validate_answer(parse_json(raw), allowed)
             if res.ok:

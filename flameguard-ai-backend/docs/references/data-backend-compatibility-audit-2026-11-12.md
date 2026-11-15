@@ -1,99 +1,99 @@
 # Data Team → Backend compatibility audit (Phase 3B)
 
-**Ngày:** 12/11/2026
-**Trạng thái:** Bản audit tạm để đọc và quyết định; không phải hợp đồng import đã duyệt.
-**Phạm vi:** Chỉ đọc Data Team repository và backend repository. Không chạy ETL/import/test, không đổi database hoặc Phase 4.
+**Date:** 2026-11-12
+**Status:** Temporary audit for review and decision-making; not an approved import contract.
+**Scope:** Read-only across Data Team repository and backend repository. No ETL/import/test execution, no changes to database or Phase 4.
 
-## A. Đánh giá tương thích hiện tại
+## A. Current compatibility assessment
 
-**Tương thích một phần.** Backend có thể biểu diễn investigation, run, điều kiện và phần lớn phép đo số bằng schema hiện tại. Tuy nhiên, chưa thể nhập và công bố nguyên vẹn bộ output của Data Team: phép đo dạng chữ, cờ chất lượng, provenance ở cấp run/measurement, chuỗi thời gian và kết quả ranking chưa có ánh xạ đầy đủ. Phase 4 cũng chưa có cơ chế chấp nhận và công bố collection đã được Data Team duyệt.
+**Partially compatible.** The backend can represent investigations, runs, conditions, and most numeric measurements using the current schema. However, it cannot yet ingest and publish the Data Team's output intact: categorical/text measurements, quality flags, run/measurement-level provenance, time series, and ranking results lack complete mappings. Phase 4 also lacks an admission and publication mechanism for Data Team-curated collections.
 
-[Build report](../../../Nasa-hackathon-dataprocessing/data/unified/BUILD_REPORT.md) ghi **19 investigations, 1.687 runs, 6.574 measurements, 882 mẫu time series, 43 facts và 456 ranking rows**. Đây là số liệu từ báo cáo build có sẵn; audit này không chạy lại ETL hay kiểm chứng khoa học các kết quả. Có 11 investigations có dữ liệu ở cấp run; 8 investigations còn lại hiện chủ yếu là metadata.
+The [Build report](../../../Nasa-hackathon-dataprocessing/data/unified/BUILD_REPORT.md) records **19 investigations, 1,687 runs, 6,574 measurements, 882 time series samples, 43 facts, and 456 ranking rows**. These figures are from the existing build report; this audit does not re-run ETL or scientifically verify the results. There are 11 investigations with run-level data; the remaining 8 investigations currently consist primarily of metadata.
 
-Dataset Report nằm tại [Data Team docs](../../../Nasa-hackathon-dataprocessing/docs/Flame%20in%20Freefall%20-%20Dataset%20Report.md). Trước khi tạo file audit này, backend chưa có thư mục `docs/references/`.
+The Dataset Report is located at [Data Team docs](../../../Nasa-hackathon-dataprocessing/docs/Flame%20in%20Freefall%20-%20Dataset%20Report.md). Prior to creating this audit file, the backend did not have a `docs/references/` directory.
 
-## B. Ma trận ánh xạ trường
+## B. Field mapping matrix
 
-**Trực tiếp** nghĩa là có cột tương ứng. **Adapter** nghĩa là cần đổi kiểu/đơn vị hoặc tách thành nhiều hàng. **Thiếu** nghĩa là không thể giữ đủ ý nghĩa trong schema hiện tại.
+**Direct** means a corresponding column exists. **Adapter** means type/unit conversion or splitting into multiple rows is required. **Missing** means full semantics cannot be preserved in the current schema.
 
-| Data output và trường | Backend đích | Đánh giá và quy tắc |
+| Data output and field | Target backend | Assessment and rules |
 | --- | --- | --- |
-| `experiments.psi_id`, `full_name` | `investigation.psi_id`, `title` | **Trực tiếp.** `experiment_id` cần manifest ánh xạ ổn định tới UUID; public slug là danh tính thứ ba, không thay cho PSI ID. |
-| `experiments` purpose/objectives, platform | `investigation.research_purpose`, `platform` | **Adapter**, chỉ khi có metadata nguồn được Data Team xác nhận. Không suy ra platform từ tên hardware. |
-| `experiments.pillar[]`, family | `tag` + `investigation_tag` | **Adapter** với từ điển tag và quy tắc phiên bản. |
-| `experiments` PI, sensors, hardware, aliases, tier, envelope, report paths, counts | Không có cột catalog tương ứng | **Thiếu** nếu cần lưu/trả từng trường. Không nhét toàn bộ vào `research_purpose` hoặc `platform`. Counts có thể tính lại; envelope chỉ nên suy ra từ các run phù hợp hoặc lưu như metadata có nguồn. |
-| `runs.run_id`, `experiment_id`, `psi_id` | `test_run.external_run_key`, `investigation_id` → `investigation.psi_id` | **Adapter.** Tạo UUID riêng; kiểm tra `run_id` duy nhất theo phạm vi đã thống nhất. Schema hiện không áp unique cho external run key. |
-| `runs.fuel`, `geometry`, `gravity_g` | `test_run.material_type`, `sample_geometry`, `gravity` | **Adapter có nguy cơ mất chi tiết.** `fuel` không đồng nghĩa mọi trường hợp với material; gravity số và trạng thái unknown cần biểu diễn nhất quán. |
-| `runs.campaign`, `date`, `fuel_base`, `fuel_fraction`, `fuel_secondary`, `fraction_basis`, `fuel_phase`, `flame_config`, `size_mm`, `size_kind`, `flow_kind`, `atmosphere_status`, `aging_s`, `notes` | Chủ yếu `test_condition.variable`, `value_numeric`/`value_text`, `unit`, `data_status` | **Adapter**, mỗi thuộc tính thành điều kiện riêng, giữ tên biến, đơn vị và trạng thái gốc. `date`/campaign/notes không có cột run chuyên biệt; cách biểu diễn dưới dạng condition cần được chấp thuận nếu sẽ dùng cho truy vấn. |
-| `runs.x_o2`, `x_n2`, `x_co2`, `x_he`, `oxidizer_x_o2`, `pressure_kpa`, `flow_cm_s`, `fuel_velocity_cm_s` | `test_condition` | **Adapter phù hợp.** Giữ mole fraction `0–1`, kPa, cm/s. `oxidizer_x_o2` phải là biến khác ambient `x_o2`; inverse flame có ambient O₂ bằng null. |
-| `measurements.metric`, `value`, `unit` | `measurement.observable`, `measured_value`, `unit` | **Trực tiếp sau đổi tên**, dùng Decimal từ chuỗi nguồn. Không đổi số 0, null hoặc đơn vị khi chưa có quy tắc chuyển đổi được duyệt. |
-| `measurements.value_text` cho `ignition`, `flame_outcome`, `end_mode`, `cool_flame`, `lifted` | Không có `measurement.value_text` | **Thiếu.** Có thể tạm trình bày như `test_condition.value_text` nhưng sẽ đổi nghĩa measurement thành condition và làm sai nhóm API. Cần quyết định schema/hợp đồng. |
-| `measurements.flag`, `provenance`, `source` | Không có cột tương ứng trong `measurement` | **Thiếu, nguy cơ mất dữ liệu.** Các cờ như `reported_zero`, `within_sensor_noise`, `operational_no_ignition` phải đi cùng đúng phép đo. |
-| `timeseries.time_s`, `metric`, `value`, `unit`, `source_file` | `measurement.raw_asset_ref` | **Chỉ phù hợp ở mức tham chiếu asset.** Không có bảng mẫu thời gian, channel hoặc trục thời gian. Không biến 882 mẫu thành một scalar measurement. |
-| `experiments.doi`, `runs.source`/`source_file` | `source_document.doi`, `source_url`, `document_type`, `version` | **Cần đối soát nguồn.** Citation text và đường dẫn trong repo không tự tạo thành URL tài liệu gốc. Nguồn chi tiết có trong `research/*/SOURCES.md`, record và download manifest, nhưng chưa thành manifest tài liệu chuẩn để nối từng hàng. |
-| `facts.statement`, `condition`, `source_ref`, `confidence`, các giá trị/giới hạn/công thức | `evidence_claim.claim_text`, `limitation`; `claim_source` → `source_document` | **Chỉ một phần.** `source_ref` cần giải thành document ID và locator thật. Numeric range, formula, confidence và điều kiện riêng chưa có nơi lưu có cấu trúc. Không tự gọi một fact là claim đã review. |
-| `scenarios` | `scenario` | **Adapter**: `x_o2` fraction → `oxygen_pct`; kPa → `pressure_psi`; gravity số → chuỗi đã quy ước. `material` và `ventilation` là cột bắt buộc nhưng Data scenario không cung cấp tương ứng, nên chưa thể tạo bản ghi đầy đủ một cách trung thực. |
-| `scenario_priors`, `rankings` | `scenario_match`/`match_dimension` | **Không khớp ngữ nghĩa.** Ranking của Data Team là ở cấp investigation, theo scenario và pillar; `scenario_match` hiện là **scenario → test_run**. Không gán score investigation vào một run bất kỳ. |
-| `fuel_properties`, năm view `ml_*` | Chưa có đích persistence tương đương | **Ngoài Phase 4.** Là dữ liệu phụ trợ/đầu vào AI, cần version, nguồn và hợp đồng riêng. View ML có thể cố ý bỏ hoặc đặt NaN cho giá trị bị flag; không dùng thay bảng phép đo gốc. |
+| `experiments.psi_id`, `full_name` | `investigation.psi_id`, `title` | **Direct.** `experiment_id` requires a stable mapping manifest to UUID; public slug is a third identity, not a replacement for PSI ID. |
+| `experiments` purpose/objectives, platform | `investigation.research_purpose`, `platform` | **Adapter**, only when source metadata is confirmed by Data Team. Do not infer platform from hardware name. |
+| `experiments.pillar[]`, family | `tag` + `investigation_tag` | **Adapter** with tag dictionary and versioning rules. |
+| `experiments` PI, sensors, hardware, aliases, tier, envelope, report paths, counts | No corresponding catalog columns | **Missing** if needed to store/return per field. Do not cram everything into `research_purpose` or `platform`. Counts can be recomputed; envelope should only be inferred from matching runs or stored as sourced metadata. |
+| `runs.run_id`, `experiment_id`, `psi_id` | `test_run.external_run_key`, `investigation_id` → `investigation.psi_id` | **Adapter.** Generate separate UUID; verify unique `run_id` within the agreed scope. Current schema does not enforce uniqueness on external run key. |
+| `runs.fuel`, `geometry`, `gravity_g` | `test_run.material_type`, `sample_geometry`, `gravity` | **Adapter with risk of detail loss.** `fuel` is not synonymous with material in all cases; numeric gravity and unknown state require consistent representation. |
+| `runs.campaign`, `date`, `fuel_base`, `fuel_fraction`, `fuel_secondary`, `fraction_basis`, `fuel_phase`, `flame_config`, `size_mm`, `size_kind`, `flow_kind`, `atmosphere_status`, `aging_s`, `notes` | Primarily `test_condition.variable`, `value_numeric`/`value_text`, `unit`, `data_status` | **Adapter**, each property becomes a separate condition, preserving original variable name, unit, and status. `date`/campaign/notes lack dedicated run columns; condition-based representation requires approval if used for queries. |
+| `runs.x_o2`, `x_n2`, `x_co2`, `x_he`, `oxidizer_x_o2`, `pressure_kpa`, `flow_cm_s`, `fuel_velocity_cm_s` | `test_condition` | **Appropriate adapter.** Preserve mole fraction `0–1`, kPa, cm/s. `oxidizer_x_o2` must be a distinct variable from ambient `x_o2`; inverse flames have ambient O₂ as null. |
+| `measurements.metric`, `value`, `unit` | `measurement.observable`, `measured_value`, `unit` | **Direct after renaming**, using Decimal from source string. Do not alter 0, null, or units without approved conversion rules. |
+| `measurements.value_text` for `ignition`, `flame_outcome`, `end_mode`, `cool_flame`, `lifted` | No `measurement.value_text` | **Missing.** Could be temporarily represented as `test_condition.value_text`, but that reclassifies a measurement as a condition and distorts API groupings. Requires schema/contract decision. |
+| `measurements.flag`, `provenance`, `source` | No corresponding column in `measurement` | **Missing, risk of data loss.** Flags such as `reported_zero`, `within_sensor_noise`, `operational_no_ignition` must stay attached to the correct measurement. |
+| `timeseries.time_s`, `metric`, `value`, `unit`, `source_file` | `measurement.raw_asset_ref` | **Suitable only at asset reference level.** No time sample table, channel, or time axis exists. Do not collapse 882 samples into a single scalar measurement. |
+| `experiments.doi`, `runs.source`/`source_file` | `source_document.doi`, `source_url`, `document_type`, `version` | **Source reconciliation required.** Citation text and repo paths do not automatically constitute original document URLs. Detailed sources exist in `research/*/SOURCES.md`, records, and download manifests, but have not been compiled into a canonical document manifest linking each row. |
+| `facts.statement`, `condition`, `source_ref`, `confidence`, values/limits/formulas | `evidence_claim.claim_text`, `limitation`; `claim_source` → `source_document` | **Partial only.** `source_ref` must resolve to actual document ID and locator. Structured storage is lacking for numeric range, formula, confidence, and discrete conditions. Do not unilaterally classify a fact as a reviewed claim. |
+| `scenarios` | `scenario` | **Adapter**: `x_o2` fraction → `oxygen_pct`; kPa → `pressure_psi`; numeric gravity → conventional string. `material` and `ventilation` are required columns but Data scenarios do not supply counterparts, precluding faithful creation of complete records. |
+| `scenario_priors`, `rankings` | `scenario_match`/`match_dimension` | **Semantic mismatch.** Data Team ranking is at investigation level, by scenario and pillar; `scenario_match` currently represents **scenario → test_run**. Do not assign investigation score to an arbitrary run. |
+| `fuel_properties`, five `ml_*` views | No equivalent persistence target | **Out of scope for Phase 4.** Auxiliary/AI input data requiring independent versioning, sources, and contracts. ML views may intentionally drop or NaN flagged values; do not use in place of raw measurement tables. |
 
-Nguồn đối chiếu: [unified schema](../../../Nasa-hackathon-dataprocessing/etl/schema.py), [ETL build](../../../Nasa-hackathon-dataprocessing/etl/build.py), [catalog models](../../app/models/catalog.py), [evidence models](../../app/models/evidence.py), [scenario models](../../app/models/scenarios.py).
+Cross-reference sources: [unified schema](../../../Nasa-hackathon-dataprocessing/etl/schema.py), [ETL build](../../../Nasa-hackathon-dataprocessing/etl/build.py), [catalog models](../../app/models/catalog.py), [evidence models](../../app/models/evidence.py), [scenario models](../../app/models/scenarios.py).
 
 ## C. Backend gaps
 
-1. **Provenance chưa đủ hạt mịn.** `source_document` thuộc investigation và `claim_source` nối claim với tài liệu/run, nhưng không có liên kết nguồn trực tiếp cho từng run hay measurement. `measurements.source` có thể khác `runs.source`; lấy nguồn của run thay cho measurement sẽ làm sai traceability.
-2. **Measurement dạng phân loại và quality flag chưa lưu được đúng chỗ.** Cột số nullable không đủ để bảo tồn `value_text`, `flag` và provenance của phép đo.
-3. **Telemetry mới có tham chiếu file.** Cần hợp đồng asset, channel, thời gian, đơn vị, quyền truy cập và phiên bản trước khi có API time series.
-4. **Catalog metadata chưa đủ cho trải nghiệm Data Team.** Hardware, sensors, năm, family, tier, envelope và ranking không có DTO hoặc cột tương ứng. Phase 4 hiện trả unavailable cho nhiều trường thay vì bịa dữ liệu.
-5. **Admission/publication còn khóa.** [Collection service](../../app/services/collection.py) chỉ nhận synthetic hoặc real/unknown chưa review qua snapshot khớp chính xác 21 bảng và read role; `reviewState=curated` bị từ chối. `seed_demo_data.py` chỉ dành cho dữ liệu synthetic, không phải importer của Data Team.
-6. **Nguồn và review chưa chuẩn hóa.** `source_url` là bắt buộc, trong khi `source` ở unified là citation text. Cần URL tài liệu gốc, locator, checksum/version, thời điểm lấy và quyết định curator trước khi công bố. `verifiedRunCount` của Phase 4 vẫn là unknown.
-7. **Tài liệu có xung đột cần quyết định.** Tại thời điểm audit, [AGENTS.md](../../AGENTS.md) và [documentation map](../documentation-map.md) gọi ERD là frozen/authoritative. Chính sách này đã được cập nhật trong [ADR-0003](../decisions/ADR-0003-schema-evolution-and-hackathon-prototype.md): ERD 21 bảng là baseline hiện tại, có thể phát triển qua migration được duyệt. [Masterplan](../../../Nasa-hackathon-dataprocessing/Masterplan.md) mô tả E-FIELD như mô phỏng partial gravity, còn Dataset Report bác bỏ phép quy đổi đó. Hai cách tính **usefulness score** (`dataset_catalog`) và **scenario ranking score** (`rank.py`) cũng khác nhau; API phải đặt tên và version riêng, không gọi chung là “score”.
+1. **Insufficient provenance granularity.** `source_document` belongs to investigation and `claim_source` links claims to documents/runs, but there is no direct source link for individual runs or measurements. `measurements.source` can differ from `runs.source`; using the run source in place of the measurement source breaks traceability.
+2. **Categorical measurements and quality flags lack proper storage targets.** A nullable numeric column is insufficient to preserve `value_text`, `flag`, and provenance of measurements.
+3. **Telemetry is limited to file references.** Asset, channel, time, unit, access permissions, and version contracts are needed before exposing a time series API.
+4. **Catalog metadata is insufficient for Data Team experience.** Hardware, sensors, year, family, tier, envelope, and ranking lack corresponding DTOs or columns. Phase 4 currently returns unavailable for many fields instead of inventing data.
+5. **Admission/publication remains locked.** [Collection service](../../app/services/collection.py) accepts only synthetic or unreviewed real/unknown data via exact-matching 21-table snapshots and a read role; `reviewState=curated` is rejected. `seed_demo_data.py` is strictly for synthetic data, not an importer for the Data Team.
+6. **Sources and review are unstandardized.** `source_url` is required, whereas `source` in unified data is citation text. Original document URLs, locators, checksums/versions, retrieval timestamps, and curator decisions are needed prior to publication. Phase 4's `verifiedRunCount` remains unknown.
+7. **Conflicting documentation requiring resolution.** At the time of this audit, [AGENTS.md](../../AGENTS.md) and [documentation map](../documentation-map.md) designated the ERD as frozen/authoritative. This policy was updated in [ADR-0003](../decisions/ADR-0003-schema-evolution-and-hackathon-prototype.md): the 21-table ERD is the current baseline and can evolve via approved migrations. [Masterplan](../../../Nasa-hackathon-dataprocessing/Masterplan.md) describes E-FIELD as simulating partial gravity, whereas the Dataset Report rejects that conversion. The two calculation methods for **usefulness score** (`dataset_catalog`) and **scenario ranking score** (`rank.py`) also differ; APIs must assign separate names and versions rather than referring generically to "score".
 
-## D. Ranh giới adapter được đề xuất
+## D. Proposed adapter boundary
 
-- **Data Team:** sở hữu ETL, chuẩn hóa khoa học, source manifest, cờ chất lượng, unit dictionary, review và việc thực thi import.
-- **Backend Phase 3B:** nhận **export có version**, kiểm tra schema/identity/unit/null/nguồn, tạo kế hoạch ánh xạ UUID–PSI–run key–slug, kiểm tra tính không mất dữ liệu và tạo báo cáo accepted/rejected. Adapter chuyển output đã được duyệt sang persistence schema; không viết lại parser NASA.
-- **Read API:** tiếp tục dùng repository/service để đọc dữ liệu đã được chấp nhận. Ranking từ Data Team nên đi qua hợp đồng kết quả có `algorithmVersion`, scenario, pillar, components, data version, caveat; không ngụy trang thành sort Phase 4.
-- **Scientific/AI gate:** model, advisor và phép so sánh dẫn xuất cần AI/Data review riêng. Backend chỉ kiểm tra hợp đồng, provenance và điều kiện công bố.
+- **Data Team:** owns ETL, scientific normalization, source manifests, quality flags, unit dictionary, review, and import execution.
+- **Backend Phase 3B:** receives **versioned exports**, verifies schema/identity/units/nulls/sources, establishes UUID–PSI–run key–slug mapping plans, verifies lossless fidelity, and generates accepted/rejected reports. The adapter transforms curated output into the persistence schema; it does not rewrite NASA parsers.
+- **Read API:** continues using repository/service layers to read admitted data. Data Team rankings should flow through a result contract containing `algorithmVersion`, scenario, pillar, components, data version, and caveats; do not disguise them as Phase 4 sorting.
+- **Scientific/AI gate:** models, advisors, and derived comparisons require separate AI/Data review. Backend only verifies contracts, provenance, and publication prerequisites.
 
-Đối với dataset NASA chính thức khác vào **14/11/2026**, kiến trúc nhiều lớp và `test_condition`/`measurement` dạng long-form giúp hấp thụ **biến số và metric số mới** qua adapter. Khả năng này **không bảo đảm** giữ được loại dữ liệu mới, telemetry, provenance theo hàng, hay ranking theo investigation. Nên chốt hợp đồng mở rộng sau khi xem mẫu chính thức, không thiết kế theo giả định PSI prototype.
+For a different official NASA dataset on **2026-11-14**, the layered architecture and long-form `test_condition`/`measurement` schema help ingest **new numeric variables and metrics** via adapters. This capability **does not guarantee** preserving new data types, telemetry, row-level provenance, or investigation-level rankings. Extension contracts should be finalized after examining the official sample, rather than designed around PSI prototype assumptions.
 
-## E. Thay đổi schema có thể cần
+## E. Potential schema changes
 
-| Mức | Đề xuất có điều kiện |
+| Level | Conditional proposal |
 | --- | --- |
-| Có thể chỉ dùng adapter | Điều kiện số/text mới; đổi đơn vị có chứng từ và giữ bản gốc; tạo UUID ổn định; mapping tag; liên kết `psi_id` với investigation; asset ref ở mức file. |
-| Nên xem xét migration | `measurement.value_text`, quality flag/status và provenance hoặc bảng metadata theo measurement; liên kết run/measurement → source document + locator; run date/campaign nếu cần lọc/truy vấn; catalog metadata có cấu trúc; bảng kết quả ranking theo investigation/scenario/pillar/version nếu cần lưu và truy vấn. |
-| Chỉ quyết định sau mẫu chính thức | Thiết kế time series/channel/asset; nhiều nguồn cho một observation; uncertainty phức hợp; danh tính/version của dataset; kiểu phép đo mới ngoài scalar/categorical. |
+| Feasible via adapter only | New numeric/text conditions; documented unit conversion while preserving originals; stable UUID generation; tag mapping; linking `psi_id` to investigation; file-level asset references. |
+| Migration recommended | `measurement.value_text`, quality flag/status, and measurement-level provenance or metadata table; run/measurement → source document + locator linkage; run date/campaign if filtering/querying is required; structured catalog metadata; investigation/scenario/pillar/version ranking result tables if storage and querying are required. |
+| Defer until official sample | Time series/channel/asset design; multiple sources per observation; composite uncertainty; dataset identity/versioning; new measurement types beyond scalar/categorical. |
 
-Không sửa các migration `0001–0003`. Nếu được duyệt, tạo revision mới và ghi ADR cùng kế hoạch bảo toàn dữ liệu.
+Do not modify migrations `0001–0003`. If approved, generate a new revision and document an ADR along with a data preservation plan.
 
-## F. Phase 3B readiness checklist và acceptance tests
+## F. Phase 3B readiness checklist and acceptance tests
 
-1. Data Team giao manifest phiên bản gồm nguồn NASA gốc, URL/DOI, file hash, locator, license/access, timestamp, vocabulary, unit dictionary, review record và known issues.
-2. Chốt `experiment_id` ↔ `psi_id` ↔ UUID ↔ slug, cùng phạm vi unique của `run_id`; kiểm tra trùng và thay đổi qua các lần build.
-3. Chốt cách lưu categorical measurement, flag, provenance theo hàng và time series trước khi import.
-4. Dùng mẫu nhỏ **không ghi DB** để kiểm thử ánh xạ và lập báo cáo field-level loss: mọi trường nguồn phải được lưu, dẫn tới asset/version được quản lý, hoặc được ghi là chưa hỗ trợ.
-5. Kiểm thử bắt buộc: inverse flame không thành ambient O₂; null khác 0; CFI `reported_zero` còn flag; BRE operational no-ignition không thành nhãn khoa học; cùng unit nhưng khác phương pháp không bị so sánh dẫn xuất; nguồn từng measurement không bị gán nhầm; DOI/locator có thể truy ngược tài liệu.
-6. Sau khi hợp đồng và migration được duyệt, chạy acceptance trên **PostgreSQL test cô lập**, kiểm tra FK, idempotency, retry, raw value/unit/flag/source và API readback. Chỉ công bố collection đã được curator chấp thuận.
-7. T078 vẫn là gate **Frontend acceptance** riêng của Phase 4; Phase 3B không tự đóng nó.
+1. Data Team delivers a versioned manifest including original NASA sources, URL/DOI, file hashes, locators, license/access, timestamps, vocabulary, unit dictionary, review records, and known issues.
+2. Finalize `experiment_id` ↔ `psi_id` ↔ UUID ↔ slug, along with `run_id` uniqueness scope; verify collisions and mutations across builds.
+3. Finalize storage strategy for categorical measurements, flags, row-level provenance, and time series prior to import.
+4. Use a small sample with **no DB writes** to test mappings and generate a field-level loss report: every source field must be preserved, linked to a managed asset/version, or flagged as unsupported.
+5. Mandatory test cases: inverse flames do not become ambient O₂; null is distinct from 0; CFI `reported_zero` retains its flag; BRE operational no-ignition does not become a scientific label; identical units with differing methods are not subjected to derived comparison; per-measurement sources are not misattributed; DOI/locator can trace back to documents.
+6. Once contracts and migrations are approved, run acceptance tests on an **isolated test PostgreSQL**, verifying FKs, idempotency, retry, raw value/unit/flag/source, and API readback. Publish only curator-accepted collections.
+7. T078 remains a dedicated Phase 4 **Frontend acceptance** gate; Phase 3B does not close it on its own.
 
-## G. Bốn module và mức API hiện có
+## G. Four modules and existing API levels
 
-| Module Data Team | Phase 4 hiện có | Còn thiếu / owner |
+| Data Team module | Existing Phase 4 | Missing / owner |
 | --- | --- | --- |
-| **Summarize & Rank** | Investigation list/detail, dashboard, run/condition/measurement/source/claim pages. | Chưa có API ranking theo scenario/pillar, component score, algorithm/data version hoặc summary có nguồn. Data cung cấp kết quả và giải thích; Backend định nghĩa DTO/API sau review. |
-| **Compare** | `POST /compare` trả 2–3 investigations và observation gốc; `comparability=not_established`, không tính delta. | Muốn so sánh định lượng cần Data/scientific rule cho cùng observable, unit, geometry, run condition, phương pháp và uncertainty. Backend không tự áp dụng median trong Dataset Report. |
-| **Partial-Gravity Predictor** | Chưa có API prediction Phase 4; models lưu version/result chỉ là cấu trúc. | AI Team phải giao model, validation, domain và uncertainty. Không có đo trực tiếp 1/6 g hay 3/8 g trong bộ prototype; E-FIELD không tạo ánh xạ trọng lực. |
-| **Prevention–Detection–Suppression Advisor** | Tags, sources, claims và observation có thể cung cấp chứng cứ thô. | Chưa có advice/grounded reasoning API. Data/AI cần fact–source mapping, review và giới hạn suy luận; Backend kiểm tra citation/abstention, không phát lời khuyên an toàn đã xác nhận. |
+| **Summarize & Rank** | Investigation list/detail, dashboard, run/condition/measurement/source/claim pages. | No API for scenario/pillar ranking, component scores, algorithm/data version, or sourced summaries. Data supplies results and explanations; Backend defines DTOs/APIs after review. |
+| **Compare** | `POST /compare` returns 2–3 investigations and raw observations; `comparability=not_established`, no delta computation. | Quantitative comparison requires Data/scientific rules for identical observable, unit, geometry, run condition, method, and uncertainty. Backend does not unilaterally apply medians from Dataset Report. |
+| **Partial-Gravity Predictor** | No Phase 4 prediction API; models storing version/result are structural only. | AI Team must deliver models, validation, domain, and uncertainty. There are no direct measurements at 1/6 g or 3/8 g in the prototype dataset; E-FIELD does not establish a gravity mapping. |
+| **Prevention–Detection–Suppression Advisor** | Tags, sources, claims, and observations can supply raw evidence. | No advice/grounded reasoning API. Data/AI must provide fact–source mapping, review, and inference constraints; Backend verifies citation/abstention, issuing no confirmed safety advice. |
 
-## H. Có thể hoàn thành trước 14/11
+## H. Achievable before November 14
 
-Chốt export manifest và version, bảng ánh xạ trường, identity policy, unit/status vocabulary, danh sách trường mất dữ liệu, mẫu source/locator, contract cho ranking, cùng bộ acceptance tests trên fixtures và test DB cô lập. Có thể thiết kế ADR/migration **đề xuất** cho categorical measurement, provenance và ranking, rồi quyết định sau khi có mẫu chính thức.
+Finalize export manifest and version, field mapping table, identity policy, unit/status vocabulary, lossy field list, source/locator samples, ranking contract, along with acceptance test suite on fixtures and isolated test DB. Proposed ADRs/migrations can be drafted for categorical measurements, provenance, and ranking, then decided once the official sample is available.
 
-## I. Phải chờ dataset chính thức
+## I. Pending official dataset
 
-Xác nhận metric, kiểu dữ liệu, số lượng, provenance, quyền truy cập và danh tính của dataset được ban tổ chức cung cấp; kiểm tra adapter với mẫu thật; quyết định migration cuối cùng; chạy Data Team import và curator review; chứng minh API readback; đánh giá lại ranking, so sánh và phạm vi mô hình. Không thể coi các kết quả PSI prototype là bằng chứng rằng dataset chính thức sẽ cùng cấu trúc hoặc đủ để xác nhận prediction/advice.
+Confirm metrics, data types, counts, provenance, access permissions, and identity of the competition-provided dataset; verify adapter against real samples; decide on final migrations; run Data Team import and curator review; demonstrate API readback; re-evaluate ranking, comparison, and model scope. Prototype PSI results cannot be treated as evidence that the official dataset will share the same structure or suffice to validate prediction/advice.
 
-## Ghi chú kiểm tra
+## Verification notes
 
-Audit chỉ đọc. File Markdown này là thay đổi duy nhất của yêu cầu lưu báo cáo. Không chạy import/test, không đổi database, không sửa code, không commit hay push.
+Read-only audit. This Markdown file is the sole change requested for recording the report. No import/test execution, no database modifications, no code edits, no commit or push.

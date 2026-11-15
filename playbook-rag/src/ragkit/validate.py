@@ -1,4 +1,4 @@
-"""Validator: biến "AI không bịa" thành kiểm tra được. Câu nào không có trích dẫn hợp lệ bị loại."""
+"""Validator: turns "AI does not hallucinate" into a verifiable check. Sentences without valid citations are dropped."""
 from __future__ import annotations
 
 import json
@@ -10,7 +10,7 @@ from .text import fold
 COVERAGE = ("none", "partial", "full")
 _VERDICT = re.compile(
     r"\b(la|se|hoan toan|duoc coi la|co the coi la)\s+(khong\s+)?(an toan|on)\b|\bkhong an toan\b")
-# Câu nói rõ là KHÔNG kết luận (ví dụ trích quy tắc của chính tài liệu) thì không phải phán quyết.
+# Sentences explicitly stating NO conclusion (e.g., quoting the document's own rules) are not verdicts.
 _DISCLAIM = re.compile(r"\bkhong\s+(bao gio\s+)?(dua ra\s+)?ket luan\b")
 
 

@@ -1,4 +1,4 @@
-"""Truy xuất lai: mở rộng alias -> BM25 + vector -> RRF -> tăng điểm theo loại chunk."""
+"""Hybrid retrieval: alias expansion -> BM25 + vector -> RRF -> boost by chunk type."""
 from __future__ import annotations
 
 import re

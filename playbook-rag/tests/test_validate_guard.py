@@ -15,24 +15,24 @@ def test_validator_fails_when_nothing_survives():
 
 
 def test_verdict_text_is_dropped():
-    assert has_verdict("Vật liệu này là an toàn trong rover")
-    assert has_verdict("Điều kiện đó không an toàn")
-    assert not has_verdict("Ứng dụng không bao giờ kết luận vật liệu là an toàn hoặc không an toàn")
-    assert not has_verdict("Ba trụ cột an toàn cháy gồm phòng ngừa, phát hiện, dập lửa")
-    obj = {"segments": [{"text": "Vải này là an toàn.", "citations": ["c1"]}]}
+    assert has_verdict("This material is safe in the rover")
+    assert has_verdict("That condition is unsafe")
+    assert not has_verdict("The application never concludes whether a material is safe or unsafe")
+    assert not has_verdict("The three pillars of fire safety include prevention, detection, suppression")
+    obj = {"segments": [{"text": "This fabric is safe.", "citations": ["c1"]}]}
     assert not validate_answer(obj, {"c1"}).ok
 
 
 def test_parse_json_handles_fences():
     assert parse_json('```json\n{"a": 1}\n```') == {"a": 1}
-    assert parse_json("không phải json") is None
+    assert parse_json("not json") is None
 
 
 def test_guard_intents():
-    assert classify("Thời tiết Houston hôm nay?").off_topic
-    assert classify("Nhiên liệu tên lửa cháy thế nào?").off_topic
-    assert classify("Vải trong rover 30% O₂ có an toàn không?").verdict
-    g = classify("Có dữ liệu cháy ở trọng lực Mặt Trăng không?")
+    assert classify("Houston weather today?").off_topic
+    assert classify("How does rocket fuel burn?").off_topic
+    assert classify("Is fabric in rover 30% O₂ safe?").verdict
+    g = classify("Is there combustion data in Moon gravity?")
     assert g.gap and not g.off_topic
-    assert not classify("Căn cứ Mặt Trăng có oxy bao nhiêu?").gap
-    assert not classify("Ba trụ cột an toàn cháy là gì?").verdict
+    assert not classify("How much oxygen does the Moon base have?").gap
+    assert not classify("What are the three pillars of fire safety?").verdict
