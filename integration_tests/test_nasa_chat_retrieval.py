@@ -3,14 +3,24 @@ from uuid import UUID
 import pytest
 from app.integrations.chat import CorpusPassage, RagRequest
 from app.integrations.rag.provider import ExtractiveProvider
-from app.integrations.rag.retrieval import refusal, select_passages, terms
+from app.integrations.rag.retrieval import FAMILIES, refusal, select_passages, terms
 
 from integrations.nasa_data.unified import build_unified_release
 
 
 @pytest.fixture(scope="module")
-def passages():
-    release = build_unified_release()
+def release():
+    return build_unified_release()
+
+
+@pytest.fixture(scope="module")
+def catalog_slugs(release):
+    # The serving backend passes every catalog slug, including studies without passages.
+    return tuple(sorted(s["id"] for s in release["investigations"]))
+
+
+@pytest.fixture(scope="module")
+def passages(release):
     sources = {s["id"]: s for s in release["sources"]}
     studies = {s["id"]: s for s in release["investigations"]}
     return tuple(
@@ -68,8 +78,12 @@ async def test_planetary_conditions_do_not_return_unrelated_microgravity_rows(pa
         )
     )
     assert answer.state == "abstained" and not answer.citations
-    assert "connected dataset" in answer.text
-    assert "Mars" in answer.text
+    from app.integrations.rag.vocabulary import language
+
+    if language(question) == "vi":
+        assert "bộ dữ liệu đang kết nối" in answer.text and "Sao Hỏa" in answer.text
+    else:
+        assert "connected dataset" in answer.text and "Mars" in answer.text
 
 
 def test_general_microgravity_and_future_applications_still_retrieve(passages):
@@ -217,3 +231,140 @@ def test_unified_sources_are_retrievable(passages, question, slug):
     hits = select_passages(question, passages)
     assert hits and slug in {h.passage.slug for h in hits}
     assert all(h.excerpt in h.passage.text for h in hits)
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Which investigations studied fire suppression with carbon dioxide?",
+        "Thí nghiệm nào dập lửa bằng CO2 hoặc heli?",
+    ],
+)
+def test_v3_suppression_retrieves_flex_in_top_two(passages, question):
+    assert "flex" in [h.passage.slug for h in select_passages(question, passages)[:2]]
+
+
+def test_v3_comparison_balances_study_families(passages):
+    hits = select_passages("Compare BASS and Saffire", passages)
+    assert any(h.passage.slug == "bass" for h in hits)
+    assert any(h.passage.slug.startswith("saffire-") for h in hits)
+
+
+def test_v3_fuel_question_prefers_overview(passages):
+    hits = select_passages("What fuels were used in FLEX?", passages)
+    assert hits and (
+        hits[0].passage.locator.startswith("JSON /objective")
+        or hits[0].passage.locator == "investigations/PSI-69"
+    )
+
+
+def test_v3_pmma_evidence_mentions_the_material(passages):
+    hits = select_passages("flame spread rate of PMMA in BASS-II", passages)
+    assert hits and any(
+        word in hits[0].excerpt.lower() for word in ("pmma", "polymethyl", "acrylic")
+    )
+
+
+@pytest.mark.parametrize(
+    "question,english",
+    [
+        ("What are the FLEX objectives?", True),
+        ("Mục tiêu của FLEX là gì?", False),
+        ("Is PMMA safe at 30% oxygen?", True),
+        ("PMMA có an toàn ở 30% oxy không?", False),
+        ("highest oxygen concentration tested in microgravity", True),
+        ("Thí nghiệm nào có nồng độ oxy cao nhất?", False),
+    ],
+)
+async def test_v3_language_and_aggregate_abstention(passages, question, english):
+    hits = select_passages(question, passages)
+    answer = await ExtractiveProvider().answer(
+        RagRequest(
+            question=question,
+            corpus_version="a" * 64,
+            collection_fingerprint="b" * 64,
+            allowed_sources=tuple(h.citation for h in hits),
+        )
+    )
+    if "highest" in question or "cao nhất" in question:
+        assert answer.state == "abstained" and not answer.citations
+        assert "Explorer" in answer.text
+    if english:
+        assert not answer.text.startswith(("Tìm", "Không", "Hãy"))
+    else:
+        assert answer.text.startswith(("Tìm", "Không", "Hãy"))
+
+
+def test_v3_chemical_normalization_does_not_treat_pronouns_as_helium():
+    assert "helium" not in terms("He studied smoke detection.")
+    assert "helium" in terms("FLEX suppressants include CO2, He, and SF6.")
+    assert terms("carbon dioxide") == terms("CO2")
+    assert "flex007" in terms("FLEX007")
+
+
+def test_v3_same_word_in_followup_keeps_flex_record(passages):
+    hits = select_passages("What about the same pressure?", passages, history=("FLEX-007 D0?",))
+    assert hits and all(h.passage.slug == "flex" and "FLEX-007" in h.passage.text for h in hits)
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Compare BASS and Saffire ticket prices in Atlantis",
+        "So sánh giá vé BASS và Saffire ở Atlantis",
+    ],
+)
+def test_v3_comparison_does_not_bypass_topic_grounding(passages, question):
+    assert not select_passages(question, passages)
+
+
+def test_catalog_has_a_family_member_without_passages(passages, catalog_slugs):
+    # Precondition for the regressions below: ACME Flame Design is cataloged but unindexed.
+    assert "flame-design" in catalog_slugs
+    assert not any(p.slug == "flame-design" for p in passages)
+
+
+@pytest.mark.parametrize(
+    "question", ["What is ACME?", "ACME là gì?", "Tell me about the ACME project"]
+)
+def test_family_question_survives_member_without_passages(passages, catalog_slugs, question):
+    hits = select_passages(question, passages, study_slugs=catalog_slugs)
+    assert hits and {h.passage.slug for h in hits} <= FAMILIES["acme"]
+
+
+def test_family_comparison_survives_member_without_passages(passages, catalog_slugs):
+    hits = select_passages("Compare ACME and FLEX", passages, study_slugs=catalog_slugs)
+    slugs = {h.passage.slug for h in hits}
+    assert slugs & FAMILIES["acme"] and "flex" in slugs
+
+
+@pytest.mark.parametrize("question", ["What is ACME BRE?", "ACME BRE là gì?"])
+def test_named_family_member_is_not_widened_to_its_family(passages, catalog_slugs, question):
+    hits = select_passages(question, passages, study_slugs=catalog_slugs)
+    assert hits and {h.passage.slug for h in hits} == {"bre"}
+
+
+def test_explicitly_named_study_without_passages_still_abstains(passages, catalog_slugs):
+    assert not select_passages("What is ACME Flame Design?", passages, study_slugs=catalog_slugs)
+
+
+async def test_provider_answers_family_question_with_backend_slugs(passages, catalog_slugs):
+    provider = ExtractiveProvider()
+    citations = provider.retrieve("What is ACME?", passages, (), catalog_slugs)
+    answer = await provider.answer(
+        RagRequest(
+            question="What is ACME?",
+            corpus_version="a" * 64,
+            collection_fingerprint="b" * 64,
+            allowed_sources=citations,
+        )
+    )
+    assert answer.state == "answered" and answer.citations
+
+
+def test_v3_language_keeps_scientific_unicode_in_english():
+    from app.integrations.rag.vocabulary import language
+
+    assert language("What measurements use μg and CO₂?") == "en"
+    assert language("Thí nghiệm nào đo CO₂?") == "vi"
+    assert language("Thi nghiem nao dung heli?") == "vi"

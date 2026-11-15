@@ -1,0 +1,13 @@
+{
+  "frozen_at": "2026-11-15T17:52:40.916340+07:00",
+  "independent_review": "kit-reviewer PASS before holdout execution",
+  "algorithm_sha256": "10bca691afe215c8845dd44800bc7a760724388753a985f9b9b2e97ee26fa8b1",
+  "files": {
+    "flameguard-ai-backend/app/integrations/rag/bm25.py": "917255717ae9a6bd8e8004747f4e92281b787becd23bc32ed227cc7f3c0903e8",
+    "flameguard-ai-backend/app/integrations/rag/provider.py": "d1ad86a8393421f538b1461816aedb2b55db44f8daf7af5c4d5b3a3650a75347",
+    "flameguard-ai-backend/app/integrations/rag/retrieval.py": "62995dc0bbe773303e030dab7a91b83ee493d444c525bd1260d909b4c095e054",
+    "flameguard-ai-backend/app/integrations/rag/vocabulary.py": "07f0d0dff854a7065805678999b32e619bd32ad87701fe4c990182e1d426657b"
+  },
+  "evaluation_sha256": "602ffb50b9f46bfa9cc74878cd1fb88a9f0effed1129ca71b6f0a79bb1c00dce",
+  "note": "No retrieval/provider behavior changes after this freeze. Holdout results are not used for tuning."
+}

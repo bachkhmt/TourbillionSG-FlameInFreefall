@@ -1,0 +1,100 @@
+{
+  "date": "2026-11-15",
+  "target": "fresh isolated test DB on tourbillion-test-pg 127.0.0.1:55435",
+  "transport": "real HTTP socket on localhost ephemeral port",
+  "provider_version": "nasa-extractive-v3",
+  "runtime_corpus_version": "ebce7ca25fb3758087de0308bf936d2baf74249c32cbc34e50a28331d7fb100e",
+  "passages": 2574,
+  "results": [
+    {
+      "question": "Which investigations studied fire suppression with carbon dioxide?",
+      "http_status": 201,
+      "state": "answered",
+      "slugs": [
+        "flex",
+        "bass",
+        "bass-ii",
+        "fire-attire"
+      ],
+      "elapsed_ms": 4064
+    },
+    {
+      "question": "Thí nghiệm nào dập lửa bằng CO2 hoặc heli?",
+      "http_status": 201,
+      "state": "answered",
+      "slugs": [
+        "flex",
+        "bass-ii",
+        "bass",
+        "flex-2"
+      ],
+      "elapsed_ms": 4136
+    },
+    {
+      "question": "Compare BASS and Saffire",
+      "http_status": 201,
+      "state": "answered",
+      "slugs": [
+        "saffire-i",
+        "bass",
+        "saffire-ii",
+        "bass-ii"
+      ],
+      "elapsed_ms": 2592
+    },
+    {
+      "question": "What fuels were used in FLEX?",
+      "http_status": 201,
+      "state": "answered",
+      "slugs": [
+        "flex",
+        "flex",
+        "flex",
+        "flex"
+      ],
+      "elapsed_ms": 2810
+    },
+    {
+      "question": "flame spread rate of PMMA in BASS-II",
+      "http_status": 201,
+      "state": "answered",
+      "slugs": [
+        "bass-ii",
+        "bass-ii",
+        "bass-ii",
+        "bass-ii"
+      ],
+      "elapsed_ms": 2639
+    },
+    {
+      "question": "highest oxygen concentration tested in microgravity",
+      "http_status": 201,
+      "state": "abstained",
+      "slugs": [],
+      "elapsed_ms": 2503
+    },
+    {
+      "question": "FLEX-007 D0 đường kính mâu thuẫn?",
+      "http_status": 201,
+      "state": "answered",
+      "slugs": [
+        "flex",
+        "flex"
+      ],
+      "elapsed_ms": 3325
+    },
+    {
+      "question": "Is PMMA safe at 30% oxygen?",
+      "http_status": 201,
+      "state": "abstained",
+      "slugs": [],
+      "elapsed_ms": 2459
+    },
+    {
+      "question": "What about the same pressure?",
+      "http_status": 201,
+      "state": "answered",
+      "kept_record": "FLEX-007"
+    }
+  ]
+}
