@@ -11,3 +11,7 @@ export * from './components/act2-machine/LabLightsTransition';
 export * from './components/act2-machine/InteractiveGapDemo';
 export * from './components/act2-machine/LockedPredictiveDemo';
 export * from './components/act2-machine/ValueRevealDeck';
+export * from './components/act3-unknown/EarthImpactShowcase';
+export * from './components/act3-unknown/MissionBriefCTA';
+export * from './components/DebugHUD';
+export * from './components/EmberZeroExperience';
