@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Compass, Rocket, ArrowRight, RotateCcw, Info } from 'lucide-react';
+import { handleTimeoutFallback } from '@/hooks/api/queryHelpers';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import {
   useDashboardSummaryQuery,
@@ -31,6 +32,15 @@ export default function DashboardPage() {
   const exploreLabel = summary
     ? `Explore ${summary.investigationCount} Studies`
     : 'Explore Studies';
+
+  useEffect(() => {
+    if (
+      summary?.context?.collectionId === 'nasa-psi-archive-offline' ||
+      summary?.context?.caveats?.some((c) => /offline fallback/i.test(c))
+    ) {
+      handleTimeoutFallback();
+    }
+  }, [summary]);
 
   return (
     <motion.div

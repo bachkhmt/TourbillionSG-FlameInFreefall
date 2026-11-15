@@ -3,3 +3,7 @@
 /deploy/**/*.py text eol=lf
 /deploy/*.yaml text eol=lf
 /deploy/Caddyfile text eol=lf
+
+# Preserve original bytes: NASA raw artifacts are verified by SHA-256.
+# Never let core.autocrlf alter scientific inputs.
+integrations/nasa_data/research/** -text

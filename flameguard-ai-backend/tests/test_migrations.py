@@ -8,14 +8,15 @@ from app.core.config import get_settings
 from tests.erd_reference import ROOT, erd_tables
 
 
-def test_three_ordered_revisions_cover_every_approved_entity(monkeypatch) -> None:
+def test_ordered_revisions_preserve_baseline_and_add_source_scope(monkeypatch) -> None:
     config = Config(str(ROOT / "alembic.ini"))
     scripts = ScriptDirectory.from_config(config)
-    assert scripts.get_heads() == ["0003_could_have"]
+    assert scripts.get_heads() == ["0004_challenge_source_scope"]
     assert [(r.revision, r.down_revision) for r in reversed(list(scripts.walk_revisions()))] == [
         ("0001_must_have", None),
         ("0002_should_have", "0001_must_have"),
         ("0003_could_have", "0002_should_have"),
+        ("0004_challenge_source_scope", "0003_could_have"),
     ]
     monkeypatch.setenv("DEBUG", "false")
     get_settings.cache_clear()

@@ -1872,18 +1872,36 @@
         "additionalProperties": false
       },
       "Source": {
-        "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "title": "Id"
           },
           "investigationId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Investigationid"
+          },
+          "sourceScope": {
             "type": "string",
-            "format": "uuid"
+            "enum": [
+              "investigation",
+              "challenge"
+            ],
+            "title": "Sourcescope",
+            "default": "investigation"
           },
           "sourceUrl": {
-            "type": "string"
+            "type": "string",
+            "title": "Sourceurl"
           },
           "doi": {
             "anyOf": [
@@ -1893,10 +1911,12 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "title": "Doi"
           },
           "documentType": {
-            "type": "string"
+            "type": "string",
+            "title": "Documenttype"
           },
           "version": {
             "anyOf": [
@@ -1906,15 +1926,19 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "title": "Version"
           },
           "ingestionStatus": {
-            "type": "string"
+            "type": "string",
+            "title": "Ingestionstatus"
           },
           "context": {
             "$ref": "#/components/schemas/Context"
           }
         },
+        "additionalProperties": false,
+        "type": "object",
         "required": [
           "id",
           "investigationId",
@@ -1925,7 +1949,7 @@
           "ingestionStatus",
           "context"
         ],
-        "additionalProperties": false
+        "title": "Source"
       },
       "ClaimSource": {
         "type": "object",

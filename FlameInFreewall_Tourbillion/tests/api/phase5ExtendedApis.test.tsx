@@ -5,27 +5,21 @@ import React from 'react';
 import {
   createChatSession,
   getChatSession,
-  getChatMessages,
+  listChatMessages,
   sendChatMessage,
   getAdvisorAssessment,
+  CHAT_SEND_TIMEOUT_MS,
   evaluateMissionScenario,
   getPredictionReadiness,
   executePrediction,
 } from '@/api/services';
-import {
-  useCreateChatSessionMutation,
-  useChatSessionQuery,
-  useChatMessagesQuery,
-  useSendChatMessageMutation,
-} from '@/features/ai';
+import { useSendChatMessageMutation } from '@/features/ai';
 import {
   useScenarioEvaluationQuery,
   usePredictionReadinessQuery,
   usePredictionMutation,
 } from '@/features/mission';
 import {
-  getMockChatExchange,
-  getMockChatSession,
   getMockPredictionReadiness,
   getMockPredictionResponse,
   getMockScenarioEvaluation,
@@ -45,56 +39,54 @@ describe('Phase 5 Extended Backend APIs Integration', () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 
-  describe('Chat & Grounded Scientific Advisor', () => {
-    it('creates a chat session and returns SessionOutputDto', async () => {
-      const mockSession = getMockChatSession('bass');
-      vi.spyOn(httpClient, 'apiPost').mockResolvedValueOnce(mockSession);
+  describe('Chat & Grounded Scientific Advisor (backend contract, no local fallback)', () => {
+    const SESSION = '11111111-1111-4111-8111-111111111111';
 
-      const session = await createChatSession({ investigationId: 'bass', title: 'Exploration' });
-      expect(session.id).toBeDefined();
-      expect(session.investigationId).toBe('bass');
+    it('creates, reads and lists a session through the snake_case chat endpoints', async () => {
+      const request = vi.spyOn(httpClient, 'apiRequest').mockResolvedValue({});
+
+      await createChatSession({ investigation_id: SESSION });
+      await getChatSession(SESSION);
+      await listChatMessages(SESSION, { offset: 0, limit: 50 });
+
+      expect(request.mock.calls.map(([path, init]) => [path, init?.method ?? 'GET'])).toEqual([
+        ['/chat/sessions', 'POST'],
+        [`/chat/sessions/${SESSION}`, 'GET'],
+        [`/chat/sessions/${SESSION}/messages`, 'GET'],
+      ]);
+      expect(request.mock.calls[0][1]?.body).toEqual({ investigation_id: SESSION });
     });
 
-    it('retrieves chat session and message history', async () => {
-      const mockSession = getMockChatSession();
-      vi.spyOn(httpClient, 'apiGet')
-        .mockResolvedValueOnce(mockSession)
-        .mockResolvedValueOnce({ items: [], offset: 0, limit: 20 });
+    it('sends a question with the long chat timeout', async () => {
+      const request = vi.spyOn(httpClient, 'apiRequest').mockResolvedValue({});
 
-      const session = await getChatSession('sess-1');
-      expect(session.id).toBeDefined();
+      await sendChatMessage(SESSION, 'FLEX-007 D0?');
 
-      const messages = await getChatMessages('sess-1');
-      expect(messages.items).toHaveLength(0);
+      expect(request).toHaveBeenCalledWith(`/chat/sessions/${SESSION}/messages`, {
+        method: 'POST',
+        body: { question: 'FLEX-007 D0?' },
+        signal: undefined,
+        timeoutMs: CHAT_SEND_TIMEOUT_MS,
+      });
     });
 
-    it('sends question and receives evidence-grounded response', async () => {
-      const mockExchange = getMockChatExchange('What is the quenching limit in microgravity?');
-      vi.spyOn(httpClient, 'apiPost').mockResolvedValueOnce(mockExchange);
-
-      const exchange = await sendChatMessage('sess-1', 'What is the quenching limit in microgravity?');
-      expect(exchange.user.answer.text).toBe('What is the quenching limit in microgravity?');
-      expect(exchange.assistant.answer.state).toBe('answered');
-      expect(exchange.assistant.answer.text.length).toBeGreaterThan(0);
-    });
-
-    it('runs useSendChatMessageMutation with fallback when backend rejects', async () => {
-      vi.spyOn(httpClient, 'apiPost').mockRejectedValueOnce(new Error('503 Chat Provider Unavailable'));
+    it('surfaces a backend rejection instead of inventing a local answer', async () => {
+      vi.spyOn(httpClient, 'apiRequest').mockRejectedValue(new Error('503 Chat unavailable'));
 
       const { result } = renderHook(() => useSendChatMessageMutation(), { wrapper });
+      result.current.mutate({ sessionId: SESSION, question: 'Why are flames spherical?' });
 
-      result.current.mutate({
-        sessionId: 'sess-test',
-        question: 'Why do flames become spherical in microgravity?',
-        investigationId: 'flex',
-      });
+      await waitFor(() => expect(result.current.isError).toBe(true));
+      expect(result.current.data).toBeUndefined();
+    });
 
-      await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
+    it('posts advisor assessments to the backend', async () => {
+      const request = vi.spyOn(httpClient, 'apiRequest').mockResolvedValue({});
 
-      expect(result.current.data?.assistant.answer.text).toContain('spherical');
-      expect(result.current.data?.assistant.answer.origin).toBe('real');
+      await getAdvisorAssessment({ scenario: {} });
+
+      expect(request.mock.calls[0][0]).toBe('/advisor/assessments');
+      expect(request.mock.calls[0][1]?.method).toBe('POST');
     });
   });
 

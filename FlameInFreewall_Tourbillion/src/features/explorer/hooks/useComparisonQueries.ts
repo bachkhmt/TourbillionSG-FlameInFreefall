@@ -11,7 +11,7 @@ import { compareInvestigations } from '@/api/services';
 import { getMockComparisonResult } from '@/api/mockFallback';
 import type { MappedComparisonResult } from '@/types/api';
 import type { ApiQueryOptions } from '@/hooks/api/queryHelpers';
-import { shouldFallback } from '@/hooks/api/queryHelpers';
+import { handleTimeoutFallback, shouldFallback } from '@/hooks/api/queryHelpers';
 import { apiQueryKeys } from '@/hooks/api/queryKeys';
 
 function normalizeComparisonIds(
@@ -61,6 +61,7 @@ export function useComparisonQuery(
         return mapComparisonDto(dto);
       } catch (err) {
         if (shouldFallback(options?.enableFallback)) {
+          handleTimeoutFallback(err);
           return getMockComparisonResult(normalizedIds);
         }
         throw err;

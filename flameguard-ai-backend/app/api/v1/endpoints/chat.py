@@ -6,9 +6,13 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.routing import APIRoute
 
 from app.api.dependencies import get_scenarios
-from app.integrations.chat import bounded
+from app.integrations.chat import UnavailableProvider, bounded
 from app.schemas.api.chat import (
     AdvisorOutput,
+    ChallengeResourceOutput,
+    ChallengeResourcePage,
+    ChatReadiness,
+    ChatSourceOutput,
     Exchange,
     MessagePage,
     Question,
@@ -17,7 +21,7 @@ from app.schemas.api.chat import (
 )
 from app.schemas.api.scenarios import PILLARS, EvaluationRequest
 from app.services.advisor import evidence_gaps, require_evaluation_scope
-from app.services.chat import ChatService, validate_citations
+from app.services.chat import CORPUS_POLICY_UNAVAILABLE, ChatService, validate_citations
 from app.services.scenarios import ScenarioService
 
 
@@ -57,6 +61,110 @@ router = APIRouter(
 
 def service(request: Request):
     return ChatService(request.app)
+
+
+@router.get("/chat/readiness", response_model=ChatReadiness)
+async def readiness(chat: Annotated[ChatService, Depends(service)]):
+    """Reports whether a send can succeed; reasons are codes, never configuration details."""
+
+    def not_ready(reason):
+        return ChatReadiness(state="not_ready", mode="none", reasons=(reason,))
+
+    if isinstance(chat.provider, UnavailableProvider):
+        return not_ready("PROVIDER_UNAVAILABLE")
+    if chat.runtime is None:
+        return not_ready("RUNTIME_STORAGE_UNAVAILABLE")
+    retrieval = callable(getattr(chat.provider, "retrieve", None))
+    try:
+        snapshot = await chat.snapshot(corpus=retrieval)
+        async with chat.runtime.session_factory() as session, session.begin():
+            await chat.writer(session, snapshot.oid)
+    except HTTPException as exc:
+        corpus_policy = exc.detail == CORPUS_POLICY_UNAVAILABLE
+        return not_ready(
+            "CORPUS_POLICY_UNAVAILABLE" if corpus_policy else "CHAT_CONFIGURATION_UNAVAILABLE"
+        )
+    except Exception:
+        return not_ready("CHAT_CONFIGURATION_UNAVAILABLE")
+    version = getattr(chat.provider, "version", None)
+    if retrieval:
+        corpus = snapshot.corpus
+        if corpus is None or not corpus.passages:
+            return not_ready("CORPUS_POLICY_UNAVAILABLE")
+        return ChatReadiness(
+            state="ready",
+            mode="retrieval_only",
+            provider_version=version,
+            corpus_version=corpus.fingerprint,
+            source_revision=corpus.source_revision,
+            passages=len(corpus.passages),
+            review_status="unreviewed",
+        )
+    synthetic = snapshot.config.get("origin") == "synthetic"
+    return ChatReadiness(
+        state="ready",
+        mode="provider",
+        provider_version=version,
+        review_status="unreviewed" if synthetic else "unknown",
+    )
+
+
+@router.get("/chat/sources/{source_document_id}", response_model=ChatSourceOutput)
+async def cited_source(
+    source_document_id: UUID,
+    corpus_version: Annotated[str, Query(pattern=r"^[a-f0-9]{64}$")],
+    locator: Annotated[str, Query(min_length=1, max_length=2000)],
+    chat: Annotated[ChatService, Depends(service)],
+):
+    """Metadata of an admitted cited passage; 409 when the citation is from another corpus."""
+    corpus = (await chat.snapshot(corpus=True)).corpus
+    if corpus is None:
+        raise HTTPException(404, "Citation source unavailable")
+    if corpus_version != corpus.fingerprint:
+        raise HTTPException(409, "Citation belongs to another corpus revision")
+    if not any(
+        p.source_document_id == source_document_id and p.locator == locator for p in corpus.passages
+    ):
+        raise HTTPException(404, "Citation source unavailable")
+    entry = corpus.sources[str(source_document_id)]
+    url = entry["sourceUrl"]
+    return ChatSourceOutput(
+        source_document_id=source_document_id,
+        locator=locator,
+        corpus_version=corpus_version,
+        filename=entry["filename"],
+        source_url=url if url.startswith("https://") else None,
+        sha256=entry["sha256"],
+        license=entry["license"],
+        title=entry["title"],
+        investigation_id=entry["investigationId"],
+        source_scope=entry.get("sourceScope", "investigation"),
+    )
+
+
+@router.get("/chat/resources", response_model=ChallengeResourcePage)
+async def challenge_resources(chat: Annotated[ChatService, Depends(service)]):
+    """Official resource inventory; linked/blocked entries are never presented as indexed."""
+    corpus = (await chat.snapshot(corpus=True)).corpus
+    if corpus is None:
+        raise HTTPException(503, "Source corpus policy unavailable")
+    indexed = {str(p.source_document_id) for p in corpus.passages}
+    return ChallengeResourcePage(
+        corpus_version=corpus.fingerprint,
+        items=[
+            ChallengeResourceOutput(
+                source_document_id=identity,
+                resource_id=entry["slug"],
+                title=entry["title"],
+                source_url=entry["sourceUrl"],
+                license=entry["license"],
+                status=entry.get("status", "unknown"),
+                indexed=identity in indexed,
+            )
+            for identity, entry in corpus.sources.items()
+            if entry.get("sourceScope") == "challenge"
+        ],
+    )
 
 
 @router.post("/chat/sessions", response_model=SessionOutput, status_code=201)

@@ -11,3 +11,46 @@
 **/__pycache__/
 **/.pytest_cache/
 **/.ruff_cache/
+
+# Local environments and credentials (examples are safe to commit)
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+
+# Dependencies / installed packages
+node_modules/
+.venv/
+venv/
+*.egg-info/
+
+# Builds and caches
+.next/
+dist/
+build/
+out/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.tsbuildinfo
+
+# Tests / runtime state / local databases (settings with credentials live in .demo/)
+coverage/
+.coverage
+.demo/
+*.log
+*.pid
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Agent local state; durable plans are kept
+.claude/*
+!.claude/plans/
+
+.unified-bundle/

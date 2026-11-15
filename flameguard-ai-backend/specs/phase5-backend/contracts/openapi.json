@@ -1777,6 +1777,86 @@
           "collectionTraversalComplete"
         ],
         "title": "Coverage"
+      },
+      "Source": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "investigationId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Investigationid"
+          },
+          "sourceScope": {
+            "type": "string",
+            "enum": [
+              "investigation",
+              "challenge"
+            ],
+            "title": "Sourcescope",
+            "default": "investigation"
+          },
+          "sourceUrl": {
+            "type": "string",
+            "title": "Sourceurl"
+          },
+          "doi": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doi"
+          },
+          "documentType": {
+            "type": "string",
+            "title": "Documenttype"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "ingestionStatus": {
+            "type": "string",
+            "title": "Ingestionstatus"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "investigationId",
+          "sourceUrl",
+          "doi",
+          "documentType",
+          "version",
+          "ingestionStatus",
+          "context"
+        ],
+        "title": "Source"
       }
     }
   }

@@ -17,7 +17,7 @@ duplicate implementations and accidental work across repositories.
 | Dashboard, catalog, comparison endpoints | **Owner** | Curated dataset | Consult | **Owner of UI adapter** |
 | Scenario similarity/gap run-level persistence | **Owner of API/logic agreed with scientific reviewers** | Test-run evidence | Scientific review | UI |
 | Chat session/message/citation persistence | **Owner** | Source records | RAG results | Session browser state |
-| Retrieval, grounding, response composition, model evaluation | Adapter/persistence | Curated corpus | **Owner** | Display |
+| Retrieval, grounding, response composition, model evaluation (`app/integrations/rag/`) | Adapter, corpus admission, grounding checks, persistence (ADR-0005) | Curated corpus + CC0 corpus registry | **Owner** | Display |
 | Predictive model, training, model-domain/uncertainty evidence | Gate/adapters | Validated dataset | **Owner** | Readiness UI |
 | Next.js state, route handling, frontend tests | Contract consultation | No | No | **Owner** |
 | Backend deployment, DB migration, server secrets | **Owner** | Data access collaboration | Provider configuration collaboration | Vercel integration |

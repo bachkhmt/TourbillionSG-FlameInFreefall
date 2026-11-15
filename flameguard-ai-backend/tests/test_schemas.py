@@ -35,6 +35,8 @@ def sample_values(table):
             "int": 0,
             "datetime": datetime(2020, 1, 1, tzinfo=UTC),
         }[kind]
+    if table == "source_document":
+        values["source_scope"] = "investigation"
     return values
 
 
@@ -77,7 +79,7 @@ def test_create_requires_nonnullable_inputs_and_rejects_invented_fields(table) -
     nullable = approved_nullables()[table]
     values = {k: v for k, v in sample_values(table).items() if k in create.model_fields}
     for name in create.model_fields:
-        if name not in nullable:
+        if name not in nullable and not (table == "source_document" and name == "source_scope"):
             incomplete = {k: v for k, v in values.items() if k != name}
             with pytest.raises(ValidationError):
                 create.model_validate(incomplete)

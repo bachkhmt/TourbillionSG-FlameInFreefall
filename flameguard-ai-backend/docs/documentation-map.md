@@ -27,6 +27,12 @@ follow the route that matches the requested feature.
 
 ## Source-of-truth precedence
 
+Current Data handoff items1–2: [ADR-0006](decisions/ADR-0006-challenge-source-ownership.md),
+[Phase6c spec](../specs/phase6c-challenge-resources/spec.md) and
+[verification](../specs/phase6c-challenge-resources/verification.md). Source scope is
+an approved additive delta to the preserved historical21-table ERD; applied0001–0003
+are unchanged. AI evaluation and PR2/FE conflict resolution remain separate handoffs.
+
 1. **User-approved decisions and task scope.** New decisions that materially
    change schema or API contracts must be recorded explicitly.
 2. **Current backend ERD baseline:** `diagram/index.html` D03–D05 defines the

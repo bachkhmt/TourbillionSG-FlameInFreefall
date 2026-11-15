@@ -1,0 +1,91 @@
+{
+ "retrieved_at": "2026-11-14T16:46:04+07:00",
+ "method": "Public PSI file manifest POST and download GET; the download endpoint returns a presigned object-store URL that is followed once and never stored. Original file bytes are kept unmodified.",
+ "scope": "Official challenge resource: PSI Data Repository (Combustion Science). Files selected because they hold run-level data for PSI-20 (ACME BRE) and PSI-39 (CFI).",
+ "status": "source_checked; not independent scientific review",
+ "file_manifests": [
+  {
+   "accession": "PSI-20",
+   "study_version": 4,
+   "request": "POST /geode-py/ws/files/v2",
+   "request_body": {
+    "folder": "PSI-20/",
+    "fileType": "study",
+    "studyId": "PSI-20",
+    "version": 4,
+    "obfuscationcode": ""
+   },
+   "local_path": "manifests/PSI-20.v4.files.json.gz",
+   "compression": "gzip",
+   "downloaded_bytes": 1204944,
+   "sha256": "23af2c30d3257dda1f30616fcb9b2ed4f1796a61ba217563f4e68b0e0d194def",
+   "stored_bytes": 51407,
+   "stored_sha256": "015f2b08e9bd37fe43005b3927a59733ebd46f2f5f558a5076e0acea8ad63fce"
+  },
+  {
+   "accession": "PSI-39",
+   "study_version": 4,
+   "request": "POST /geode-py/ws/files/v2",
+   "request_body": {
+    "folder": "PSI-39/",
+    "fileType": "study",
+    "studyId": "PSI-39",
+    "version": 4,
+    "obfuscationcode": ""
+   },
+   "local_path": "manifests/PSI-39.v4.files.json.gz",
+   "compression": "gzip",
+   "downloaded_bytes": 1405621,
+   "sha256": "49aab707b119076ceedca51eb5c026dd7227cb29d04f6aaadec55f264849b0df",
+   "stored_bytes": 57106,
+   "stored_sha256": "2ab52dbda811029906ccc79c5e0790ed0f9a247c432e7b39036bc4b0b69ea7ea"
+  }
+ ],
+ "artifacts": [
+  {
+   "accession": "PSI-20",
+   "file_name": "PSI-20_Raw Data_Final ACME Chamber Calculator - 2019-01-31 to 2019-04-09.xlsx",
+   "psi_key": "psi-data/PSI-20/Raw Data/PSI-20_Raw Data_Final ACME Chamber Calculator - 2019-01-31 to 2019-04-09.xlsx",
+   "file_version": 2,
+   "study_version": 4,
+   "license": "CC0-1.0",
+   "kind": "experimental_table",
+   "source_url": "https://psi.nasa.gov/geode-py/ws/studies/PSI-20/download?file=PSI-20_Raw+Data_Final+ACME+Chamber+Calculator+-+2019-01-31+to+2019-04-09.xlsx&version=2&studyVersion=4&redirect=false",
+   "local_path": "files/PSI-20_Raw Data_Final ACME Chamber Calculator - 2019-01-31 to 2019-04-09.xlsx",
+   "listed_bytes": 438434,
+   "downloaded_bytes": 438434,
+   "sha256": "5417e11d494264724b2f4c12d2a173ed063aa2f5671df89e33ee35761fd3ce3f",
+   "download_host": "psi-curation-prod.s3.amazonaws.com"
+  },
+  {
+   "accession": "PSI-20",
+   "file_name": "PSI-20_Raw Data_Final ACME Chamber Calculator - 2020-07-22 to 2021-02-03.xlsx",
+   "psi_key": "psi-data/PSI-20/Raw Data/PSI-20_Raw Data_Final ACME Chamber Calculator - 2020-07-22 to 2021-02-03.xlsx",
+   "file_version": 3,
+   "study_version": 4,
+   "license": "CC0-1.0",
+   "kind": "experimental_table",
+   "source_url": "https://psi.nasa.gov/geode-py/ws/studies/PSI-20/download?file=PSI-20_Raw+Data_Final+ACME+Chamber+Calculator+-+2020-07-22+to+2021-02-03.xlsx&version=3&studyVersion=4&redirect=false",
+   "local_path": "files/PSI-20_Raw Data_Final ACME Chamber Calculator - 2020-07-22 to 2021-02-03.xlsx",
+   "listed_bytes": 525509,
+   "downloaded_bytes": 525509,
+   "sha256": "7657684ef9bb1b4805d10a62a049af632440a51d9f0a6dbb83bf54dc591e19c0",
+   "download_host": "psi-curation-prod.s3.amazonaws.com"
+  },
+  {
+   "accession": "PSI-39",
+   "file_name": "PSI-39_Science Documents_CFI_DataSummary_Spreadsheet_Jan2021.xlsx",
+   "psi_key": "psi-data/PSI-39/Science Documents/PSI-39_Science Documents_CFI_DataSummary_Spreadsheet_Jan2021.xlsx",
+   "file_version": 2,
+   "study_version": 4,
+   "license": "CC0-1.0",
+   "kind": "experimental_table",
+   "source_url": "https://psi.nasa.gov/geode-py/ws/studies/PSI-39/download?file=PSI-39_Science+Documents_CFI_DataSummary_Spreadsheet_Jan2021.xlsx&version=2&studyVersion=4&redirect=false",
+   "local_path": "files/PSI-39_Science Documents_CFI_DataSummary_Spreadsheet_Jan2021.xlsx",
+   "listed_bytes": 208743,
+   "downloaded_bytes": 208743,
+   "sha256": "a5b04b6a32bda764a9b367e491cc46b78ad0af0ac6b5e723e63b57abdb1d7dd8",
+   "download_host": "psi-curation-prod.s3.amazonaws.com"
+  }
+ ]
+}

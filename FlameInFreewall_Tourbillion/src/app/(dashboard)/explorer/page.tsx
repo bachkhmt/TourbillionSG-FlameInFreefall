@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Compass, AlertCircle, RotateCcw, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import type { InvestigationListParamsDto } from '@/api/dto';
+import { handleTimeoutFallback } from '@/hooks/api/queryHelpers';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import { EndOfListIndicator } from '@/components/ui/EndOfListIndicator';
@@ -56,6 +57,15 @@ export default function ExplorerPage() {
   const items = useMemo(() => pageData?.items ?? [], [pageData]);
   const totalCount = pageData?.total ?? 0;
   const hasMore = pageData?.hasMore ?? false;
+
+  useEffect(() => {
+    if (
+      pageData?.context?.collectionId === 'nasa-psi-archive-offline' ||
+      pageData?.context?.caveats?.some((c) => /offline fallback/i.test(c))
+    ) {
+      handleTimeoutFallback();
+    }
+  }, [pageData]);
 
   const comparisonStudies = useMemo<ComparisonStudySummary[]>(
     () => items.map((inv) => ({ id: inv.id, label: inv.psiId })),

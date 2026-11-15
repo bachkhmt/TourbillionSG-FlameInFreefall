@@ -37,9 +37,11 @@ export const apiQueryKeys = {
     investigationIds: string[],
     pagination?: { observationOffset?: number; observationLimit?: number }
   ) => ['api', 'compare', [...investigationIds].sort(), pagination ?? {}] as const,
-  chatSession: (id: string) => ['api', 'chat', 'session', id] as const,
-  chatMessages: (sessionId: string, pagination?: PaginationParamsDto) =>
-    ['api', 'chat', 'session', sessionId, 'messages', pagination ?? {}] as const,
+  chatReadiness: ['api', 'chat', 'readiness'] as const,
+  chatHistory: (sessionId: string, offset: number) =>
+    ['api', 'chat', 'history', sessionId, offset] as const,
+  chatSource: (sourceId: string, locator: string, corpusVersion: string) =>
+    ['api', 'chat', 'source', sourceId, locator, corpusVersion] as const,
   scenarioEvaluation: (digestOrId: string) =>
     ['api', 'scenario', 'evaluation', digestOrId] as const,
   predictionReadiness: (modelId?: string) =>

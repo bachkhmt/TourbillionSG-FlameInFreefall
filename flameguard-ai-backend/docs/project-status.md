@@ -16,6 +16,7 @@ official-dataset acceptance require their owners' evidence.
 | 4 | Dashboard, Explorer, Detail, Comparison APIs | **Executable convergence fixes through T084 verified 2026-11-12**; 441 tests passed, including 185 PostgreSQL integration tests; see `phase-4-api-verification.md` | T078 Frontend acceptance blocked; Data curated/scientific gates pending; fresh Converge review required |
 | 5 | Run-level scenario matching, rankings and pillar evidence | **Backend engineering verified 2026-11-12** for P5-01–P5-06. 551 tests passed, including 197 isolated PostgreSQL integration tests. See `phase-5-scenario-evidence-verification.md`. | T056–T060 Data/Frontend acceptance pending. T061/P5-07 deferred. T062 scenario-history writer pending, chat foundation accepted in Phase 6. |
 | 6 | Persistent demo chat and structured Advisor | **Backend/mock engineering and audit follow-up verified 2026-11-13**. Full suite 572 passed, PostgreSQL integration 210 passed, zero skips. See [Phase 6 verification](phase-6-chat-advisor-verification.md). | Real AI/Data evaluation and Frontend acceptance pending. Chat-only T062 boundary accepted in ADR-0004. |
+| 6b | Real-corpus extractive chat via provider extension point | **Engineering verified 2026-11-14** on branch `feat/rag-nasa-chat`: backend 679 passed (650 prior + 29 new), root PostgreSQL HTTP/retrieval 41 passed, zero skips. See [ADR-0005](decisions/ADR-0005-real-corpus-extractive-chat.md) and [Phase 6b spec](../specs/phase6b-real-corpus-chat/spec.md). | Answers stay `unreviewed`; T018 scientific evaluation and backend-upstream owner review pending. |
 | 7 | Stateless Predictive Lab backend | **Backend engineering converged 2026-11-13** for P7-01–P7-06. Full suite 650 passed, isolated PostgreSQL 223 passed, zero skips. See [Phase 7 verification](phase-7-prediction-verification.md). | T013 AI/Data and T014 Frontend acceptance pending. Public scientific readiness remains not_ready. |
 | 8 | Deployment and FE integration | **Pending implementation and acceptance** | Backend + Frontend |
 
@@ -24,6 +25,21 @@ Do not mark Phase 3 complete solely because ORM tables exist. Do not mark a late
 phase complete based on mock UI screenshots or unexecuted tests.
 
 ## Current backend implementation
+
+### Data handoff items1–2 update — 2026-11-14
+
+On `feat/data-backend-handoff-20261114` (base PR3): option A implemented with
+`0004_challenge_source_scope`, still21tables. Legacy rows/snapshots retain investigation
+ownership; ten challenge resources have nullable ownership, explicit scope/status and
+source/corpus hash admission. `GET /chat/resources` and nullable citation metadata are
+available. Both PSI2508 and extended2574-passage profiles imported/checked on newly
+created approved localhost55435 test DBs. Shared/demo/prod DBs were not changed.
+Fresh execution evidence is in [Phase6c verification](../specs/phase6c-challenge-resources/verification.md).
+Latest full root integration confirmation:80passed,0failed/errors/skipped,458.88s,
+exit0 on approved55435. Initial77passed/2failed is preserved as historical fixture evidence.
+Earlier phase counts below remain historical. AI quality/item3 and PR2 FE conflicts/item4
+stay pending with their owners; six articles indexed, Apollo/video/full Guide PDF gaps
+are explicit. No scientific validation, FE acceptance or deployment claim.
 
 - Backend: FastAPI modular monolith using Poetry/Python, SQLAlchemy async and Alembic.
 - ORM: 21 models across Must/Should/Could groups; migration revisions
@@ -54,7 +70,7 @@ phase complete based on mock UI screenshots or unexecuted tests.
 | Phase 4 | T078 Frontend acceptance and recorded follow-up review disposition | [Phase 4 verification](phase-4-api-verification.md). Frontend + Backend |
 | Phase 5 | T056–T059 Data/scientific/ranking acceptance, T060 Frontend acceptance, T062 scenario-history writer decision | [Phase 5 handoff](../specs/phase5-backend/handoff.md). Data + Frontend + Backend owner |
 | Phase 5 optional enrichment | T061/P5-07 remains deferred | Data + Frontend |
-| Phase 6 | T018 reviewed corpus/real AI provider evaluation and T019 Frontend API/privacy acceptance | [Phase 6 handoff](../specs/phase6-rag-advisor/handoff.md). AI + Data + Frontend |
+| Phase 6 | T018 reviewed corpus/real AI provider evaluation (extractive retrieval provider engineered in Phase 6b, scientific evaluation still open) and T019 Frontend API/privacy acceptance | [Phase 6 handoff](../specs/phase6-rag-advisor/handoff.md). AI + Data + Frontend |
 | Phase 7 | T013 validated model/provider/data acceptance and T014 Frontend acceptance | [Prediction handoff](contracts/phase-7-prediction-handoff.md). AI + Data + Frontend |
 | Phase 8 | Integration, deployment and end-to-end acceptance under its own approved scope | Backend + Frontend |
 

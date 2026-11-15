@@ -79,6 +79,7 @@ vi.mock('@/api/services', async (importOriginal) => {
     listInvestigationMeasurements: vi.fn(),
     listInvestigationSources: vi.fn(),
     listInvestigationClaims: vi.fn(),
+    listClaimSources: vi.fn(),
     listRunConditions: vi.fn(),
     listRunMeasurements: vi.fn(),
     compareInvestigations: vi.fn(),
@@ -761,6 +762,103 @@ describe('Experiment Explorer & Detail Pages (/explorer & /explorer/[id])', () =
 
       fireEvent.click(screen.getByTestId('export-csv-btn'));
       expect(window.URL.createObjectURL).toHaveBeenCalledTimes(2);
+    });
+
+    it('TestRunsTable renders pagination controls and honest search notice when runs are partially loaded', () => {
+      const handleLoadMore = vi.fn();
+      const handleLoadAll = vi.fn();
+
+      renderWithQuery(
+        <TestRunsTable
+          study={study}
+          runs={runs.slice(0, 1)}
+          totalRuns={10}
+          onLoadMore={handleLoadMore}
+          onLoadAll={handleLoadAll}
+          hasMore={true}
+        />
+      );
+
+      expect(screen.getByTestId('runs-pagination-controls')).toBeInTheDocument();
+      expect(screen.queryByTestId('end-of-list-indicator')).toBeNull();
+
+      fireEvent.change(screen.getByTestId('runs-search-input'), {
+        target: { value: 'RUN' },
+      });
+      expect(screen.getByTestId('runs-search-scope-notice')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByTestId('load-more-runs-btn'));
+      expect(handleLoadMore).toHaveBeenCalledTimes(1);
+
+      fireEvent.click(screen.getByTestId('load-all-runs-btn'));
+      expect(handleLoadAll).toHaveBeenCalledTimes(1);
+    });
+
+    it('ClaimsList allows loading additional provenance sources using useClaimSourcesQuery', async () => {
+      vi.mocked(apiServices.listClaimSources).mockResolvedValueOnce(
+        makePageDto([
+          makeClaimSourceDto({
+            id: 'second-source-id',
+            sourceLocator: 'Second Source Locator',
+            contextMismatch: false,
+          }),
+          makeClaimSourceDto({
+            id: 'third-source-id',
+            sourceLocator: 'Third Source Locator',
+            contextMismatch: false,
+          }),
+        ])
+      );
+
+      const claimWithExtraSources = mapClaimDto(
+        makeClaimDto({
+          sources: {
+            ...makePageDto([
+              makeClaimSourceDto({
+                sourceLocator: 'Initial Page 1 Locator',
+                contextMismatch: false,
+              }),
+            ]),
+            total: 3,
+            has_more: true,
+          },
+        })
+      );
+
+      renderWithQuery(<ClaimsList study={study} claims={[claimWithExtraSources]} />);
+
+      const loadMoreBtn = screen.getByTestId(`load-more-sources-${claimWithExtraSources.id}`);
+      expect(loadMoreBtn).toBeInTheDocument();
+      expect(loadMoreBtn.textContent).toContain('Load remaining 2 sources');
+
+      fireEvent.click(loadMoreBtn);
+
+      await waitFor(() => {
+        expect(screen.getByText(/All 3 sources loaded/i)).toBeInTheDocument();
+      });
+    });
+
+    it('PsiExportTab displays partial export warning and provides fetch full dataset button', () => {
+      const handleFetchAll = vi.fn();
+      const claims = [mapClaimDto(makeClaimDto())];
+
+      renderWithQuery(
+        <PsiExportTab
+          study={study}
+          runs={runs.slice(0, 1)}
+          observations={observations}
+          sources={sources}
+          claims={claims}
+          totalRuns={10}
+          onFetchAllData={handleFetchAll}
+        />
+      );
+
+      expect(screen.getByTestId('dataset-completeness-badge').textContent).toContain('Partial Dataset');
+      expect(screen.getByTestId('partial-export-warning')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByTestId('fetch-all-export-btn'));
+      expect(handleFetchAll).toHaveBeenCalledTimes(1);
     });
   });
 
