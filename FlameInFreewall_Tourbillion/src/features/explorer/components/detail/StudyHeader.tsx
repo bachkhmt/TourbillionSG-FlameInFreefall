@@ -16,6 +16,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import type { MappedInvestigationDetail, MappedSource } from '@/types/api';
+import { browserSourceUrl } from '@/lib/psiLinks';
 
 export interface StudyHeaderProps {
   study: MappedInvestigationDetail;
@@ -54,7 +55,7 @@ export const StudyHeader: React.FC<StudyHeaderProps> = ({
         </div>
 
         <a
-          href={primarySourceUrl ?? 'https://psi.nasa.gov/'}
+          href={browserSourceUrl(primarySourceUrl) ?? 'https://psi.nasa.gov/'}
           target="_blank"
           rel="noopener noreferrer"
           data-testid="study-nasa-psi-link"

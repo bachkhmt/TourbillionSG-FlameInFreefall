@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { apiPost } from '@/api/client';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import type { ResearchBrief } from '@/types/missionResearch';
+import { browserSourceUrl } from '@/lib/psiLinks';
 
 const labels = { match: 'Matched', mismatch: 'Different', unknown: 'Unknown', related: 'Related regime' };
 const colors = { match: 'bg-blue-50 text-blue-900', mismatch: 'bg-amber-50 text-amber-900', unknown: 'bg-slate-100 text-slate-700', related: 'bg-violet-50 text-violet-900' };
@@ -89,7 +90,7 @@ export function MissionResearch({ focusKeys = NO_FOCUS }: { focusKeys?: string[]
         {row.record?.observations.map((o,i) => <p key={i} className="my-2 text-xs">Recorded {o.name}: raw {o.raw}; normalized {o.value ?? 'Unknown'} {o.unit}; original unit {o.originalUnit}; {o.status} [{o.citationId}]</p>)}
         {[...row.limitations,...(row.record?.issues ?? [])].map((s,i) => <p key={i} className="my-2 text-xs text-amber-900">{s}</p>)}
       </details>)}
-      <details className="text-xs leading-6"><summary className="cursor-pointer font-bold">Method, original references & next steps</summary>{[...shown.method,...shown.limitations,...shown.nextSteps].map((s,i) => <p className="my-2" key={i}>{s}</p>)}{shown.citations.map(c => <p key={c.id} className="my-3 break-words">[{c.id}] <a href={c.source.sourceUrl} target="_blank" rel="noreferrer" className="underline">{c.source.filename}</a> · {c.locator} · study v{c.source.studyVersion}/file v{c.source.fileVersion} · SHA256 {c.source.sha256}</p>)}</details>
+      <details className="text-xs leading-6"><summary className="cursor-pointer font-bold">Method, original references & next steps</summary>{[...shown.method,...shown.limitations,...shown.nextSteps].map((s,i) => <p className="my-2" key={i}>{s}</p>)}{shown.citations.map(c => <p key={c.id} className="my-3 break-words">[{c.id}] <a href={browserSourceUrl(c.source.sourceUrl) ?? undefined} target="_blank" rel="noreferrer" className="underline">{c.source.filename}</a> · {c.locator} · study v{c.source.studyVersion}/file v{c.source.fileVersion} · SHA256 {c.source.sha256}</p>)}</details>
     </>}
   </section>;
 }
