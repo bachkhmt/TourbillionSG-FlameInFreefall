@@ -29,7 +29,7 @@ export const FloatingAiDock: React.FC<FloatingAiDockProps> = ({ className = '' }
         onClick={toggleOpen}
         aria-label={isOpen ? 'Close AI Assistant' : 'Open FlameGuard AI Assistant (Open Grounded AI Assistant)'}
         aria-expanded={isOpen}
-        className="group relative bg-white/95 backdrop-blur-xl hover:bg-white text-slate-900 shadow-[0_10px_35px_rgba(0,0,0,0.12)] hover:shadow-[0_14px_40px_rgba(0,0,0,0.16)] rounded-full py-2.5 px-4 flex items-center gap-2.5 border-2 border-white hover:border-zinc-200/80 font-black cursor-pointer active:scale-95 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#D4FC02]"
+        className="group relative flex size-11 cursor-pointer items-center justify-center gap-2.5 rounded-full border-2 border-white bg-white/95 font-black text-slate-900 shadow-[0_10px_35px_rgba(0,0,0,0.12)] backdrop-blur-xl transition-[background-color,border-color,box-shadow,scale] duration-300 hover:border-zinc-200/80 hover:bg-white hover:shadow-[0_14px_40px_rgba(0,0,0,0.16)] focus:outline-none focus:ring-2 focus:ring-[#D4FC02] active:scale-95 sm:size-auto sm:px-4 sm:py-2.5"
       >
         {/* Outer Ring Glow */}
         <span
@@ -49,7 +49,7 @@ export const FloatingAiDock: React.FC<FloatingAiDockProps> = ({ className = '' }
               </div>
             )}
           </div>
-          <span className="text-xs font-black tracking-tight text-slate-900">
+          <span className="hidden text-xs font-black tracking-tight text-slate-900 sm:inline">
             {isOpen ? 'Close' : 'FlameGuard AI'}
           </span>
         </div>
@@ -67,7 +67,7 @@ export const FloatingAiDock: React.FC<FloatingAiDockProps> = ({ className = '' }
         {/* Pinned Context Dot Indicator */}
         {activeContextStudyId && (
           <span
-            className="w-2 h-2 rounded-full bg-[#0B2374] ring-2 ring-white shrink-0"
+            className="absolute -bottom-0.5 -left-0.5 size-2 shrink-0 rounded-full bg-[#0B2374] ring-2 ring-white sm:static"
             title={`Active Context: ${activeContextStudyId.toUpperCase()}`}
           />
         )}
