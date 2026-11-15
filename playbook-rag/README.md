@@ -1,3 +1,8 @@
+> **Educational prototype, excluded from the submitted application runtime.**
+> The production extractive assistant lives in `../flameguard-ai-backend/app/integrations/rag/`.
+> Optional Anthropic code and evaluation scores in this directory do not describe that assistant.
+> Repository introduction: commit `d0563c4`, 2026-11-15 (+07:00); original authoring dates remain unverified.
+
 # playbook-rag
 
 RAG học tập chạy **offline** (không cần API key): BM25 + vector tùy chọn + RRF, mỗi câu trả lời kèm trích dẫn

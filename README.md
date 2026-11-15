@@ -116,3 +116,14 @@ Kiểm tra và phạm vi thay đổi: [bản ghi](docs/EVIDENCE_ONLY_SCOPE.md).
 
 Luồng chatbot, giới hạn và cách chạy: [docs/CHATBOT_FLOW.md](docs/CHATBOT_FLOW.md).
 Quy ước cho agent: [AGENTS.md](AGENTS.md).
+
+
+## Phạm vi prototype học tập và khai báo tái sử dụng
+
+`playbook-rag/` là prototype học tập độc lập, không được import bởi backend phục vụ hay frontend. Nhánh Anthropic tùy chọn của prototype này không chạy trong sản phẩm. Chat trong sản phẩm dùng `app/integrations/rag/`, `CHAT_PROVIDER=extractive`, không LLM và không provider trả phí. Benchmark trong `playbook-rag/reports/` không phải điểm chất lượng của chatbot sản phẩm.
+
+Thư mục được thêm vào lịch sử repo tại `d0563c4` (2026-11-15, +07:00); thời điểm tác giả soạn từng tài liệu gốc chưa được xác minh. Flame Studio là minh họa đồ họa, không phải dữ liệu cháy NASA hay mô hình đã được kiểm chứng. Mọi thành phần tái sử dụng và công cụ AI cần được nhóm khai báo đúng nguồn/thời điểm trong bản nộp.
+
+[Hướng dẫn từ NASA Space Apps về mã có trước sự kiện](https://github.com/nasa/spaceapps/discussions/1924) phân biệt tài nguyên có sẵn với việc phát triển riêng cho challenge trước giờ thi và yêu cầu ghi nguồn. Việc giữ prototype trong repo không tự xác lập đủ điều kiện dự thi; nhóm cần xác nhận lịch sử tác giả và danh sách thành phần tái sử dụng. Trang legal chính thức chưa truy cập được trong lần đối chiếu 2026-11-15 (HTTP 502).
+
+Các sửa lỗi trước khi nộp, kết quả kiểm tra và việc còn thiếu: [verification](flameguard-ai-backend/specs/hackathon-readiness/verification.md).

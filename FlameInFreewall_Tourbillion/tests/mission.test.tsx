@@ -3,15 +3,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import {
   ScenarioConfigForm,
-  ConditionGapMatrix,
-  RankedEvidenceList,
 } from '@/features/mission';
 import MissionPage from '../src/app/(dashboard)/mission/page';
 import { useWorkspaceStore, DEFAULT_SCENARIO } from '../src/store/useWorkspaceStore';
 import { toastStore } from '../src/components/toast/toast-store';
-import { SCENARIO_PRESETS } from '../src/data/presets';
-import { evaluateGapMatrix } from '../src/lib/gapMatrixEngine';
-import { calculateTopicalRankings } from '../src/lib/rankingEngine';
 
 const mockPush = vi.fn();
 let mockSearchParams = new URLSearchParams();
@@ -137,99 +132,6 @@ describe('Mission Scenario & Evidence Gap Matrix (/mission)', () => {
         fireEvent.change(airflowSlider, { target: { value: '12.5' } });
       });
       expect(useWorkspaceStore.getState().activeScenario.airflowVelocity).toBe(12.5);
-    });
-  });
-
-  describe('ConditionGapMatrix Component', () => {
-    it('audits all 6 dimensions (gravity, material, oxygen, pressure, airflow, combined)', () => {
-      render(<ConditionGapMatrix />);
-
-      expect(screen.getByTestId('condition-gap-matrix')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-gravity')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-material')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-oxygen')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-pressure')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-airflow')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-combined')).toBeDefined();
-    });
-
-    it('renders MATCH status and matched test runs for ISS baseline scenario', () => {
-      render(<ConditionGapMatrix />);
-
-      const overallBadge = screen.getByTestId('badge-overall-status');
-      expect(overallBadge.textContent).toContain('OVERALL MATCH');
-      expect(overallBadge.className).toContain('bg-lime-50');
-      expect(overallBadge.className).toContain('text-lime-900');
-      expect(overallBadge.className).not.toContain('emerald');
-
-      const matchedRuns = screen.getByTestId('badge-matched-runs');
-      expect(matchedRuns).toBeDefined();
-
-      const gravBadge = screen.getByTestId('badge-dim-gravity');
-      expect(gravBadge.textContent).toContain('MATCH');
-    });
-
-    it('flags partial gravity gap and displays safety warning when Moon or Mars gravity is set', () => {
-      act(() => {
-        useWorkspaceStore.getState().setActiveScenario({
-          ...DEFAULT_SCENARIO,
-          gravity: 0.16,
-          name: 'Artemis Moon Base',
-        });
-      });
-
-      render(<ConditionGapMatrix />);
-
-      const gravBadge = screen.getByTestId('badge-dim-gravity');
-      expect(gravBadge.textContent).toContain('GAP');
-
-      const warningBanner = screen.getByTestId('partial-gravity-warning');
-      expect(warningBanner).toBeDefined();
-      expect(warningBanner.textContent).toContain('NASA Safety Guardrail — Partial Gravity Empirical Gap');
-      expect(warningBanner.textContent).toContain('Cannot conclude safe or unsafe');
-    });
-
-    it('handles the mandatory NASA safety guardrail disclaimer when present', () => {
-      render(<ConditionGapMatrix />);
-
-      const disclaimer = screen.queryByTestId('nasa-safety-disclaimer');
-      if (disclaimer) {
-        expect(disclaimer.textContent).toContain('Cannot conclude safe or unsafe');
-      }
-    });
-  });
-
-  describe('RankedEvidenceList Component', () => {
-    it('renders topical investigation rankings with rank numbers and similarity badges', () => {
-      render(<RankedEvidenceList />);
-
-      expect(screen.getByTestId('ranked-evidence-list')).toBeDefined();
-
-      // For default ISS PMMA scenario, BASS is top ranked
-      const bassCard = screen.getByTestId('ranked-study-card-bass');
-      expect(bassCard).toBeDefined();
-      expect(bassCard.textContent).toContain('01');
-      expect(bassCard.textContent).toContain('BASS');
-
-      const similarityBadge = screen.getByTestId('similarity-badge-bass');
-      expect(similarityBadge.textContent).toContain('% Match');
-    });
-
-    it('displays closest test run telemetry for top study', () => {
-      render(<RankedEvidenceList />);
-
-      const closestRun = screen.getByTestId('closest-run-bass');
-      expect(closestRun).toBeDefined();
-      expect(closestRun.textContent).toContain('Closest PSI Run:');
-      expect(closestRun.textContent).toContain('BASS-RUN-01');
-    });
-
-    it('links each ranked study to Explorer with /explorer/[id]', () => {
-      render(<RankedEvidenceList />);
-
-      const inspectLink = screen.getByTestId('inspect-study-btn-bass');
-      expect(inspectLink).toBeDefined();
-      expect(inspectLink.getAttribute('href')).toBe('/explorer/bass');
     });
   });
 

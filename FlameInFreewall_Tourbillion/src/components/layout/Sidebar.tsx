@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { motion, type Variants } from 'framer-motion';
+import React, { useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { motion, type Variants } from "framer-motion";
 import {
   LayoutDashboard,
   Layers,
@@ -16,10 +16,10 @@ import {
   RotateCcw,
   ExternalLink,
   BookOpen,
-} from 'lucide-react';
-import { DockPillButton } from './DockPillButton';
-import { useWorkspaceStore } from '@/store/useWorkspaceStore';
-import { toast } from '@/components/toast/toast-store';
+} from "lucide-react";
+import { DockPillButton } from "./DockPillButton";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
+import { toast } from "@/components/toast/toast-store";
 
 export interface NavItemConfig {
   path: string;
@@ -30,15 +30,15 @@ export interface NavItemConfig {
 
 export const NAV_ITEMS: NavItemConfig[] = [
   {
-    path: '/dashboard',
-    label: 'Research Dashboard',
-    description: 'PSI KPIs & telemetry',
+    path: "/dashboard",
+    label: "Research Dashboard",
+    description: "PSI KPIs & telemetry",
     icon: LayoutDashboard,
   },
   {
-    path: '/explorer',
-    label: 'Experiment Explorer',
-    description: 'Filter & compare 20 studies',
+    path: "/explorer",
+    label: "Experiment Explorer",
+    description: "Filter & compare source studies",
     icon: Layers,
   },
   {
@@ -48,9 +48,9 @@ export const NAV_ITEMS: NavItemConfig[] = [
     icon: Rocket,
   },
   {
-    path: '/resources',
-    label: 'Official Resources',
-    description: 'NASA data, science context & case studies',
+    path: "/resources",
+    label: "Official Resources",
+    description: "NASA data, science context & case studies",
     icon: BookOpen,
   },
 ];
@@ -73,7 +73,7 @@ const dockItemVariants: Variants = {
     x: 0,
     scale: 1,
     transition: {
-      type: 'spring',
+      type: "spring",
       stiffness: 240,
       damping: 20,
     },
@@ -91,17 +91,20 @@ export const Sidebar: React.FC = () => {
     NAV_ITEMS.forEach((item) => {
       router.prefetch(item.path);
     });
-    router.prefetch('/studio');
+    router.prefetch("/studio");
   }, [router]);
 
   const isNavActive = (path: string): boolean => {
-    if (path === '/dashboard' && pathname === '/') return true;
+    if (path === "/dashboard" && pathname === "/") return true;
     return pathname === path || pathname.startsWith(`${path}/`);
   };
 
   const handleResetWorkspace = () => {
     resetWorkspace();
-    toast.success('Workspace Reset', 'Active scenario and filters restored to default ISS baseline.');
+    toast.success(
+      "Workspace Reset",
+      "Active scenario and filters restored to default ISS baseline.",
+    );
   };
 
   return (
@@ -110,7 +113,7 @@ export const Sidebar: React.FC = () => {
       <motion.aside
         initial={false}
         animate={{ width: isExpanded ? 280 : 58 }}
-        transition={{ type: 'spring', stiffness: 160, damping: 18 }}
+        transition={{ type: "spring", stiffness: 160, damping: 18 }}
         className="hidden sm:flex flex-col items-start justify-between h-[calc(100vh-1.5rem)] sticky top-3 my-3 ml-3.5 flex-shrink-0 z-50 select-none self-start"
         aria-label="FlameGuard AI primary navigation dock"
       >
@@ -121,7 +124,10 @@ export const Sidebar: React.FC = () => {
           className="flex flex-col justify-between h-full w-full"
         >
           {/* TOP SECTION: TOGGLE EXPAND / COLLAPSE BUTTON WITH CHEVRON */}
-          <motion.div variants={dockItemVariants} className="relative z-10 flex flex-col items-start gap-3 w-full">
+          <motion.div
+            variants={dockItemVariants}
+            className="relative z-10 flex flex-col items-start gap-3 w-full"
+          >
             <DockPillButton
               id="sidebar-toggle-button"
               onClick={() => setIsExpanded(!isExpanded)}
@@ -139,16 +145,20 @@ export const Sidebar: React.FC = () => {
                   />
                 )
               }
-              label={isExpanded ? 'Collapse Dock' : 'Expand Dock'}
-              description={isExpanded ? 'Switch to compact icon view' : 'Show full labels & telemetry details'}
-              tooltipText={isExpanded ? undefined : 'Expand navigation dock'}
+              label={isExpanded ? "Collapse Dock" : "Expand Dock"}
+              description={
+                isExpanded
+                  ? "Switch to compact icon view"
+                  : "Show full labels & telemetry details"
+              }
+              tooltipText={isExpanded ? undefined : "Expand navigation dock"}
             />
           </motion.div>
 
           {/* MIDDLE SECTION: MAIN FLOW NAVIGATION PILLS */}
           <div
             className={`relative z-10 flex flex-col items-start w-full transition-all duration-300 ${
-              isExpanded ? 'space-y-1.5' : 'space-y-3'
+              isExpanded ? "space-y-1.5" : "space-y-3"
             }`}
           >
             {NAV_ITEMS.map((item) => {
@@ -156,16 +166,22 @@ export const Sidebar: React.FC = () => {
               const active = isNavActive(item.path);
 
               return (
-                <motion.div key={item.path} variants={dockItemVariants} className="w-full">
+                <motion.div
+                  key={item.path}
+                  variants={dockItemVariants}
+                  className="w-full"
+                >
                   <DockPillButton
-                    id={`nav-pill-${item.path.replace('/', '')}`}
+                    id={`nav-pill-${item.path.replace("/", "")}`}
                     href={item.path}
                     isExpanded={isExpanded}
                     active={active}
                     icon={
                       <Icon
                         className={`w-5 h-5 transition-colors ${
-                          active ? 'text-zinc-950' : 'text-zinc-600 group-hover:text-zinc-950'
+                          active
+                            ? "text-zinc-950"
+                            : "text-zinc-600 group-hover:text-zinc-950"
                         }`}
                         strokeWidth={2.5}
                       />
@@ -180,7 +196,10 @@ export const Sidebar: React.FC = () => {
           </div>
 
           {/* BOTTOM SECTION: QUICK ACTIONS */}
-          <motion.div variants={dockItemVariants} className="relative z-10 flex flex-col items-start gap-3 w-full">
+          <motion.div
+            variants={dockItemVariants}
+            className="relative z-10 flex flex-col items-start gap-3 w-full"
+          >
             <DockPillButton
               id="sidebar-studio-button"
               href="/studio"
@@ -193,7 +212,7 @@ export const Sidebar: React.FC = () => {
               }
               label="3D Flame Studio"
               description="Interactive 3D combustion model"
-              tooltipText={isExpanded ? undefined : 'Launch 3D Flame Studio'}
+              tooltipText={isExpanded ? undefined : "Launch 3D Flame Studio"}
             />
             <DockPillButton
               id="sidebar-reset-button"
@@ -207,7 +226,9 @@ export const Sidebar: React.FC = () => {
               }
               label="Reset Workspace"
               description={`Current: ${activeScenario.name}`}
-              tooltipText={isExpanded ? undefined : 'Reset scenario to default baseline'}
+              tooltipText={
+                isExpanded ? undefined : "Reset scenario to default baseline"
+              }
             />
           </motion.div>
         </motion.div>
@@ -269,7 +290,9 @@ export const Sidebar: React.FC = () => {
                   <span className="font-extrabold text-sm text-[#1A1A1A] block leading-tight">
                     FlameGuard <span className="text-[#0B2374]">AI</span>
                   </span>
-                  <span className="text-[10px] text-zinc-500">Microgravity Fire Safety</span>
+                  <span className="text-[10px] text-zinc-500">
+                    Microgravity Fire Safety
+                  </span>
                 </div>
               </div>
               <button
@@ -294,21 +317,25 @@ export const Sidebar: React.FC = () => {
                     onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl transition-all ${
                       active
-                        ? 'bg-[#D4FC02] text-zinc-950 font-bold shadow-[0_0_16px_rgba(212,252,2,0.35)] border border-lime-200'
-                        : 'text-zinc-600 hover:bg-slate-100 hover:text-zinc-950'
+                        ? "bg-[#D4FC02] text-zinc-950 font-bold shadow-[0_0_16px_rgba(212,252,2,0.35)] border border-lime-200"
+                        : "text-zinc-600 hover:bg-slate-100 hover:text-zinc-950"
                     }`}
                   >
                     <Icon
-                      className={`w-4 h-4 ${active ? 'text-zinc-950' : 'text-zinc-500'}`}
+                      className={`w-4 h-4 ${active ? "text-zinc-950" : "text-zinc-500"}`}
                       strokeWidth={2.5}
                     />
                     <div className="flex-1 min-w-0">
-                      <span className={`text-xs font-bold block ${active ? 'text-zinc-950' : 'text-zinc-800'}`}>
+                      <span
+                        className={`text-xs font-bold block ${active ? "text-zinc-950" : "text-zinc-800"}`}
+                      >
                         {item.label}
                       </span>
                       <p
                         className={`text-[10.5px] truncate mt-0.5 ${
-                          active ? 'text-zinc-900/80 font-medium' : 'text-zinc-500'
+                          active
+                            ? "text-zinc-900/80 font-medium"
+                            : "text-zinc-500"
                         }`}
                       >
                         {item.description}
@@ -322,8 +349,12 @@ export const Sidebar: React.FC = () => {
             {/* Scenario Status and Footer */}
             <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-2">
               <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs">
-                <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-semibold">Active Scenario</span>
-                <span className="text-xs font-semibold text-zinc-800 block truncate">{activeScenario.name}</span>
+                <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-semibold">
+                  Active Scenario
+                </span>
+                <span className="text-xs font-semibold text-zinc-800 block truncate">
+                  {activeScenario.name}
+                </span>
                 <span className="text-[10px] text-[#0B2374] font-bold">
                   {activeScenario.oxygenPct}% O₂ · {activeScenario.gravity}g
                 </span>

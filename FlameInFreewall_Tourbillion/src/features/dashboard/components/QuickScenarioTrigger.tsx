@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { Rocket, Orbit, Moon, Globe, ArrowRight, Zap } from 'lucide-react';
-import { SCENARIO_PRESETS } from '@/data/presets';
-import { useWorkspaceStore } from '@/store/useWorkspaceStore';
-import { toast } from '@/components/toast/toast-store';
+import React from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { Rocket, Orbit, Moon, Globe, ArrowRight, Zap } from "lucide-react";
+import { SCENARIO_PRESETS } from "@/lib/scenarioPresets";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
+import { toast } from "@/components/toast/toast-store";
 
 export interface QuickScenarioConfig {
   presetId: string;
@@ -16,7 +16,7 @@ export interface QuickScenarioConfig {
   gravityValue: number;
   atmosphereDisplay: string;
   riskSummary: string;
-  badge: 'Measured' | 'Illustrative';
+  badge: "Measured" | "Illustrative";
   cardBorder: string;
   hoverBorder: string;
   iconBg: string;
@@ -25,55 +25,62 @@ export interface QuickScenarioConfig {
 
 export const QUICK_SCENARIOS: QuickScenarioConfig[] = [
   {
-    presetId: 'iss-baseline',
-    name: 'ISS Microgravity Baseline',
-    label: 'Orbital Freefall (0.00g)',
-    gravityDisplay: '0.00g',
+    presetId: "iss-baseline",
+    name: "ISS Microgravity Baseline",
+    label: "Orbital Freefall (0.00g)",
+    gravityDisplay: "0.00g",
     gravityValue: 0.0,
-    atmosphereDisplay: '21% O₂ · 14.7 psia · 5 cm/s flow',
-    riskSummary: 'Absence of buoyant convection; spherical diffusion flame sustained by HVAC forced air ventilation.',
-    badge: 'Measured',
-    cardBorder: 'border-lime-200',
-    hoverBorder: 'hover:border-lime-300',
-    iconBg: 'bg-lime-50 text-lime-900 border border-lime-200',
+    atmosphereDisplay: "21% O₂ · 14.7 psia · 5 cm/s flow",
+    riskSummary:
+      "Absence of buoyant convection; spherical diffusion flame sustained by HVAC forced air ventilation.",
+    badge: "Measured",
+    cardBorder: "border-lime-200",
+    hoverBorder: "hover:border-lime-300",
+    iconBg: "bg-lime-50 text-lime-900 border border-lime-200",
     icon: Orbit,
   },
   {
-    presetId: 'artemis-lunar-base',
-    name: 'Artemis Moon Base / Rover',
-    label: 'Lunar Surface Habitat (0.16g)',
-    gravityDisplay: '0.16g',
+    presetId: "artemis-lunar-base",
+    name: "Artemis Moon Base / Rover",
+    label: "Lunar Surface Habitat (0.16g)",
+    gravityDisplay: "0.16g",
     gravityValue: 0.16,
-    atmosphereDisplay: '30% O₂ · 10.2 psia · 8 cm/s flow',
-    riskSummary: 'High-O₂ exploration atmosphere removes N₂ dilution, drastically accelerating polymer flame spread.',
-    badge: 'Illustrative',
-    cardBorder: 'border-amber-200',
-    hoverBorder: 'hover:border-amber-300',
-    iconBg: 'bg-amber-50 text-amber-700 border border-amber-200',
+    atmosphereDisplay: "30% O₂ · 10.2 psia · 8 cm/s flow",
+    riskSummary:
+      "High-O₂ exploration atmosphere removes N₂ dilution, drastically accelerating polymer flame spread.",
+    badge: "Illustrative",
+    cardBorder: "border-amber-200",
+    hoverBorder: "hover:border-amber-300",
+    iconBg: "bg-amber-50 text-amber-700 border border-amber-200",
     icon: Moon,
   },
   {
-    presetId: 'mars-surface-habitat',
-    name: 'Mars Surface Colony Habitat',
-    label: 'Martian Gravity (0.38g)',
-    gravityDisplay: '0.38g',
+    presetId: "mars-surface-habitat",
+    name: "Mars Surface Colony Habitat",
+    label: "Martian Gravity (0.38g)",
+    gravityDisplay: "0.38g",
     gravityValue: 0.38,
-    atmosphereDisplay: '28% O₂ · 8.2 psia · 10 cm/s flow',
-    riskSummary: 'Intermediate buoyancy and low total pressure produce mixed-convection boundary layer; zero empirical PSI data.',
-    badge: 'Illustrative',
-    cardBorder: 'border-red-200',
-    hoverBorder: 'hover:border-red-300',
-    iconBg: 'bg-red-50 text-red-700 border border-red-200',
+    atmosphereDisplay: "28% O₂ · 8.2 psia · 10 cm/s flow",
+    riskSummary:
+      "Intermediate buoyancy and low total pressure produce mixed-convection boundary layer; zero empirical PSI data.",
+    badge: "Illustrative",
+    cardBorder: "border-red-200",
+    hoverBorder: "hover:border-red-300",
+    iconBg: "bg-red-50 text-red-700 border border-red-200",
     icon: Globe,
   },
 ];
 
 export const QuickScenarioTrigger: React.FC = () => {
   const router = useRouter();
-  const setActiveScenario = useWorkspaceStore((state) => state.setActiveScenario);
+  const setActiveScenario = useWorkspaceStore(
+    (state) => state.setActiveScenario,
+  );
 
   const handleLaunchScenario = (config: QuickScenarioConfig) => {
-    const matchedPreset = SCENARIO_PRESETS.find((p) => p.id === config.presetId);
+    const matchedPreset = SCENARIO_PRESETS.find(
+      (p) => p.id === config.presetId,
+    );
 
     if (matchedPreset) {
       setActiveScenario(matchedPreset);
@@ -81,26 +88,38 @@ export const QuickScenarioTrigger: React.FC = () => {
       setActiveScenario({
         id: config.presetId,
         name: config.name,
-        environment: config.presetId.includes('lunar')
-          ? 'lunar'
-          : config.presetId.includes('mars')
-          ? 'mars'
-          : 'iss',
+        environment: config.presetId.includes("lunar")
+          ? "lunar"
+          : config.presetId.includes("mars")
+            ? "mars"
+            : "iss",
         gravity: config.gravityValue,
-        oxygenPct: config.presetId.includes('lunar') ? 30.0 : config.presetId.includes('mars') ? 28.0 : 21.0,
-        pressurePsi: config.presetId.includes('lunar') ? 10.2 : config.presetId.includes('mars') ? 8.2 : 14.7,
-        material: config.presetId.includes('mars') ? 'Nomex' : 'PMMA',
-        airflowVelocity: config.presetId.includes('lunar') ? 8.0 : config.presetId.includes('mars') ? 10.0 : 5.0,
+        oxygenPct: config.presetId.includes("lunar")
+          ? 30.0
+          : config.presetId.includes("mars")
+            ? 28.0
+            : 21.0,
+        pressurePsi: config.presetId.includes("lunar")
+          ? 10.2
+          : config.presetId.includes("mars")
+            ? 8.2
+            : 14.7,
+        material: config.presetId.includes("mars") ? "Nomex" : "PMMA",
+        airflowVelocity: config.presetId.includes("lunar")
+          ? 8.0
+          : config.presetId.includes("mars")
+            ? 10.0
+            : 5.0,
         description: config.riskSummary,
       });
     }
 
     toast.success(
       `Scenario Configured: ${config.name}`,
-      `Atmospheric conditions loaded (${config.gravityDisplay}, ${config.atmosphereDisplay}). Navigating to Mission Simulation...`
+      `Atmospheric conditions loaded (${config.gravityDisplay}, ${config.atmosphereDisplay}). Navigating to Mission Simulation...`,
     );
 
-    router.push('/mission');
+    router.push("/mission");
   };
 
   return (
@@ -127,7 +146,7 @@ export const QuickScenarioTrigger: React.FC = () => {
               data-testid={`scenario-card-${scenario.presetId}`}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className={`p-5 rounded-[36px] bg-gray-200/50 ${scenario.hoverBorder} hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all flex flex-col justify-between group cursor-pointer`}
             >
               <div>
@@ -151,9 +170,9 @@ export const QuickScenarioTrigger: React.FC = () => {
 
                   <span
                     className={`px-2.5 py-0.5 rounded-full text-[11px] font-extrabold shadow-2xs border ${
-                      scenario.badge === 'Measured'
-                        ? 'bg-lime-50 text-lime-900 border-lime-300'
-                        : 'bg-amber-50 text-amber-800 border-amber-200'
+                      scenario.badge === "Measured"
+                        ? "bg-lime-50 text-lime-900 border-lime-300"
+                        : "bg-amber-50 text-amber-800 border-amber-200"
                     }`}
                   >
                     {scenario.badge}

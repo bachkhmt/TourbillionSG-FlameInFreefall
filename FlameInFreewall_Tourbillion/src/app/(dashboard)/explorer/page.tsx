@@ -1,12 +1,20 @@
-'use client';
+"use client";
+import { DataContextNotice } from "@/components/ui/DataContextNotice";
 
-import React, { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Compass, AlertCircle, RotateCcw, ChevronLeft, ChevronRight, Info } from 'lucide-react';
-import type { InvestigationListParamsDto } from '@/api/dto';
-import { useWorkspaceStore } from '@/store/useWorkspaceStore';
-import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
-import { EndOfListIndicator } from '@/components/ui/EndOfListIndicator';
+import React, { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Compass,
+  AlertCircle,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  Info,
+} from "lucide-react";
+import type { InvestigationListParamsDto } from "@/api/dto";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
+import { ApiErrorBanner } from "@/components/ui/ApiErrorBanner";
+import { EndOfListIndicator } from "@/components/ui/EndOfListIndicator";
 import {
   useCatalogCapabilitiesQuery,
   useInvestigationsQuery,
@@ -21,34 +29,61 @@ import {
   type ComparisonStudySummary,
   ComparisonModal,
   InvestigationCardShimmer,
-} from '@/features/explorer';
+} from "@/features/explorer";
 
 const PAGE_LIMIT = 20;
 
 export default function ExplorerPage() {
   const compareList = useWorkspaceStore((state) => state.compareList);
   const toggleCompare = useWorkspaceStore((state) => state.toggleCompare);
-  const removeFromCompare = useWorkspaceStore((state) => state.removeFromCompare);
+  const removeFromCompare = useWorkspaceStore(
+    (state) => state.removeFromCompare,
+  );
   const clearCompare = useWorkspaceStore((state) => state.clearCompare);
-  const isComparisonModalOpen = useWorkspaceStore((state) => state.isComparisonModalOpen);
-  const setComparisonModalOpen = useWorkspaceStore((state) => state.setComparisonModalOpen);
+  const isComparisonModalOpen = useWorkspaceStore(
+    (state) => state.isComparisonModalOpen,
+  );
+  const setComparisonModalOpen = useWorkspaceStore(
+    (state) => state.setComparisonModalOpen,
+  );
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [platformFilter, setPlatformFilter] = useState<PlatformFilterValue>('all');
-  const [materialFilter, setMaterialFilter] = useState('');
-  const [gravityFilter, setGravityFilter] = useState<GravityFilterValue>('all');
-  const [sortBy, setSortBy] = useState<ExplorerSortOption>('title-asc');
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [platformFilter, setPlatformFilter] =
+    useState<PlatformFilterValue>("all");
+  const [materialFilter, setMaterialFilter] = useState("");
+  const [gravityFilter, setGravityFilter] = useState<GravityFilterValue>("all");
+  const [sortBy, setSortBy] = useState<ExplorerSortOption>("title-asc");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [offset, setOffset] = useState(0);
+  const [tagFilter, setTagFilter] = useState("");
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setMaterialFilter(params.get("material") ?? "");
+    setGravityFilter(params.get("gravityRaw") ?? "all");
+    setTagFilter(params.get("tag") ?? "");
+  }, []);
 
   const queryParams = useMemo<InvestigationListParamsDto>(() => {
-    const params: InvestigationListParamsDto = { sort: sortBy, offset, limit: PAGE_LIMIT };
+    const params: InvestigationListParamsDto = {
+      sort: sortBy,
+      offset,
+      limit: PAGE_LIMIT,
+    };
+    if (tagFilter) params.tag = tagFilter;
     if (searchQuery.trim()) params.q = searchQuery.trim();
-    if (platformFilter !== 'all') params.platform = platformFilter;
+    if (platformFilter !== "all") params.platform = platformFilter;
     if (materialFilter.trim()) params.material = materialFilter.trim();
-    if (gravityFilter !== 'all') params.gravityRaw = gravityFilter;
+    if (gravityFilter !== "all") params.gravityRaw = gravityFilter;
     return params;
-  }, [searchQuery, platformFilter, materialFilter, gravityFilter, sortBy, offset]);
+  }, [
+    searchQuery,
+    platformFilter,
+    materialFilter,
+    gravityFilter,
+    sortBy,
+    offset,
+    tagFilter,
+  ]);
 
   const capabilitiesQuery = useCatalogCapabilitiesQuery();
   const investigationsQuery = useInvestigationsQuery(queryParams);
@@ -59,20 +94,23 @@ export default function ExplorerPage() {
 
   const comparisonStudies = useMemo<ComparisonStudySummary[]>(
     () => items.map((inv) => ({ id: inv.id, label: inv.psiId })),
-    [items]
+    [items],
   );
 
-  const withOffsetReset = <T,>(setter: React.Dispatch<React.SetStateAction<T>>) => (val: T) => {
-    setter(val);
-    setOffset(0);
-  };
+  const withOffsetReset =
+    <T,>(setter: React.Dispatch<React.SetStateAction<T>>) =>
+    (val: T) => {
+      setter(val);
+      setOffset(0);
+    };
 
   const handleResetFilters = () => {
-    setSearchQuery('');
-    setPlatformFilter('all');
-    setMaterialFilter('');
-    setGravityFilter('all');
-    setSortBy('title-asc');
+    setTagFilter("");
+    setSearchQuery("");
+    setPlatformFilter("all");
+    setMaterialFilter("");
+    setGravityFilter("all");
+    setSortBy("title-asc");
     setOffset(0);
   };
 
@@ -91,6 +129,11 @@ export default function ExplorerPage() {
         </h1>
       </div>
 
+      {tagFilter && (
+        <button onClick={handleResetFilters} className="text-sm underline">
+          Clear active tag filter
+        </button>
+      )}
       <div className="sticky top-0 z-30 -mx-3 px-3 sm:-mx-6 sm:px-6 py-3 pb-5 transition-all duration-300">
         <div className="absolute inset-0 bg-[#F8F9FA]/50 backdrop-blur-sm pointer-events-none -z-10 [mask-image:linear-gradient(to_bottom,black_85%,transparent)]" />
         <ExplorerFiltersBar
@@ -116,43 +159,30 @@ export default function ExplorerPage() {
       <div className="flex items-center justify-between text-xs sm:text-sm text-zinc-500 px-1">
         <div className="flex items-center gap-2">
           <span data-testid="explorer-summary-count">
-            Showing <span className="font-bold text-zinc-950">{items.length}</span> of {totalCount} NASA PSI Studies
+            Showing{" "}
+            <span className="font-bold text-zinc-950">{items.length}</span> of{" "}
+            {totalCount} NASA PSI Studies
           </span>
 
-          {pageData && pageData.context.caveats.length > 0 && (
-            <div
-              data-testid="explorer-caveats-banner"
-              className="relative group inline-flex items-center"
-            >
-              <button
-                type="button"
-                aria-label="Offline Fallback & Caveats"
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 text-[11px] font-bold transition-colors cursor-pointer shadow-2xs"
-              >
-                <Info className="w-3 h-3 text-amber-800" />
-                <span>Offline Fallback</span>
-              </button>
-
-              <div className="absolute left-0 top-full mt-2 hidden group-hover:block group-focus-within:block z-50 w-72 sm:w-80 p-3.5 rounded-2xl bg-[#0B2374] text-white text-xs shadow-2xl border border-[#D4FC02]/30 pointer-events-none">
-                <div className="font-extrabold text-[#D4FC02] text-xs mb-1.5 flex items-center gap-1.5">
-                  <Info className="w-4 h-4 text-[#D4FC02] shrink-0" />
-                  <span>{pageData.context.origin} · {pageData.context.reviewState}</span>
-                </div>
-                <p className="leading-relaxed text-zinc-200 text-[11.5px] font-medium">
-                  {pageData.context.caveats.join(' · ')}
-                </p>
-              </div>
-            </div>
+          {pageData && (
+            <DataContextNotice
+              context={pageData.context}
+              testId="explorer-caveats-banner"
+            />
           )}
         </div>
 
         <span className="text-zinc-400 hidden sm:inline">
-          Click any study to inspect test runs, observations &amp; evidence claims
+          Click any study to inspect test runs, observations &amp; evidence
+          claims
         </span>
       </div>
 
       {investigationsQuery.isLoading ? (
-        <div data-testid="explorer-shimmer-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div
+          data-testid="explorer-shimmer-grid"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+        >
           <InvestigationCardShimmer cardCount={6} />
         </div>
       ) : investigationsQuery.isError ? (
@@ -171,9 +201,12 @@ export default function ExplorerPage() {
             <AlertCircle className="w-6 h-6" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-base font-bold text-zinc-900">No investigations match your filters</h3>
+            <h3 className="text-base font-bold text-zinc-900">
+              No investigations match your filters
+            </h3>
             <p className="text-xs text-zinc-500 max-w-md mx-auto">
-              We couldn&apos;t find any NASA PSI studies matching your active search keywords or filter criteria.
+              We couldn&apos;t find any NASA PSI studies matching your active
+              search keywords or filter criteria.
             </p>
           </div>
           <button
@@ -186,8 +219,11 @@ export default function ExplorerPage() {
             <span>Reset All Filters</span>
           </button>
         </div>
-      ) : viewMode === 'grid' ? (
-        <div data-testid="explorer-grid-view" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      ) : viewMode === "grid" ? (
+        <div
+          data-testid="explorer-grid-view"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+        >
           {items.map((study) => (
             <InvestigationCard
               key={study.id}
@@ -198,41 +234,49 @@ export default function ExplorerPage() {
           ))}
         </div>
       ) : (
-        <InvestigationTable investigations={items} compareList={compareList} onToggleCompare={toggleCompare} />
+        <InvestigationTable
+          investigations={items}
+          compareList={compareList}
+          onToggleCompare={toggleCompare}
+        />
       )}
 
-      {totalCount > PAGE_LIMIT && !investigationsQuery.isLoading && !investigationsQuery.isError && (
-        <div
-          data-testid="explorer-pagination"
-          className="flex items-center justify-between gap-4 px-4 py-3 rounded-3xl bg-white border border-gray-200/70 text-xs"
-        >
-          <span className="text-zinc-600 font-semibold">
-            Offset {offset + 1}–{offset + items.length} of {totalCount}
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              data-testid="pagination-prev-btn"
-              disabled={offset === 0}
-              onClick={() => setOffset((prev) => Math.max(0, prev - PAGE_LIMIT))}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-gray-200 font-bold text-zinc-800 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-              <span>Previous</span>
-            </button>
-            <button
-              type="button"
-              data-testid="pagination-next-btn"
-              disabled={!hasMore}
-              onClick={() => setOffset((prev) => prev + PAGE_LIMIT)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#0B2374] text-white font-bold hover:bg-[#102B82] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <span>Next</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
+      {totalCount > PAGE_LIMIT &&
+        !investigationsQuery.isLoading &&
+        !investigationsQuery.isError && (
+          <div
+            data-testid="explorer-pagination"
+            className="flex items-center justify-between gap-4 px-4 py-3 rounded-3xl bg-white border border-gray-200/70 text-xs"
+          >
+            <span className="text-zinc-600 font-semibold">
+              Offset {offset + 1}–{offset + items.length} of {totalCount}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                data-testid="pagination-prev-btn"
+                disabled={offset === 0}
+                onClick={() =>
+                  setOffset((prev) => Math.max(0, prev - PAGE_LIMIT))
+                }
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-gray-200 font-bold text-zinc-800 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>Previous</span>
+              </button>
+              <button
+                type="button"
+                data-testid="pagination-next-btn"
+                disabled={!hasMore}
+                onClick={() => setOffset((prev) => prev + PAGE_LIMIT)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#0B2374] text-white font-bold hover:bg-[#102B82] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              >
+                <span>Next</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {items.length > 0 && !hasMore && <EndOfListIndicator />}
 

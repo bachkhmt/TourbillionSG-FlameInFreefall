@@ -1,9 +1,19 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo } from 'react';
-import { Flame, Sliders, SplitSquareVertical, Maximize2, Info } from 'lucide-react';
-import { computeCombustionPhysics } from '@/lib/combustionMath';
-import { EarthFlameSvg, IssFlameSvg, MorphFlameSvg } from './FlameVectorGraphics';
+import React, { useState, useMemo } from "react";
+import {
+  Flame,
+  Sliders,
+  SplitSquareVertical,
+  Maximize2,
+  Info,
+} from "lucide-react";
+import { computeCombustionPhysics } from "@/lib/combustionMath";
+import {
+  EarthFlameSvg,
+  IssFlameSvg,
+  MorphFlameSvg,
+} from "./FlameVectorGraphics";
 
 interface GravityPreset {
   id: string;
@@ -13,45 +23,69 @@ interface GravityPreset {
 }
 
 const PRESETS: GravityPreset[] = [
-  { id: 'iss', name: 'Microgravity (0.00g)', label: 'ISS Orbit', gravity: 0.0 },
-  { id: 'lunar', name: 'Lunar Base (0.16g)', label: 'Moon (Artemis)', gravity: 0.16 },
-  { id: 'mars', name: 'Martian Hab (0.38g)', label: 'Mars Surface', gravity: 0.38 },
-  { id: 'earth', name: 'Terrestrial (1.00g)', label: 'Earth Sea-Level', gravity: 1.0 },
+  { id: "iss", name: "Microgravity (0.00g)", label: "ISS Orbit", gravity: 0.0 },
+  {
+    id: "lunar",
+    name: "Lunar Base (0.16g)",
+    label: "Moon (Artemis)",
+    gravity: 0.16,
+  },
+  {
+    id: "mars",
+    name: "Martian Hab (0.38g)",
+    label: "Mars Surface",
+    gravity: 0.38,
+  },
+  {
+    id: "earth",
+    name: "Terrestrial (1.00g)",
+    label: "Earth Sea-Level",
+    gravity: 1.0,
+  },
 ];
 
 export const KurzgesagtFlameScene: React.FC = () => {
   const [gravity, setGravity] = useState<number>(0.0);
-  const [viewMode, setViewMode] = useState<'morph' | 'side-by-side'>('side-by-side');
+  const [viewMode, setViewMode] = useState<"morph" | "side-by-side">(
+    "side-by-side",
+  );
 
   const telemetry = useMemo(() => {
     return computeCombustionPhysics({
-      name: 'Interactive Flame Visualizer',
-      environment: gravity === 0 ? 'iss' : gravity === 1 ? 'earth' : 'custom',
+      name: "Interactive Flame Visualizer",
+      environment: gravity === 0 ? "iss" : gravity === 1 ? "earth" : "custom",
       gravity,
       oxygenPct: 21,
       pressurePsi: 14.7,
-      material: 'PMMA',
+      material: "PMMA",
       airflowVelocity: 3.0,
     });
   }, [gravity]);
 
   return (
-    <section id="flame-physics" className="py-16 relative w-full overflow-hidden bg-[#F8F9FA]" data-testid="kurzgesagt-flame-scene">
+    <section
+      id="flame-physics"
+      className="py-16 relative w-full overflow-hidden bg-[#F8F9FA]"
+      data-testid="kurzgesagt-flame-scene"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/70 px-3 py-1 text-xs font-bold text-[#0B2374] shadow-2xs mb-4">
             <Flame className="w-3.5 h-3.5 text-[#0B2374]" />
-            <span>Kurzgesagt Vector Physics</span>
+            <span>Illustrative flame physics</span>
             <span className="h-1.5 w-1.5 rounded-full bg-[#D4FC02]" />
             <span>Buoyant Convection vs Pure Diffusion</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-black text-zinc-950 tracking-tight mb-4">
-            Why Do Flames Burn <span className="text-[#0B2374]">Round &amp; Blue</span> in Freefall?
+            Why Do Flames Burn{" "}
+            <span className="text-[#0B2374]">Round &amp; Blue</span> in
+            Freefall?
           </h2>
           <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
-            On Earth, gravity pulls colder, denser air downward, forcing hot combustion gases to rise
-            in a vigorous buoyant chimney draft (30–60 cm/s). In microgravity, buoyancy vanishes entirely.
+            On Earth, gravity pulls colder, denser air downward, forcing hot
+            combustion gases to rise in a vigorous buoyant chimney draft (30–60
+            cm/s). In microgravity, buoyancy vanishes entirely.
           </p>
         </div>
 
@@ -69,8 +103,8 @@ export const KurzgesagtFlameScene: React.FC = () => {
                   onClick={() => setGravity(preset.gravity)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-[#D4FC02] text-zinc-950 border border-lime-300 shadow-2xs'
-                      : 'bg-gray-100 text-zinc-700 hover:bg-gray-200'
+                      ? "bg-[#D4FC02] text-zinc-950 border border-lime-300 shadow-2xs"
+                      : "bg-gray-100 text-zinc-700 hover:bg-gray-200"
                   }`}
                   data-testid={`preset-btn-${preset.id}`}
                 >
@@ -82,9 +116,11 @@ export const KurzgesagtFlameScene: React.FC = () => {
 
           <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
             <button
-              onClick={() => setViewMode('side-by-side')}
+              onClick={() => setViewMode("side-by-side")}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'side-by-side' ? 'bg-white text-zinc-950 shadow-2xs' : 'text-zinc-600 hover:text-zinc-900'
+                viewMode === "side-by-side"
+                  ? "bg-white text-zinc-950 shadow-2xs"
+                  : "text-zinc-600 hover:text-zinc-900"
               }`}
               data-testid="mode-side-by-side"
             >
@@ -92,9 +128,11 @@ export const KurzgesagtFlameScene: React.FC = () => {
               <span>Side-by-Side</span>
             </button>
             <button
-              onClick={() => setViewMode('morph')}
+              onClick={() => setViewMode("morph")}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'morph' ? 'bg-white text-zinc-950 shadow-2xs' : 'text-zinc-600 hover:text-zinc-900'
+                viewMode === "morph"
+                  ? "bg-white text-zinc-950 shadow-2xs"
+                  : "text-zinc-600 hover:text-zinc-900"
               }`}
               data-testid="mode-morph"
             >
@@ -105,8 +143,11 @@ export const KurzgesagtFlameScene: React.FC = () => {
         </div>
 
         {/* Chambers View */}
-        {viewMode === 'side-by-side' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8" data-testid="side-by-side-grid">
+        {viewMode === "side-by-side" ? (
+          <div
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8"
+            data-testid="side-by-side-grid"
+          >
             {/* Earth 1.00g */}
             <div className="rounded-3xl border border-gray-200/80 bg-white p-6 shadow-2xs flex flex-col justify-between">
               <div>
@@ -128,15 +169,21 @@ export const KurzgesagtFlameScene: React.FC = () => {
               <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
                 <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl">
                   <div className="text-zinc-500 font-semibold">Sphericity</div>
-                  <div className="text-base font-black text-amber-600">0.25 (Teardrop)</div>
+                  <div className="text-base font-black text-amber-600">
+                    0.25 (Teardrop)
+                  </div>
                 </div>
                 <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl">
                   <div className="text-zinc-500 font-semibold">Peak Temp</div>
-                  <div className="text-base font-black text-zinc-900">~1,760 K</div>
+                  <div className="text-base font-black text-zinc-900">
+                    ~1,760 K
+                  </div>
                 </div>
                 <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl">
                   <div className="text-zinc-500 font-semibold">Flicker</div>
-                  <div className="text-base font-black text-zinc-800">~10.0 Hz</div>
+                  <div className="text-base font-black text-zinc-800">
+                    ~10.0 Hz
+                  </div>
                 </div>
               </div>
             </div>
@@ -162,22 +209,31 @@ export const KurzgesagtFlameScene: React.FC = () => {
               <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
                 <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl">
                   <div className="text-zinc-500 font-semibold">Sphericity</div>
-                  <div className="text-base font-black text-cyan-600">0.98 (Spherical)</div>
+                  <div className="text-base font-black text-cyan-600">
+                    0.98 (Spherical)
+                  </div>
                 </div>
                 <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl">
                   <div className="text-zinc-500 font-semibold">Peak Temp</div>
-                  <div className="text-base font-black text-zinc-900">~1,420 K</div>
+                  <div className="text-base font-black text-zinc-900">
+                    ~1,420 K
+                  </div>
                 </div>
                 <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl">
                   <div className="text-zinc-500 font-semibold">Flicker</div>
-                  <div className="text-base font-black text-zinc-800">0.4 Hz (Steady)</div>
+                  <div className="text-base font-black text-zinc-800">
+                    0.4 Hz (Steady)
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         ) : (
           /* Interactive Morph Flame Chamber */
-          <div className="rounded-3xl border border-gray-200/80 bg-white p-6 sm:p-8 shadow-2xs mb-8" data-testid="morph-chamber">
+          <div
+            className="rounded-3xl border border-gray-200/80 bg-white p-6 sm:p-8 shadow-2xs mb-8"
+            data-testid="morph-chamber"
+          >
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
               <div>
                 <h3 className="text-xl font-black text-zinc-950 flex items-center gap-2">
@@ -185,7 +241,8 @@ export const KurzgesagtFlameScene: React.FC = () => {
                   Continuous Gravitational Flame Morphing
                 </h3>
                 <p className="text-xs text-zinc-600 mt-1">
-                  Adjust gravity from 0.00g (pure diffusion sphere) to 1.00g (buoyant elongated teardrop)
+                  Adjust gravity from 0.00g (pure diffusion sphere) to 1.00g
+                  (buoyant elongated teardrop)
                 </p>
               </div>
 
@@ -215,40 +272,58 @@ export const KurzgesagtFlameScene: React.FC = () => {
         )}
 
         {/* Live Telemetry HUD */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 text-xs mb-8" data-testid="live-telemetry-hud">
+        <div
+          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 text-xs mb-8"
+          data-testid="live-telemetry-hud"
+        >
           <div className="bg-white border border-gray-200/80 rounded-2xl p-3 shadow-2xs">
-            <span className="text-zinc-500 block text-[11px] font-semibold">Sphericity</span>
+            <span className="text-zinc-500 block text-[11px] font-semibold">
+              Sphericity
+            </span>
             <span className="text-base font-black text-[#0B2374]">
               {(telemetry.sphericity * 100).toFixed(0)}%
             </span>
           </div>
           <div className="bg-white border border-gray-200/80 rounded-2xl p-3 shadow-2xs">
-            <span className="text-zinc-500 block text-[11px] font-semibold">Flame Elongation</span>
+            <span className="text-zinc-500 block text-[11px] font-semibold">
+              Flame Elongation
+            </span>
             <span className="text-base font-black text-cyan-600">
               {telemetry.elongation.toFixed(2)}x
             </span>
           </div>
           <div className="bg-white border border-gray-200/80 rounded-2xl p-3 shadow-2xs">
-            <span className="text-zinc-500 block text-[11px] font-semibold">Peak Temperature</span>
+            <span className="text-zinc-500 block text-[11px] font-semibold">
+              Peak Temperature
+            </span>
             <span className="text-base font-black text-amber-600">
               {telemetry.peakTempK} K
             </span>
           </div>
           <div className="bg-white border border-gray-200/80 rounded-2xl p-3 shadow-2xs">
-            <span className="text-zinc-500 block text-[11px] font-semibold">Soot Fraction</span>
+            <span className="text-zinc-500 block text-[11px] font-semibold">
+              Soot Fraction
+            </span>
             <span className="text-base font-black text-zinc-800">
               {(telemetry.sootFraction * 100).toFixed(0)}%
             </span>
           </div>
           <div className="bg-white border border-gray-200/80 rounded-2xl p-3 shadow-2xs">
-            <span className="text-zinc-500 block text-[11px] font-semibold">Flicker Rate</span>
+            <span className="text-zinc-500 block text-[11px] font-semibold">
+              Flicker Rate
+            </span>
             <span className="text-base font-black text-purple-600">
               {telemetry.flickerFrequencyHz} Hz
             </span>
           </div>
           <div className="bg-white border border-gray-200/80 rounded-2xl p-3 shadow-2xs">
-            <span className="text-zinc-500 block text-[11px] font-semibold">Regime</span>
-            <span className="text-[11px] font-bold text-zinc-900 truncate block" title={telemetry.regimeLabel}>
+            <span className="text-zinc-500 block text-[11px] font-semibold">
+              Regime
+            </span>
+            <span
+              className="text-[11px] font-bold text-zinc-900 truncate block"
+              title={telemetry.regimeLabel}
+            >
               {telemetry.regimeLabel}
             </span>
           </div>
@@ -261,13 +336,16 @@ export const KurzgesagtFlameScene: React.FC = () => {
           </div>
           <div>
             <h4 className="text-sm font-black text-zinc-950 mb-1">
-              NASA PSI Microgravity Discovery: Why ISS Flames Burn Longer &amp; Cooler
+              NASA PSI Microgravity Discovery: Why ISS Flames Burn Longer &amp;
+              Cooler
             </h4>
             <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
-              Without upward buoyant evacuation, hot carbon dioxide and water vapor linger around the flame,
-              impeding fresh oxygen flow. This lowers flame temperature to ~1,200–1,400 K (or ~700 K in droplet
-              cool flames) and eliminates soot incandescence. The flame burns with a dim blue luminescence
-              that is nearly invisible under bright cabin lighting!
+              Without upward buoyant evacuation, hot carbon dioxide and water
+              vapor linger around the flame, impeding fresh oxygen flow. This
+              lowers flame temperature to ~1,200–1,400 K (or ~700 K in droplet
+              cool flames) and eliminates soot incandescence. The flame burns
+              with a dim blue luminescence that is nearly invisible under bright
+              cabin lighting!
             </p>
           </div>
         </div>

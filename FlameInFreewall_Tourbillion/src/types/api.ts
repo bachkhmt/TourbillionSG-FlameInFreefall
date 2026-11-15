@@ -1,6 +1,12 @@
-import type { DataOriginDto, ReviewStateDto, UnavailableReason } from '@/api/dto';
+import type {
+  DataOriginDto,
+  ReviewStateDto,
+  UnavailableReason,
+} from "@/api/dto";
 
 export interface ApiContextMeta {
+  /** Explicit local demo fallback; independent from collection origin. */
+  isFallback?: boolean;
   collectionId: string;
   origin: DataOriginDto;
   reviewState: ReviewStateDto;
@@ -202,7 +208,11 @@ export interface MappedComparisonResult {
 // Chat (backend Phase 6 + ADR-0005): extractive, cited, unreviewed answers
 // ---------------------------------------------------------------------------
 
-export type ChatAnswerState = 'answered' | 'abstained' | 'unavailable' | 'timeout';
+export type ChatAnswerState =
+  | "answered"
+  | "abstained"
+  | "unavailable"
+  | "timeout";
 
 export interface MappedChatCitation {
   sourceDocumentId: string;
@@ -224,13 +234,13 @@ export interface MappedChatAnswer {
 
 export interface MappedChatMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   createdAt: string;
   answer: MappedChatAnswer;
 }
 
 export interface MappedChatReadiness {
-  state: 'ready' | 'not_ready';
+  state: "ready" | "not_ready";
   mode: string;
   providerVersion: string | null;
   corpusVersion: string | null;

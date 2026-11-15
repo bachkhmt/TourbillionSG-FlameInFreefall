@@ -1,6 +1,6 @@
-import { INVESTIGATIONS } from '@/data/investigations';
-import { TEST_RUNS } from '@/data/testRuns';
-import { EVIDENCE_CLAIMS } from '@/data/evidenceClaims';
+import { INVESTIGATIONS } from "@/data/investigations";
+import { TEST_RUNS } from "@/data/testRuns";
+import { EVIDENCE_CLAIMS } from "@/data/evidenceClaims";
 import type {
   ApiContextMeta,
   MappedCatalogCapabilities,
@@ -18,7 +18,7 @@ import type {
   MappedPage,
   MappedRun,
   MappedSource,
-} from '@/types/api';
+} from "@/types/api";
 import type {
   ChallengeResourceDto,
   ChallengeResourcePageDto,
@@ -30,16 +30,17 @@ import type {
   PredictionRequestDto,
   PredictionResponseDto,
   ReadinessDto,
-} from '@/api/dto';
-import type { Investigation, TestRun } from '@/types';
+} from "@/api/dto";
+import type { Investigation, TestRun } from "@/types";
 
 export const FALLBACK_CONTEXT: ApiContextMeta = {
-  collectionId: 'nasa-psi-archive-offline',
-  origin: 'real',
-  reviewState: 'curated',
-  caveats: ['NASA PSI Archive Data (Offline Fallback Mode)'],
-  isSynthetic: false,
-  isUnreviewed: false,
+  collectionId: "illustrative-demo-fallback",
+  origin: "synthetic",
+  reviewState: "unreviewed",
+  caveats: ["Illustrative demo data; not NASA records."],
+  isSynthetic: true,
+  isUnreviewed: true,
+  isFallback: true,
 };
 
 function mapStudyToInvestigation(study: Investigation): MappedInvestigation {
@@ -51,7 +52,7 @@ function mapStudyToInvestigation(study: Investigation): MappedInvestigation {
     routeKey: study.id,
     title: study.title,
     researchPurpose: study.researchPurpose ?? study.subtitle ?? null,
-    platform: study.platform ?? study.hardware ?? 'ISS Module',
+    platform: study.platform ?? study.hardware ?? "ISS Module",
     tags: objectives.slice(0, 3).map((obj, i) => ({
       id: `${study.id}-tag-${i}`,
       slug: `${study.id}-tag-${i}`,
@@ -92,10 +93,10 @@ function mapTestRunToMappedRun(run: TestRun): MappedRun {
     id: run.id,
     investigationId: run.investigationId,
     externalRunKey: run.externalRunKey ?? run.id,
-    materialType: run.materialType ?? 'PMMA Acrylic',
-    sampleGeometry: run.sampleGeometry ?? 'Standard Coupon',
-    gravity: run.gravity === 0 ? '0g (Microgravity)' : `${run.gravity}g`,
-    verification: 'NASA PSI Archival Event',
+    materialType: run.materialType ?? "PMMA Acrylic",
+    sampleGeometry: run.sampleGeometry ?? "Standard Coupon",
+    gravity: run.gravity === 0 ? "0g (Microgravity)" : `${run.gravity}g`,
+    verification: "NASA PSI Archival Event",
     conditionsCount: Object.keys(run.conditions ?? {}).length,
     measurementsCount: Object.keys(run.measurements ?? {}).length,
     unavailableFields: {},
@@ -107,7 +108,7 @@ function mapTestRunToMappedRun(run: TestRun): MappedRun {
  * Fallback dashboard summary providing live-like KPIs and featured studies from mock data.
  */
 export function getMockDashboardSummary(
-  filters?: InvestigationFilterParamsDto
+  filters?: InvestigationFilterParamsDto,
 ): MappedDashboardSummary {
   const featured = INVESTIGATIONS.slice(0, 4).map(mapStudyToInvestigation);
 
@@ -123,7 +124,7 @@ export function getMockDashboardSummary(
       denominator: INVESTIGATIONS.length,
       ratio: 1,
       percentage: 100,
-      rawRatio: '1.0',
+      rawRatio: "1.0",
     },
     fuelDistribution: null,
     facilityDistribution: null,
@@ -140,17 +141,17 @@ export function getMockDashboardSummary(
 export function getMockCatalogCapabilities(): MappedCatalogCapabilities {
   return {
     supportedFilters: [
-      'q',
-      'platform',
-      'material',
-      'gravity_raw',
-      'tag',
-      'purpose',
-      'source_type',
-      'evidence_status',
-      'review_status',
+      "q",
+      "platform",
+      "material",
+      "gravity_raw",
+      "tag",
+      "purpose",
+      "source_type",
+      "evidence_status",
+      "review_status",
     ],
-    supportedSorts: ['title-asc', 'runs-desc'],
+    supportedSorts: ["title-asc", "runs-desc"],
     unsupportedFilters: [],
     unsupportedSorts: [],
     unavailableDisplayFields: [],
@@ -163,52 +164,66 @@ export function getMockCatalogCapabilities(): MappedCatalogCapabilities {
  * Fallback filtered & paginated investigations list.
  */
 export function getMockInvestigationsPage(
-  params?: InvestigationListParamsDto
+  params?: InvestigationListParamsDto,
 ): MappedPage<MappedInvestigation> {
   const q = params?.q?.trim().toLowerCase();
   const platform = params?.platform?.trim().toLowerCase();
   const material = params?.material?.trim().toLowerCase();
-  const gravity = (params?.gravityRaw ?? (params as Record<string, unknown>)?.gravity_raw)?.toString().trim().toLowerCase();
+  const gravity = (
+    params?.gravityRaw ?? (params as Record<string, unknown>)?.gravity_raw
+  )
+    ?.toString()
+    .trim()
+    .toLowerCase();
 
   let filtered = INVESTIGATIONS.filter((study) => {
     if (q) {
       const matchQ =
         study.title.toLowerCase().includes(q) ||
         study.code.toLowerCase().includes(q) ||
-        (study.researchPurpose && study.researchPurpose.toLowerCase().includes(q)) ||
+        (study.researchPurpose &&
+          study.researchPurpose.toLowerCase().includes(q)) ||
         (study.platform && study.platform.toLowerCase().includes(q));
       if (!matchQ) return false;
     }
 
-    if (platform && platform !== 'all') {
-      const p = (study.platform ?? '').toLowerCase();
-      const hw = (study.hardware ?? '').toLowerCase();
+    if (platform && platform !== "all") {
+      const p = (study.platform ?? "").toLowerCase();
+      const hw = (study.hardware ?? "").toLowerCase();
       if (!p.includes(platform) && !hw.includes(platform)) return false;
     }
 
-    if (material && material !== 'all') {
-      const mats = (study.fuelDetails?.materials ?? []).map((m) => m.toLowerCase());
-      const ft = (study.fuelType ?? '').toLowerCase();
-      const matchMat = ft.includes(material) || mats.some((m) => m.includes(material));
+    if (material && material !== "all") {
+      const mats = (study.fuelDetails?.materials ?? []).map((m) =>
+        m.toLowerCase(),
+      );
+      const ft = (study.fuelType ?? "").toLowerCase();
+      const matchMat =
+        ft.includes(material) || mats.some((m) => m.includes(material));
       if (!matchMat) return false;
     }
 
-    if (gravity && gravity !== 'all') {
+    if (gravity && gravity !== "all") {
       const g = study.gravityLevelG;
-      if (gravity === '0g' && g !== 0) return false;
-      if (gravity === '1g' && g !== 1) return false;
-      if (gravity === 'partial' && (g <= 0 || g >= 1)) return false;
+      if (gravity === "0g" && g !== 0) return false;
+      if (gravity === "1g" && g !== 1) return false;
+      if (gravity === "partial" && (g <= 0 || g >= 1)) return false;
     }
 
     return true;
   });
 
-  if (params?.sort === 'runs-desc') {
+  if (params?.sort === "runs-desc") {
     const runCounts = new Map<string, number>();
     for (const r of TEST_RUNS) {
-      runCounts.set(r.investigationId, (runCounts.get(r.investigationId) ?? 0) + 1);
+      runCounts.set(
+        r.investigationId,
+        (runCounts.get(r.investigationId) ?? 0) + 1,
+      );
     }
-    filtered.sort((a, b) => (runCounts.get(b.id) ?? 0) - (runCounts.get(a.id) ?? 0));
+    filtered.sort(
+      (a, b) => (runCounts.get(b.id) ?? 0) - (runCounts.get(a.id) ?? 0),
+    );
   } else {
     filtered.sort((a, b) => a.title.localeCompare(b.title));
   }
@@ -225,7 +240,10 @@ export function getMockInvestigationsPage(
     offset,
     limit,
     hasMore: offset + limit < total,
-    next: offset + limit < total ? `/api/proxy/api/v1/investigations?offset=${offset + limit}&limit=${limit}` : null,
+    next:
+      offset + limit < total
+        ? `/api/proxy/api/v1/investigations?offset=${offset + limit}&limit=${limit}`
+        : null,
     context: FALLBACK_CONTEXT,
   };
 }
@@ -233,11 +251,15 @@ export function getMockInvestigationsPage(
 /**
  * Fallback study detail matching by ID or Code/Slug.
  */
-export function getMockInvestigationDetail(idOrSlug: string): MappedInvestigationDetail {
+export function getMockInvestigationDetail(
+  idOrSlug: string,
+): MappedInvestigationDetail {
   const normalized = idOrSlug.trim().toLowerCase();
   const study =
     INVESTIGATIONS.find(
-      (s) => s.id.toLowerCase() === normalized || s.code.toLowerCase() === normalized
+      (s) =>
+        s.id.toLowerCase() === normalized ||
+        s.code.toLowerCase() === normalized,
     ) ?? INVESTIGATIONS[0];
 
   return mapStudyToDetail(study);
@@ -248,10 +270,12 @@ export function getMockInvestigationDetail(idOrSlug: string): MappedInvestigatio
  */
 export function getMockRunsPage(
   investigationId: string,
-  pagination?: PaginationParamsDto
+  pagination?: PaginationParamsDto,
 ): MappedPage<MappedRun> {
   const normId = investigationId.trim().toLowerCase();
-  let runs = TEST_RUNS.filter((r) => r.investigationId.toLowerCase() === normId);
+  let runs = TEST_RUNS.filter(
+    (r) => r.investigationId.toLowerCase() === normId,
+  );
   if (runs.length === 0) {
     runs = TEST_RUNS.slice(0, 6);
   }
@@ -277,41 +301,45 @@ export function getMockRunsPage(
  */
 export function getMockConditions(
   runId: string,
-  pagination?: PaginationParamsDto
+  pagination?: PaginationParamsDto,
 ): MappedPage<MappedCondition> {
   const run = TEST_RUNS.find((r) => r.id === runId) ?? TEST_RUNS[0];
-  const conditionsEntries = Object.entries(run?.conditions ?? {
-    oxygenPct: 21,
-    pressurePsi: 14.7,
-    flowVelocityCmS: 5,
-    ambientTempK: 295.15,
-    gravityG: 0,
-  });
+  const conditionsEntries = Object.entries(
+    run?.conditions ?? {
+      oxygenPct: 21,
+      pressurePsi: 14.7,
+      flowVelocityCmS: 5,
+      ambientTempK: 295.15,
+      gravityG: 0,
+    },
+  );
 
   const units: Record<string, string> = {
-    oxygenPct: '%',
-    pressurePsi: 'psi',
-    flowVelocityCmS: 'cm/s',
-    radiantFluxKWPerM2: 'kW/m²',
-    ambientTempK: 'K',
-    gravityG: 'g',
+    oxygenPct: "%",
+    pressurePsi: "psi",
+    flowVelocityCmS: "cm/s",
+    radiantFluxKWPerM2: "kW/m²",
+    ambientTempK: "K",
+    gravityG: "g",
   };
 
-  const items: MappedCondition[] = conditionsEntries.map(([key, value], idx) => {
-    const num = typeof value === 'number' ? value : null;
-    return {
-      id: `${run.id}-cond-${idx}`,
-      testRunId: run.id,
-      variable: key,
-      valueNumeric: num,
-      rawValueNumeric: num !== null ? String(num) : null,
-      valueText: typeof value === 'string' ? value : null,
-      displayValue: `${value}${units[key] ? ' ' + units[key] : ''}`,
-      unit: units[key] ?? null,
-      dataStatus: 'MEASURED',
-      context: FALLBACK_CONTEXT,
-    };
-  });
+  const items: MappedCondition[] = conditionsEntries.map(
+    ([key, value], idx) => {
+      const num = typeof value === "number" ? value : null;
+      return {
+        id: `${run.id}-cond-${idx}`,
+        testRunId: run.id,
+        variable: key,
+        valueNumeric: num,
+        rawValueNumeric: num !== null ? String(num) : null,
+        valueText: typeof value === "string" ? value : null,
+        displayValue: `${value}${units[key] ? " " + units[key] : ""}`,
+        unit: units[key] ?? null,
+        dataStatus: "MEASURED",
+        context: FALLBACK_CONTEXT,
+      };
+    },
+  );
 
   const offset = pagination?.offset ?? 0;
   const limit = pagination?.limit ?? 20;
@@ -332,40 +360,42 @@ export function getMockConditions(
  */
 export function getMockRunMeasurements(
   runId: string,
-  pagination?: PaginationParamsDto
+  pagination?: PaginationParamsDto,
 ): MappedPage<MappedMeasurement> {
   const run = TEST_RUNS.find((r) => r.id === runId) ?? TEST_RUNS[0];
-  const measEntries = Object.entries(run?.measurements ?? {
-    flameSpreadRateMmS: 0.85,
-    peakTempK: 1580,
-    quenchingDiameterMm: 2.1,
-    burnDurationSec: 74,
-  });
+  const measEntries = Object.entries(
+    run?.measurements ?? {
+      flameSpreadRateMmS: 0.85,
+      peakTempK: 1580,
+      quenchingDiameterMm: 2.1,
+      burnDurationSec: 74,
+    },
+  );
 
   const units: Record<string, string> = {
-    flameSpreadRateMmS: 'mm/s',
-    peakTempK: 'K',
-    quenchingDiameterMm: 'mm',
-    burnDurationSec: 's',
-    sootVolumeFraction: 'fraction',
-    extinctionLimitO2Pct: '%',
-    flameLengthMm: 'mm',
-    flameWidthMm: 'mm',
+    flameSpreadRateMmS: "mm/s",
+    peakTempK: "K",
+    quenchingDiameterMm: "mm",
+    burnDurationSec: "s",
+    sootVolumeFraction: "fraction",
+    extinctionLimitO2Pct: "%",
+    flameLengthMm: "mm",
+    flameWidthMm: "mm",
   };
 
   const items: MappedMeasurement[] = measEntries.map(([key, value], idx) => {
-    const num = typeof value === 'number' ? value : null;
+    const num = typeof value === "number" ? value : null;
     return {
       id: `${run.id}-meas-${idx}`,
       testRunId: run.id,
       observable: key,
       measuredValue: num,
       rawMeasuredValue: num !== null ? String(num) : null,
-      unit: units[key] ?? '',
+      unit: units[key] ?? "",
       rawAssetRef: null,
       uncertainty: null,
       rawUncertainty: null,
-      displayValue: `${value}${units[key] ? ' ' + units[key] : ''}`,
+      displayValue: `${value}${units[key] ? " " + units[key] : ""}`,
       unavailableFields: {},
       context: FALLBACK_CONTEXT,
     };
@@ -390,17 +420,19 @@ export function getMockRunMeasurements(
  */
 export function getMockObservationsPage(
   investigationId: string,
-  pagination?: PaginationParamsDto
+  pagination?: PaginationParamsDto,
 ): MappedPage<MappedObservation> {
   const normId = investigationId.trim().toLowerCase();
-  const runs = TEST_RUNS.filter((r) => r.investigationId.toLowerCase() === normId);
+  const runs = TEST_RUNS.filter(
+    (r) => r.investigationId.toLowerCase() === normId,
+  );
   const targetRuns = runs.length > 0 ? runs : TEST_RUNS.slice(0, 4);
 
   const observations: MappedObservation[] = [];
   for (const r of targetRuns) {
     const mappedR = mapTestRunToMappedRun(r);
     for (const [key, value] of Object.entries(r.measurements ?? {})) {
-      if (typeof value === 'number') {
+      if (typeof value === "number") {
         observations.push({
           measurement: {
             id: `${r.id}-obs-${key}`,
@@ -408,7 +440,7 @@ export function getMockObservationsPage(
             observable: key,
             measuredValue: value,
             rawMeasuredValue: String(value),
-            unit: 'mm/s',
+            unit: "mm/s",
             rawAssetRef: null,
             uncertainty: null,
             rawUncertainty: null,
@@ -442,27 +474,27 @@ export function getMockObservationsPage(
  */
 export function getMockSourcesPage(
   investigationId: string,
-  pagination?: PaginationParamsDto
+  pagination?: PaginationParamsDto,
 ): MappedPage<MappedSource> {
   const items: MappedSource[] = [
     {
       id: `${investigationId}-src-1`,
       investigationId,
-      sourceUrl: 'https://psi.nasa.gov',
-      doi: '10.1016/j.combustflame.2014.08.012',
-      documentType: 'NASA Archival Technical Paper',
-      version: '1.0',
-      ingestionStatus: 'VERIFIED',
+      sourceUrl: "https://psi.nasa.gov",
+      doi: "10.1016/j.combustflame.2014.08.012",
+      documentType: "NASA Archival Technical Paper",
+      version: "1.0",
+      ingestionStatus: "VERIFIED",
       context: FALLBACK_CONTEXT,
     },
     {
       id: `${investigationId}-src-2`,
       investigationId,
-      sourceUrl: 'https://ntrs.nasa.gov',
-      doi: '10.2514/6.2013-0872',
-      documentType: 'AIAA Science Conference Proceedings',
-      version: '1.0',
-      ingestionStatus: 'VERIFIED',
+      sourceUrl: "https://ntrs.nasa.gov",
+      doi: "10.2514/6.2013-0872",
+      documentType: "AIAA Science Conference Proceedings",
+      version: "1.0",
+      ingestionStatus: "VERIFIED",
       context: FALLBACK_CONTEXT,
     },
   ];
@@ -486,11 +518,13 @@ export function getMockSourcesPage(
  */
 export function getMockClaimsPage(
   investigationId: string,
-  pagination?: PaginationParamsDto
+  pagination?: PaginationParamsDto,
 ): MappedPage<MappedClaim> {
   const normId = investigationId.trim().toLowerCase();
   let claims = EVIDENCE_CLAIMS.filter(
-    (c) => c.investigationId.toLowerCase() === normId || c.investigationCode.toLowerCase() === normId
+    (c) =>
+      c.investigationId.toLowerCase() === normId ||
+      c.investigationCode.toLowerCase() === normId,
   );
   if (claims.length === 0) {
     claims = EVIDENCE_CLAIMS.slice(0, 3);
@@ -504,16 +538,16 @@ export function getMockClaimsPage(
         source: {
           id: `${c.id}-source`,
           investigationId: c.investigationId,
-          sourceUrl: 'https://psi.nasa.gov',
+          sourceUrl: "https://psi.nasa.gov",
           doi: c.doi ?? null,
-          documentType: 'Scientific Literature',
-          version: '1.0',
-          ingestionStatus: 'VERIFIED',
+          documentType: "Scientific Literature",
+          version: "1.0",
+          ingestionStatus: "VERIFIED",
           context: FALLBACK_CONTEXT,
         },
         testRunId: c.testRunId ?? null,
         runInvestigationId: c.investigationId,
-        sourceLocator: c.sourceLocator ?? 'NASA PSI Record',
+        sourceLocator: c.sourceLocator ?? "NASA PSI Record",
         sourceExcerpt: c.scientificContext,
         contextMismatch: false,
         context: FALLBACK_CONTEXT,
@@ -553,11 +587,13 @@ export function getMockClaimsPage(
  */
 export function getMockClaimSourcesPage(
   claimId: string,
-  pagination?: PaginationParamsDto
+  pagination?: PaginationParamsDto,
 ): MappedPage<MappedClaimSource> {
   const normClaimId = claimId.trim().toLowerCase();
-  const matchedClaim = EVIDENCE_CLAIMS.find((c) => c.id.toLowerCase() === normClaimId);
-  const investigationId = matchedClaim?.investigationId ?? 'mock-inv';
+  const matchedClaim = EVIDENCE_CLAIMS.find(
+    (c) => c.id.toLowerCase() === normClaimId,
+  );
+  const investigationId = matchedClaim?.investigationId ?? "mock-inv";
 
   const allSources: MappedClaimSource[] = [
     {
@@ -566,17 +602,20 @@ export function getMockClaimSourcesPage(
       source: {
         id: `${claimId}-src-doc-1`,
         investigationId,
-        sourceUrl: 'https://psi.nasa.gov',
-        doi: matchedClaim?.doi ?? '10.1016/j.proci.2020.06.001',
-        documentType: 'Scientific Literature',
-        version: '1.0',
-        ingestionStatus: 'VERIFIED',
+        sourceUrl: "https://psi.nasa.gov",
+        doi: matchedClaim?.doi ?? "10.1016/j.proci.2020.06.001",
+        documentType: "Scientific Literature",
+        version: "1.0",
+        ingestionStatus: "VERIFIED",
         context: FALLBACK_CONTEXT,
       },
       testRunId: matchedClaim?.testRunId ?? null,
       runInvestigationId: investigationId,
-      sourceLocator: matchedClaim?.sourceLocator ?? 'NASA PSI Record Section 3.2',
-      sourceExcerpt: matchedClaim?.scientificContext ?? 'Extinction limits evaluated under microgravity environment.',
+      sourceLocator:
+        matchedClaim?.sourceLocator ?? "NASA PSI Record Section 3.2",
+      sourceExcerpt:
+        matchedClaim?.scientificContext ??
+        "Extinction limits evaluated under microgravity environment.",
       contextMismatch: false,
       context: FALLBACK_CONTEXT,
     },
@@ -586,17 +625,18 @@ export function getMockClaimSourcesPage(
       source: {
         id: `${claimId}-src-doc-2`,
         investigationId,
-        sourceUrl: 'https://ntrs.nasa.gov/citations/2021000891',
-        doi: '10.2514/6.2021-0891',
-        documentType: 'NASA Technical Memorandum',
-        version: '2.1',
-        ingestionStatus: 'VERIFIED',
+        sourceUrl: "https://ntrs.nasa.gov/citations/2021000891",
+        doi: "10.2514/6.2021-0891",
+        documentType: "NASA Technical Memorandum",
+        version: "2.1",
+        ingestionStatus: "VERIFIED",
         context: FALLBACK_CONTEXT,
       },
       testRunId: null,
       runInvestigationId: investigationId,
-      sourceLocator: 'Appendix B, pp. 45-48 (Experimental Chamber Calibration)',
-      sourceExcerpt: 'Calibrated oxygen index measured at 101.3 kPa with laminar co-flow conditions in CIR chamber.',
+      sourceLocator: "Appendix B, pp. 45-48 (Experimental Chamber Calibration)",
+      sourceExcerpt:
+        "Calibrated oxygen index measured at 101.3 kPa with laminar co-flow conditions in CIR chamber.",
       contextMismatch: false,
       context: FALLBACK_CONTEXT,
     },
@@ -606,17 +646,18 @@ export function getMockClaimSourcesPage(
       source: {
         id: `${claimId}-src-doc-3`,
         investigationId,
-        sourceUrl: 'https://psi.nasa.gov/raw/telemetry',
+        sourceUrl: "https://psi.nasa.gov/raw/telemetry",
         doi: null,
-        documentType: 'Flight Telemetry Log',
-        version: '1.0',
-        ingestionStatus: 'VERIFIED',
+        documentType: "Flight Telemetry Log",
+        version: "1.0",
+        ingestionStatus: "VERIFIED",
         context: FALLBACK_CONTEXT,
       },
       testRunId: matchedClaim?.testRunId ?? null,
       runInvestigationId: investigationId,
-      sourceLocator: 'Video Sensor Channel 4 Frame Timestamp 00:14:22',
-      sourceExcerpt: 'High-speed imaging verified spherical flame front stabilization prior to extinction threshold.',
+      sourceLocator: "Video Sensor Channel 4 Frame Timestamp 00:14:22",
+      sourceExcerpt:
+        "High-speed imaging verified spherical flame front stabilization prior to extinction threshold.",
       contextMismatch: false,
       context: FALLBACK_CONTEXT,
     },
@@ -639,7 +680,9 @@ export function getMockClaimSourcesPage(
 /**
  * Fallback comparison result across multiple studies.
  */
-export function getMockComparisonResult(investigationIds: string[]): MappedComparisonResult {
+export function getMockComparisonResult(
+  investigationIds: string[],
+): MappedComparisonResult {
   const studies: MappedComparisonStudy[] = investigationIds.map((id) => {
     const detail = getMockInvestigationDetail(id);
     const obsPage = getMockObservationsPage(id, { limit: 50 });
@@ -656,22 +699,22 @@ export function getMockComparisonResult(investigationIds: string[]): MappedCompa
       }
     }
 
-    const observableSummaries: MappedObservableSummary[] = Array.from(summaryMap.entries()).map(
-      ([observable, info]) => ({
-        observable,
-        unit: info.unit,
-        count: info.values.length,
-        minValue: Math.min(...info.values),
-        maxValue: Math.max(...info.values),
-      })
-    );
+    const observableSummaries: MappedObservableSummary[] = Array.from(
+      summaryMap.entries(),
+    ).map(([observable, info]) => ({
+      observable,
+      unit: info.unit,
+      count: info.values.length,
+      minValue: Math.min(...info.values),
+      maxValue: Math.max(...info.values),
+    }));
 
     return {
       investigation: detail,
       observations: obsPage,
       observableSummaries,
-      observedMaterials: ['Cast PMMA Acrylic', 'Nomex Fabric', 'Cellulose'],
-      observedGravities: ['0g', '1g'],
+      observedMaterials: ["Cast PMMA Acrylic", "Nomex Fabric", "Cellulose"],
+      observedGravities: ["0g", "1g"],
       context: FALLBACK_CONTEXT,
     };
   });
@@ -680,7 +723,7 @@ export function getMockComparisonResult(investigationIds: string[]): MappedCompa
     studies,
     deltas: null,
     highlights: null,
-    comparability: 'NASA PSI Archive Comparative Assessment',
+    comparability: "NASA PSI Archive Comparative Assessment",
     unavailableFields: {},
     context: FALLBACK_CONTEXT,
   };
@@ -689,42 +732,44 @@ export function getMockComparisonResult(investigationIds: string[]): MappedCompa
 /**
  * Fallback mission scenario evaluation across the 4 pillars.
  */
-export function getMockScenarioEvaluation(request: EvaluationRequestDto): EvaluationDto {
+export function getMockScenarioEvaluation(
+  request: EvaluationRequestDto,
+): EvaluationDto {
   const original = request.scenario;
   return {
     scenario: {
       original,
-      digest: 'digest-' + Math.random().toString(36).substring(2, 9),
+      digest: "digest-" + Math.random().toString(36).substring(2, 9),
       fieldStates: {
-        gravity: original.gravity ? 'supplied' : 'omitted',
-        oxygen: original.oxygen ? 'supplied' : 'omitted',
-        pressure: original.pressure ? 'supplied' : 'omitted',
-        material: original.material ? 'supplied' : 'omitted',
+        gravity: original.gravity ? "supplied" : "omitted",
+        oxygen: original.oxygen ? "supplied" : "omitted",
+        pressure: original.pressure ? "supplied" : "omitted",
+        material: original.material ? "supplied" : "omitted",
       },
       unavailableFields: [],
     },
     context: {
-      collectionId: 'nasa-psi-archive-offline',
-      origin: 'real',
-      reviewState: 'curated',
-      caveats: ['NASA PSI Empirical Offline Baseline'],
+      collectionId: "nasa-psi-archive-offline",
+      origin: "real",
+      reviewState: "curated",
+      caveats: ["NASA PSI Empirical Offline Baseline"],
     },
     scope: {
-      collectionId: 'nasa-psi-archive-offline',
-      scenarioDigest: 'digest-offline',
-      collectionFingerprint: 'offline-fingerprint',
+      collectionId: "nasa-psi-archive-offline",
+      scenarioDigest: "digest-offline",
+      collectionFingerprint: "offline-fingerprint",
     },
     coverage: {
-      state: 'evaluated',
-      reasonCodes: ['EMPIRICAL_MATCH_FOUND'],
+      state: "evaluated",
+      reasonCodes: ["EMPIRICAL_MATCH_FOUND"],
       examinedRuns: TEST_RUNS.length,
       requiredConditionsComplete: true,
       collectionTraversalComplete: true,
       items: [],
     },
     rankings: {
-      state: 'evaluated',
-      reasonCodes: ['RANKED_BY_SCENARIO_RELEVANCE'],
+      state: "evaluated",
+      reasonCodes: ["RANKED_BY_SCENARIO_RELEVANCE"],
       items: INVESTIGATIONS.slice(0, 5).map((inv, idx) => ({
         position: idx + 1,
         rank: idx + 1,
@@ -735,30 +780,30 @@ export function getMockScenarioEvaluation(request: EvaluationRequestDto): Evalua
         },
         externalExperimentId: inv.code,
         scenarioRelevanceScore: (0.95 - idx * 0.08).toFixed(2),
-        catalogUsefulnessScore: (0.90 - idx * 0.05).toFixed(2),
+        catalogUsefulnessScore: (0.9 - idx * 0.05).toFixed(2),
         rationale: `Highly correlated microgravity parameters for ${inv.code}`,
       })),
     },
     pillarEvidence: {
-      state: 'evaluated',
-      reasonCodes: ['EVIDENCE_MAPPED_TO_PILLARS'],
+      state: "evaluated",
+      reasonCodes: ["EVIDENCE_MAPPED_TO_PILLARS"],
       groups: [
         {
-          pillar: 'prevention',
+          pillar: "prevention",
           total: 2,
-          reasonCodes: ['PREVENTION_BASELINE_VALIDATED'],
+          reasonCodes: ["PREVENTION_BASELINE_VALIDATED"],
           items: [],
         },
         {
-          pillar: 'detection',
+          pillar: "detection",
           total: 1,
-          reasonCodes: ['DETECTION_SENSOR_CALIBRATED'],
+          reasonCodes: ["DETECTION_SENSOR_CALIBRATED"],
           items: [],
         },
         {
-          pillar: 'suppression',
+          pillar: "suppression",
           total: 1,
-          reasonCodes: ['EXTINCTION_BOUNDARY_IDENTIFIED'],
+          reasonCodes: ["EXTINCTION_BOUNDARY_IDENTIFIED"],
           items: [],
         },
       ],
@@ -771,20 +816,20 @@ export function getMockScenarioEvaluation(request: EvaluationRequestDto): Evalua
  */
 export function getMockPredictionReadiness(modelId?: string): ReadinessDto {
   return {
-    state: 'ready',
-    reasons: ['NASA_PSI_PHYSICS_SOLVER_READY'],
-    modelId: modelId ?? 'model-flameguard-microgravity-v1',
-    modelVersion: '1.0.0',
-    datasetVersion: 'nasa-psi-2024-q4',
-    origin: 'real',
+    state: "ready",
+    reasons: ["NASA_PSI_PHYSICS_SOLVER_READY"],
+    modelId: modelId ?? "model-flameguard-microgravity-v1",
+    modelVersion: "1.0.0",
+    datasetVersion: "nasa-psi-2024-q4",
+    origin: "real",
     capabilities: {
-      quenchedLimit: 'true',
-      flameSpreadRate: 'true',
-      froudeScaling: 'true',
+      quenchedLimit: "true",
+      flameSpreadRate: "true",
+      froudeScaling: "true",
     },
     limitations: [
-      'Valid for 0g to 1g terrestrial/orbital range',
-      'Atmospheric pressure 8.0 to 18.0 psia',
+      "Valid for 0g to 1g terrestrial/orbital range",
+      "Atmospheric pressure 8.0 to 18.0 psia",
     ],
   };
 }
@@ -792,145 +837,156 @@ export function getMockPredictionReadiness(modelId?: string): ReadinessDto {
 /**
  * Fallback physical prediction response calculation.
  */
-export function getMockPredictionResponse(request: PredictionRequestDto): PredictionResponseDto {
+export function getMockPredictionResponse(
+  request: PredictionRequestDto,
+): PredictionResponseDto {
   const g = Number(request.scenario.gravity?.value ?? 0);
   const o2 = Number(request.scenario.oxygen?.value ?? 21);
-  const estSpreadRate = Math.max(0.01, (0.15 + (o2 - 21) * 0.02 + g * 0.1)).toFixed(3);
+  const estSpreadRate = Math.max(
+    0.01,
+    0.15 + (o2 - 21) * 0.02 + g * 0.1,
+  ).toFixed(3);
 
   return {
-    state: 'predicted',
+    state: "predicted",
     readiness: getMockPredictionReadiness(request.modelId),
-    reasons: ['EMPIRICAL_EXTRAPOLATION_CONVERGED'],
+    reasons: ["EMPIRICAL_EXTRAPOLATION_CONVERGED"],
     result: {
       modelId: request.modelId,
-      modelVersion: '1.0.0',
-      datasetVersion: 'nasa-psi-2024-q4',
+      modelVersion: "1.0.0",
+      datasetVersion: "nasa-psi-2024-q4",
       observable: request.observable,
       value: estSpreadRate,
-      unit: 'mm/s',
-      origin: 'real',
-      providerVersion: 'flameguard-analytical-v1',
-      collectionFingerprint: 'fingerprint-analytical',
+      unit: "mm/s",
+      origin: "real",
+      providerVersion: "flameguard-analytical-v1",
+      collectionFingerprint: "fingerprint-analytical",
       uncertainty: {
         lower: (Number(estSpreadRate) * 0.85).toFixed(3),
         upper: (Number(estSpreadRate) * 1.15).toFixed(3),
-        methodRef: 'NASA-SP-8000-SERIES',
+        methodRef: "NASA-SP-8000-SERIES",
       },
-      limitations: ['Empirically validated for PMMA / Nomex in microgravity chambers'],
+      limitations: [
+        "Empirically validated for PMMA / Nomex in microgravity chambers",
+      ],
     },
   };
 }
 
 export const MOCK_OFFICIAL_RESOURCES: ChallengeResourceDto[] = [
   {
-    resource_id: 'psi-combustion',
-    title: 'PSI Data Repository: Combustion Science',
-    source_url: 'https://psi.nasa.gov/physci/repo/search?q=combustion',
-    kind: 'data_repository',
-    role: 'Discover original experimental data, versions and source documentation.',
-    status: 'discovery_link',
-    license: 'unknown',
+    resource_id: "psi-combustion",
+    title: "PSI Data Repository: Combustion Science",
+    source_url: "https://psi.nasa.gov/physci/repo/search?q=combustion",
+    kind: "data_repository",
+    role: "Discover original experimental data, versions and source documentation.",
+    status: "discovery_link",
+    license: "unknown",
     indexed: false,
-    source_scope: 'challenge',
+    source_scope: "challenge",
   },
   {
-    resource_id: 'nasa-combustion',
-    title: 'NASA Combustion Science',
-    source_url: 'https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/',
-    kind: 'background',
-    role: 'Research and hardware context; experimental measurements remain in PSI.',
-    status: 'discovery_link',
-    license: 'unknown',
+    resource_id: "nasa-combustion",
+    title: "NASA Combustion Science",
+    source_url:
+      "https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/",
+    kind: "background",
+    role: "Research and hardware context; experimental measurements remain in PSI.",
+    status: "discovery_link",
+    license: "unknown",
     indexed: false,
-    source_scope: 'challenge',
+    source_scope: "challenge",
   },
   {
-    resource_id: 'sciencecasts-combustion',
-    title: 'NASA ScienceCasts: The Power of Studying Combustion on the ISS',
-    source_url: 'https://www.youtube.com/watch?v=W1oXykoz9zg',
-    kind: 'video',
-    role: 'An introduction to combustion research; not a table of measurements.',
-    status: 'discovery_link',
-    license: 'unknown',
+    resource_id: "sciencecasts-combustion",
+    title: "NASA ScienceCasts: The Power of Studying Combustion on the ISS",
+    source_url: "https://www.youtube.com/watch?v=W1oXykoz9zg",
+    kind: "video",
+    role: "An introduction to combustion research; not a table of measurements.",
+    status: "discovery_link",
+    license: "unknown",
     indexed: false,
-    source_scope: 'challenge',
+    source_scope: "challenge",
   },
   {
-    resource_id: 'researchers-guide',
-    title: "A Researcher's Guide to International Space Station Combustion Science",
-    source_url: 'https://www.nasa.gov/missions/station/a-researchers-guide-to-combustion-science/',
-    kind: 'background',
-    role: 'Research background and investigation context.',
-    status: 'discovery_link',
-    license: 'unknown',
+    resource_id: "researchers-guide",
+    title:
+      "A Researcher's Guide to International Space Station Combustion Science",
+    source_url:
+      "https://www.nasa.gov/missions/station/a-researchers-guide-to-combustion-science/",
+    kind: "background",
+    role: "Research background and investigation context.",
+    status: "discovery_link",
+    license: "unknown",
     indexed: false,
-    source_scope: 'challenge',
+    source_scope: "challenge",
   },
   {
-    resource_id: 'apollo-1',
-    title: 'Apollo 1',
-    source_url: 'https://sma.nasa.gov/sma-disciplines/accllp/apollo-1',
-    kind: 'case_study',
-    role: 'Historical mission and fire-safety lessons; not experimental test records.',
-    status: 'discovery_link',
-    license: 'unknown',
+    resource_id: "apollo-1",
+    title: "Apollo 1",
+    source_url: "https://sma.nasa.gov/sma-disciplines/accllp/apollo-1",
+    kind: "case_study",
+    role: "Historical mission and fire-safety lessons; not experimental test records.",
+    status: "discovery_link",
+    license: "unknown",
     indexed: false,
-    source_scope: 'challenge',
+    source_scope: "challenge",
   },
   {
-    resource_id: 'apollo-13',
-    title: 'Apollo 13',
-    source_url: 'https://sma.nasa.gov/sma-disciplines/accllp/apollo-13',
-    kind: 'case_study',
-    role: 'Historical mission and investigation context.',
-    status: 'discovery_link',
-    license: 'unknown',
+    resource_id: "apollo-13",
+    title: "Apollo 13",
+    source_url: "https://sma.nasa.gov/sma-disciplines/accllp/apollo-13",
+    kind: "case_study",
+    role: "Historical mission and investigation context.",
+    status: "discovery_link",
+    license: "unknown",
     indexed: false,
-    source_scope: 'challenge',
+    source_scope: "challenge",
   },
   {
-    resource_id: 'mir-fire',
-    title: '25 Years Ago: Fire Aboard Space Station Mir',
-    source_url: 'https://www.nasa.gov/history/25-years-ago-fire-aboard-space-station-mir/',
-    kind: 'case_study',
-    role: 'Historical fire event and lessons for crew environments.',
-    status: 'discovery_link',
-    license: 'unknown',
+    resource_id: "mir-fire",
+    title: "25 Years Ago: Fire Aboard Space Station Mir",
+    source_url:
+      "https://www.nasa.gov/history/25-years-ago-fire-aboard-space-station-mir/",
+    kind: "case_study",
+    role: "Historical fire event and lessons for crew environments.",
+    status: "discovery_link",
+    license: "unknown",
     indexed: false,
-    source_scope: 'challenge',
+    source_scope: "challenge",
   },
   {
-    resource_id: 'fireman-air-tanks',
+    resource_id: "fireman-air-tanks",
     title: "Fireman's Air Tanks",
-    source_url: 'https://spinoff.nasa.gov/node/9582',
-    kind: 'earth_application',
-    role: 'An Earth application of space technology; not a combustion training label.',
-    status: 'discovery_link',
-    license: 'unknown',
+    source_url: "https://spinoff.nasa.gov/node/9582",
+    kind: "earth_application",
+    role: "An Earth application of space technology; not a combustion training label.",
+    status: "discovery_link",
+    license: "unknown",
     indexed: false,
-    source_scope: 'challenge',
+    source_scope: "challenge",
   },
   {
-    resource_id: 'fire-detector',
-    title: 'Fire Detector',
-    source_url: 'https://spinoff.nasa.gov/node/9407',
-    kind: 'earth_application',
-    role: 'Smoke-detection technology transfer context.',
-    status: 'discovery_link',
-    license: 'unknown',
+    resource_id: "fire-detector",
+    title: "Fire Detector",
+    source_url: "https://spinoff.nasa.gov/node/9407",
+    kind: "earth_application",
+    role: "Smoke-detection technology transfer context.",
+    status: "discovery_link",
+    license: "unknown",
     indexed: false,
-    source_scope: 'challenge',
+    source_scope: "challenge",
   },
   {
-    resource_id: 'fire-attire',
-    title: 'New Technology for the Fire Attire',
-    source_url: 'https://spinoff.nasa.gov/node/9918',
-    kind: 'earth_application',
-    role: 'Protective-clothing technology transfer context.',
-    status: 'discovery_link',
-    license: 'unknown',
+    resource_id: "fire-attire",
+    title: "New Technology for the Fire Attire",
+    source_url: "https://spinoff.nasa.gov/node/9918",
+    kind: "earth_application",
+    role: "Protective-clothing technology transfer context.",
+    status: "discovery_link",
+    license: "unknown",
     indexed: false,
-    source_scope: 'challenge',
+    source_scope: "challenge",
   },
 ];
 
