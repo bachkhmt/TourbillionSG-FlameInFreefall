@@ -74,9 +74,6 @@ export const LandingHero: React.FC = () => {
             <a href="#core-intelligence" className="hover:text-[#D4FC02] transition-colors">
               AI Engine &amp; Ignition
             </a>
-            <a href="#terrestrial-spinoffs" className="hover:text-[#D4FC02] transition-colors">
-              Earth Spinoffs
-            </a>
             <a href="#mission-modules" className="hover:text-[#D4FC02] transition-colors">
               Research Workspace
             </a>

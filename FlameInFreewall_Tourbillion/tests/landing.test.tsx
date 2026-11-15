@@ -6,7 +6,6 @@ import {
   KurzgesagtFlameScene,
   AtmosphericPhysics,
   CoreIntelligenceSection,
-  TerrestrialSpinoffsSection,
   MissionControlCTA,
   LandingFooter,
 } from '@/features/landing';
@@ -205,21 +204,6 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
     });
   });
 
-  describe('TerrestrialSpinoffsSection Component', () => {
-    it('renders all 3 terrestrial spinoff applications and impact callout banner', () => {
-      render(<TerrestrialSpinoffsSection />);
-      expect(screen.getByTestId('terrestrial-spinoffs-section')).toBeDefined();
-      expect(screen.getByTestId('spinoff-card-water-mist')).toBeDefined();
-      expect(screen.getByTestId('spinoff-card-smoke-sensor')).toBeDefined();
-      expect(screen.getByTestId('spinoff-card-firefighter-gear')).toBeDefined();
-      expect(screen.getByTestId('spinoff-impact-banner')).toBeDefined();
-
-      expect(screen.getByText(/Zero-Leak High-Pressure Water Mist Valve/i)).toBeDefined();
-      expect(screen.getByText(/Early Optical Smoke Sensor for Low-Convection Regimes/i)).toBeDefined();
-      expect(screen.getByText(/Lightweight SCBA & Flashover-Resistant Protective Gear/i)).toBeDefined();
-    });
-  });
-
   describe('Full Landing Page Integration', () => {
     it('assembles all sections smoothly within the main landing route', () => {
       render(<LandingPage />);
@@ -227,7 +211,6 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       expect(screen.getByTestId('kurzgesagt-flame-scene')).toBeDefined();
       expect(screen.getByTestId('atmospheric-physics')).toBeDefined();
       expect(screen.getByTestId('core-intelligence-section')).toBeDefined();
-      expect(screen.getByTestId('terrestrial-spinoffs-section')).toBeDefined();
       expect(screen.getByTestId('mission-control-cta')).toBeDefined();
       expect(screen.getByTestId('landing-footer')).toBeDefined();
     });

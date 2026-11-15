@@ -109,7 +109,7 @@ export const CoreIntelligenceSection: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto mb-10">
 
           <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight mb-3">
-            How FlameGuard AI Bridges Data to Decision
+            How This App Bridges Data to Decision
           </h2>
 
           <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">

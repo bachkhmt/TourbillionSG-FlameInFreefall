@@ -9,7 +9,6 @@ import {
   KurzgesagtFlameScene,
   AtmosphericPhysics,
   CoreIntelligenceSection,
-  TerrestrialSpinoffsSection,
   MissionControlCTA,
   LandingFooter,
 } from '@/features/landing';
@@ -27,7 +26,6 @@ export default function LandingPage() {
       <KurzgesagtFlameScene />
       <AtmosphericPhysics />
       <CoreIntelligenceSection />
-      <TerrestrialSpinoffsSection />
       <MissionControlCTA />
       <LandingFooter />
     </main>
