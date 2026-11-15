@@ -4314,13 +4314,33 @@ function applyEnv(g, o2, flow) {
   let sootFraction = Math.pow(g, 0.65) * (o2 / 21) * (1 + (flow / 60));
   sootFraction = Math.max(0, Math.min(1, sootFraction));
 
-  let blueCore = new Nt("#829eff"), blueMid = new Nt("#153eff"), blueEdge = new Nt("#0616bc"), blueBase = new Nt("#163aff");
-  let amberCore = new Nt("#fff2cb"), amberMid = new Nt("#ffae32"), amberEdge = new Nt("#c82d04"), amberBase = new Nt("#243cff");
+  // NASA CFM Physical Spectroscopy Transition (eliminates RGB purple/pink interpolation artifact)
+  let cBase = new Nt("#163aff").lerp(new Nt("#243cff"), sootFraction);
 
-  let cCore = blueCore.clone().lerp(amberCore, sootFraction);
-  let cMid = blueMid.clone().lerp(amberMid, sootFraction);
-  let cEdge = blueEdge.clone().lerp(amberEdge, sootFraction);
-  let cBase = blueBase.clone().lerp(amberBase, sootFraction);
+  let cEdge = new Nt("#0616bc");
+  if (sootFraction > 0.45) {
+    let edgeT = (sootFraction - 0.45) / 0.55;
+    let r = 0.02 + edgeT * 0.76;
+    let b = 0.74 * Math.pow(1.0 - edgeT, 2.0);
+    let gCol = Math.max(0.08 + edgeT * 0.10, Math.min(r, b) * 0.95);
+    cEdge.setRGB(r, gCol, b);
+  }
+
+  let cCore = new Nt();
+  if (sootFraction < 0.35) {
+    cCore.copy(new Nt("#829eff")).lerp(new Nt("#fff8e7"), sootFraction / 0.35);
+  } else {
+    cCore.copy(new Nt("#fff8e7")).lerp(new Nt("#fff2cb"), (sootFraction - 0.35) / 0.65);
+  }
+
+  let cMid = new Nt();
+  if (sootFraction < 0.45) {
+    let subT = (sootFraction / 0.45) * 0.85;
+    cMid.copy(new Nt("#153eff")).lerp(new Nt("#ffffff"), subT);
+  } else {
+    let subT = (sootFraction - 0.45) / 0.55;
+    cMid.copy(new Nt("#ffffff")).lerp(new Nt("#ffae32"), subT);
+  }
 
   if (Oe) {
     Oe.material.uniforms.uCore.value.copy(cCore);
@@ -4358,8 +4378,8 @@ function applyEnv(g, o2, flow) {
     It("hud-temp").textContent = `~${temp.toLocaleString("vi-VN")} K`;
   }
   if (It("hud-color")) {
-    It("hud-color").textContent = sootFraction < 0.15 ? "Xanh lam (CH*/C₂*)" : sootFraction < 0.55 ? "Xanh pha váng vàng" : "Vàng cam chói (Muội than)";
-    It("hud-color").style.color = sootFraction < 0.15 ? "#829eff" : sootFraction < 0.55 ? "#ffd166" : "#ffae32";
+    It("hud-color").textContent = sootFraction < 0.12 ? "Xanh lam (CH*/C₂*)" : sootFraction < 0.35 ? "Xanh vòm · Chớm vệt vàng đỉnh" : sootFraction < 0.65 ? "Vàng hổ phách · Chân xanh" : "Vàng cam chói (Muội than 1.600K)";
+    It("hud-color").style.color = sootFraction < 0.12 ? "#829eff" : sootFraction < 0.35 ? "#93c5fd" : sootFraction < 0.65 ? "#fde047" : "#ffae32";
   }
   if (It("hud-flicker")) {
     let hz = (g * 11.2 + (flow / 30) * 2.5).toFixed(1);
@@ -4369,7 +4389,7 @@ function applyEnv(g, o2, flow) {
     It("hud-transport").textContent = g === 0 && flow === 0 ? "Khuếch tán phân tử đẳng hướng (Fickian Diffusion)" : g === 0 ? "Khuếch tán + Thông gió cưỡng bức" : g <= 0.38 ? "Đối lưu tự nhiên yếu + Khuếch tán hỗn hợp" : "Đối lưu tự nhiên mạnh (Cột khói 30–60 cm/s)";
   }
   if (It("shape-caption")) {
-    It("shape-caption").textContent = g === 0 ? "Vòm lửa nến vi trọng lực · Khuếch tán phân tử 360° (ISS 0g)" : g === 1 ? "Lửa nến Trái Đất (1g) · Cột khói đối lưu tự nhiên & bồ hóng vàng" : `Môi trường trọng lực ${gFormatted} · Nồng độ oxy ${o2}%`;
+    It("shape-caption").textContent = g === 0 ? "Vòm lửa nến vi trọng lực · Khuếch tán phân tử 360° (ISS 0g)" : g === 0.16 ? "Trọng lực Mặt Trăng (0.16g) · Vòm xanh chớm muội than đỉnh" : g === 0.38 ? "Trọng lực Sao Hỏa (0.38g) · Đối lưu yếu & lõi vàng hổ phách" : g === 1 ? "Lửa nến Trái Đất (1g) · Cột khói đối lưu tự nhiên & bồ hóng vàng" : `Môi trường trọng lực ${gFormatted} · Nồng độ oxy ${o2}%`;
   }
 }
 
