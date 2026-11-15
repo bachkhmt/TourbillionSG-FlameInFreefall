@@ -749,13 +749,13 @@ export function getMockScenarioEvaluation(
       unavailableFields: [],
     },
     context: {
-      collectionId: "nasa-psi-archive-offline",
-      origin: "real",
-      reviewState: "curated",
-      caveats: ["NASA PSI Empirical Offline Baseline"],
+      collectionId: FALLBACK_CONTEXT.collectionId,
+      origin: "synthetic",
+      reviewState: "unreviewed",
+      caveats: ["Illustrative demo data; not NASA records."],
     },
     scope: {
-      collectionId: "nasa-psi-archive-offline",
+      collectionId: FALLBACK_CONTEXT.collectionId,
       scenarioDigest: "digest-offline",
       collectionFingerprint: "offline-fingerprint",
     },
@@ -812,7 +812,7 @@ export function getMockScenarioEvaluation(
 }
 
 /**
- * Fallback physical prediction readiness.
+ * Illustrative prediction-readiness test fixture (no validated model exists).
  */
 export function getMockPredictionReadiness(modelId?: string): ReadinessDto {
   return {
@@ -821,21 +821,21 @@ export function getMockPredictionReadiness(modelId?: string): ReadinessDto {
     modelId: modelId ?? "model-flameguard-microgravity-v1",
     modelVersion: "1.0.0",
     datasetVersion: "nasa-psi-2024-q4",
-    origin: "real",
+    origin: "synthetic",
     capabilities: {
       quenchedLimit: "true",
       flameSpreadRate: "true",
       froudeScaling: "true",
     },
     limitations: [
-      "Valid for 0g to 1g terrestrial/orbital range",
+      "Illustrative test fixture; no validated prediction model exists.",
       "Atmospheric pressure 8.0 to 18.0 psia",
     ],
   };
 }
 
 /**
- * Fallback physical prediction response calculation.
+ * Illustrative prediction-response test fixture; not a NASA prediction.
  */
 export function getMockPredictionResponse(
   request: PredictionRequestDto,
@@ -858,7 +858,7 @@ export function getMockPredictionResponse(
       observable: request.observable,
       value: estSpreadRate,
       unit: "mm/s",
-      origin: "real",
+      origin: "synthetic",
       providerVersion: "flameguard-analytical-v1",
       collectionFingerprint: "fingerprint-analytical",
       uncertainty: {
@@ -867,7 +867,7 @@ export function getMockPredictionResponse(
         methodRef: "NASA-SP-8000-SERIES",
       },
       limitations: [
-        "Empirically validated for PMMA / Nomex in microgravity chambers",
+        "Illustrative test fixture; not a validated NASA prediction.",
       ],
     },
   };

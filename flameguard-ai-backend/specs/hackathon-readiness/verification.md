@@ -13,8 +13,15 @@ RAG prompts 4–5 ship separately in PR #7. Plan: `.claude/plans/readiness-merge
 - Readiness ADR renamed to ADR-0008 to avoid the ADR-0007 number clash.
 - Readiness files were reformatted to double quotes by a formatter; content changes are the
   ones listed in the plan. No project formatter config exists to normalise this.
+- Branch then merged `origin/main` at b9bc971 (gitignore + English translation); README and
+  DATA_HANDOFF keep main's English text with the readiness sections appended in English. The
+  RAG code, `.gitignore` and `playbook-rag/` match main except the 5-line prototype notice.
+- Reviewer follow-up: the remaining mock scenario/prediction fixtures in `mockFallback.ts` were
+  relabelled `synthetic`/`unreviewed` (no product code calls them; tests use them as HTTP stubs).
 
 ## Executed checks
+Re-run after merging b9bc971; results unchanged from the first run.
+
 | Check | Result |
 | --- | --- |
 | FE `npm test` | 29 files, **308 passed** |
@@ -23,6 +30,7 @@ RAG prompts 4–5 ship separately in PR #7. Plan: `.claude/plans/readiness-merge
 | BE suite via `scripts/test_db.py run` (55435) | **702 passed, 0 skipped** |
 | Root suite via `scripts/test_db.py run` (55435) | **106 passed, 0 skipped** (includes `test_mission_http` on the tag/oxygenContext snapshot and its tamper → 503 case) |
 | `scripts/verify_data_handoff.py` via `test_db.py run` | psi PASS (71 sources, 2508 passages); unified PASS (81 sources, 2574 passages, 10 resources) |
+| BE `ruff check .` / `ruff format --check .` | 1 error each, both in `app/integrations/rag/retrieval.py` (E501 at line 67), which is byte-identical to main b9bc971; pre-existing on main, not touched here |
 | Prompt 8 grep (SoFIE, PSI Verified Baseline, Predictive Lab, Could Have, Diagram D14, 20 Studies/NASA, 148+, Kurzgesagt Vector, Offline Fallback, Drop Tower, Terrestrial (1g), Vietnamese toast) | no user-visible matches in `src` outside `src/data` demo fallback and type comments |
 
 ## Browser smoke (fresh preview target from merged code, test container 55435)
