@@ -7,3 +7,5 @@
 # Preserve original bytes: NASA raw artifacts are verified by SHA-256.
 # Never let core.autocrlf alter scientific inputs.
 integrations/nasa_data/research/** -text
+# The frozen evaluation checksum also requires the original JSON bytes on Windows.
+integration_tests/data/chat_eval.json -text

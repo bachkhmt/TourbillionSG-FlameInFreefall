@@ -39,7 +39,7 @@ Identity `id-flameguard-github` có federated credential với các giá trị s
 | Thuộc tính | Giá trị |
 | --- | --- |
 | Issuer | `https://token.actions.githubusercontent.com` |
-| Subject | `repo:bachkhmt/TourbillionSG-FlameInFreefall:ref:refs/heads/main` |
+| Subject | `repo:hieuduong1810/TourbillionSG-FlameInFreefall:ref:refs/heads/main` |
 | Audience | `api://AzureADTokenExchange` |
 | ACR role | `AcrPush`, scope `acrflameguard` |
 | Deployment role | `Container Apps Contributor`, scope từng app `ca-flameguard-api` và `ca-flameguard-web` |
@@ -47,6 +47,11 @@ Identity `id-flameguard-github` có federated credential với các giá trị s
 Repository variables dùng trong Azure Login gồm `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`
 và `AZURE_SUBSCRIPTION_ID`. Database credentials tiếp tục lấy từ Container App secrets.
 Các Actions chính thức được pin bằng commit SHA.
+
+Repo hiện có tên chính thức `hieuduong1810/TourbillionSG-FlameInFreefall`.
+Đã cập nhật federated credential `github-main` theo tên này; URL `bachkhmt/...`
+chuyển hướng sang repo hiện tại. Nếu repo đổi tên/chủ sở hữu lần nữa, phải kiểm tra
+lại subject OIDC trước khi deploy.
 
 ## Bundle NASA
 
