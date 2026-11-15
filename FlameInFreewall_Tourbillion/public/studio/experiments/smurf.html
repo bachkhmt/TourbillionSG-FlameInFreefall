@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="vi" data-theme="dark" data-studio-demo="smurf"><head><meta charset="utf-8">
+<html lang="en" data-theme="dark" data-studio-demo="smurf"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SMuRF: lửa trên Trái Đất và trong vũ trụ</title>
-<link rel="stylesheet" href="/assets/fonts/inter.css">
+<title>SMµRF · Spacecraft Materials Microgravity Research on Flammability (NASA SoFIE)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="/assets/fonts/inter.css">
 <style>
 :root{--bg:#eef1f4;--ink:#14202b;--mut:#56646f;--card:#fff;--line:#cfd7de;--ok:#0b8a6a;--warn:#d9480f;--warnbg:rgba(240,170,20,.32);--grey:#7b8794;--ug:#2f6fe0;--g1:#e8590c;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e151c;--ink:#e5ecf2;--mut:#93a3b1;--card:#151e27;--line:#2a3744;--ok:#3ccf9f;--warn:#ff7a45;--warnbg:rgba(240,170,20,.28);--grey:#8a97a3;--ug:#6aa2ff;--g1:#ff8a3d;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#0e151c;--ink:#e5ecf2;--mut:#93a3b1;--card:#151e27;--line:#2a3744;--ok:#3ccf9f;--warn:#ff7a45;--warnbg:rgba(240,170,20,.28);--grey:#8a97a3;--ug:#6aa2ff;--g1:#ff8a3d;color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:inherit}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 Inter,system-ui,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.5 'Plus Jakarta Sans',Inter,system-ui,sans-serif}
 main{max-width:1120px;margin:0 auto;padding:18px 16px 32px}
 h1{font-size:clamp(20px,3.4vw,30px);line-height:1.2;margin:0 0 6px;font-weight:700}
 .sub{color:var(--mut);margin:0 0 14px;max-width:72ch}
@@ -46,36 +46,36 @@ button:focus-visible,input:focus-visible,canvas:focus-visible{outline:2px solid 
 .note{font-size:12.5px;color:var(--mut);margin:12px 2px 0;max-width:100ch}
 @media (max-width:700px){.labs{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.lab+.lab{border-left:0;border-top:1px solid #ffffff22}.stage{height:700px}.lower{grid-template-columns:1fr}.chart canvas{height:310px}}
 </style><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body><main>
-<h1>Cùng một que nhựa: trên Trái Đất lửa tắt, trong vũ trụ lửa vẫn cháy</h1>
-<p class="sub">Mẫu đặt dọc, gió thổi từ dưới lên, lửa lan lên theo gió. Hai khung dùng cùng vật liệu, oxy và gió; khác nhau ở trọng lực. Trên Trái Đất lửa tự sinh thêm một dòng khí nổi khoảng 30 cm/s, trong vũ trụ thì không. Kéo chuột để xoay.</p>
+<h1>Same Solid Fuel: Extinguished on Earth, Sustained in Space</h1>
+<p class="sub">NASA SoFIE Investigation. Vertically oriented solid sample with upward forced airflow. Both viewports share identical fuel, oxygen, and forced flow; differing only by gravity. On Earth, buoyant convection induces an upward draft (~30 cm/s), cooling the base and blowing off the flame at lower oxygen; in microgravity, lack of buoyancy allows flames to persist at lower oxygen levels. Drag to rotate.</p>
 
 <div class="stage"><canvas id="gl"></canvas>
  <div class="labs">
-  <div class="lab"><div><h2>Trái Đất (1g)</h2><small id="s1"></small></div><span class="badge" id="b1"></span></div>
-  <div class="lab"><div><h2>Vũ trụ (μg)</h2><small id="s2"></small></div><span class="badge" id="b2"></span></div>
+  <div class="lab"><div><h2>Earth (1g Baseline)</h2><small id="s1"></small></div><span class="badge" id="b1"></span></div>
+  <div class="lab"><div><h2>Spaceflight (ISS Microgravity)</h2><small id="s2"></small></div><span class="badge" id="b2"></span></div>
  </div></div>
 
 <div class="lower">
- <section class="card ctl" aria-label="Điều chỉnh">
-  <div class="seg" id="sSample"><button data-v="rod">Que nhựa PMMA</button><button data-v="sheet">Tấm mỏng</button></div>
-  <div class="seg" id="sSpread"><button data-v="conc">Lan cùng chiều gió</button><button data-v="opp">Lan ngược chiều gió</button></div>
-  <label>Oxy (O₂) <b id="oO"></b><input type="range" id="rO" min="12" max="40" step="0.1" value="25"></label>
-  <label>Tốc độ gió thổi vào <b id="oV"></b><input type="range" id="rV" min="0" max="40" step="0.5" value="10"></label>
-  <label>Áp suất (giả định) <b id="oP"></b><input type="range" id="rP" min="8.2" max="14.7" step="0.1" value="14.7"></label>
+ <section class="card ctl" aria-label="Controls">
+  <div class="seg" id="sSample"><button data-v="rod">PMMA Solid Rod</button><button data-v="sheet">Thin Flat Sheet</button></div>
+  <div class="seg" id="sSpread"><button data-v="conc">Concurrent Spread (with flow)</button><button data-v="opp">Opposed Spread (against flow)</button></div>
+  <label>Oxygen (O₂) <b id="oO"></b><input type="range" id="rO" min="12" max="40" step="0.1" value="25"></label>
+  <label>Forced Airflow Velocity <b id="oV"></b><input type="range" id="rV" min="0" max="40" step="0.5" value="10"></label>
+  <label>Chamber Pressure (psia) <b id="oP"></b><input type="range" id="rP" min="8.2" max="14.7" step="0.1" value="14.7"></label>
   <div class="row">
-   <button class="b" id="pAmb">Không khí thường</button>
-   <button class="b" id="pExp">Khí quyển tàu thám hiểm (34% O₂, 8,2 psia)</button>
-   <button class="b p" id="bBound">Thử ngay: Trái Đất tắt, vũ trụ vẫn cháy</button>
-   <button class="b" id="bIgn">Châm lửa lại</button>
+   <button class="b" id="pAmb">Standard Air (21% O₂, 14.7 psia)</button>
+   <button class="b" id="pExp">Exploration Atmosphere (34% O₂, 8.2 psia)</button>
+   <button class="b p" id="bBound">Test Divergence: Earth Extinguishes, Space Sustains</button>
+   <button class="b" id="bIgn">Reignite Samples</button>
   </div>
  </section>
  <section class="card chart">
-  <header><h3>Bản đồ: lửa cháy được ở đâu?</h3><span class="tag" id="bSrc"></span></header>
-  <canvas id="cc" tabindex="0" role="img" aria-label="Bản đồ ngưỡng cháy; bấm để đặt điểm"></canvas>
+  <header><h3>Flammability Map: Operational Boundaries</h3><span class="tag" id="bSrc"></span></header>
+  <canvas id="cc" tabindex="0" role="img" aria-label="Flammability map; click to place test point"></canvas>
   <p class="verdict" id="vd" aria-live="polite"></p>
  </section>
 </div>
-<p class="note">Căn cứ NASA: thử nghiệm chuẩn NASA-STD-6001 Test 1 đốt mẫu đặt đứng từ dưới lên trong không khí lặng, đạt nếu cháy ngắn hơn 15,2 cm. Dòng khí nổi ở 1g khoảng 30 cm/s. Ở μg, giới hạn cháy có dạng chữ U: gió quá yếu thì lửa tắt vì mất nhiệt bức xạ, gió quá mạnh thì bị thổi tắt, đáy chữ U ở gió rất yếu. Chênh lệch giữa giới hạn 1g và đáy chữ U gọi là NOMS; slide SMuRF ghi 1,4% O₂ cho que PMMA (một đợt thử trên ISS với que 1/4 inch cho 2,4%: 16% ở 1g so với 13,6% ở μg). Giả định: vị trí đáy chữ U, độ dốc các nhánh, ảnh hưởng của áp suất, và khác biệt giữa que, tấm, lan ngược. Hình lửa là minh họa định tính.</p>
+<p class="note">NASA Reference Baseline: Standard flammability qualification under NASA-STD-6001 Test 1 ignites vertical samples bottom-up in quiescent air, passing if burn length is < 15.2 cm. Natural buoyant convective draft at 1g is ~30 cm/s. In microgravity (μg), flammability boundary forms a characteristic U-curve: low flow leads to radiative quench extinction, while high flow causes kinetic blowoff; minimum LOC occurs at low flow. The divergence between 1g threshold and the μg minimum is termed Non-Operational Margin of Safety (NOMS); NASA SMµRF reported 1.4% to 2.4% lower LOC in μg compared to 1g (e.g. 16.0% 1g vs 13.6% μg on 1/4" PMMA rod). Assumed parameters: U-curve vertex location, branch slopes, pressure exponents, and geometric sheet adjustments. Illustrative phenomenological simulation.</p>
 </main>
 <script src="/assets/vendor/three-r128.min.js"></script>
 <script>
@@ -223,19 +223,19 @@ function sync(){
   S.O=+$('rO').value;S.V=+$('rV').value;S.P=+$('rP').value;
   lu=loc('ug');lg=loc('1g');bu=S.O>lu;bg=S.O>lg;
   $('oO').textContent=fmt(S.O)+'%';$('oV').textContent=fmt(S.V)+' cm/s';$('oP').textContent=fmt(S.P)+' psia';
-  $('s1').textContent='gió '+fmt(S.V,0)+' cm/s cộng dòng khí nổi ≈ 30 cm/s: hiệu dụng ≈ '+fmt(Math.hypot(S.V,VB),0)+' cm/s';
-  $('s2').textContent='gió '+fmt(S.V,0)+' cm/s, không có dòng khí nổi';
+  $('s1').textContent='Forced flow '+fmt(S.V,0)+' cm/s + buoyant draft ≈ 30 cm/s (Effective: ~'+fmt(Math.hypot(S.V,VB),0)+' cm/s)';
+  $('s2').textContent='Forced flow '+fmt(S.V,0)+' cm/s (Zero buoyant draft)';
   document.querySelectorAll('#sSample button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.sample));
   document.querySelectorAll('#sSpread button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.spread));
-  const ob=document.querySelector('#sSpread [data-v=opp]');ob.disabled=S.sample==='rod';ob.title=S.sample==='rod'?'Que PMMA chỉ có đường cong lan cùng chiều (slide NASA)':'';
-  $('bSrc').textContent=S.sample==='rod'?'NOMS ≈ 1,4% O₂ (slide NASA)':'Tấm: chênh lệch giả định';
+  const ob=document.querySelector('#sSpread [data-v=opp]');ob.disabled=S.sample==='rod';ob.title=S.sample==='rod'?'PMMA rod only tested for concurrent spread (NASA data)':'';
+  $('bSrc').textContent=S.sample==='rod'?'NOMS ≈ 1.4% O₂ (NASA data)':'Sheet: Assumed offset';
   let k,h;
-  if(bu&&!bg){k='warn';h='Trong mô phỏng: lửa tắt ở 1g và tiếp tục cháy ở μg'}
-  else if(bu&&bg){k='ok';h='Lửa cháy ở cả hai nơi'}
-  else if(!bu&&bg){k='';h='Gió quá yếu: ở μg lửa tắt vì mất nhiệt, ở 1g dòng khí nổi giúp lửa còn cháy'}
-  else{k='';h='Lửa không cháy ở cả hai nơi'}
-  let t='Với gió '+fmt(S.V)+' cm/s, lửa cần ít nhất '+fmt(lu)+'% oxy ở μg và '+fmt(lg)+'% ở 1g (đã tính dòng nổi). Hiện có '+fmt(S.O)+'%.';
-  if(Math.abs(S.P-8.2)<.05&&S.O>=33)t+=' Ở 34% O₂, 8,2 psia rất ít vật liệu tấm mỏng đạt xếp hạng, kể cả ở 1g (slide NASA).';
+  if(bu&&!bg){k='warn';h='Divergence: Extinguished at 1g but persists in μg'}
+  else if(bu&&bg){k='ok';h='Flammable: Sustained in both 1g and μg'}
+  else if(!bu&&bg){k='';h='Low Flow: μg extinguished by radiative heat loss; 1g sustained by buoyant draft'}
+  else{k='';h='Non-flammable: Below extinction threshold in both regimes'}
+  let t='At flow '+fmt(S.V)+' cm/s, combustion requires ≥ '+fmt(lu)+'% O₂ in μg and ≥ '+fmt(lg)+'% in 1g (including buoyant draft). Currently at '+fmt(S.O)+'%.';
+  if(Math.abs(S.P-8.2)<.05&&S.O>=33)t+=' Under 34% O₂ at 8.2 psia, few thin materials pass flammability standards even in 1g (NASA reference).';
   $('vd').className='verdict '+k;$('vd').innerHTML='<strong>'+h+'</strong>'+t;
 }
 let dpr=1;
@@ -250,18 +250,18 @@ function drawChart(T){
   x.fillStyle=col.ink;x.globalAlpha=.06;x.fillRect(X(5),M.t,X(20)-X(5),ih);x.globalAlpha=1;
   for(const o of [12,15,20,25,30,35,40]){x.strokeStyle=col.line;x.beginPath();x.moveTo(M.l,Y(o));x.lineTo(w-M.r,Y(o));x.stroke();x.fillStyle=col.mut;x.textAlign='right';x.fillText(o,M.l-6,Y(o))}
   x.textAlign='center';for(const v of [0,10,20,30,40])x.fillText(v,X(v),h-M.b+13);
-  x.fillText('Tốc độ gió thổi vào (cm/s)',M.l+iw/2,h-8);x.save();x.translate(12,M.t+ih/2);x.rotate(-Math.PI/2);x.fillText('Oxy (O₂, %)',0,0);x.restore();
-  x.fillText('gió thông gió tàu 5 đến 20 cm/s',X(12.5),Y(LO)-8);
+  x.fillText('Forced Airflow Velocity (cm/s)',M.l+iw/2,h-8);x.save();x.translate(12,M.t+ih/2);x.rotate(-Math.PI/2);x.fillText('Oxygen (% O₂)',0,0);x.restore();
+  x.fillText('Spacecraft ventilation: 5–20 cm/s',X(12.5),Y(LO)-8);
   band(()=>LO,mn,col.grey,.16);band(U_,mx,col.warnbg,1);band(G_,mx,col.ug,.18);
   const line=(f,cl)=>{x.beginPath();vs.forEach((v,i)=>x[i?'lineTo':'moveTo'](X(v),Y(f(v))));x.strokeStyle=cl;x.lineWidth=2.5;x.stroke()};
   line(G_,col.g1);line(U_,col.ug);
-  x.font='600 11px Inter,sans-serif';x.fillStyle=col.warn;x.textAlign='center';x.fillText('vùng khác biệt mô phỏng',X(24),Y(G_(24))-14);
+  x.font='600 11px Inter,sans-serif';x.fillStyle=col.warn;x.textAlign='center';x.fillText('Divergence Zone (μg burning, 1g out)',X(24),Y(G_(24))-14);
   x.beginPath();x.strokeStyle=col.warn;x.lineWidth=1;x.moveTo(X(24),Y(G_(24))-8);x.lineTo(X(24),Y((G_(24)+U_(24))/2));x.stroke();
-  x.font='11px Inter,sans-serif';x.textAlign='left';x.fillStyle=col.ug;x.fillText('μg tắt: gió quá yếu',X(.8),Y(Math.min(HI,(U_(0)+G_(0))/2+2.5)));
-  x.textAlign='right';x.fillStyle=col.mut;x.fillText('Cháy ở cả hai nơi',w-M.r-6,M.t+10);
+  x.font='11px Inter,sans-serif';x.textAlign='left';x.fillStyle=col.ug;x.fillText('μg Extinct: Low flow quench',X(.8),Y(Math.min(HI,(U_(0)+G_(0))/2+2.5)));
+  x.textAlign='right';x.fillStyle=col.mut;x.fillText('Flammable in both',w-M.r-6,M.t+10);
   const a=U_(5),b=G_(5);x.strokeStyle=col.ink;x.lineWidth=1.5;x.beginPath();x.moveTo(X(5),Y(a));x.lineTo(X(5),Y(b));x.moveTo(X(5)-4,Y(a));x.lineTo(X(5)+4,Y(a));x.moveTo(X(5)-4,Y(b));x.lineTo(X(5)+4,Y(b));x.stroke();
-  x.textAlign='left';x.fillStyle=col.ink;x.fillText(S.sample==='rod'?'NOMS ≈ 1,4% O₂ (NASA)':'chênh ≈ 1,4% (giả định)',X(5)+8,Y(b)-13);
-  x.fillStyle=col.g1;x.fillText('— đường ngưỡng Trái Đất (1g)',M.l+8,M.t+26);x.fillStyle=col.ug;x.fillText('— đường ngưỡng vũ trụ (μg)',M.l+8,M.t+42);
+  x.textAlign='left';x.fillStyle=col.ink;x.fillText(S.sample==='rod'?'NOMS ≈ 1.4% O₂ (NASA)':'Offset ≈ 1.4% (Assumed)',X(5)+8,Y(b)-13);
+  x.fillStyle=col.g1;x.fillText('— Earth 1g Boundary (LOC)',M.l+8,M.t+26);x.fillStyle=col.ug;x.fillText('— Space μg Boundary (LOC)',M.l+8,M.t+42);
   const warn=bu&&!bg,dc=warn?col.warn:(bg?col.ok:col.grey),px=X(S.V),py=Y(S.O);
   if(warn){x.strokeStyle=col.warn;x.lineWidth=2;x.beginPath();x.arc(px,py,11+3*Math.sin(T*4),0,7);x.stroke()}
   x.fillStyle=dc;x.beginPath();x.arc(px,py,7,0,7);x.fill();x.strokeStyle=col.card;x.lineWidth=2;x.stroke();

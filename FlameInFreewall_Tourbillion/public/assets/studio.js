@@ -1,11 +1,74 @@
 const demos = [
-  { id: 'candle', label: 'Lửa tự do', tag: '3D', title: 'Phòng quan sát lửa', description: 'Khám phá hình dạng, màu sắc và chuyển động của ngọn lửa.', hint: 'Kéo để xoay · Cuộn để thu phóng · Đổi màu và hình dạng trong bảng điều chỉnh.', file: 'candle' },
-  { id: 'mist', label: 'MIST', tag: '01', title: 'Mồi lửa & dập tắt', description: 'Que PMMA, gia nhiệt bức xạ và lan lửa ngược dòng.', hint: 'Bấm “Chạy thí nghiệm”, rồi thử pha loãng N₂, giảm dòng hoặc xả khí khi lửa đang lan.', file: 'mist' },
-  { id: 'nca', label: 'NCA', tag: '02', title: 'Lan lửa trong khe hẹp', description: 'Đặt cạnh nhau: 1g kênh mở, 1g khe hẹp và vi trọng lực.', hint: 'Thay đổi khe kênh và dòng khí để quan sát ba khung cùng lúc.', file: 'nca' },
-  { id: 'rtdfs', label: 'RTDFS', tag: '03', title: 'Lan lửa trên PMMA mỏng', description: 'Khám phá ảnh hưởng của dòng khí, độ dày và oxy lên hình ảnh lan lửa.', hint: 'Thử các nút V=1, V=8 và V=50; mở “Chú thích” để xem các giả định.', file: 'rtdfs' },
-  { id: 'smurf', label: 'SMµRF', tag: '04', title: 'Trái Đất & vi trọng lực', description: 'Cùng vật liệu và điều kiện đầu, quan sát hai môi trường trọng lực.', hint: 'Thử nút “Trái Đất tắt, vũ trụ vẫn cháy”, rồi đổi oxy và tốc độ gió.', file: 'smurf' },
-  { id: 'gel-comparison', label: 'GEL · đối chiếu', tag: '05', title: 'Quả cầu cháy ở 1g & μg', description: 'Hai góc nhìn về quá trình phát triển và suy giảm của lửa quanh cầu PMMA.', hint: 'Đổi oxy hoặc đường kính, bấm “Mồi lửa / Chạy lại”; thử “Xả N₂”.', file: 'gel-comparison' },
-  { id: 'gel', label: 'GEL · dập tắt', tag: '06', title: 'Giới hạn dập tắt quanh cầu', description: 'Bốn kịch bản minh họa: dòng thấp, thổi tắt, trung gian và dòng cực thấp.', hint: 'Chọn kịch bản A–D hoặc bấm lên bản đồ dòng × O₂ để thử điều kiện khác.', file: 'gel' },
+  {
+    id: 'candle',
+    category: 'NASA CFM · DIFFUSION FLAME',
+    label: 'Candle Flame',
+    tag: '3D',
+    title: 'Candle Flames in Microgravity (CFM)',
+    description: 'Direct empirical comparison between 0g orbital freefall (molecular diffusion dome) and 1g terrestrial baseline (buoyant teardrop flame).',
+    hint: 'Drag to rotate · Scroll to zoom · Toggle gravity regimes and adjust atmospheric conditions in the side panel.',
+    file: 'candle'
+  },
+  {
+    id: 'mist',
+    category: 'NASA SoFIE · SOLID FUEL (ISS)',
+    label: 'MIST · Rod Ignition',
+    tag: '01',
+    title: 'Material Ignition and Suppression Test (MIST)',
+    description: 'PMMA acrylic rod under external radiant heating with opposed-flow flame spread and three independent suppression methods.',
+    hint: 'Click "Run Experiment", then test N₂ dilution, flow reduction (quenching), or chamber depressurization while the flame spreads.',
+    file: 'mist'
+  },
+  {
+    id: 'nca',
+    category: 'NASA SoFIE · SOLID FUEL (ISS)',
+    label: 'NCA · Narrow Channel',
+    tag: '02',
+    title: 'Narrow Channel Apparatus (NCA)',
+    description: 'Synchronized comparison: 1g open duct, 1g 5mm narrow channel (buoyancy suppression), and ISS microgravity.',
+    hint: 'Adjust channel gap and opposed airflow velocity to observe terrestrial buoyancy suppression across the three viewports.',
+    file: 'nca'
+  },
+  {
+    id: 'rtdfs',
+    category: 'NASA SoFIE · SOLID FUEL (ISS)',
+    label: 'RTDFS · Thin Films',
+    tag: '03',
+    title: 'Residence Time Driven Flame Spread (RTDFS)',
+    description: 'Opposed-flow flame spread across thin PMMA film in 3D: radiation quenching at low flow vs aerodynamic blowoff at high flow.',
+    hint: 'Toggle flow presets (V=1, V=8, V=50 cm/s); open "Notes" for underlying NASA experimental bounds.',
+    file: 'rtdfs'
+  },
+  {
+    id: 'smurf',
+    category: 'NASA SoFIE · SOLID FUEL (ISS)',
+    label: 'SMµRF · Space Safety',
+    tag: '04',
+    title: 'NASA-STD-6001 Flammability Paradox (SMµRF)',
+    description: 'The same PMMA material: self-extinguishes on Earth due to buoyant stretch, but sustains combustion in ventilated microgravity.',
+    hint: 'Inspect the U-shaped flammability boundary and Non-combustion to Microgravity Spread (NOMS) margin.',
+    file: 'smurf'
+  },
+  {
+    id: 'gel-comparison',
+    category: 'NASA SoFIE · SOLID FUEL (ISS)',
+    label: 'GEL · Sphere (Dual)',
+    tag: '05',
+    title: 'Growth and Extinction Limit (GEL) · 1g vs µg',
+    description: 'Dual 3D viewports comparing flame growth, thermal regression, and extinction dynamics over thick solid PMMA spheres.',
+    hint: 'Adjust ambient O₂ and sphere diameter; click "Ignite / Rerun" or trigger "N₂ Quench".',
+    file: 'gel-comparison'
+  },
+  {
+    id: 'gel',
+    category: 'NASA SoFIE · SOLID FUEL (ISS)',
+    label: 'GEL · Extinction Map',
+    tag: '06',
+    title: 'Extinction Boundaries on Solid Spheres (GEL)',
+    description: 'Phase space map of flow velocity vs O₂ with calibrated NASA test runs 1409B & 1410A across four extinction regimes.',
+    hint: 'Select scenarios A–D or click directly on the Flow × O₂ phase map to test custom operating points.',
+    file: 'gel'
+  },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -14,7 +77,16 @@ let current = null;
 let requestVersion = 0;
 let readinessTimer;
 
+let lastCategory = '';
 for (const demo of demos) {
+  if (demo.category !== lastCategory) {
+    lastCategory = demo.category;
+    const catHeader = document.createElement('div');
+    catHeader.className = 'category-header';
+    catHeader.textContent = demo.category;
+    navigation.append(catHeader);
+  }
+
   const link = document.createElement('a');
   link.href = `#${demo.id}`;
   link.className = 'demo-link';
@@ -37,7 +109,7 @@ function showState(kind, message) {
   $('frame-state').dataset.state = kind;
   $('state-message').textContent = message;
   $('retry-demo').hidden = kind !== 'error';
-  $('demo-status').textContent = kind === 'ready' ? 'Đang hiển thị' : kind === 'error' ? 'Chưa tải được' : 'Đang chuẩn bị';
+  $('demo-status').textContent = kind === 'ready' ? 'Active simulation' : kind === 'error' ? 'Loading failed' : 'Preparing...';
 }
 
 async function selectDemo(force = false) {
@@ -48,23 +120,22 @@ async function selectDemo(force = false) {
   current = demo.id;
   const version = ++requestVersion;
   clearTimeout(readinessTimer);
-  // Removing the browsing context stops its animation loops and releases its renderer.
   $('demo-frame')?.remove();
-  for (const link of navigation.children) {
+  for (const link of navigation.querySelectorAll('.demo-link')) {
     if (link.dataset.demo === demo.id) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   }
   $('demo-title').textContent = demo.title;
   $('demo-description').textContent = demo.description;
   $('demo-hint').textContent = demo.hint;
-  $('demo-kind').textContent = demo.id === 'candle' ? 'QUAN SÁT 3D' : 'SOFIE / MINH HỌA';
+  $('demo-kind').textContent = demo.id === 'candle' ? '3D VOLUMETRIC SIMULATION' : 'NASA SOFIE EXPERIMENT';
   $('provenance').textContent = demo.id === 'candle'
-    ? 'Minh họa hình ảnh tương tác. Hình dạng và màu sắc phục vụ quan sát.'
-    : 'Minh họa định tính · Có tham số giả định · Nguồn các mốc số chưa xác minh · Chưa kết nối số đo PSI.';
+    ? 'Interactive visual simulation. Morphological and spectroscopic model for physical observation.'
+    : 'Qualitative phenomenological simulation · Assumed boundary parameters · Numerical thresholds are illustrative approximations from NASA reference literature · Not direct raw PSI sensor streams.';
   const url = `/studio/experiments/${demo.file}.html`;
   $('open-demo').href = url;
   document.title = `${demo.label} · Studio · Flame in Freefall`;
-  showState('loading', 'Đang chuẩn bị minh họa…');
+  showState('loading', 'Preparing demonstration...');
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -78,10 +149,10 @@ async function selectDemo(force = false) {
     frame.src = url;
     $('frame-host').prepend(frame);
     readinessTimer = setTimeout(() => {
-      if (version === requestVersion) showState('error', 'Minh họa chưa phản hồi. Hãy thử tải lại hoặc mở riêng.');
+      if (version === requestVersion) showState('error', 'Demonstration unresponsive. Please reload or open standalone.');
     }, 20000);
   } catch {
-    if (version === requestVersion) showState('error', 'Không tải được minh họa. Hãy thử tải lại hoặc mở riêng.');
+    if (version === requestVersion) showState('error', 'Unable to load demonstration. Please reload or open standalone.');
   }
 }
 

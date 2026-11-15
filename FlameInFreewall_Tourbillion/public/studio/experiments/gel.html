@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="vi" data-theme="dark" data-studio-demo="gel"><head><meta charset="utf-8">
-<title>GEL – Mô phỏng dập tắt lửa quanh quả cầu PMMA</title>
+<html lang="en" data-theme="dark" data-studio-demo="gel"><head><meta charset="utf-8">
+<title>GEL · Growth and Extinction Limit (NASA SoFIE)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
 :root{--bg:#eef0f3;--fg:#13161b;--mut:#596270;--card:#fff;--bd:#cfd5de;--ac:#c2410c;--on:#13161b;--onfg:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0e13;--fg:#e6e9ef;--mut:#929bab;--card:#141922;--bd:#272e3b;--ac:#ff8a4c;--on:#e6e9ef;--onfg:#0b0e13}}
 :root[data-theme="dark"]{--bg:#0b0e13;--fg:#e6e9ef;--mut:#929bab;--card:#141922;--bd:#272e3b;--ac:#ff8a4c;--on:#e6e9ef;--onfg:#0b0e13}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 'Plus Jakarta Sans',Inter,system-ui,sans-serif}
 .wrap{max-width:1280px;margin:0 auto;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px}
 @media(max-width:900px){.wrap{grid-template-columns:1fr}}
 h1{font-size:18px;margin:0 0 2px}.sub{color:var(--mut);font-size:12.5px;margin:0 0 10px}
@@ -32,44 +32,44 @@ button.on{background:var(--on);color:var(--onfg);border-color:var(--on)}
 .chk{display:flex;gap:8px;justify-content:flex-start;align-items:center}
 .note{font-size:11.5px;color:var(--mut);margin:6px 0 0}
 h2{font-size:13px;margin:0 0 6px}
-</style><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body>
+</style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body>
 <div class="wrap">
 <div>
- <h1>GEL – lửa quanh quả cầu PMMA ở vùng giới hạn dập tắt</h1>
- <p class="sub">Cầu PMMA Ø4 cm trên ống thép Ø6,35 mm trong ống dòng vuông 13,3×13,3 cm. Dòng chảy từ trái sang phải; điểm trì trệ ở mép trái quả cầu. Kéo để xoay, cuộn để zoom.</p>
+ <h1>GEL: Extinction Dynamics on Spherical PMMA</h1>
+ <p class="sub">NASA SoFIE Investigation. Spherical PMMA fuel sample (Ø4 cm) mounted on a 6.35 mm steel tube within a 13.3 × 13.3 cm flow duct. Forced airflow travels left to right; stagnation point is located on the left leading edge. Drag to rotate, scroll to zoom.</p>
  <div class="card"><div class="stage"><canvas id="cv" aria-label="Mô phỏng 3D ngọn lửa quanh quả cầu PMMA"></canvas>
   <span class="ov" style="left:12px;top:8px" id="oU"></span><span class="ov" style="right:12px;top:8px" id="oG"></span></div>
   <div class="hud">
-   <div><small>Chế độ</small><b id="hMode">–</b></div>
-   <div><small>O₂ hiện tại</small><b id="hO2">–</b></div>
-   <div><small id="hAL">Vị trí đuôi lửa (từ điểm trì trệ)</small><b id="hAng">–</b></div>
-   <div><small>Khoảng cách lửa–bề mặt</small><b id="hD">–</b></div>
+   <div><small>Combustion Regime</small><b id="hMode">–</b></div>
+   <div><small>Current O₂</small><b id="hO2">–</b></div>
+   <div><small id="hAL">Flame Tail Angle (from Stagnation)</small><b id="hAng">–</b></div>
+   <div><small>Flame Standoff Distance</small><b id="hD">–</b></div>
   </div>
   <p class="note" id="hSt"></p>
  </div>
 </div>
 <div class="col">
- <div class="card"><h2>Kịch bản</h2>
+ <div class="card"><h2>Investigation Cases</h2>
   <div class="row" id="pres">
-   <button class="pre" data-p="A"><b>A · Quench</b><i>Case 1 · 4,83 cm/s: xung đuôi lửa</i></button>
-   <button class="pre" data-p="B"><b>B · Blowoff</b><i>Case 2 · 34,3 cm/s: lỗ → mảnh xoay</i></button>
-   <button class="pre" data-p="C"><b>C · Trung gian</b><i>Case 3 · 11,5 cm/s: co mượt</i></button>
-   <button class="pre" data-p="D"><b>D · Dòng cực thấp</b><i>Case 4 · 0,44 cm/s: xung tự duy trì</i></button>
+   <button class="pre" data-p="A"><b>A · Quench</b><i>Case 1 · 4.83 cm/s: Wake pulse</i></button>
+   <button class="pre" data-p="B"><b>B · Blowoff</b><i>Case 2 · 34.3 cm/s: Hole → rotating fragment</i></button>
+   <button class="pre" data-p="C"><b>C · Intermediate</b><i>Case 3 · 11.5 cm/s: Smooth shrinkage</i></button>
+   <button class="pre" data-p="D"><b>D · Ultra-low Flow</b><i>Case 4 · 0.44 cm/s: Self-sustained oscillation</i></button>
   </div>
  </div>
- <div class="card"><h2>Điều kiện</h2>
-  <label for="sU">Dòng chảy <span id="vU"></span></label><input id="sU" type="range" min="0" max="100" step="0.1">
+ <div class="card"><h2>Experimental Parameters</h2>
+  <label for="sU">Flow Velocity <span id="vU"></span></label><input id="sU" type="range" min="0" max="100" step="0.1">
   <label for="sO"><b id="lO" style="font-weight:400">O₂</b> <span id="vO"></span></label><input id="sO" type="range" min="13" max="28" step="0.1">
-  <label for="sH">Gia nhiệt mẫu (q_c thấp hơn) <span id="vH"></span></label><input id="sH" type="range" min="0" max="1" step="0.01">
-  <label class="chk"><input id="cDep" type="checkbox" checked> O₂ giảm tự nhiên (cháy tiêu thụ O₂, dòng giữ cố định)</label>
-  <label class="chk"><input id="cExit" type="checkbox"> Mẫu ở cửa ra ống (lửa trong yếu phía sau)</label>
+  <label for="sH">Sample Preheating (lower critical flux) <span id="vH"></span></label><input id="sH" type="range" min="0" max="1" step="0.01">
+  <label class="chk"><input id="cDep" type="checkbox" checked> Natural O₂ depletion (combustion consumption, constant flow)</label>
+  <label class="chk"><input id="cExit" type="checkbox"> Sample at duct exit (weaker internal flame)</label>
   <div class="row"><button id="g0" class="on">μg</button><button id="g1">1g</button>
    <select id="sp" aria-label="Tốc độ mô phỏng"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
-   <button id="rst">Mồi lửa lại</button></div>
+   <button id="rst">Reignite</button></div>
  </div>
- <div class="card"><h2>Mặt phẳng dòng × O₂</h2>
+ <div class="card"><h2>Flow Velocity × O₂ Boundary Plane</h2>
   <canvas id="mp" aria-label="Bản đồ giới hạn dập tắt"></canvas>
-  <p class="note">Nhấn vào bản đồ để đặt điều kiện đầu. ○ = điểm hiệu chỉnh (paper:GEL). Gia nhiệt mẫu dịch đường giới hạn ≈4,6 %O₂ trên mỗi W/cm² q_c (từ hai điểm 1409B và 1410A; áp sang nhánh blowoff là giả định). O₂ giảm nhanh hơn thật ~10–25×; chuỗi tắt chạy theo thời gian thật. Hình ảnh là minh hoạ định tính, không phải CFD.</p>
+  <p class="note">Click the regime map to set initial conditions. ○ = NASA experimental calibration points. Sample preheating shifts the extinction boundary by ~4.6 %O₂ per W/cm² critical flux. Chamber O₂ depletes accelerated for interaction; extinction sequence runs in real-time. Qualitative 3D visualization, not raw CFD.</p>
  </div>
 </div></div>
 <script src="/assets/vendor/three-r128.min.js"></script>
@@ -87,7 +87,7 @@ function limit(U,h){const x=Math.log10(U),n=PTS.length;let i=0;while(i<n-2&&x>PT
 const UB=20; // GIẢ ĐỊNH: dòng đối lưu tự nhiên quanh cầu ở 1g (cm/s); paper: quench cần dòng thấp hơn mức này nên không đo được ở 1g
 const Ue=()=>S.g?Math.hypot(S.U,UB):S.U;
 const regime=U=>U<1?'D':U<9?'A':U<13?'C':'B'; // hợp nhất nhánh ở ~10 cm/s (a≈7,5 s⁻¹)
-const NAMES={A:'Quench · đuôi dao động',B:'Blowoff · lỗ → mảnh xoay',C:'Trung gian · co mượt',D:'Quench dòng cực thấp'};
+const NAMES={A:'Quench · Wake Oscillation',B:'Blowoff · Hole Formation & Rotor',C:'Intermediate · Smooth Shrinkage',D:'Ultra-low Flow Quench'};
 // thời lượng chuỗi tắt: B 5,02 s (Case 2), C 1,5 s; A/D theo lịch xung (sched)
 const PRE={A:[4.83,17.5],B:[34.28,17],C:[11.5,17],D:[0.44,26.2]}; // = Case 1,2,3,4 của paper
 const S={U:5,o2s:17.5,o2:17.5,dep:true,h:.5,g:0,exit:false,sp:1,st:'burn',tb:0,te:0,bt:0,mode:'A',ph:0,fq:1.4,frag:[]};
@@ -97,7 +97,7 @@ const f1=x=>x.toFixed(1).replace('.',',');
 function reset(){S.st='burn';S.tb=S.te=S.bt=0;S.o2=S.o2s;S.ph=0}
 function sync(){$('sU').value=U2v(S.U);$('sO').value=S.o2s;$('sH').value=S.h;lab()}
 function lab(){$('vU').textContent=fU(S.U)+' cm/s';$('vO').textContent=f1(S.o2s)+' %';$('vH').textContent='Δq_c '+(((.5-S.h)*.8>=0)?'+':'')+((.5-S.h)*.8).toFixed(2).replace('.',',')+' W/cm²';
- $('lO').textContent=S.dep?'O₂ ban đầu':'O₂ (trực tiếp)';$('oU').textContent='Dòng → '+fU(S.U)+' cm/s';$('oG').textContent=S.g?'1g: lực nổi hướng lên':'μg: không lực nổi'}
+ $('lO').textContent=S.dep?'Initial O₂':'Direct O₂';$('oU').textContent='Flow → '+fU(S.U)+' cm/s';$('oG').textContent=S.g?'1g: Upward buoyant draft':'μg: Zero buoyant draft'}
 function clr(){document.querySelectorAll('.pre').forEach(b=>b.classList.remove('on'))}
 function preset(k){S.U=PRE[k][0];S.o2s=PRE[k][1];S.h=.5;reset();sync();document.querySelectorAll('.pre').forEach(b=>b.classList.toggle('on',b.dataset.p==k))}
 $('pres').onclick=e=>{const b=e.target.closest('button');if(b)preset(b.dataset.p)};

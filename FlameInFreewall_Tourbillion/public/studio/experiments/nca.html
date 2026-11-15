@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="vi" data-theme="dark" data-studio-demo="nca"><head><meta charset="utf-8">
+<html lang="en" data-theme="dark" data-studio-demo="nca"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>NCA: lửa lan trên PMMA trong khe hẹp</title>
-<link rel="stylesheet" href="/assets/fonts/inter.css">
+<title>NCA · Narrow Channel Apparatus (NASA SoFIE)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="/assets/fonts/inter.css">
 <style>
 :root{--bg:#e4eaee;--card:#f5f8fa;--ink:#15212b;--mut:#566673;--line:#c2ced6;--acc:#1b5ea8;--onacc:#fff;--A:#c96a00;--B:#0b8a73;--C:#6b4bc4;--reg:rgba(107,75,196,.12);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e151c;--card:#16212b;--ink:#e3ebf1;--mut:#97a8b6;--line:#2b3b48;--acc:#6fb1f2;--onacc:#08121c;--A:#f0963a;--B:#34c4a8;--C:#a28bf0;--reg:rgba(162,139,240,.16);color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#0e151c;--card:#16212b;--ink:#e3ebf1;--mut:#97a8b6;--line:#2b3b48;--acc:#6fb1f2;--onacc:#08121c;--A:#f0963a;--B:#34c4a8;--C:#a28bf0;--reg:rgba(162,139,240,.16);color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,"Segoe UI",sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 'Plus Jakarta Sans',Inter,system-ui,sans-serif}
 .w{max-width:1180px;margin:0 auto;padding:18px 16px 28px}
 h1{font-size:1.5rem;margin:0 0 4px;font-weight:700}
 .sub{color:var(--mut);margin:0 0 14px;max-width:72ch;font-size:.92rem}
@@ -41,34 +41,34 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .nt{margin-top:14px;font-size:.82rem;color:var(--mut);display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px 24px}
 .nt b{color:var(--ink)}
 </style><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body><div class="w">
-<h1>NCA: lửa lan ngược dòng trên PMMA</h1>
-<p class="sub">Mẫu bay PMMA 10×5×1 cm, lan lửa ngược chiều dòng. Cùng O₂, dòng và áp suất, ba khung cho thấy khe hẹp mặt đất bắt chước μg tới mức nào. Thời gian tua nhanh, đồng hồ thật luôn hiển thị.</p>
+<h1>NCA: Opposed Flame Spread on PMMA</h1>
+<p class="sub">NASA SoFIE Investigation. Flat PMMA flight sample (10 × 5 × 1 cm) with opposed forced airflow. Under identical O₂, flow velocity, and pressure, three comparative viewports illustrate how narrow ground channels suppress buoyant convection to emulate true microgravity.</p>
 
-<section class="ctl" aria-label="Điều khiển">
-<label class="sl"><span>O₂ <em class="tg">đề xuất 21–85%</em></span><output id="oo2"></output><input type="range" id="o2" min="21" max="85" step="1" value="21"></label>
-<label class="sl"><span>Dòng (ngược chiều lan) <em class="tg">0–60</em></span><output id="ou"></output><input type="range" id="u" min="0" max="60" step="1" value="20"></label>
-<label class="sl"><span>Khe kênh (khung B) <em class="tg">SDSU: 5 mm</em></span><output id="ow"></output><input type="range" id="w" min="3" max="20" step="1" value="5"></label>
-<div class="sl"><span>Áp suất <em class="tg a">assumed</em></span><output id="op"></output><input type="range" id="p" min="20" max="110" step="1" value="101" aria-label="Áp suất"><label class="chk"><input type="checkbox" id="pa" checked> theo đường normoxic (pO₂ ≈ 21,3 kPa)</label></div>
+<section class="ctl" aria-label="Controls">
+<label class="sl"><span>Oxygen (O₂) <em class="tg">Range: 21–85%</em></span><output id="oo2"></output><input type="range" id="o2" min="21" max="85" step="1" value="21"></label>
+<label class="sl"><span>Opposed Flow <em class="tg">0–60 cm/s</em></span><output id="ou"></output><input type="range" id="u" min="0" max="60" step="1" value="20"></label>
+<label class="sl"><span>Channel Gap (B) <em class="tg">SDSU: 5 mm</em></span><output id="ow"></output><input type="range" id="w" min="3" max="20" step="1" value="5"></label>
+<div class="sl"><span>Pressure <em class="tg a">Assumed</em></span><output id="op"></output><input type="range" id="p" min="20" max="110" step="1" value="101" aria-label="Pressure"><label class="chk"><input type="checkbox" id="pa" checked> Normoxic curve (pO₂ ≈ 21.3 kPa)</label></div>
 </section>
 
 <div class="bar">
-<button id="sw" class="pri">Quét dòng</button>
-<button id="pz">Tạm dừng</button>
-<button id="rs">Đốt lại từ đầu</button>
-<span id="sp" role="group" aria-label="Tốc độ tua"><button data-s="1">×1</button> <button data-s="10">×10</button> <button data-s="50">×50</button> <button data-s="200" class="on">×200</button></span>
+<button id="sw" class="pri">Sweep Flow</button>
+<button id="pz">Pause</button>
+<button id="rs">Restart Run</button>
+<span id="sp" role="group" aria-label="Simulation Speed"><button data-s="1">×1</button> <button data-s="10">×10</button> <button data-s="50">×50</button> <button data-s="200" class="on">×200</button></span>
 <span class="clock" id="clk"></span>
 </div>
 
 <div class="grid">
 <div id="pns"></div>
-<aside class="cb"><h3>Tốc độ lan lửa theo dòng</h3><canvas id="ch" aria-label="Đường tốc độ lan lửa theo dòng cho ba điều kiện"></canvas>
-<div class="lg"><span><i style="background:var(--A)"></i>A · 1g kênh mở</span><span><i style="background:var(--B)"></i>B · 1g khe hẹp</span><span><i style="background:var(--C)"></i>C · μg bay</span></div>
+<aside class="cb"><h3>Spread Rate vs Flow Velocity</h3><canvas id="ch" aria-label="Flame spread rate curves vs flow velocity across three gravity configurations"></canvas>
+<div class="lg"><span><i style="background:var(--A)"></i>A · 1g Open Channel (Buoyant)</span><span><i style="background:var(--B)"></i>B · 1g Narrow Channel (5 mm)</span><span><i style="background:var(--C)"></i>C · μg Spaceflight (ISS)</span></div>
 <p class="cap" id="cap"></p></aside>
 </div>
 
 <div class="nt">
-<div><b>Từ nguồn.</b> PMMA 10×5×1 cm, lan ngược dòng; khe SDSU 5 mm; mốc MSU (thiết bị mặt đất, không phải bay): dòng 8–58 cm/s, tốc độ lan 0,02–0,07 mm/s, cháy hồi quy trên ~30 cm/s, gần như không phụ thuộc dòng. BASS: lửa dòng thấp chủ yếu xanh, bọt khí vỡ gây bùng cam. Tài liệu: ba chế độ radiative–thermal–kinetic; μg chậm hơn 1g khi giàu O₂ (que PMMA); standoff ≈ 1,1 mm và giảm theo dòng; gần giới hạn lửa vỡ thành flamelet, vùng này rộng hơn khi giảm áp.</div>
-<div><b>Assumed (minh họa, chưa phải mô hình số).</b> Số mũ O₂ theo trọng lực (A 1,7; C 0,65; B nội suy theo khe; hiệu chỉnh thô theo tỉ lệ “μg ×2–3, 1g >×10” của que PMMA); thổi tắt kinetic ngoài ~58 cm/s (A: ~22 cm/s, chưa xác minh cho mẫu nằm ngang); áp suất qua pO₂; giới hạn tắt ≈ 3 cm/s ở 21% O₂; tổn thất nhiệt theo khe; độ dốc hồi quy; riêng đoạn dòng ngoài 8–58 cm/s và đường cong A, C. Lửa vẽ bằng shader WebGL (raymarching thể tích, nhiễu fbm cuộn lên); dạng lửa chỉ mang tính định tính.</div>
+<div><b>NASA Reference Baseline:</b> PMMA 10 × 5 × 1 cm opposed flame spread; SDSU narrow channel gap 5 mm; MSU ground test facility (non-flight apparatus): flow 8–58 cm/s, spread rate 0.02–0.07 mm/s, regression burning above ~30 cm/s exhibiting weak flow dependence. BASS experiments show faint blue chemiluminescent flames at low flow with occasional soot bursts from vapor bubbles; radiative-thermal-kinetic combustion regimes; flame standoff ~1.1 mm decreasing with velocity; flamelet cellular breakup observed near flammability boundaries, expanding at lower pressure.</div>
+<div><b>Assumed Parameters (Illustrative Phenomenological Model):</b> Gravity-dependent O₂ scaling exponents (A: 1.7, C: 0.65, B: gap interpolation); kinetic blowoff beyond ~58 cm/s (A: ~22 cm/s); normoxic pressure scaling; low-flow extinction threshold ~3 cm/s at 21% O₂; channel wall convective/conductive heat loss. 3D WebGL volumetric raymarching for qualitative visualization. Numerical curves are illustrative approximations from NASA research studies.</div>
 </div>
 </div>
 
@@ -90,7 +90,7 @@ function g(u,q,a){q=Math.min(q,7.5);const v=u>=30?.07:u>=8?.02+.05*sm((u-8)/22):
 function sp(f,u){const a=par(f),ue=Math.hypot(u,a.ub);
  if(ue<=a.q||(f!=='A'&&u<a.q))return{V:0,ue,a};return{V:a.sc*g(ue,a.q,a),ue,a}}
 
-const T={A:['(A) 1g, kênh mở','lửa nhấc lên, nghiêng'],B:['(B) 1g, kênh hẹp','lửa bị ép dẹp sát trần'],C:['(C) μg bay','lửa nhỏ, bám bề mặt']};
+const T={A:['(A) 1g Open Channel','Buoyant flame lifted & tilted'],B:['(B) 1g Narrow Channel','Quenched against top wall'],C:['(C) μg Spaceflight','Compact, surface-attached flame']};
 function init(P){P.xf=100;P.tp=new Uint8Array(N);P.rg=new Uint8Array(N);P.dep=new Float32Array(N);P.tp[200]=1;P.pp=new Uint8Array(NB);P.fl=[];P.I=1;P.s='burn';P.V=0;P.ue=0;P.reg=false}
 const PN=['A','B','C'].map(f=>{const el=document.createElement('section');el.className='pn';el.style.setProperty('--c','var(--'+f+')');
  el.innerHTML='<header><h2>'+T[f][0]+'</h2><span class="sd">'+T[f][1]+'</span><span class="st"></span></header><canvas></canvas>';
@@ -166,10 +166,10 @@ function draw(P,pv){
  c.setTransform(P.dpr,0,0,P.dpr,0,0);c.clearRect(0,0,W,P.H);
  const a=par(f),b=f==='A'?1:f==='B'?Math.pow(S.w/20,2):0;
  c.font='11px Inter,sans-serif';c.fillStyle=c.strokeStyle='#8fa6bb';c.lineWidth=1;
- arrow(c,X(2),X(16),14);c.textAlign='left';c.fillText('dòng',X(17.5),18);
- arrow(c,X(98),X(84),14);c.textAlign='right';c.fillText('lan lửa',X(82.5),18);
+ arrow(c,X(2),X(16),14);c.textAlign='left';c.fillText('flow',X(17.5),18);
+ arrow(c,X(98),X(84),14);c.textAlign='right';c.fillText('spread',X(82.5),18);
  if(f==='B'){const yc=t0-S.w*s-6;c.fillStyle='rgba(150,215,240,.22)';c.fillRect(X(-3),yc,106*s,6);c.strokeStyle='rgba(170,225,245,.65)';c.strokeRect(X(-3),yc,106*s,6);
-  c.fillStyle='#8fa6bb';c.textAlign='left';c.fillText('khe '+S.w+' mm',X(103.5),yc+6)}
+  c.fillStyle='#8fa6bb';c.textAlign='left';c.fillText('gap '+S.w+' mm',X(103.5),yc+6)}
  for(let i=0;i<N;i++){const d=P.dep[i];if(d>=10)continue;const y=t0+d*s;
   c.fillStyle='#e6dabb';c.fillRect(X(i/2)-.5,y,.5*s+1,bot-y);
   if(P.tp[i]){c.fillStyle='#7d6c46';c.fillRect(X(i/2)-.5,y,.5*s+1,2)}}
@@ -180,7 +180,7 @@ function draw(P,pv){
  const I=pv?(P.V>0?1:0):P.I;
  {const sy=H+10,sh=30,zs=sh/50,tt=performance.now()/1000,k0=f==='A'?0:cl(1-(P.ue-a.q)*Math.sqrt(S.P*S.o2/100/21.27)/6,0,1);c.fillStyle='#2b3342';c.fillRect(X(0),sy,100*s,sh);c.fillStyle='#e6dabb';c.fillRect(X(0),sy,P.xf*s,sh);
   for(let z=-25;z<25;z++){const v=(1-sm((Math.abs(z)-16)/11))*(1-k0+k0*sm((Math.sin(z*.35+tt*.2)*Math.sin(z*.17-tt*.13+1)+.3)/.5))*I;if(v>.03){c.fillStyle='rgba(90,170,255,'+Math.min(.95,v)+')';c.fillRect(X(P.xf)-.5*s,sy+(z+25)*zs,6*s,zs+.5)}}
-  c.fillStyle='#8fa6bb';c.textAlign='left';c.fillText('từ trên',X(101),sy+sh/2+3)}
+  c.fillStyle='#8fa6bb';c.textAlign='left';c.fillText('top view',X(101),sy+sh/2+3)}
  if(I>.02){
   const sf=f==='A'?1:.45+.55*cl((P.ue-a.q)/6),o=Math.pow(S.o2/21,.4),u=Math.sqrt(P.ue/10),e=I*sf*o;
   const ys=t0+Math.min(9,P.dep[Math.min(200,Math.round(P.xf*2)+6)])*s,st=1.1*Math.sqrt(20/Math.max(P.ue,3))+1.6*b;
@@ -198,9 +198,9 @@ function draw(P,pv){
    c.fillStyle='rgba(255,140,30,'+.75*k+')';c.beginPath();c.ellipse(fx,yb-Hp/2,3+4*k,Math.max(1,Hp/2),0,0,6.29);c.fill()})}}}
 
 const clk=t=>{t=Math.floor(t);const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60,p=n=>String(n).padStart(2,'0');return(h?h+':':'')+p(m)+':'+p(s)};
-function ui(){PN.forEach(P=>{const k=P.s==='out'?'Lửa đã tắt':P.s==='done'?'Hết mẫu':P.reg?'Cháy hồi quy':'Lan lửa thường';
- P.st.textContent=k+' · V = '+fm(P.V)+' mm/s · đã cháy '+fm(100-P.xf,1)+' mm'});
- $('clk').textContent='Giờ thực '+clk(gT)+' · tua ×'+S.spd}
+function ui(){PN.forEach(P=>{const k=P.s==='out'?'Extinguished':P.s==='done'?'Burnout':P.reg?'Regression burning':'Steady spread';
+ P.st.textContent=k+' · V = '+fm(P.V)+' mm/s · burned '+fm(100-P.xf,1)+' mm'});
+ $('clk').textContent='Sim Time '+clk(gT)+' · ×'+S.spd}
 
 let CW=300,CH=280,cdpr=1;const ch=$('ch');
 function chart(){
@@ -211,20 +211,20 @@ function chart(){
  ['A','B','C'].forEach(f=>cur[f]=us.map(u=>{const x=sp(f,u).V;mx=Math.max(mx,x);return x}));
  const stp=mx<=.12?.02:mx<=.3?.05:.1,ym=Math.ceil(mx*1.08/stp)*stp,xs=u=>L+u/90*pw,ys=y=>T0+ph*(1-y/ym);
  c.fillStyle=v('--reg');c.fillRect(xs(30),T0,xs(90)-xs(30),ph);
- c.font='11px Inter,sans-serif';c.fillStyle=mut;c.textAlign='center';c.fillText('cháy hồi quy / thổi tắt (assumed)',xs(58),T0+12);
+ c.font='11px Inter,sans-serif';c.fillStyle=mut;c.textAlign='center';c.fillText('Blowoff / extinction limit (assumed)',xs(58),T0+12);
  c.strokeStyle=line;c.lineWidth=1;c.fillStyle=mut;c.textAlign='right';
  for(let y=0;y<=ym+1e-9;y+=stp){c.beginPath();c.moveTo(L,ys(y));c.lineTo(W-R,ys(y));c.stroke();c.fillText(fm(y,2),L-6,ys(y)+4)}
  c.textAlign='center';for(let u=0;u<=90;u+=10)c.fillText(u,xs(u),T0+ph+15);
- c.fillText('dòng (cm/s)',L+pw/2,H-6);c.save();c.translate(12,T0+ph/2);c.rotate(-Math.PI/2);c.fillText('tốc độ lan (mm/s)',0,0);c.restore();
+ c.fillText('Flow Velocity (cm/s)',L+pw/2,H-6);c.save();c.translate(12,T0+ph/2);c.rotate(-Math.PI/2);c.fillText('Spread Rate (mm/s)',0,0);c.restore();
  c.setLineDash([4,3]);c.strokeStyle=mut;c.strokeRect(xs(8),ys(.07),xs(58)-xs(8),ys(.02)-ys(.07));c.setLineDash([]);
- c.textAlign='left';c.fillStyle=mut;c.fillText('mốc MSU (mặt đất)',xs(8)+4,ys(.07)-4);
+ c.textAlign='left';c.fillStyle=mut;c.fillText('MSU Ground Baseline',xs(8)+4,ys(.07)-4);
  if(sweeping||sweepDone){const lim=sweeping?sweepU:90;
   ['A','B','C'].forEach(f=>{c.strokeStyle=col[f];c.lineWidth=2.2;us.forEach((u,i)=>{if(!i||u>lim)return;c.setLineDash(f!=='B'||u<8||u>58?[4,3]:[]);c.beginPath();c.moveTo(xs(u-1),ys(cur[f][i-1]));c.lineTo(xs(u),ys(cur[f][i]));c.stroke()});c.setLineDash([])})}
- else{c.fillStyle=mut;c.textAlign='center';c.fillText('Bấm “Quét dòng” để vẽ đường cong',L+pw/2,T0+ph*.45)}
+ else{c.fillStyle=mut;c.textAlign='center';c.fillText('Click "Sweep Flow" to render curves',L+pw/2,T0+ph*.45)}
  c.setLineDash([2,3]);c.strokeStyle=ink;c.lineWidth=1;c.beginPath();c.moveTo(xs(S.u),T0);c.lineTo(xs(S.u),T0+ph);c.stroke();c.setLineDash([]);
  ['A','B','C'].forEach(f=>{const r=sp(f,S.u);c.fillStyle=col[f];c.strokeStyle=ink;c.beginPath();c.arc(xs(S.u),ys(r.V),4.5,0,6.29);c.fill();c.stroke()});
  const qb=par('B').q,qc=par('C').q;
- $('cap').textContent='O₂ '+S.o2+'%, khe '+S.w+' mm, P '+Math.round(S.P)+' kPa. Giới hạn dòng làm tắt (assumed): B ≈ '+fm(qb,1)+' cm/s, C ≈ '+fm(qc,1)+' cm/s; A không tắt vì còn dòng do lực nổi. Nét liền: bám mốc MSU (khung B, 8–58 cm/s); nét đứt: assumed.'}
+ $('cap').textContent='O₂ '+S.o2+'%, Gap '+S.w+' mm, P '+Math.round(S.P)+' kPa. Extinction limits (assumed): B ≈ '+fm(qb,1)+' cm/s, C ≈ '+fm(qc,1)+' cm/s; A sustains due to buoyant draft. Solid curve: MSU baseline (8–58 cm/s); dashed: assumed.'}
 
 function resize(){PN.forEach(P=>{const W=P.cv.clientWidth||300,s=W*.008,H=Math.max(214,Math.round(.256*W+94)),d=window.devicePixelRatio||1;
   P.W=W;P.H=H;P.dpr=d;P.cv.width=W*d;P.cv.height=H*d;P.cv.style.height=H+'px'});
@@ -237,7 +237,7 @@ function setP(){if(S.auto)S.P=cl(101.3*21/S.o2,20,110)}
 ['o2','u','w','p'].forEach(k=>$(k).oninput=e=>{const x=+e.target.value;if(k==='p')S.P=x;else S[k]=x;if(k==='o2')setP();sync();dirty=1});
 $('pa').onchange=e=>{S.auto=e.target.checked;setP();sync();dirty=1};
 $('sp').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.spd=+b.dataset.s;[...$('sp').children].forEach(x=>x.classList.toggle('on',x===b))};
-$('pz').onclick=()=>{S.paused=!S.paused;$('pz').textContent=S.paused?'Chạy tiếp':'Tạm dừng'};
+$('pz').onclick=()=>{S.paused=!S.paused;$('pz').textContent=S.paused?'Resume':'Pause'};
 $('rs').onclick=()=>{PN.forEach(init);gT=0};
 $('sw').onclick=()=>{if(sweeping)return;sweeping=true;sweepDone=false;sweepU=0;const keep=S.u;$('u').disabled=true;
  const id=setInterval(()=>{S.u=sweepU;sync();dirty=1;if(sweepU>=60){clearInterval(id);sweeping=false;sweepDone=true;S.u=keep;$('u').disabled=false;sync();dirty=1}else sweepU++},90)};
