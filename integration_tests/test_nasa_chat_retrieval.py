@@ -29,7 +29,7 @@ def passages():
 
 
 def test_flex_conflicts_preserve_both_original_sources(passages):
-    hits = select_passages("FLEX-007 D0 đường kính mâu thuẫn?", passages)
+    hits = select_passages("FLEX-007 D0 diameter contradiction?", passages)
     assert len({h.passage.source_document_id for h in hits}) >= 2
     assert "1.87" in " ".join(h.excerpt for h in hits)
     assert "1.82" in " ".join(h.excerpt for h in hits)
@@ -38,22 +38,22 @@ def test_flex_conflicts_preserve_both_original_sources(passages):
 
 
 def test_followup_keeps_original_run_anchor(passages):
-    hits = select_passages("còn áp suất thì sao?", passages, history=("FLEX-007 D0?",))
+    hits = select_passages("what about the pressure?", passages, history=("FLEX-007 D0?",))
     assert hits and all("FLEX-007" in h.passage.text for h in hits)
 
 
 @pytest.mark.parametrize(
     "question",
     [
-        "Dữ liệu cháy ở trọng lực Sao Hỏa 0.38g?",
-        "Có thí nghiệm cháy ở 0,16 g không?",
+        "Combustion data at Mars gravity 0.38g?",
+        "Are there combustion experiments at 0.16 g?",
         "Are there fire measurements on Mars?",
         "Combustion at 0.38 g?",
         "Combustion at 0.380 g?",
         "Are there droplet experiments under lunar gravity?",
         "What combustion data do we have for Mars?",
         "What sample mass was measured at 0.38 g gravity?",
-        "Khối lượng mẫu thử ở trọng lực 0,38 g là bao nhiêu?",
+        "What is the test sample mass at 0.38 g gravity?",
     ],
 )
 async def test_planetary_conditions_do_not_return_unrelated_microgravity_rows(passages, question):
@@ -68,8 +68,8 @@ async def test_planetary_conditions_do_not_return_unrelated_microgravity_rows(pa
         )
     )
     assert answer.state == "abstained" and not answer.citations
-    assert "bộ dữ liệu đang kết nối" in answer.text
-    assert "Sao Hỏa" in answer.text
+    assert "connected dataset" in answer.text
+    assert "Mars" in answer.text
 
 
 def test_general_microgravity_and_future_applications_still_retrieve(passages):
@@ -82,7 +82,7 @@ def test_general_microgravity_and_future_applications_still_retrieve(passages):
 
 
 async def test_d0_conflict_is_visible_before_excerpts(passages):
-    question = "FLEX-007 đường kính D0 có mâu thuẫn 1.87 và 1.82 không?"
+    question = "Does FLEX-007 D0 diameter have a conflict between 1.87 and 1.82?"
     hits = select_passages(question, passages)
     request = RagRequest(
         question=question,
@@ -113,7 +113,7 @@ async def test_d0_conflict_is_visible_before_excerpts(passages):
 @pytest.mark.parametrize(
     "question",
     [
-        "Giá bitcoin hôm nay?",
+        "What is the bitcoin price today?",
         "Is PMMA safe in a NASA habitat at 34% oxygen?",
         "NASA rocket propulsion engine performance?",
     ],
@@ -123,7 +123,7 @@ def test_out_of_corpus_or_safety_verdict_abstains(passages, question):
 
 
 def test_bass_fan_units_are_not_fabricated_airflow(passages):
-    hits = select_passages("BASS-II fan display và air display có giới hạn gì?", passages)
+    hits = select_passages("What are the limits for BASS-II fan display and air display?", passages)
     text = " ".join(h.excerpt for h in hits).lower()
     assert "voltage" in text and "1 min" in text
     assert {h.passage.slug for h in hits} == {"bass-ii"}

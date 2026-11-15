@@ -7,10 +7,10 @@ const host = $('scene');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const smallScreen = window.matchMedia('(max-width: 899px)');
 const palettes = {
-  blue: { name: 'Xanh lam', core: '#829eff', mid: '#153eff', edge: '#0616bc', base: '#163aff' },
-  amber: { name: 'Hổ phách', core: '#fff2cb', mid: '#ffae32', edge: '#c82d04', base: '#243cff' },
-  rose: { name: 'Hồng', core: '#ffe7f3', mid: '#ff6797', edge: '#af0b49' },
-  mint: { name: 'Ngọc', core: '#defff3', mid: '#5ce1b8', edge: '#08766f' },
+  blue: { name: 'Blue', core: '#829eff', mid: '#153eff', edge: '#0616bc', base: '#163aff' },
+  amber: { name: 'Amber', core: '#fff2cb', mid: '#ffae32', edge: '#c82d04', base: '#243cff' },
+  rose: { name: 'Rose', core: '#ffe7f3', mid: '#ff6797', edge: '#af0b49' },
+  mint: { name: 'Mint', core: '#defff3', mid: '#5ce1b8', edge: '#08766f' },
 };
 let renderer, controls, timer, observer, scene, camera, volume;
 let initialized = false, failed = false, paused = reducedMotion.matches;
@@ -28,7 +28,7 @@ function on(element, event, callback, options) {
 function setPaused(value) {
   paused = value;
   $('pause').setAttribute('aria-pressed', String(paused));
-  $('pause-label').textContent = paused ? 'Tiếp tục' : 'Tạm dừng';
+  $('pause-label').textContent = paused ? 'Resume' : 'Pause';
   $('pause-icon').textContent = paused ? '▷' : 'Ⅱ';
   dirty = true;
 }
@@ -42,8 +42,8 @@ function selectShape(value) {
       (value === 1 && button.dataset.shape === 'sphere');
     button.setAttribute('aria-pressed', String(selected));
   });
-  $('shape-caption').textContent = value === 1 ? 'Vòm lửa nến · tham chiếu vi trọng lực' :
-    value === 0 ? 'Lửa nến thuôn dài · tham chiếu 1g' : `Dáng tùy chỉnh · ${Math.round(value*100)}% biến hình`;
+  $('shape-caption').textContent = value === 1 ? 'Candle flame dome · microgravity reference' :
+    value === 0 ? 'Elongated candle flame · 1g reference' : `Custom shape · ${Math.round(value*100)}% morph`;
   dirty = true;
 }
 function applyPalette(palette, key = null) {
@@ -67,7 +67,7 @@ function setQuality(mode) {
     renderer.setPixelRatio(pixelRatio);
     volume.material.uniforms.uSteps.value = steps;
     resize();
-    $('render-status').textContent = mode === 'high' ? 'Chi tiết cao' : mode === 'low' ? 'Chế độ nhẹ' : 'Chất lượng tự động';
+    $('render-status').textContent = mode === 'high' ? 'High detail' : mode === 'low' ? 'Performance mode' : 'Auto quality';
   }
 }
 function resize() {
@@ -100,7 +100,7 @@ function initialize() {
     renderer.setClearColor(0x000000);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.1;
-    renderer.debug.onShaderError = () => fail('Trình duyệt không biên dịch được hiệu ứng lửa. Hãy thử tải lại hoặc dùng Edge/Chrome mới hơn.');
+    renderer.debug.onShaderError = () => fail('Browser could not compile flame shaders. Try refreshing or use a modern Chrome/Edge.');
     host.appendChild(renderer.domElement);
     renderer.domElement.setAttribute('aria-hidden','true');
     scene = new THREE.Scene();
@@ -144,7 +144,7 @@ function initialize() {
     observer = new ResizeObserver(resize); observer.observe(host);
     on(renderer.domElement,'webglcontextlost',(event) => {
       event.preventDefault();
-      fail('Phiên dựng 3D bị gián đoạn. Bấm “Thử tải lại” để khởi động lại.');
+      fail('3D rendering context was lost. Click “Retry” to restart.');
     });
     on(host,'keydown',(event) => {
       if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','=','-','Home'].includes(event.key)) return;
@@ -172,7 +172,7 @@ function initialize() {
     renderer.render(scene,camera);
   } catch(error) {
     console.error('Flame studio:',error);
-    fail('Thiết bị chưa bật WebGL 2. Hãy bật tăng tốc phần cứng hoặc mở bằng Edge/Chrome mới hơn.');
+    fail('Device does not have WebGL 2 enabled. Please enable hardware acceleration or open in a modern Chrome/Edge.');
   }
 }
 function tick() {
@@ -197,7 +197,7 @@ function tick() {
     if(slowFrames>35 && pixelRatio>.85) {
       pixelRatio=Math.max(.85,pixelRatio-.2); steps=Math.max(48,steps-16);
       renderer.setPixelRatio(pixelRatio); volume.material.uniforms.uSteps.value=steps; resize(); slowFrames=0;
-      $('render-status').textContent='Tự động · giảm tải GPU';
+      $('render-status').textContent='Auto · reduced GPU load';
     }
   }
 }
@@ -206,7 +206,7 @@ function fail(message) {
   renderer?.setAnimationLoop(null);
   $('loading').hidden=true; $('fallback').hidden=false;
   $('fallback-reason').textContent=message;
-  $('render-status').textContent='Xem ảnh minh họa';
+  $('render-status').textContent='Viewing fallback image';
   document.querySelectorAll('#controls input,#controls select,#controls .shape-preset,#controls .color-swatch').forEach(el => {el.disabled=true;});
   ['capture','reset-camera','pause'].forEach(id => {$(id).disabled=true;});
 }
@@ -251,7 +251,7 @@ on($('morph'),'input',event=>selectShape(Number(event.target.value)/100));
 document.querySelectorAll('.color-swatch').forEach(button=>on(button,'click',()=>applyPalette(palettes[button.dataset.palette],button.dataset.palette)));
 on($('custom-color'),'input',event=>{
   const mid=new THREE.Color(event.target.value);
-  applyPalette({name:'Tùy chọn',mid:event.target.value,core:`#${mid.clone().lerp(new THREE.Color('white'),.8).getHexString()}`,edge:`#${mid.clone().multiplyScalar(.28).getHexString()}`});
+  applyPalette({name:'Custom',mid:event.target.value,core:`#${mid.clone().lerp(new THREE.Color('white'),.8).getHexString()}`,edge:`#${mid.clone().multiplyScalar(.28).getHexString()}`});
 });
 on($('turbulence'),'input',event=>{
   $('turbulence-value').value=`${event.target.value}%`;
@@ -260,7 +260,7 @@ on($('turbulence'),'input',event=>{
 });
 on($('intensity'),'input',event=>{
   const value=Number(event.target.value)/100;
-  $('intensity-value').value=`${value.toLocaleString('vi-VN',{minimumFractionDigits:2})}×`;
+  $('intensity-value').value=`${value.toLocaleString('en-US',{minimumFractionDigits:2})}×`;
   if(volume)volume.material.uniforms.uIntensity.value=value;
   dirty=true;
 });
@@ -277,8 +277,8 @@ on($('capture'),'click',()=>{
     const link=document.createElement('a');
     link.download=`flame-${Math.round(shapeTarget*100)}-${Date.now()}.png`;
     link.href=renderer.domElement.toDataURL('image/png'); link.click();
-    announce('Đã lưu ảnh PNG của góc nhìn hiện tại.');
-  } catch(error) {console.error(error); announce('Chưa lưu được ảnh. Hãy thử lại.');}
+    announce('Saved PNG snapshot of current view.');
+  } catch(error) {console.error(error); announce('Failed to save image. Please try again.');}
 });
 on(window,'pagehide',(event)=>{
   if(event.persisted)return;

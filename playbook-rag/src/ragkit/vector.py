@@ -1,8 +1,8 @@
-"""Chỉ mục vector tùy chọn.
+"""Optional vector index.
 
-HashIndex: embedding băm n-gram ký tự (không cần mô hình, không cần mạng). Nó bắt được
-sự giống nhau về chính tả/từ gốc, KHÔNG phải ngữ nghĩa thật. Muốn ngữ nghĩa thật thì dùng
-STIndex (sentence-transformers) bằng RAG_EMBEDDER=st:<tên-mô-hình>.
+HashIndex: character n-gram hashed embedding (no model, no network required). It captures
+orthographic/stem similarity, NOT true semantics. For true semantics, use
+STIndex (sentence-transformers) via RAG_EMBEDDER=st:<model-name>.
 """
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ class HashIndex:
         return sorted(out, key=lambda x: -x[1])[:k]
 
 
-class STIndex:  # tùy chọn: pip install sentence-transformers
+class STIndex:  # optional: pip install sentence-transformers
     def __init__(self, texts: list[str], model: str):
         from sentence_transformers import SentenceTransformer  # type: ignore
 

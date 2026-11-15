@@ -1,7 +1,7 @@
-"""Đo riêng lớp truy xuất (Recall@5, MRR) và hành vi từ chối. Chạy offline, không cần LLM.
+"""Evaluate the retrieval layer (Recall@5, MRR) and refusal behavior separately. Runs offline, no LLM required.
 
-Chú ý: đáp án vàng ở đây lấy từ chính playbook, nên nó kiểm tra pipeline, KHÔNG kiểm tra
-độ đúng của sự thật khoa học về NASA.
+Note: the gold answers here are taken from the playbook itself, so it tests the pipeline, NOT the
+scientific factual correctness regarding NASA.
 """
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ def main(argv: list[str] | None = None) -> int:
     for r in res["rows"]:
         print(("PASS" if r["ok"] else "FAIL"), r["kind"].ljust(9), r["q"][:70],
               f"(rank {r['rank']})" if r["kind"] == "retrieval" else f"({r['reason']})")
-    print(f"\nRecall@5 {res['recall@5']}  MRR {res['mrr']}  Từ chối đúng {res['refusal_accuracy']}")
+    print(f"\nRecall@5 {res['recall@5']}  MRR {res['mrr']}  Refusal accuracy {res['refusal_accuracy']}")
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(res, f, ensure_ascii=False, indent=1)
     return 0 if res["recall@5"] >= a.min_recall and res["refusal_accuracy"] >= a.min_refusal else 1

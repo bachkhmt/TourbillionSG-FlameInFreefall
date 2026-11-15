@@ -79,7 +79,7 @@ def main() -> None:
         assert changed(drop, export("flame-morph.png"))
         page.locator("#custom-color").evaluate("el=>{el.value='#00ff44';el.dispatchEvent(new Event('input',{bubbles:true}));}")
         custom = export("flame-custom.png")
-        expect(page.locator("#palette-name")).to_have_text("Tùy chọn")
+        expect(page.locator("#palette-name")).to_have_text("Custom")
         assert changed(drop, custom)
         page.locator("#scene").focus()
         # Yawing an axisymmetric candle barely changes its silhouette; tilt to verify the 3D view.
@@ -88,7 +88,7 @@ def main() -> None:
         page.wait_for_timeout(500)
         assert changed(custom, export("flame-orbit.png")), "Keyboard orbit does not change the view"
         page.locator("#quality").select_option("low")
-        expect(page.locator("#render-status")).to_have_text("Chế độ nhẹ")
+        expect(page.locator("#render-status")).to_have_text("Performance mode")
         page.locator('[data-shape="drop"]').click()
         page.locator('[data-palette="amber"]').click()
         page.locator("#turbulence").focus()

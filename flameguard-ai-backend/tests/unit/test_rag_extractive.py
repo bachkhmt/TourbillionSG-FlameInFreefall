@@ -58,7 +58,7 @@ def request(question, citations):
 
 async def test_conflicting_values_keep_both_sources_verbatim():
     provider = ExtractiveProvider()
-    question = "FLEX-007 D0 đường kính mâu thuẫn?"
+    question = "FLEX-007 D0 conflicting diameter?"
     citations = provider.retrieve(question, PASSAGES, (), SLUGS)
     by_source = {p.source_document_id: p for p in PASSAGES}
     assert {c.source_document_id for c in citations} == {CSV, SHEET}
@@ -79,7 +79,7 @@ async def test_safety_verdicts_and_planetary_gravity_are_refused():
     provider = ExtractiveProvider()
     for question in (
         "Is PMMA safe at 30% oxygen?",
-        "Dữ liệu cháy ở trọng lực Sao Hỏa 0.38g?",
+        "Combustion data in Mars gravity 0.38g?",
     ):
         assert provider.retrieve(question, PASSAGES, (), SLUGS) == ()
         answer = await provider.answer(request(question, ()))
@@ -88,7 +88,7 @@ async def test_safety_verdicts_and_planetary_gravity_are_refused():
 
 def test_follow_up_reuses_the_previous_study_anchor():
     citations = ExtractiveProvider().retrieve(
-        "còn đường kính của nó?", PASSAGES, ("FLEX-007 D0?",), SLUGS
+        "what about its diameter?", PASSAGES, ("FLEX-007 D0?",), SLUGS
     )
     assert citations
     assert {c.source_document_id for c in citations} <= {CSV, SHEET}

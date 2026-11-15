@@ -29,9 +29,9 @@ def flex_diameter_comparison(question, citations):
         if not re.match(rf"{run_id}(?=\s|$)", fold(excerpt)):
             continue
         if re.fullmatch(r"CSV row \d+", citation.source_locator):
-            label, match = "Bảng CSV", TABLE_D0.search(excerpt)
+            label, match = "CSV table", TABLE_D0.search(excerpt)
         elif citation.source_locator == "TEST CONDITIONS / D0 / kavg":
-            label, match = "Phiếu thí nghiệm", SHEET_D0.search(excerpt)
+            label, match = "Test sheet", SHEET_D0.search(excerpt)
         else:
             continue
         if match:
@@ -39,12 +39,12 @@ def flex_diameter_comparison(question, citations):
     if len({Decimal(value) for _, _, value in values.values()}) < 2:
         return None
     lines = "\n".join(
-        f"• {label} ghi {value} mm [{index}]." for index, label, value in values.values()
+        f"• {label} records {value} mm [{index}]." for index, label, value in values.values()
     )
     return (
-        f"Hai nguồn ghi đường kính ban đầu (D0) của {run_id.upper()} khác nhau.\n"
+        f"Two sources record different initial diameters (D0) for {run_id.upper()}.\n"
         f"{lines}\n"
-        "Giữ cả hai giá trị theo từng nguồn. Mở trích đoạn để xem các điều kiện thử đi kèm."
+        "Keep both values per source. Open excerpts to view accompanying test conditions."
     )
 
 
@@ -77,16 +77,16 @@ class ExtractiveProvider:
             reason
             or flex_diameter_comparison(request.question, citations)
             or (
-                "Tìm thấy các trích đoạn nguồn sau. Giữ nguyên đơn vị "
-                "và các giá trị khác nhau theo từng nguồn:\n\n"
+                "Found the following source excerpts. Keep original units "
+                "and different values per source:\n\n"
                 + "\n\n".join(
                     f"[{index}] {citation.source_excerpt}"
                     for index, citation in enumerate(citations, 1)
                 )
                 if citations
                 else (
-                    "Không tìm thấy bằng chứng phù hợp trong corpus hiện tại. "
-                    "Hãy nêu tên thí nghiệm, mã run hoặc thông số cụ thể."
+                    "No matching evidence found in the current corpus. "
+                    "Please specify the experiment name, run code, or specific parameter."
                 )
             )
         )

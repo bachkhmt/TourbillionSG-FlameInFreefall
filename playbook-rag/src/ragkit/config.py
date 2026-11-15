@@ -14,8 +14,8 @@ class Settings:
     corpus_dir: Path = ROOT / "data" / "corpus"
     top_k: int = 6
     timeout_s: float = 15.0
-    rate_limit: int = 20  # số request / phút / IP
-    embedder: str = "hash"  # "hash" | "st:<model>" | "" (tắt vector)
+    rate_limit: int = 20  # requests / min / IP
+    embedder: str = "hash"  # "hash" | "st:<model>" | "" (disable vector)
     llm_model: str = "claude-sonnet-5-5"
 
     @classmethod

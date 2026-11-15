@@ -8,7 +8,7 @@ from ragkit.cache import RateLimiter
 def test_api_contract(pipe):
     c = TestClient(create_app(pipe, RateLimiter(100)))
     assert c.get("/api/health").json()["ok"]
-    r = c.post("/api/ask", json={"question": "FLEX dập lửa bằng cách nào?", "mode": "student"})
+    r = c.post("/api/ask", json={"question": "How does FLEX extinguish fire?", "mode": "student"})
     d = r.json()
     assert r.status_code == 200 and set(d) == {"answer", "chunks", "meta"}
     assert set(d["answer"]) == {"segments", "coverage", "missing"}
@@ -17,8 +17,8 @@ def test_api_contract(pipe):
 def test_api_validation_and_rate_limit(pipe):
     c = TestClient(create_app(pipe, RateLimiter(1)))
     assert c.post("/api/ask", json={"question": "x"}).status_code == 422
-    assert c.post("/api/ask", json={"question": "RRF là gì?"}).status_code == 200
-    assert c.post("/api/ask", json={"question": "RRF là gì?"}).status_code == 429
+    assert c.post("/api/ask", json={"question": "What is RRF?"}).status_code == 200
+    assert c.post("/api/ask", json={"question": "What is RRF?"}).status_code == 429
 
 
 def test_local_source_can_be_opened_without_exposing_other_files(pipe):

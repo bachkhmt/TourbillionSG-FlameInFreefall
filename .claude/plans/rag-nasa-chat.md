@@ -1,87 +1,87 @@
-# RAG NASA chat end-to-end (port từ /Users/mac/Projects/NASA)
+# RAG NASA chat end-to-end (port from /Users/mac/Projects/NASA)
 
-Tier: T3 (DB roles/writer, concurrency/advisory lock, độ chính xác citation).
-Branch: `feat/rag-nasa-chat` từ `main@5b6c720`. Mỗi bước một commit; cuối cùng push + PR.
+Tier: T3 (DB roles/writer, concurrency/advisory lock, citation accuracy).
+Branch: `feat/rag-nasa-chat` from `main@5b6c720`. One commit per step; finally push + PR.
 
-## Quyết định đã chốt với user (2026-11-14)
-- Phạm vi: RAG end-to-end (data adapter → chat extension → tests → FE AI Drawer → docs).
-- Generation: extractive, không LLM (`nasa-extractive-v2`), không provider trả phí.
-- Push: branch riêng + PR vào main.
-- DB test: container Postgres 17 mới, riêng cho repo này, cổng 127.0.0.1:55435.
+## Decisions finalized with user (2026-11-14)
+- Scope: End-to-end RAG (data adapter → chat extension → tests → FE AI Drawer → docs).
+- Generation: extractive, no LLM (`nasa-extractive-v2`), no paid provider.
+- Push: separate branch + PR into main.
+- Test DB: new Postgres 17 container, dedicated to this repo, port 127.0.0.1:55435.
 
-## Nguyên tắc kiến trúc mang sang
-1. **BE giữ nguyên.** `flameguard-ai-backend/` không bị sửa. Mở rộng nằm ngoài BE,
-   ở `integrations/`, và nối vào qua app factory + `dependency_overrides`
-   (`integrations/nasa_chat/app.py:create_app`). Không monkeypatch validator upstream.
-2. **Data adapter offline** (`integrations/nasa_data/`): build release từ file NASA
-   đã lưu trong repo, xuất snapshot 21 bảng + slugs + registry. Không gọi network,
-   không ghi DB.
-3. **Policy nguồn**: chỉ chunk từ nguồn CC0-1.0, có hash và registry pin theo
-   sourceRevision. Fingerprint corpus = scientific snapshot + policy + registry hash.
-4. **Extractive provider**: chỉ trích nguyên văn chunk (≤4 citations), từ chối theo
-   quy tắc (safe/unsafe, ngoài phạm vi, trọng lực Mặt Trăng/Sao Hỏa, trộn nhiều run).
-   Service kiểm lại câu trả lời của provider bằng chính ExtractiveProvider.
-5. **Lưu trữ atomic**: advisory lock theo session từ lúc đọc history đến commit,
-   `lock_timeout` 5s, kiểm drift corpus trước khi INSERT, rollback nếu lỗi.
-6. **FE không fallback giả lập**: AI Drawer gọi API thật; readiness `not_ready` thì
-   khóa Send + Retry. Bỏ `ragKnowledgeEngine` khỏi runtime.
+## Architecture principles brought over
+1. **BE remains unchanged.** `flameguard-ai-backend/` is not modified. Extensions live outside BE,
+   in `integrations/`, and connect via app factory + `dependency_overrides`
+   (`integrations/nasa_chat/app.py:create_app`). No monkeypatching upstream validators.
+2. **Offline data adapter** (`integrations/nasa_data/`): builds releases from NASA files
+   already saved in the repo, exports snapshots of 21 tables + slugs + registry. No network calls,
+   no DB writes.
+3. **Source policy**: only chunks from CC0-1.0 sources, with hash and registry pinned to
+   sourceRevision. Corpus fingerprint = scientific snapshot + policy + registry hash.
+4. **Extractive provider**: only quotes verbatim chunks (≤4 citations), rejects by
+   rules (safe/unsafe, out of scope, Moon/Mars gravity, mixing multiple runs).
+   Service verifies provider's answer using ExtractiveProvider itself.
+5. **Atomic storage**: per-session advisory lock from history read until commit,
+   `lock_timeout` 5s, checks corpus drift before INSERT, rollback on error.
+6. **No simulated FE fallback**: AI Drawer calls the real API; if readiness is `not_ready`,
+   lock Send + Retry. Remove `ragKnowledgeEngine` from runtime.
 
-## Các bước và tiêu chí chấp nhận
-S1. Scaffolding monorepo: root `.gitignore` (.demo/, .venv/…), root `pytest.ini`
+## Steps and acceptance criteria
+S1. Monorepo scaffolding: root `.gitignore` (.demo/, .venv/…), root `pytest.ini`
     (testpaths integration_tests, pythonpath `. flameguard-ai-backend`), root `AGENTS.md`.
-    AC: `pytest --collect-only` ở root thu được test của integration_tests.
+    AC: `pytest --collect-only` at root collects integration_tests.
 S2. `integrations/nasa_data/` (challenge, pilot, export, resources, research data).
-    AC: test export: revision `91e41126…`, 21 bảng, 18 investigations, 910 runs,
-    51 sources, 1045 chunks, origin real, 0 reviewed, artifacts đúng sha256.
-S3. `integrations/nasa_chat/` + `integration_tests/` (retrieval 14 tests không DB;
-    HTTP 9 tests cần DB; `chat_target.py` chỉ chấp nhận 127.0.0.1:55435).
-    AC: retrieval tests pass (FLEX-007 giữ cả 1.87 và 1.82 mm; follow-up giữ anchor;
-    từ chối safe/unsafe, Mars/Moon; excerpt là slice nguyên văn của chunk).
-S4. Container test `tourbillion-test-pg` (postgres:17, 127.0.0.1:55435, mật khẩu ngẫu
-    nhiên lưu trong `.demo/test-db-settings.json` mode 0600, không commit).
-    AC: BE suite đầy đủ pass với TEST_DATABASE_URL (0 skip phần PG);
-    9 HTTP chat tests pass: answer/history/source binding, citation giả bị 502,
-    đổi registry → 409/rollback, 2 tin gửi đồng thời theo thứ tự, writer giới hạn
-    quyền, timeout, hết hạn phiên 404.
+    AC: test export: revision `91e41126…`, 21 tables, 18 investigations, 910 runs,
+    51 sources, 1045 chunks, origin real, 0 reviewed, artifacts match sha256.
+S3. `integrations/nasa_chat/` + `integration_tests/` (retrieval 14 tests without DB;
+    HTTP 9 tests requiring DB; `chat_target.py` only accepts 127.0.0.1:55435).
+    AC: retrieval tests pass (FLEX-007 preserves both 1.87 and 1.82 mm; follow-up keeps anchor;
+    rejects safe/unsafe, Mars/Moon; excerpt is a verbatim slice of chunk).
+S4. Test container `tourbillion-test-pg` (postgres:17, 127.0.0.1:55435, random password
+    stored in `.demo/test-db-settings.json` mode 0600, not committed).
+    AC: full BE suite passes with TEST_DATABASE_URL (0 skip for PG portion);
+    9 HTTP chat tests pass: answer/history/source binding, fake citation gets 502,
+    registry change → 409/rollback, 2 messages sent concurrently in order, writer role
+    permissions restricted, timeout, session expiration 404.
 S5. FE: `src/api/dto/chat.ts`, `src/api/services/chatService.ts`,
-    `src/hooks/api/useChatQueries.ts`, session token trong sessionStorage,
-    AiDrawer/AiMessageItem/CitationBadge dùng API; bỏ import ragKnowledgeEngine.
-    AC: vitest pass (test mới mock API: readiness not_ready khóa Send; gửi tạo session
-    rồi hiện answer + citation; 404 session → xóa token; View source gọi
-    `/chat/sources/{id}` với corpus_version, 409 hiện thông báo bản cũ);
-    `tsc --noEmit` và `next build` pass.
-S6. `scripts/prepare_chat_preview.py` (tạo target preview mới trên 55435) +
-    chạy BE factory cổng 8111, FE cổng 3311 qua proxy; smoke trên trình duyệt.
-    AC: hỏi "FLEX-007 D0" thấy 1.87/1.82 mm có citation, reload thấy history.
-S7. Docs: `docs/CHATBOT_FLOW.md`, cập nhật root README (cách chạy RAG).
-S8. Reviewer (focus: concurrency, data integrity, security của writer role/CORS),
-    full gate, push branch, mở PR.
+    `src/hooks/api/useChatQueries.ts`, session token in sessionStorage,
+    AiDrawer/AiMessageItem/CitationBadge use API; remove import ragKnowledgeEngine.
+    AC: vitest pass (new tests mock API: readiness not_ready locks Send; send creates session
+    then shows answer + citation; 404 session → delete token; View source calls
+    `/chat/sources/{id}` with corpus_version, 409 displays stale version notice);
+    `tsc --noEmit` and `next build` pass.
+S6. `scripts/prepare_chat_preview.py` (creates new preview target on 55435) +
+    run BE factory on port 8111, FE on port 3311 via proxy; browser smoke test.
+    AC: query "FLEX-007 D0" shows 1.87/1.82 mm with citation, reload shows history.
+S7. Docs: `docs/CHATBOT_FLOW.md`, update root README (how to run RAG).
+S8. Reviewer (focus: concurrency, data integrity, security of writer role/CORS),
+    full gate, push branch, open PR.
 
-## Chỉnh sửa sau plan-critic (REVISE → đã xử lý)
-1. HTTP chat tests đọc `PHASE4_ADMIN_URL`; BE suite đọc `TEST_DATABASE_URL`. AC S4 yêu cầu
-   cả hai và **0 skip** cho `integration_tests`.
-2. Admin của container: superuser `postgres` (container chỉ dùng test), URL trỏ DB
-   `flameguard_test_admin` (khớp `flameguard_test_[a-z0-9_]{1,35}`); fixture tự tạo DB/role con.
-3. Cổng 55433 → 55435 ở `chat_target.py` (guard + thông điệp lỗi) và
-   `scripts/prepare_chat_preview.py` (assert, URL, help text); container name đổi tương ứng.
-4. `/chat/sources/{id}` cần cả `corpus_version` và `locator`; FE test cả 404 và 409.
-5. Readiness/sources trả camelCase, phần chat lõi snake_case → DTO FE khai báo đúng từng shape.
-6. POST message dùng timeout riêng 30s (BE chat 10s + lock_timeout 5s).
-7. `.gitattributes` cho `integrations/nasa_data/research/** -text` (đã làm ở S2).
-8. Chỉ port test export của `test_remote_authority.py` (bỏ source-lock/rebuild-kit).
-9. Lệnh chạy root: `flameguard-ai-backend/.venv/bin/python -m pytest` (venv có pytest-asyncio);
-   `ruff check integrations integration_tests` bằng ruff của venv.
-10. Preview S6: nạp JSON settings vào env (`DATABASE_URL`, `RUNTIME_DATABASE_URL`,
-    `CATALOG_COLLECTION_MANIFEST`) rồi chạy factory; tài liệu hóa trong CHATBOT_FLOW.
-11. FE đi qua `/api/proxy` nên không cần CORS cho 3311; `persist_preview` tạo file bằng
-    `os.open(..., 0o600)` ngay từ đầu.
-12. S5 viết vitest trước khi sửa AiDrawer; cover 409/timeout/not_ready. QUICK_PROMPTS chuyển
-    sang file FE riêng (`src/lib/chatPrompts.ts`); `ragKnowledgeEngine`/`ragSyntheses` bỏ khỏi
-    runtime, xóa nếu không còn import (cập nhật test liên quan).
+## Revisions after plan-critic (REVISE → addressed)
+1. HTTP chat tests read `PHASE4_ADMIN_URL`; BE suite reads `TEST_DATABASE_URL`. AC S4 requires
+   both and **0 skip** for `integration_tests`.
+2. Container admin: superuser `postgres` (container used only for tests), URL points to DB
+   `flameguard_test_admin` (matching `flameguard_test_[a-z0-9_]{1,35}`); fixture creates child DB/roles.
+3. Port 55433 → 55435 in `chat_target.py` (guard + error message) and
+   `scripts/prepare_chat_preview.py` (assert, URL, help text); container name changed accordingly.
+4. `/chat/sources/{id}` requires both `corpus_version` and `locator`; FE tests both 404 and 409.
+5. Readiness/sources returns camelCase, core chat part snake_case → FE DTO declares exact shape for each.
+6. POST message uses separate 30s timeout (BE chat 10s + lock_timeout 5s).
+7. `.gitattributes` for `integrations/nasa_data/research/** -text` (done in S2).
+8. Only port export tests from `test_remote_authority.py` (omit source-lock/rebuild-kit).
+9. Root run command: `flameguard-ai-backend/.venv/bin/python -m pytest` (venv has pytest-asyncio);
+   `ruff check integrations integration_tests` using venv ruff.
+10. Preview S6: load JSON settings into env (`DATABASE_URL`, `RUNTIME_DATABASE_URL`,
+    `CATALOG_COLLECTION_MANIFEST`) then run factory; document in CHATBOT_FLOW.
+11. FE routes through `/api/proxy` so no CORS needed for 3311; `persist_preview` creates file via
+    `os.open(..., 0o600)` from the start.
+12. S5 write vitest before modifying AiDrawer; cover 409/timeout/not_ready. QUICK_PROMPTS moved
+    to separate FE file (`src/lib/chatPrompts.ts`); `ragKnowledgeEngine`/`ragSyntheses` removed from
+    runtime, delete if no longer imported (update related tests).
 
-## Ngoài phạm vi / rủi ro
-- Không đụng Mission/Predictive Lab giả lập (task khác). Không source-lock BE,
-  rebuild-kit, playbook-rag, launcher Windows.
-- `admit_collection` quét toàn DB mỗi request (đã biết, giữ nguyên vì BE upstream).
-- Session ID chỉ là token demo, không phải auth.
-- Rollback: xóa branch; container test có thể dừng/xóa riêng (chỉ chứa dữ liệu test).
+## Out of scope / risks
+- Do not touch simulated Mission/Predictive Lab (different task). No BE source-lock,
+  rebuild-kit, playbook-rag, Windows launcher.
+- `admit_collection` scans entire DB on each request (known, unchanged due to upstream BE).
+- Session ID is only a demo token, not auth.
+- Rollback: delete branch; test container can be stopped/deleted independently (contains test data only).

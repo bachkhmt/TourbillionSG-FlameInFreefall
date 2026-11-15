@@ -1,7 +1,7 @@
 # Phase 6 material decision proposal
 
 Prepared 2026-11-13. Status APPROVED by the project owner on 2026-11-13
-through “duyệt rồi tiến hành làm đi”. Implementation and isolated PostgreSQL
+through "approved, proceed with implementation". Implementation and isolated PostgreSQL
 verification are authorized for the proposed scope below.
 
 ## Storage boundary for T062
