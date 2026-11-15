@@ -136,8 +136,8 @@ export const StudyHeader: React.FC<StudyHeaderProps> = ({
       </div>
 
       {/* Collection Totals & Compare Button */}
-      <div className="pt-4 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-zinc-600">
+      <div className="pt-4 border-t border-gray-100 flex flex-col gap-3.5">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-zinc-600">
           <div className="flex items-center gap-1.5 font-semibold text-zinc-800">
             <Activity className="w-4 h-4 text-[#0B2374]" />
             <span>{study.runsMeta.total} Test Runs</span>
@@ -156,7 +156,7 @@ export const StudyHeader: React.FC<StudyHeaderProps> = ({
           type="button"
           data-testid="header-compare-btn"
           onClick={() => onToggleCompare(study.id)}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+          className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
             isComparing
               ? 'bg-[#D4FC02] text-zinc-950 shadow-xs hover:bg-[#c4eb02]'
               : 'bg-gray-100 hover:bg-gray-200 text-zinc-800 border border-gray-200'

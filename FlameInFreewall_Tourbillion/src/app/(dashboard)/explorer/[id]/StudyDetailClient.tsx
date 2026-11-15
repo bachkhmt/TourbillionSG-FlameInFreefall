@@ -455,111 +455,18 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
       variants={pageContainerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full max-w-[1600px] mx-auto space-y-6 py-2 pb-24"
+      className="w-full max-w-[1600px] mx-auto py-2 pb-24"
     >
-      <motion.div variants={columnVariants}>
-        <StudyHeader
-          study={study}
-          sources={sources}
-          isComparing={isCompared}
-          onToggleCompare={(sid) => toggleCompare(sid)}
-        />
-      </motion.div>
-
-      {/* 2-Column Responsive Split Layout (StructPaper Extracted Content Style) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] xl:grid-cols-[400px_1fr] gap-6 items-start">
-        {/* LEFT COLUMN: Study Overview & Physical Science Profile */}
-        <motion.div variants={columnVariants} className="space-y-4 lg:sticky lg:top-4">
-          {/* Quick Summary Metrics (2x2 Grid, exact StructPaper pattern) */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
-              <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
-                <Activity className="w-3 h-3 text-[#0B2374]" /> Test Runs
-              </span>
-              <span className="text-base font-extrabold text-[#0B2374] mt-0.5 block">
-                {study.runsMeta?.total ?? effectiveRuns.length} Runs
-              </span>
-            </div>
-            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
-              <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
-                <BookOpen className="w-3 h-3 text-[#0B2374]" /> Sources
-              </span>
-              <span className="text-base font-extrabold text-zinc-900 mt-0.5 block">
-                {sources.length || study.sourcesMeta?.total || 0} Records
-              </span>
-            </div>
-            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
-              <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
-                <FileText className="w-3 h-3 text-[#0B2374]" /> Claims
-              </span>
-              <span className="text-base font-extrabold text-zinc-900 mt-0.5 block">
-                {claims.length || study.claimsMeta?.total || 0} Verified
-              </span>
-            </div>
-            <div className="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
-              <span className="text-[10px] text-zinc-500 font-semibold block uppercase tracking-wider flex items-center gap-1">
-                <Gauge className="w-3 h-3 text-[#0B2374]" /> Observations
-              </span>
-              <span className="text-base font-extrabold text-zinc-900 mt-0.5 block">
-                {effectiveObservations.length} Points
-              </span>
-            </div>
-          </div>
-
-          {/* Physical Science & Platform Parameters Card */}
-          <div className="p-4 sm:p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3 transition-all duration-200 hover:shadow-sm">
-            <div className="flex items-center gap-2 text-zinc-900">
-              <Layers className="w-4 h-4 text-[#0B2374]" />
-              <h3 className="font-bold text-xs uppercase tracking-wider text-zinc-900">
-                Physical Science Profile
-              </h3>
-            </div>
-
-            <div className="space-y-2 text-xs">
-              <div className="p-2.5 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between">
-                <span className="text-zinc-500 font-medium">Platform</span>
-                <span className="font-bold text-zinc-900">{study.platform ?? 'Platform unmapped'}</span>
-              </div>
-              <div className="p-2.5 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between">
-                <span className="text-zinc-500 font-medium">Collection</span>
-                <span className="font-mono text-zinc-900 font-semibold">{study.context.collectionId}</span>
-              </div>
-              {study.fuelType && (
-                <div className="p-2.5 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between">
-                  <span className="text-zinc-500 font-medium">Fuel / Sample</span>
-                  <span className="font-bold text-zinc-900">{study.fuelType}</span>
-                </div>
-              )}
-              {study.gravityRaw && (
-                <div className="p-2.5 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center justify-between">
-                  <span className="text-zinc-500 font-medium">Gravity Level</span>
-                  <span className="font-bold text-zinc-900">{study.gravityRaw}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Catalog Taxonomy Tags */}
-          {study.tags.length > 0 && (
-            <div className="p-4 sm:p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-2.5 transition-all duration-200 hover:shadow-sm">
-              <span className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider flex items-center gap-1.5">
-                <Tag className="w-3.5 h-3.5 text-[#0B2374]" /> Catalog Tags ({study.tags.length})
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {study.tags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gray-100 border border-gray-200/80 text-[11px] font-semibold text-zinc-700"
-                  >
-                    <span>{tag.label}</span>
-                    {tag.category && (
-                      <span className="text-[10px] text-zinc-400">({tag.category})</span>
-                    )}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+      {/* 2-Column Responsive Split Layout (Exact StructPaper Extracted Content Drawer Pattern) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[38%_62%] xl:grid-cols-[420px_1fr] 2xl:grid-cols-[450px_1fr] gap-6 items-start">
+        {/* LEFT COLUMN: Entire Study Header Card (Sticky) */}
+        <motion.div variants={columnVariants} className="lg:sticky lg:top-4">
+          <StudyHeader
+            study={study}
+            sources={sources}
+            isComparing={isCompared}
+            onToggleCompare={(sid) => toggleCompare(sid)}
+          />
         </motion.div>
 
         {/* RIGHT COLUMN: Segmented Tabs & Active Tab Data Explorer */}
