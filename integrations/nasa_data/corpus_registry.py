@@ -81,5 +81,24 @@ def write_corpus_policy(manifest_path, release: dict) -> Path:
         "registrySha256": hashlib.sha256(raw).hexdigest(),
         "sourceRevision": release["revision"],
     }
+    from .export import build_snapshot
+
+    snapshot_path = manifest_path.parent / config["snapshot"]
+    snapshot_raw = snapshot_path.read_bytes()
+    if json.loads(snapshot_raw) != build_snapshot(release):
+        raise ValueError("Research release does not project to the declared snapshot")
+    research_raw = json.dumps(
+        {k: v for k, v in release.items() if not k.startswith("_")},
+        ensure_ascii=False, sort_keys=True,
+    ).encode()
+    research_path = manifest_path.parent / "mission-release.json"
+    research_path.write_bytes(research_raw)
+    config["researchPolicy"] = {
+        "version": "mission-research-v1",
+        "release": research_path.name,
+        "sha256": hashlib.sha256(research_raw).hexdigest(),
+        "snapshotSha256": hashlib.sha256(snapshot_raw).hexdigest(),
+        "sourceRevision": release["revision"],
+    }
     manifest_path.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     return path

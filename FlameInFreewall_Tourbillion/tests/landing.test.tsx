@@ -183,15 +183,15 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       expect(screen.getByText('Space Apps Challenge 2026')).toBeDefined();
     });
 
-    it('displays the mandatory NASA Fire Safety protocol disclaimer', () => {
+    it('explains research scope without promoting prediction or safety certification', () => {
       render(<LandingFooter />);
       const disclaimer = screen.getByTestId('safety-disclaimer');
       expect(disclaimer).toBeDefined();
       expect(
-        screen.getByText(/NASA Physical Sciences Fire Safety Protocol & Disclaimer/i)
+        screen.getByText(/Research scope & limitations/i)
       ).toBeDefined();
       expect(
-        screen.getByText(/NASA-STD-6001 standards/i)
+        screen.getByText(/Research relevance is not a fire-risk probability/i)
       ).toBeDefined();
     });
   });

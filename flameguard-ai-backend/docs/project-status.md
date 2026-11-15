@@ -120,3 +120,12 @@ recorded under Phases 5–7 above.
 On completion of a **reviewed** feature, update only its row, acceptance state,
 known blockers and relevant phase record. Do not invent completion, change the
 historical test counts, or rewrite architecture history.
+
+## Mission research lookup — 2026-11-15
+
+Additive `/mission/research` and source-bound lossless release policy delivered
+for unreviewed research navigation. Mission now consumes API results without
+local seed engines/error fallbacks. Original scientific evaluation gates stay
+unchanged. No tables or migrations changed. Verification and target configuration:
+[Mission API record](../../docs/MISSION_API.md). Scientific sign-off and browser/
+production acceptance remain separate; existing targets need policy declaration.

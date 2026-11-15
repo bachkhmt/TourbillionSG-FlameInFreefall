@@ -124,14 +124,12 @@ export const LandingFooter: React.FC = () => {
           <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="text-xs text-amber-950 leading-relaxed">
             <span className="font-bold text-amber-900 block mb-0.5">
-              NASA Physical Sciences Fire Safety Protocol &amp; Disclaimer
+              Research scope &amp; limitations
             </span>
-            FlameGuard AI is an evidence-first scientific analysis and educational decision-support
-            platform. Synthesized metrics and predictive models are grounded strictly on NASA Physical
-            Sciences Informatics (PSI) flight and ground experiments. Mission-critical spacecraft fire
-            safety certification requires certified chamber qualification under NASA-STD-6001 standards.
-            Partial-gravity regimes (0 &lt; g &lt; 1) represent open empirical knowledge gaps and must not
-            be treated as verified safe without direct experimental evidence.
+            FlameGuard AI helps users explore, compare and interpret NASA combustion research.
+            Source context, reported observations and missing evidence must be considered together.
+            Research relevance is not a fire-risk probability or operational safety certification.
+            Partial-gravity conditions remain an evidence gap where direct measurements are unavailable.
           </div>
         </div>
 

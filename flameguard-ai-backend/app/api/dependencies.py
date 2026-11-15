@@ -25,6 +25,7 @@ async def get_read_context(
         config, slugs = await admit_collection(session, request.app.state.settings)
         context = collection_context(config)
         request.state.phase4_context = context
+        request.state.phase4_config = config
         yield session, context, slugs, request.app.state.settings.api_v1_prefix
 
 
