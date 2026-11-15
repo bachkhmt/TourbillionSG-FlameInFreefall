@@ -17,7 +17,14 @@ class RuntimeDatabase:
             writer.database,
         ):
             raise ValueError("Runtime database must match scientific database")
-        self.engine = create_async_engine(raw, hide_parameters=True, pool_pre_ping=True)
+        self.engine = create_async_engine(
+            raw,
+            hide_parameters=True,
+            pool_pre_ping=True,
+            pool_size=settings.db_runtime_pool_size,
+            max_overflow=settings.db_runtime_max_overflow,
+            pool_timeout=settings.db_pool_timeout_seconds,
+        )
         self.session_factory = async_sessionmaker(self.engine, expire_on_commit=False)
 
     async def validate(self, session):
