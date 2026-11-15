@@ -129,40 +129,32 @@
         <button class="close-sheet mobile-only" id="close-controls" type="button" aria-label="Đóng bảng điều chỉnh">×</button>
       </div>
 
-      <!-- 1. GRAVITY REGIME -->
+      <!-- 1. GRAVITY REGIME: NASA EMPIRICAL VERIFIED PAIR (0g ISS vs 1g Earth) -->
       <section class="control-section" aria-labelledby="gravity-title">
         <div class="section-title">
-          <h3 id="gravity-title">Trọng lực (Gravity Regime)</h3>
+          <h3 id="gravity-title">Môi trường Trọng lực (NASA Empirical Regimes)</h3>
           <span id="gravity-label" style="font-size:11px;color:#ffae71;font-weight:700;">0.00g (Vi trọng lực ISS)</span>
         </div>
         
-        <!-- Gravity Presets -->
-        <div class="gravity-presets">
-          <button class="gravity-preset active" data-gravity="0" type="button" aria-pressed="true">
-            <span class="preset-name">ISS Orbit</span>
-            <small>0.00g · Freefall</small>
+        <!-- Two Verified NASA Regimes -->
+        <div class="gravity-presets" style="grid-template-columns: repeat(2, 1fr);">
+          <button class="gravity-preset active" data-gravity="0" type="button" aria-pressed="true" style="padding:12px 10px;">
+            <span class="preset-name" style="font-size:13px;">Vi trọng lực ISS</span>
+            <small>0.00g · NASA CFM (Freefall)</small>
           </button>
-          <button class="gravity-preset" data-gravity="0.16" type="button" aria-pressed="false">
-            <span class="preset-name">Mặt Trăng</span>
-            <small>0.16g · Artemis</small>
-          </button>
-          <button class="gravity-preset" data-gravity="0.38" type="button" aria-pressed="false">
-            <span class="preset-name">Sao Hỏa</span>
-            <small>0.38g · Mars Hab</small>
-          </button>
-          <button class="gravity-preset" data-gravity="1.0" type="button" aria-pressed="false">
-            <span class="preset-name">Trái Đất</span>
-            <small>1.00g · 1g Baseline</small>
+          <button class="gravity-preset" data-gravity="1.0" type="button" aria-pressed="false" style="padding:12px 10px;">
+            <span class="preset-name" style="font-size:13px;">Đối chứng Mặt đất</span>
+            <small>1.00g · NASA Ground Baseline</small>
           </button>
         </div>
 
-        <label class="range-label" for="gravity">
-          <span>Gia tốc trọng trường $g$</span>
-          <output id="gravity-value" for="gravity">0.00g</output>
-        </label>
-        <input id="gravity" type="range" min="0" max="100" value="0" step="1" aria-describedby="gravity-help">
-        <div class="range-ends"><span>0.00g (Vi trọng lực)</span><span>1.00g (Trái Đất)</span></div>
-        <p class="control-help" id="gravity-help">Trong vi trọng lực (0g), không có lực đẩy nổi (buoyancy) nên lửa tạo thành hình vòm cầu màu xanh lam. Ở 1g, đối lưu hút khí vào đáy và đẩy khí nóng bốc lên, kéo ngọn lửa thành hình giọt nước và sinh muội than vàng rực.</p>
+        <p class="control-help" style="margin-top:10px;background:#141820;padding:10px 12px;border-radius:6px;border-left:3px solid #ffae71;color:#c3ccda;line-height:1.5;">
+          <strong>Minh bạch khoa học (NASA PSI):</strong> Kho dữ liệu thực nghiệm của NASA chỉ có dữ liệu đốt thực tế ở <strong>0.00g</strong> (Trạm ISS / buồng CIR) và <strong>1.00g</strong> (Mặt đất). NASA chưa từng đốt mẫu nến trực tiếp trên bề mặt Mặt Trăng hay Sao Hỏa. Thí nghiệm này đối chiếu trực quan 2 mốc thực nghiệm chuẩn xác đó.
+        </p>
+
+        <!-- Hidden inputs for script compatibility -->
+        <input type="hidden" id="gravity" value="0">
+        <output id="gravity-value" hidden>0.00g</output>
       </section>
 
       <!-- 2. ATMOSPHERIC CONDITIONS -->

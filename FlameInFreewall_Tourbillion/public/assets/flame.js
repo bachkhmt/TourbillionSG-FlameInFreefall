@@ -4307,89 +4307,64 @@ void main() {
 let curG = 0, curO2 = 21, curFlow = 0;
 function applyEnv(g, o2, flow) {
   curG = g; curO2 = o2; curFlow = flow;
-  let shapeMorph = Math.max(0, Math.min(1, 1 - Math.pow(g, 0.75)));
+  let shapeMorph = g === 0 ? 1 : 0;
   if (flow > 0 && g === 0) shapeMorph = Math.max(0, shapeMorph - (flow / 30) * 0.15);
   Ph(shapeMorph);
 
-  let sootFraction = Math.pow(g, 0.65) * (o2 / 21) * (1 + (flow / 60));
-  sootFraction = Math.max(0, Math.min(1, sootFraction));
-
-  // NASA CFM Physical Spectroscopy Transition (eliminates RGB purple/pink interpolation artifact)
-  let cBase = new Nt("#163aff").lerp(new Nt("#243cff"), sootFraction);
-
-  let cEdge = new Nt("#0616bc");
-  if (sootFraction > 0.45) {
-    let edgeT = (sootFraction - 0.45) / 0.55;
-    let r = 0.02 + edgeT * 0.76;
-    let b = 0.74 * Math.pow(1.0 - edgeT, 2.0);
-    let gCol = Math.max(0.08 + edgeT * 0.10, Math.min(r, b) * 0.95);
-    cEdge.setRGB(r, gCol, b);
-  }
-
-  let cCore = new Nt();
-  if (sootFraction < 0.35) {
-    cCore.copy(new Nt("#829eff")).lerp(new Nt("#fff8e7"), sootFraction / 0.35);
-  } else {
-    cCore.copy(new Nt("#fff8e7")).lerp(new Nt("#fff2cb"), (sootFraction - 0.35) / 0.65);
-  }
-
-  let cMid = new Nt();
-  if (sootFraction < 0.45) {
-    let subT = (sootFraction / 0.45) * 0.85;
-    cMid.copy(new Nt("#153eff")).lerp(new Nt("#ffffff"), subT);
-  } else {
-    let subT = (sootFraction - 0.45) / 0.55;
-    cMid.copy(new Nt("#ffffff")).lerp(new Nt("#ffae32"), subT);
-  }
+  // Pure 0g ISS CFM (molecular diffusion, pale blue chemiluminescence) vs 1g Ground Baseline (strong buoyant convection, glowing amber soot)
+  let cBase = g === 0 ? new Nt("#163aff") : new Nt("#243cff");
+  let cEdge = g === 0 ? new Nt("#0616bc") : new Nt("#c82d04");
+  let cCore = g === 0 ? new Nt("#829eff") : new Nt("#fff2cb");
+  let cMid = g === 0 ? new Nt("#153eff") : new Nt("#ffae32");
 
   if (Oe) {
     Oe.material.uniforms.uCore.value.copy(cCore);
     Oe.material.uniforms.uMid.value.copy(cMid);
     Oe.material.uniforms.uEdge.value.copy(cEdge);
     Oe.material.uniforms.uBase.value.copy(cBase);
-    Oe.material.uniforms.uTurbulence.value = Math.min(1, g * 0.70 + (flow / 30) * 0.20);
+    Oe.material.uniforms.uTurbulence.value = g === 0 ? (flow / 30) * 0.25 : 0.70 + (flow / 30) * 0.20;
     Oe.material.uniforms.uIntensity.value = (0.85 + g * 0.40) * (o2 / 21) * (1 + (flow / 60));
     $e = !0;
   }
 
-  let gFormatted = g.toFixed(2) + "g";
+  let gFormatted = g === 0 ? "0.00g (Vi trọng lực ISS)" : "1.00g (Đối chứng Trái Đất)";
   if (It("gravity")) It("gravity").value = Math.round(g * 100);
-  if (It("gravity-value")) It("gravity-value").value = gFormatted;
+  if (It("gravity-value")) It("gravity-value").value = g === 0 ? "0.00g" : "1.00g";
   if (It("oxygen")) It("oxygen").value = o2;
   if (It("oxygen-value")) It("oxygen-value").value = `${o2}%`;
   if (It("airflow")) It("airflow").value = flow;
   if (It("airflow-value")) It("airflow-value").value = `${flow} cm/s`;
 
   if (It("gravity-label")) {
-    It("gravity-label").textContent = g === 0 ? "0.00g (Vi trọng lực ISS)" : g === 0.16 ? "0.16g (Mặt Trăng Artemis)" : g === 0.38 ? "0.38g (Bề mặt Sao Hỏa)" : g === 1 ? "1.00g (Trái Đất Baseline)" : `${gFormatted} (Trọng lực cục bộ)`;
+    It("gravity-label").textContent = gFormatted;
   }
   document.querySelectorAll(".gravity-preset").forEach(b => {
     let bg = parseFloat(b.dataset.gravity);
-    let isActive = Math.abs(bg - g) < 0.03;
+    let isActive = Math.abs(bg - g) < 0.1;
     b.classList.toggle("active", isActive);
     b.setAttribute("aria-pressed", String(isActive));
   });
 
   if (It("hud-shape")) {
-    It("hud-shape").textContent = g === 0 ? "Vòm bán cầu (0.98)" : g <= 0.2 ? "Bầu dục vòm (0.84)" : g <= 0.5 ? "Bầu dục thuôn (0.62)" : "Giọt nước (0.25)";
+    It("hud-shape").textContent = g === 0 ? "Vòm bán cầu (0.98)" : "Giọt nước thuôn dài (0.25)";
   }
   if (It("hud-temp")) {
-    let temp = Math.round(1380 + g * 360 + (o2 - 21) * 18 + flow * 4);
+    let temp = Math.round(g === 0 ? 1380 + (o2 - 21) * 15 + flow * 4 : 1740 + (o2 - 21) * 20 + flow * 5);
     It("hud-temp").textContent = `~${temp.toLocaleString("vi-VN")} K`;
   }
   if (It("hud-color")) {
-    It("hud-color").textContent = sootFraction < 0.12 ? "Xanh lam (CH*/C₂*)" : sootFraction < 0.35 ? "Xanh vòm · Chớm vệt vàng đỉnh" : sootFraction < 0.65 ? "Vàng hổ phách · Chân xanh" : "Vàng cam chói (Muội than 1.600K)";
-    It("hud-color").style.color = sootFraction < 0.12 ? "#829eff" : sootFraction < 0.35 ? "#93c5fd" : sootFraction < 0.65 ? "#fde047" : "#ffae32";
+    It("hud-color").textContent = g === 0 ? "Xanh lam (CH*/C₂*)" : "Vàng cam chói (Muội than 1.600K)";
+    It("hud-color").style.color = g === 0 ? "#829eff" : "#ffae32";
   }
   if (It("hud-flicker")) {
-    let hz = (g * 11.2 + (flow / 30) * 2.5).toFixed(1);
+    let hz = g === 0 ? (flow > 0 ? (flow / 30 * 1.5).toFixed(1) : "0.0") : (11.2 + (flow / 30) * 2.5).toFixed(1);
     It("hud-flicker").textContent = g === 0 && flow === 0 ? "0.0 Hz (Tĩnh lặng)" : `${hz} Hz (Dao động)`;
   }
   if (It("hud-transport")) {
-    It("hud-transport").textContent = g === 0 && flow === 0 ? "Khuếch tán phân tử đẳng hướng (Fickian Diffusion)" : g === 0 ? "Khuếch tán + Thông gió cưỡng bức" : g <= 0.38 ? "Đối lưu tự nhiên yếu + Khuếch tán hỗn hợp" : "Đối lưu tự nhiên mạnh (Cột khói 30–60 cm/s)";
+    It("hud-transport").textContent = g === 0 && flow === 0 ? "Khuếch tán phân tử đẳng hướng (Fickian Diffusion)" : g === 0 ? "Khuếch tán + Thông gió cưỡng bức" : "Đối lưu tự nhiên mạnh (Cột khói 30–60 cm/s)";
   }
   if (It("shape-caption")) {
-    It("shape-caption").textContent = g === 0 ? "Vòm lửa nến vi trọng lực · Khuếch tán phân tử 360° (ISS 0g)" : g === 0.16 ? "Trọng lực Mặt Trăng (0.16g) · Vòm xanh chớm muội than đỉnh" : g === 0.38 ? "Trọng lực Sao Hỏa (0.38g) · Đối lưu yếu & lõi vàng hổ phách" : g === 1 ? "Lửa nến Trái Đất (1g) · Cột khói đối lưu tự nhiên & bồ hóng vàng" : `Môi trường trọng lực ${gFormatted} · Nồng độ oxy ${o2}%`;
+    It("shape-caption").textContent = g === 0 ? "Vòm lửa nến vi trọng lực · Khuếch tán phân tử 360° (ISS 0g)" : "Lửa nến Trái Đất (1g) · Cột khói đối lưu tự nhiên & bồ hóng vàng";
   }
 }
 
