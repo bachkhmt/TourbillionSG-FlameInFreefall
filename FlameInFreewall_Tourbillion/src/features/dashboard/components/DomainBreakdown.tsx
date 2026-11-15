@@ -1,215 +1,268 @@
-'use client';
-
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Flame, Box, AlertTriangle, ArrowRight, Orbit, Layers, Info } from 'lucide-react';
-import { useDashboardSummaryQuery } from '../hooks/useDashboardQueries';
-import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
-import type { MappedDashboardSummary } from '@/types/api';
-
+"use client";
+import React from "react";
+import {
+  useDescriptiveQuery,
+  type CountBin,
+  type ConditionPoint,
+} from "@/api/services/evidenceNavigation";
+import { ApiErrorBanner } from "@/components/ui/ApiErrorBanner";
+import type { MappedDashboardSummary } from "@/types/api";
 export interface DomainBreakdownProps {
   summary?: MappedDashboardSummary;
 }
 
-export const DomainBreakdown: React.FC<DomainBreakdownProps> = ({
-  summary: summaryProp,
-}) => {
-  const summaryQuery = useDashboardSummaryQuery(undefined, {
-    enabled: summaryProp === undefined,
-  });
-
-  const summary = summaryProp ?? summaryQuery.data;
-
-  if (!summaryProp && summaryQuery.isLoading) {
-    return (
-      <div
-        data-testid="domain-breakdown-loading"
-        className="grid grid-cols-1 lg:grid-cols-3 gap-4"
+export function RecordBars({
+  title,
+  bins,
+  denominator,
+  missing,
+  source,
+}: {
+  title: string;
+  bins: CountBin[];
+  denominator: number;
+  missing: number;
+  source: string;
+}) {
+  const ranked = [...bins].sort(
+    (a, b) => b.count - a.count || a.label.localeCompare(b.label),
+  );
+  const shown =
+    ranked.length > 12
+      ? [
+          ...ranked.slice(0, 11),
+          {
+            label: "Other recorded values",
+            count: ranked.slice(11).reduce((sum, bin) => sum + bin.count, 0),
+          },
+        ]
+      : ranked;
+  const max = Math.max(1, ...shown.map((bin) => bin.count));
+  return (
+    <figure className="rounded-3xl border border-slate-200 bg-white p-5 space-y-3">
+      <figcaption className="font-bold">{title}</figcaption>
+      <svg
+        role="img"
+        aria-label={title}
+        viewBox={`0 0 560 ${shown.length * 26 + 12}`}
+        className="w-full"
       >
-        {Array.from({ length: 3 }, (_, index) => (
-          <div
-            key={`domain-skeleton-${index}`}
-            className="bg-gray-200/50 rounded-[36px] p-5 min-h-[210px] animate-pulse"
-          />
+        {shown.map((bin, index) => (
+          <g key={bin.label} transform={`translate(0,${index * 26})`}>
+            <title>
+              {bin.label}: {bin.count} source records
+            </title>
+            <text x="0" y="16" fontSize="11">
+              {bin.label.length > 27 ? bin.label.slice(0, 24) + "…" : bin.label}
+            </text>
+            <rect
+              x="190"
+              y="3"
+              width={(bin.count / max) * 310}
+              height="17"
+              rx="4"
+              fill="#0B2374"
+            />
+            <text x="510" y="16" fontSize="11">
+              {bin.count}
+            </text>
+          </g>
         ))}
-      </div>
-    );
-  }
+      </svg>
+      <p className="text-xs text-slate-600">
+        {denominator.toLocaleString("en-US")} source records · {missing} missing
+        or unknown. {source}
+      </p>
+    </figure>
+  );
+}
 
-  if (!summaryProp && summaryQuery.isError) {
+function ConditionMap({
+  points,
+  title,
+  ambient,
+}: {
+  points: ConditionPoint[];
+  title: string;
+  ambient: boolean;
+}) {
+  const maxX = Math.max(40, ...points.map((p) => Number(p.oxygenPct)));
+  const maxY = Math.max(16, ...points.map((p) => Number(p.pressurePsi)));
+  const x = (n: number) => 50 + (n / maxX) * 480;
+  const y = (n: number) => 270 - (n / maxY) * 220;
+  return (
+    <figure className="rounded-3xl border border-slate-200 bg-white p-5 space-y-3">
+      <figcaption className="font-bold">{title}</figcaption>
+      <svg
+        role="img"
+        aria-label={title}
+        viewBox="0 0 580 320"
+        className="w-full"
+      >
+        {ambient && (
+          <>
+            <rect
+              x={x(30)}
+              y={y(10.2)}
+              width={x(maxX) - x(30)}
+              height={270 - y(10.2)}
+              fill="#fef3c7"
+            />
+            <text x={x(30) + 3} y={y(10.2) - 5} fontSize="9">
+              Moon Base reference envelope
+            </text>
+            <circle
+              cx={x(21)}
+              cy={y(14.7)}
+              r="5"
+              fill="none"
+              stroke="#b45309"
+            />
+            <text x={x(21) + 6} y={y(14.7)} fontSize="9">
+              ISS reference
+            </text>
+          </>
+        )}
+        <path d="M50 40V270H540" fill="none" stroke="#64748b" />
+        {[0, 10, 20, 30, 40]
+          .filter((t) => t <= maxX)
+          .map((t) => (
+            <text key={t} x={x(t)} y="286" fontSize="10">
+              {t}
+            </text>
+          ))}
+        {[0, 4, 8, 12, 16]
+          .filter((t) => t <= maxY)
+          .map((t) => (
+            <text key={t} x="23" y={y(t)} fontSize="10">
+              {t}
+            </text>
+          ))}
+        {points.map((point) => {
+          const color = `hsl(${[...(point.slug ?? "")].reduce((n, c) => n + c.charCodeAt(0), 0) % 360} 60% 36%)`;
+          const label = `${point.slug}: ${point.oxygenPct} ${point.oxygenBasis}; ${point.pressurePsi} psia; ${point.oxygenMeaning}; ${point.runId}`;
+          return point.oxygenBasis === "mole_percent" ? (
+            <circle
+              key={point.runId}
+              cx={x(Number(point.oxygenPct))}
+              cy={y(Number(point.pressurePsi))}
+              r="3"
+              fill={color}
+              opacity=".65"
+            >
+              <title>{label}</title>
+            </circle>
+          ) : (
+            <rect
+              key={point.runId}
+              x={x(Number(point.oxygenPct)) - 3}
+              y={y(Number(point.pressurePsi)) - 3}
+              width="6"
+              height="6"
+              fill={color}
+              opacity=".65"
+            >
+              <title>{label}</title>
+            </rect>
+          );
+        })}
+        <text x="200" y="310" fontSize="11">
+          Oxygen percent (basis preserved)
+        </text>
+        <text x="4" y="24" fontSize="11">
+          Pressure (psia)
+        </text>
+      </svg>
+      <p className="text-xs text-slate-600">
+        {points.length} records · Circle: mole percent · Square: volume percent.
+        Color identifies investigation; hover a point for its record and units.
+      </p>
+      <p className="text-xs text-slate-600">
+        {ambient
+          ? "Reference conditions describe atmosphere inputs only; points do not establish habitat coverage or risk. Moon and Mars gravity are not measured here."
+          : "Burner-stream and unknown oxygen meanings are kept separate from ambient habitat reference conditions."}
+      </p>
+    </figure>
+  );
+}
+
+export const DomainBreakdown: React.FC<DomainBreakdownProps> = ({
+  summary,
+}) => {
+  const query = useDescriptiveQuery(summary?.selection);
+  if (query.isLoading)
+    return <p role="status">Loading descriptive source-record charts…</p>;
+  if (query.isError)
     return (
       <ApiErrorBanner
-        title="Unable to load domain breakdown"
-        error={summaryQuery.error}
-        onRetry={() => summaryQuery.refetch()}
-        isRetrying={summaryQuery.isFetching}
+        title="Unable to load descriptive charts"
+        error={query.error}
+        onRetry={() => query.refetch()}
       />
     );
-  }
-
-  if (!summary) return null;
-
-  const fuelReason = summary.unavailableFields.fuelDistribution ?? 'UNSUPPORTED_MAPPING';
-  const facilityReason = summary.unavailableFields.facilityDistribution ?? 'UNSUPPORTED_MAPPING';
-  const gravityReason = summary.unavailableFields.gravityDistribution ?? 'UNSUPPORTED_MAPPING';
-
+  const data = query.data;
+  if (!data) return null;
+  const source = `Source: ${data.context.collectionId} · ${data.context.origin} · ${data.context.reviewState}.`;
   return (
-    <section aria-label="Physical Science Domain Breakdown" className="w-full space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <h2 className="text-xl sm:text-2xl font-black tracking-tight text-[#1A1A1A] flex items-center gap-2.5">
-          <Layers className="w-5 h-5 text-[#0B2374]" />
-          Combustion Physics Domain Breakdown
-        </h2>
-        <Link
-          href="/explorer"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0B2374] hover:text-[#102B82] transition-colors self-start sm:self-auto"
-        >
-          Explore in matrix view <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+    <section data-testid="domain-breakdown" className="space-y-4">
+      <h2 className="text-xl font-bold">Source-record coverage</h2>
+      <p className="text-sm text-slate-600">{data.selectionSemantics}</p>
+      <div className="grid gap-4 lg:grid-cols-3">
+        <RecordBars
+          title="Records by investigation"
+          bins={data.investigationDistribution.map((s) => ({
+            label: s.slug ?? s.psiId,
+            count: s.count,
+          }))}
+          denominator={data.recordCount}
+          missing={0}
+          source={source}
+        />
+        <RecordBars
+          title="Records by material"
+          bins={data.materialDistribution}
+          denominator={data.recordCount}
+          missing={data.missingMaterial}
+          source={source}
+        />
+        <RecordBars
+          title="Records by gravity regime"
+          bins={data.gravityDistribution}
+          denominator={data.recordCount}
+          missing={data.missingGravity}
+          source={source}
+        />
       </div>
-
-      <div data-testid="domain-breakdown" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Card 1: Fuel Phase & Material */}
-        <motion.div
-          data-testid="fuel-distribution"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="bg-gray-200/50 rounded-[36px] p-5 hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all flex flex-col justify-between"
-        >
-          <div>
-            <div className="flex items-center justify-between mb-4 gap-2">
-              <span className="text-xs uppercase font-extrabold tracking-wider text-[#64748B] flex items-center gap-2">
-                <Flame className="w-4 h-4 text-[#0B2374]" /> Fuel Phase &amp; Material
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                {fuelReason}
-              </span>
-            </div>
-
-            <div className="p-4 rounded-3xl bg-white/80 border border-gray-200/70 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#1A1A1A]">
-                <Info className="w-4 h-4 text-[#0B2374] shrink-0" />
-                <span>Unavailable in current PSI scope</span>
-              </div>
-              <p className="text-[11px] text-[#64748B] leading-relaxed">
-                Aggregate fuel-phase counts are not published for collection{' '}
-                <strong className="text-[#1A1A1A]">{summary.context.collectionId}</strong>{' '}
-                across {summary.investigationCount} indexed studies.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-gray-200/70 flex items-center justify-between text-[11px]">
-            <span className="text-[#64748B]">
-              Origin: <strong className="text-[#1A1A1A]">{summary.context.origin}</strong>
-            </span>
-            <Link
-              href="/explorer"
-              className="font-bold text-[#0B2374] hover:underline flex items-center gap-1"
-            >
-              Filter by material <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-        </motion.div>
-
-        {/* Card 2: Flight Hardware Platform */}
-        <motion.div
-          data-testid="facility-distribution"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="bg-gray-200/50 rounded-[36px] p-5 hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all flex flex-col justify-between"
-        >
-          <div>
-            <div className="flex items-center justify-between mb-4 gap-2">
-              <span className="text-xs uppercase font-extrabold tracking-wider text-[#64748B] flex items-center gap-2">
-                <Box className="w-4 h-4 text-[#0B2374]" /> Flight Hardware Platform
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                {facilityReason}
-              </span>
-            </div>
-
-            <div className="p-4 rounded-3xl bg-white/80 border border-gray-200/70 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#1A1A1A]">
-                <Info className="w-4 h-4 text-[#0B2374] shrink-0" />
-                <span>Unavailable in current PSI scope</span>
-              </div>
-              <p className="text-[11px] text-[#64748B] leading-relaxed">
-                Platform-level distribution rollups are gated until facility taxonomy mapping is
-                verified for {summary.runCount} runs.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-gray-200/70 flex items-center justify-between text-[11px]">
-            <span className="text-[#64748B]">
-              Review: <strong className="text-[#1A1A1A]">{summary.context.reviewState}</strong>
-            </span>
-            <Link
-              href="/explorer"
-              className="font-bold text-[#0B2374] hover:underline flex items-center gap-1"
-            >
-              Browse platforms <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-        </motion.div>
-
-        {/* Card 3: Gravity Regimes Telemetry */}
-        <motion.div
-          data-testid="gravity-distribution"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="bg-gray-200/50 rounded-[36px] p-5 hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all flex flex-col justify-between"
-        >
-          <div>
-            <div className="flex items-center justify-between mb-4 gap-2">
-              <span className="text-xs uppercase font-extrabold tracking-wider text-[#64748B] flex items-center gap-2">
-                <Orbit className="w-4 h-4 text-[#0B2374]" /> Gravity Regimes (g-Level)
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                {gravityReason}
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              <div className="p-3 rounded-3xl bg-white/80 border border-gray-200/70 space-y-1">
-                <div className="text-xs font-bold text-[#1A1A1A]">
-                  Unavailable in current PSI scope
-                </div>
-                <p className="text-[11px] text-[#64748B] leading-relaxed">
-                  Per-regime run counts are unmapped at the dashboard aggregate level.
-                </p>
-              </div>
-
-              {/* Partial Gravity Void (0 < g < 1) */}
-              <div className="p-3 rounded-3xl bg-amber-50/90 border border-amber-200/70">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-extrabold text-amber-900 flex items-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" /> Partial Gravity Void (0 &lt; g &lt; 1)
-                  </span>
-                </div>
-                <p className="text-[11px] text-amber-900/90 leading-tight">
-                  Moon (0.16g) &amp; Mars (0.38g) lack validated physical test coverage in NASA PSI.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-gray-200/70 flex items-center justify-between">
-            <span className="text-[10px] text-[#64748B]">Extrapolations require caution.</span>
-            <Link
-              href="/mission"
-              className="text-xs font-bold text-[#0B2374] hover:text-[#102B82] hover:underline flex items-center gap-1"
-            >
-              Analyze Gap Matrix <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-        </motion.div>
+      <h3 className="text-lg font-bold">Evidence coverage map</h3>
+      <p className="text-sm">
+        {data.oxygenRecordCount.toLocaleString("en-US")} of{" "}
+        {data.recordCount.toLocaleString("en-US")} records have an oxygen value.
+        Missing oxygen: {data.missingOxygen}; missing pressure:{" "}
+        {data.missingPressure}. {data.recordCount - data.conditionPoints.length}{" "}
+        records excluded from the maps; incompatible conditions:{" "}
+        {data.incompatibleConditions}.
+      </p>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ConditionMap
+          title="Chamber oxygen and pressure"
+          points={data.conditionPoints.filter(
+            (p) => p.oxygenMeaning === "chamber",
+          )}
+          ambient
+        />
+        <ConditionMap
+          title="Burner-stream or unspecified oxygen context"
+          points={data.conditionPoints.filter(
+            (p) => p.oxygenMeaning !== "chamber",
+          )}
+          ambient={false}
+        />
       </div>
+      <p className="text-xs text-slate-600">
+        {source} Oxygen bases remain distinct. CFI-G burner oxygen is not
+        ambient oxygen; the challenge's upper burner value is not inferred from
+        missing data.
+      </p>
     </section>
   );
 };

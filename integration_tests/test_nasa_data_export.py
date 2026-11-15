@@ -63,3 +63,36 @@ def test_challenge_v1_profile_is_still_reproducible(tmp_path):
     assert payload["revision"] == "91e411265adf5c8e801d3d8e83b633631631d2c17739d2ca2c1cd98a65d31c9f"
     assert len(snapshot["tables"]["test_run"]) == 910
     assert len(snapshot["tables"]["document_chunk"]) == 1045
+
+
+def test_navigation_tags_and_oxygen_context_are_lossless_and_deterministic():
+    from integrations.nasa_data.export import build_snapshot
+    from integrations.nasa_data.resource_documents import build_resource_release
+
+    release = build_resource_release()
+    snapshot = build_snapshot(release)
+    assert snapshot == build_snapshot(release)
+    tags = {t["id"]: t for t in snapshot["tables"]["tag"]}
+    flex = next(s for s in release["investigations"] if s["id"] == "flex")
+    labels = {
+        (tags[link["tag_id"]]["category"], tags[link["tag_id"]]["label"])
+        for link in snapshot["tables"]["investigation_tag"]
+        if link["investigation_id"] == flex["uuid"]
+    }
+    assert {
+        ("code", "FLEX"),
+        ("hardware", "CIR"),
+        ("hardware", "MDCA"),
+        ("hardware", flex["hardware"]),
+        ("fuel-type", "droplet"),
+        ("pillar", "suppression"),
+    } <= labels
+    contexts = {
+        c["test_run_id"]: c["value_text"]
+        for c in snapshot["tables"]["test_condition"]
+        if c["variable"] == "oxygenContext"
+    }
+    for run in release["runs"]:
+        original = run["conditions"].get("oxygenContext")
+        assert contexts.get(run["id"]) == (original if original and original != "unknown" else None)
+    assert len(snapshot["tables"]) == 21

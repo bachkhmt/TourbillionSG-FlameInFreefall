@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * LandingFooter Component
@@ -6,13 +6,16 @@
  * with mandatory NASA Physical Sciences Fire Safety Protocol & Disclaimer.
  */
 
-import React from 'react';
-import Link from 'next/link';
-import { Flame, ShieldAlert, ExternalLink, Globe } from 'lucide-react';
+import React from "react";
+import Link from "next/link";
+import { Flame, ShieldAlert, ExternalLink, Globe } from "lucide-react";
 
 export const LandingFooter: React.FC = () => {
   return (
-    <footer className="w-full bg-white border-t border-gray-200 text-zinc-600 text-xs" data-testid="landing-footer">
+    <footer
+      className="w-full bg-white border-t border-gray-200 text-zinc-600 text-xs"
+      data-testid="landing-footer"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         {/* Top 4 Columns */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
@@ -27,31 +30,42 @@ export const LandingFooter: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              NASA Space Apps Challenge 2026: Flame in Freefall. Microgravity combustion &amp; spacecraft
-              fire safety intelligence platform.
+              NASA Space Apps Challenge 2026: Flame in Freefall. Microgravity
+              combustion &amp; spacecraft fire safety intelligence platform.
             </p>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-[10px] font-bold text-[#0B2374]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#0B2374] animate-ping" />
-              <span>Telemetry Active • PSI 20 Studies</span>
+              <span>NASA PSI research evidence</span>
             </div>
           </div>
 
           {/* Core Modules */}
           <div>
-            <h4 className="font-black text-sm text-zinc-950 mb-3">Core Modules</h4>
+            <h4 className="font-black text-sm text-zinc-950 mb-3">
+              Core Modules
+            </h4>
             <ul className="space-y-2 font-semibold">
               <li>
-                <Link href="/dashboard" className="text-zinc-600 hover:text-zinc-950 transition-colors">
+                <Link
+                  href="/dashboard"
+                  className="text-zinc-600 hover:text-zinc-950 transition-colors"
+                >
                   Research Dashboard
                 </Link>
               </li>
               <li>
-                <Link href="/explorer" className="text-zinc-600 hover:text-zinc-950 transition-colors">
+                <Link
+                  href="/explorer"
+                  className="text-zinc-600 hover:text-zinc-950 transition-colors"
+                >
                   Experiment Explorer
                 </Link>
               </li>
               <li>
-                <Link href="/mission" className="text-zinc-600 hover:text-zinc-950 transition-colors">
+                <Link
+                  href="/mission"
+                  className="text-zinc-600 hover:text-zinc-950 transition-colors"
+                >
                   Mission Scenario &amp; Gap Matrix
                 </Link>
               </li>
@@ -60,7 +74,9 @@ export const LandingFooter: React.FC = () => {
 
           {/* NASA PSI Resources */}
           <div>
-            <h4 className="font-black text-sm text-zinc-950 mb-3">NASA PSI Data</h4>
+            <h4 className="font-black text-sm text-zinc-950 mb-3">
+              NASA PSI Data
+            </h4>
             <ul className="space-y-2 font-semibold">
               <li>
                 <a
@@ -85,30 +101,45 @@ export const LandingFooter: React.FC = () => {
                 </a>
               </li>
               <li>
-                <span className="text-zinc-500 font-normal">NASA-STD-6001 Test 1 Upward Flammability</span>
+                <span className="text-zinc-500 font-normal">
+                  NASA-STD-6001 Test 1 Upward Flammability
+                </span>
               </li>
               <li>
-                <span className="text-zinc-500 font-normal">BASS / ACME / FLEX / SoFIE Investigations</span>
+                <span className="text-zinc-500 font-normal">
+                  BASS / ACME / FLEX / Saffire Investigations
+                </span>
               </li>
             </ul>
           </div>
 
           {/* Visual Story Navigation */}
           <div>
-            <h4 className="font-black text-sm text-zinc-950 mb-3">Visual Story</h4>
+            <h4 className="font-black text-sm text-zinc-950 mb-3">
+              Visual Story
+            </h4>
             <ul className="space-y-2 font-semibold">
               <li>
-                <a href="#flame-physics" className="text-zinc-600 hover:text-zinc-950 transition-colors">
+                <a
+                  href="#flame-physics"
+                  className="text-zinc-600 hover:text-zinc-950 transition-colors"
+                >
                   Earth 1g vs ISS 0g Flame
                 </a>
               </li>
               <li>
-                <a href="#lunar-paradox" className="text-zinc-600 hover:text-zinc-950 transition-colors">
+                <a
+                  href="#lunar-paradox"
+                  className="text-zinc-600 hover:text-zinc-950 transition-colors"
+                >
                   Lunar Flammability Paradox
                 </a>
               </li>
               <li>
-                <a href="#mission-modules" className="text-zinc-600 hover:text-zinc-950 transition-colors">
+                <a
+                  href="#mission-modules"
+                  className="text-zinc-600 hover:text-zinc-950 transition-colors"
+                >
                   Spaceflight Modules
                 </a>
               </li>
@@ -136,7 +167,8 @@ export const LandingFooter: React.FC = () => {
         {/* Bottom Bar */}
         <div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-semibold text-zinc-500">
           <div>
-            © 2026 FlameGuard AI Team • Built for NASA Space Apps Challenge 2026 (Flame in Freefall)
+            © 2026 FlameGuard AI Team • Built for NASA Space Apps Challenge
+            2026 (Flame in Freefall)
           </div>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-zinc-600">

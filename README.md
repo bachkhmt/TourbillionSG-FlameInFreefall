@@ -116,3 +116,14 @@ Verification and scope of changes: [record](docs/EVIDENCE_ONLY_SCOPE.md).
 
 Chatbot flow, limitations, and how to run: [docs/CHATBOT_FLOW.md](docs/CHATBOT_FLOW.md).
 Agent conventions: [AGENTS.md](AGENTS.md).
+
+
+## Learning prototype scope and reuse disclosure
+
+`playbook-rag/` is a standalone learning prototype; neither the serving backend nor the frontend imports it. Its optional Anthropic path does not run in the product. Product chat uses `app/integrations/rag/` with `CHAT_PROVIDER=extractive`, no LLM and no paid provider. Benchmarks in `playbook-rag/reports/` are not quality scores for the product chatbot.
+
+The folder entered the repository history at `d0563c4` (2026-11-15, +07:00); the original authoring time of each document has not been verified. Flame Studio is a graphic illustration, not NASA combustion data or a validated model. The team must declare every reused component and AI tool with its correct source and time in the submission.
+
+[NASA Space Apps guidance on pre-existing code](https://github.com/nasa/spaceapps/discussions/1924) distinguishes existing resources from challenge-specific work done before the event and requires attribution. Keeping the prototype in the repository does not by itself establish eligibility; the team must confirm authorship history and the list of reused components. The official legal page was unreachable during the 2026-11-15 check (HTTP 502).
+
+Pre-submission fixes, executed checks and open items: [verification](flameguard-ai-backend/specs/hackathon-readiness/verification.md).

@@ -149,3 +149,10 @@ Mir, and 3 spinoffs have no valid place to be stored. Evaluated options:
 - PSI-10 (license unknown, not indexed).
 - `facts`/`rankings`/`ml_*` from the legacy Data repo: no per-row hash/locator.
 - All schema changes, DB imports, and pushes.
+
+
+## Snapshot adapter update — 2026-11-15
+
+Adapter `source-tags-oxygen-context-v2` exports deterministic navigation tags (code, original hardware labels/acronyms, fuel-type, and unreviewed team pillar annotation) through existing tag tables. It also retains the release's explicit oxygenContext as a textual test_condition. No new tables/migration; 24 investigations, 1,926 source records, 81 sources and 2,574 passages are unchanged. Snapshot content/fingerprints change; fresh test-target import was used. Source revision and text corpus remain unchanged. Existing targets need a newly prepared/admitted bundle rather than silently reusing their prior snapshot.
+
+`GET /catalog/descriptive` counts all records within catalog-selected investigations, with denominators/missingness and original oxygen basis/context. `GET /investigations/{id}/overview` returns only corpus-policy-admitted original passages and fails closed if policy is missing or invalid. No scientific review is conferred by either endpoint.

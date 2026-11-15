@@ -13,6 +13,7 @@ export interface ChallengeResourceDto {
 }
 
 export interface ChallengeResourcePageDto {
+  isFallback?: boolean;
   items: ChallengeResourceDto[];
   total?: number;
 }

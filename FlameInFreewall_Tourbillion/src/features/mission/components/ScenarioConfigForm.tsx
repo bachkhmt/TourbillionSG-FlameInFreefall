@@ -1,25 +1,28 @@
-'use client';
+"use client";
 
-import React from 'react';
-import {
-  Orbit,
-  Sliders,
-  Wind,
-  Gauge,
-  Flame,
-  Activity,
-} from 'lucide-react';
-import { SCENARIO_PRESETS } from '@/data/presets';
-import { useWorkspaceStore } from '@/store/useWorkspaceStore';
-import { toast } from '@/components/toast/toast-store';
-import { ScenarioPresetSelector } from './ScenarioPresetSelector';
+import React from "react";
+import { Orbit, Sliders, Wind, Gauge, Flame, Activity } from "lucide-react";
+import { SCENARIO_PRESETS } from "@/lib/scenarioPresets";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
+import { toast } from "@/components/toast/toast-store";
+import { ScenarioPresetSelector } from "./ScenarioPresetSelector";
 
-const MATERIALS = ['PMMA', 'Nomex', 'Cotton', 'Polyethylene', 'Methane'] as const;
+const MATERIALS = [
+  "PMMA",
+  "Nomex",
+  "Cotton",
+  "Polyethylene",
+  "Methane",
+] as const;
 
 export const ScenarioConfigForm: React.FC = () => {
   const activeScenario = useWorkspaceStore((state) => state.activeScenario);
-  const setActiveScenario = useWorkspaceStore((state) => state.setActiveScenario);
-  const updateActiveScenario = useWorkspaceStore((state) => state.updateActiveScenario);
+  const setActiveScenario = useWorkspaceStore(
+    (state) => state.setActiveScenario,
+  );
+  const updateActiveScenario = useWorkspaceStore(
+    (state) => state.updateActiveScenario,
+  );
 
   const ppO2Val = activeScenario.pressurePsi * (activeScenario.oxygenPct / 100);
   const ppO2Display = ppO2Val.toFixed(2);
@@ -34,15 +37,12 @@ export const ScenarioConfigForm: React.FC = () => {
     setActiveScenario(preset);
     toast.info(
       `Scenario Preset Loaded: ${preset.name}`,
-      `Environment configured for ${preset.gravity.toFixed(2)}g, ${preset.oxygenPct}% O₂, ${preset.pressurePsi} psia (${preset.material}).`
+      `Environment configured for ${preset.gravity.toFixed(2)}g, ${preset.oxygenPct}% O₂, ${preset.pressurePsi} psia (${preset.material}).`,
     );
   };
 
   return (
-    <div
-      data-testid="scenario-config-form"
-      className="p-5 space-y-6"
-    >
+    <div data-testid="scenario-config-form" className="p-5 space-y-6">
       {/* Header & Presets Selector */}
       <div className="space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -65,8 +65,12 @@ export const ScenarioConfigForm: React.FC = () => {
           >
             <Activity className="w-3.5 h-3.5 shrink-0" />
             <div className="text-left">
-              <span className="text-xs font-bold">ppO₂: {ppO2Display} psia</span>
-              <span className="hidden sm:inline text-[10px] opacity-75 ml-1.5">({ppO2Status})</span>
+              <span className="text-xs font-bold">
+                ppO₂: {ppO2Display} psia
+              </span>
+              <span className="hidden sm:inline text-[10px] opacity-75 ml-1.5">
+                ({ppO2Status})
+              </span>
             </div>
           </div>
         </div>
@@ -83,7 +87,10 @@ export const ScenarioConfigForm: React.FC = () => {
         {/* Control 1: Gravity Slider */}
         <div className="space-y-2 p-3.5 rounded-3xl bg-gray-200/50">
           <div className="flex items-center justify-between">
-            <label htmlFor="gravity-slider" className="text-xs font-bold text-zinc-800 flex items-center gap-1.5">
+            <label
+              htmlFor="gravity-slider"
+              className="text-xs font-bold text-zinc-800 flex items-center gap-1.5"
+            >
               <Orbit className="w-3.5 h-3.5 text-[#0B2374]" />
               Gravitational Acceleration
             </label>
@@ -102,9 +109,16 @@ export const ScenarioConfigForm: React.FC = () => {
             onChange={(e) => {
               const val = parseFloat(e.target.value);
               updateActiveScenario({
-                id: 'custom-scenario',
+                id: "custom-scenario",
                 gravity: val,
-                environment: val === 0 ? 'iss' : val === 0.16 ? 'lunar' : val === 0.38 ? 'mars' : 'custom',
+                environment:
+                  val === 0
+                    ? "iss"
+                    : val === 0.16
+                      ? "lunar"
+                      : val === 0.38
+                        ? "mars"
+                        : "custom",
               });
             }}
             className="w-full accent-[#0B2374] cursor-pointer"
@@ -120,7 +134,10 @@ export const ScenarioConfigForm: React.FC = () => {
         {/* Control 2: Oxygen % Slider */}
         <div className="space-y-2 p-3.5 rounded-3xl bg-gray-200/50">
           <div className="flex items-center justify-between">
-            <label htmlFor="oxygen-slider" className="text-xs font-bold text-zinc-800 flex items-center gap-1.5">
+            <label
+              htmlFor="oxygen-slider"
+              className="text-xs font-bold text-zinc-800 flex items-center gap-1.5"
+            >
               <Flame className="w-3.5 h-3.5 text-orange-600" />
               Oxygen Concentration
             </label>
@@ -138,7 +155,7 @@ export const ScenarioConfigForm: React.FC = () => {
             data-testid="slider-oxygen"
             onChange={(e) => {
               updateActiveScenario({
-                id: 'custom-scenario',
+                id: "custom-scenario",
                 oxygenPct: parseFloat(e.target.value),
               });
             }}
@@ -155,7 +172,10 @@ export const ScenarioConfigForm: React.FC = () => {
         {/* Control 3: Total Pressure psia Slider */}
         <div className="space-y-2 p-3.5 rounded-3xl bg-gray-200/50">
           <div className="flex items-center justify-between">
-            <label htmlFor="pressure-slider" className="text-xs font-bold text-zinc-800 flex items-center gap-1.5">
+            <label
+              htmlFor="pressure-slider"
+              className="text-xs font-bold text-zinc-800 flex items-center gap-1.5"
+            >
               <Gauge className="w-3.5 h-3.5 text-purple-700" />
               Cabin Total Pressure
             </label>
@@ -173,7 +193,7 @@ export const ScenarioConfigForm: React.FC = () => {
             data-testid="slider-pressure"
             onChange={(e) => {
               updateActiveScenario({
-                id: 'custom-scenario',
+                id: "custom-scenario",
                 pressurePsi: parseFloat(e.target.value),
               });
             }}
@@ -191,12 +211,15 @@ export const ScenarioConfigForm: React.FC = () => {
         {/* Control 4: Material Select */}
         <div className="space-y-2 p-3.5 rounded-3xl bg-gray-200/50">
           <div className="flex items-center justify-between">
-            <label htmlFor="material-select" className="text-xs font-bold text-zinc-800 flex items-center gap-1.5">
+            <label
+              htmlFor="material-select"
+              className="text-xs font-bold text-zinc-800 flex items-center gap-1.5"
+            >
               <Flame className="w-3.5 h-3.5 text-[#0B2374]" />
               Combustible Fuel Material
             </label>
             <span className="text-[10px] text-zinc-500">
-              PSI Verified Baseline
+              Illustrative scenario input
             </span>
           </div>
           <select
@@ -205,7 +228,7 @@ export const ScenarioConfigForm: React.FC = () => {
             data-testid="select-material"
             onChange={(e) => {
               updateActiveScenario({
-                id: 'custom-scenario',
+                id: "custom-scenario",
                 material: e.target.value,
               });
             }}
@@ -213,19 +236,28 @@ export const ScenarioConfigForm: React.FC = () => {
           >
             {MATERIALS.map((mat) => (
               <option key={mat} value={mat}>
-                {mat} {mat === 'PMMA' ? '(Standard Acrylic Polymer)' : mat === 'Nomex' ? '(Aramid Flame-Retardant)' : ''}
+                {mat}{" "}
+                {mat === "PMMA"
+                  ? "(Standard Acrylic Polymer)"
+                  : mat === "Nomex"
+                    ? "(Aramid Flame-Retardant)"
+                    : ""}
               </option>
             ))}
           </select>
           <p className="text-[10px] text-zinc-500">
-            Standard NASA flight materials investigated in BASS, SoFIE, and Saffire programs.
+            Material selection is a scenario input. Check source records for
+            actual materials tested.
           </p>
         </div>
 
         {/* Control 5: Airflow Velocity Slider */}
         <div className="space-y-2 p-3.5 rounded-3xl bg-gray-200/50 md:col-span-2 lg:col-span-2">
           <div className="flex items-center justify-between">
-            <label htmlFor="airflow-slider" className="text-xs font-bold text-zinc-800 flex items-center gap-1.5">
+            <label
+              htmlFor="airflow-slider"
+              className="text-xs font-bold text-zinc-800 flex items-center gap-1.5"
+            >
               <Wind className="w-3.5 h-3.5 text-[#0B2374]" />
               HVAC Forced Ventilation Speed
             </label>
@@ -243,7 +275,7 @@ export const ScenarioConfigForm: React.FC = () => {
             data-testid="slider-airflow"
             onChange={(e) => {
               updateActiveScenario({
-                id: 'custom-scenario',
+                id: "custom-scenario",
                 airflowVelocity: parseFloat(e.target.value),
               });
             }}

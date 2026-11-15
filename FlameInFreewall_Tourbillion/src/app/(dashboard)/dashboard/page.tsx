@@ -1,10 +1,11 @@
-'use client';
+"use client";
+import { DataContextNotice } from "@/components/ui/DataContextNotice";
 
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Compass, Rocket, ArrowRight, RotateCcw, Info } from 'lucide-react';
-import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
+import React from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Compass, Rocket, ArrowRight, RotateCcw, Info } from "lucide-react";
+import { ApiErrorBanner } from "@/components/ui/ApiErrorBanner";
 import {
   useDashboardSummaryQuery,
   DashboardShimmer,
@@ -12,8 +13,8 @@ import {
   QuickScenarioTrigger,
   CuratedStudiesGrid,
   DomainBreakdown,
-} from '@/features/dashboard';
-import { useWorkspaceStore } from '@/store/useWorkspaceStore';
+} from "@/features/dashboard";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 
 export default function DashboardPage() {
   const compareList = useWorkspaceStore((state) => state.compareList);
@@ -30,7 +31,7 @@ export default function DashboardPage() {
 
   const exploreLabel = summary
     ? `Explore ${summary.investigationCount} Studies`
-    : 'Explore Studies';
+    : "Explore Studies";
 
   return (
     <motion.div
@@ -47,33 +48,16 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
               <Rocket className="w-6 h-6 text-[#0B2374]" strokeWidth={2.5} />
-              <span>Microgravity Combustion Science &amp; Fire Safety Intelligence</span>
+              <span>
+                Microgravity Combustion Science &amp; Fire Safety Intelligence
+              </span>
             </h1>
 
-            {summary && summary.context.caveats.length > 0 && (
-              <div
-                data-testid="dashboard-caveats-banner"
-                className="relative group inline-flex items-center"
-              >
-                <button
-                  type="button"
-                  aria-label="Offline Fallback & Caveats"
-                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 text-[11px] font-bold transition-colors cursor-pointer shadow-2xs"
-                >
-                  <Info className="w-3 h-3 text-amber-800" />
-                  <span>Offline Fallback</span>
-                </button>
-
-                <div className="absolute left-0 top-full mt-2 hidden group-hover:block group-focus-within:block z-50 w-72 sm:w-80 p-3.5 rounded-2xl bg-[#0B2374] text-white text-xs shadow-2xl border border-[#D4FC02]/30 pointer-events-none">
-                  <div className="font-extrabold text-[#D4FC02] text-xs mb-1.5 flex items-center gap-1.5">
-                    <Info className="w-4 h-4 text-[#D4FC02] shrink-0" />
-                    <span>{summary.context.origin} · {summary.context.reviewState}</span>
-                  </div>
-                  <p className="leading-relaxed text-zinc-200 text-[11.5px] font-medium">
-                    {summary.context.caveats.join(' · ')}
-                  </p>
-                </div>
-              </div>
+            {summary && (
+              <DataContextNotice
+                context={summary.context}
+                testId="dashboard-caveats-banner"
+              />
             )}
           </div>
 
@@ -98,7 +82,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-
 
       {/* Comparison floating quick-action pill if items are selected */}
       {compareList.length > 0 && (
