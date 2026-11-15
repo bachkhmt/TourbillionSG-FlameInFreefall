@@ -1,0 +1,2678 @@
+{
+  "experiments": [
+    {
+      "candidate": "ridge_basic",
+      "candidateAvailable": true,
+      "comparisons": {
+        "median": {
+          "comparisonEligible": true,
+          "coverageFraction": 1.0,
+          "groupMeanMae": 3.8333333333333335,
+          "groups": 3,
+          "rowMae": 3.8333333333333335,
+          "rows": 3,
+          "supportedRows": 3,
+          "totalRows": 3
+        },
+        "median_all_rows": {
+          "comparisonEligible": true,
+          "coverageFraction": 1.0,
+          "groupMeanMae": 3.8333333333333335,
+          "groups": 3,
+          "rowMae": 3.8333333333333335,
+          "rows": 3,
+          "supportedRows": 3,
+          "totalRows": 3
+        },
+        "ridge_basic": {
+          "comparisonEligible": true,
+          "coverageFraction": 1.0,
+          "groupMeanMae": 2.8637777777777784,
+          "groups": 3,
+          "rowMae": 2.8637777777777784,
+          "rows": 3,
+          "supportedRows": 3,
+          "totalRows": 3
+        }
+      },
+      "experiment": "flex_heptane",
+      "exploratoryResultsAvailable": true,
+      "features": [
+        "oxygen_mol_pct",
+        "pressure_psia"
+      ],
+      "heldOut": [
+        {
+          "actual": 8.9,
+          "eventId": "181F001@2009-11-27T13:01:24+00:00",
+          "features": {
+            "oxygen_mol_pct": 21.0,
+            "pressure_psia": 14.852578766613629
+          },
+          "fold": 0,
+          "groupId": "FLEX-033",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 3.15,
+            "ridge_basic": 3.942
+          },
+          "runId": "FLEX-035",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 4.8,
+          "eventId": "301F001@2010-03-11T21:37:48+00:00",
+          "features": {
+            "oxygen_mol_pct": 18.0,
+            "pressure_psia": 14.730757068619011
+          },
+          "fold": 1,
+          "groupId": "FLEX-062",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 5.2,
+            "ridge_basic": 5.816666666666667
+          },
+          "runId": "FLEX-062",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.5,
+          "eventId": "179F001@2010-03-30T00:40:16+00:00",
+          "features": {
+            "oxygen_mol_pct": 13.0,
+            "pressure_psia": 14.852578766613629
+          },
+          "fold": 2,
+          "groupId": "FLEX-079",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 6.85,
+            "ridge_basic": 4.116666666666666
+          },
+          "runId": "FLEX-079",
+          "unsupportedCategory": false
+        }
+      ],
+      "protocol": {
+        "id": "flex-heptane-free-droplet-n2",
+        "scope": "Recorded burn time conditional on Extinction; Completion/Disruption remain audited."
+      },
+      "publicReadiness": "not_ready",
+      "reasons": [
+        "validation_plan_missing",
+        "exploratory_results_only"
+      ],
+      "reviewStatus": "unreviewed",
+      "runId": "20261115T094135599447Z-8afde7db",
+      "sources": {
+        "candidate.json": "6f81d61baffb68d4b049cbffa7b0cc29a4bfb42c156f4e95fc406b1ff0fd2c87",
+        "evaluation.json": "48f7699667cdb3766734e95df126eb8db8fdccdd8d6c7d19d650711ef5f0d0f8",
+        "metrics.json": "9e3c374a5e1d3406509349b274ebf5461ec60bbae59b1eea4df621211c890a40",
+        "model_card.md": "ea550df28055bb5736c457540d50d9a75f31a2b0fbc49521306e2e0842b3f163",
+        "predictions.json": "f5564f2131e1bccfefa74542cad289ccc050931ab5d2d5f816a7898f313e8fb4"
+      },
+      "status": "blocked",
+      "target": "burn_duration",
+      "unit": "s"
+    },
+    {
+      "candidate": "ridge_basic",
+      "candidateAvailable": true,
+      "comparisons": {
+        "median": {
+          "comparisonEligible": true,
+          "coverageFraction": 0.8235294117647058,
+          "groupMeanMae": 38.97689594356261,
+          "groups": 9,
+          "rowMae": 41.70238095238095,
+          "rows": 84,
+          "supportedRows": 84,
+          "totalRows": 102
+        },
+        "median_all_rows": {
+          "comparisonEligible": true,
+          "coverageFraction": 1.0,
+          "groupMeanMae": 37.63766233766234,
+          "groups": 11,
+          "rowMae": 39.92156862745098,
+          "rows": 102,
+          "supportedRows": 102,
+          "totalRows": 102
+        },
+        "ridge_basic": {
+          "comparisonEligible": true,
+          "coverageFraction": 0.8235294117647058,
+          "groupMeanMae": 36.9413895133861,
+          "groups": 9,
+          "rowMae": 36.69556270456602,
+          "rows": 84,
+          "supportedRows": 84,
+          "totalRows": 102
+        }
+      },
+      "experiment": "cfig_normal",
+      "exploratoryResultsAvailable": true,
+      "features": [
+        "oxygen_mol_pct",
+        "pressure_bar"
+      ],
+      "heldOut": [
+        {
+          "actual": 50.0,
+          "eventId": "cfig:21088A1",
+          "features": {
+            "fuel": "ethane",
+            "oxygen_mol_pct": 39.39,
+            "pressure_bar": 0.9443956
+          },
+          "fold": 0,
+          "groupId": "normal:21088A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21088A1",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 43.0,
+          "eventId": "cfig:21088B1",
+          "features": {
+            "fuel": "ethane",
+            "oxygen_mol_pct": 38.9822946,
+            "pressure_bar": 0.9443956
+          },
+          "fold": 0,
+          "groupId": "normal:21088A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21088B1",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 42.0,
+          "eventId": "cfig:21088C1",
+          "features": {
+            "fuel": "ethane",
+            "oxygen_mol_pct": 38.6321188,
+            "pressure_bar": 0.9443956
+          },
+          "fold": 0,
+          "groupId": "normal:21088A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21088C1",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 42.0,
+          "eventId": "cfig:21088G1",
+          "features": {
+            "fuel": "ethane",
+            "oxygen_mol_pct": 37.9858042,
+            "pressure_bar": 0.9443956
+          },
+          "fold": 0,
+          "groupId": "normal:21088A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21088G1",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 37.0,
+          "eventId": "cfig:21088J1",
+          "features": {
+            "fuel": "ethane",
+            "oxygen_mol_pct": 37.3391583,
+            "pressure_bar": 0.9443956
+          },
+          "fold": 0,
+          "groupId": "normal:21088A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21088J1",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 9.0,
+          "eventId": "cfig:21088L1",
+          "features": {
+            "fuel": "ethane",
+            "oxygen_mol_pct": 20.9638709,
+            "pressure_bar": 1.0133
+          },
+          "fold": 0,
+          "groupId": "normal:21088A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21088L1",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 13.0,
+          "eventId": "cfig:21088M4",
+          "features": {
+            "fuel": "ethane",
+            "oxygen_mol_pct": 21.01,
+            "pressure_bar": 1.0133
+          },
+          "fold": 0,
+          "groupId": "normal:21088A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21088M4",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 7.0,
+          "eventId": "cfig:21088N1",
+          "features": {
+            "fuel": "ethane",
+            "oxygen_mol_pct": 18.02,
+            "pressure_bar": 1.0133
+          },
+          "fold": 0,
+          "groupId": "normal:21088A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21088N1",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 8.0,
+          "eventId": "cfig:21088P1",
+          "features": {
+            "fuel": "ethane",
+            "oxygen_mol_pct": 17.9685675,
+            "pressure_bar": 1.0133
+          },
+          "fold": 0,
+          "groupId": "normal:21088A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21088P1",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 40.0,
+          "eventId": "cfig:21102A1",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 39.57,
+            "pressure_bar": 1.0133
+          },
+          "fold": 1,
+          "groupId": "normal:21102A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 80.17051145804678
+          },
+          "runId": "normal:21102A1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 38.0,
+          "eventId": "cfig:21102B1",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 39.0548195,
+            "pressure_bar": 1.0133
+          },
+          "fold": 1,
+          "groupId": "normal:21102A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 78.32077173160312
+          },
+          "runId": "normal:21102B1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 41.0,
+          "eventId": "cfig:21102C1",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 39.3031985,
+            "pressure_bar": 1.0133
+          },
+          "fold": 1,
+          "groupId": "normal:21102A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 79.21256888524995
+          },
+          "runId": "normal:21102C1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 82.0,
+          "eventId": "cfig:21102C3",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 38.6221513,
+            "pressure_bar": 1.0133
+          },
+          "fold": 1,
+          "groupId": "normal:21102A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 76.76728987833252
+          },
+          "runId": "normal:21102C3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 8.0,
+          "eventId": "cfig:21102M1",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 23.41,
+            "pressure_bar": 1.0133
+          },
+          "fold": 1,
+          "groupId": "normal:21102A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 22.14852891148387
+          },
+          "runId": "normal:21102M1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 14.0,
+          "eventId": "cfig:21102M2",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 23.3649188,
+            "pressure_bar": 1.0133
+          },
+          "fold": 1,
+          "groupId": "normal:21102A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 21.986666250618892
+          },
+          "runId": "normal:21102M2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 32.0,
+          "eventId": "cfig:21291B1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 38.8318854,
+            "pressure_bar": 2.0266
+          },
+          "fold": 10,
+          "groupId": "normal:21291A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 26.5,
+            "ridge_basic": 65.79210452598815
+          },
+          "runId": "normal:21291B1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 27.0,
+          "eventId": "cfig:21291C2",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 38.9271344,
+            "pressure_bar": 2.0266
+          },
+          "fold": 10,
+          "groupId": "normal:21291A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 26.5,
+            "ridge_basic": 66.12652020747568
+          },
+          "runId": "normal:21291C2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 47.0,
+          "eventId": "cfig:21291D1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 39.78,
+            "pressure_bar": 1.0133
+          },
+          "fold": 10,
+          "groupId": "normal:21291A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 26.5,
+            "ridge_basic": 73.78864758376105
+          },
+          "runId": "normal:21291D1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 161.0,
+          "eventId": "cfig:21291G1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 39.4946781,
+            "pressure_bar": 1.0133
+          },
+          "fold": 10,
+          "groupId": "normal:21291A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 26.5,
+            "ridge_basic": 72.7868930495212
+          },
+          "runId": "normal:21291G1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 60.0,
+          "eventId": "cfig:21291G2",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 38.845523,
+            "pressure_bar": 1.0133
+          },
+          "fold": 10,
+          "groupId": "normal:21291A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 26.5,
+            "ridge_basic": 70.5077337391075
+          },
+          "runId": "normal:21291G2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 35.0,
+          "eventId": "cfig:21291H1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 38.7190712,
+            "pressure_bar": 2.0266
+          },
+          "fold": 10,
+          "groupId": "normal:21291A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 26.5,
+            "ridge_basic": 65.39601808335394
+          },
+          "runId": "normal:21291H1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 27.0,
+          "eventId": "cfig:21291J2",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 38.2657026,
+            "pressure_bar": 1.0133
+          },
+          "fold": 10,
+          "groupId": "normal:21291A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 26.5,
+            "ridge_basic": 68.47200597077017
+          },
+          "runId": "normal:21291J2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 83.0,
+          "eventId": "cfig:21291J3",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 38.0783875,
+            "pressure_bar": 1.0133
+          },
+          "fold": 10,
+          "groupId": "normal:21291A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 26.5,
+            "ridge_basic": 67.8143496508151
+          },
+          "runId": "normal:21291J3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 60.0,
+          "eventId": "cfig:21106A4",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 39.26,
+            "pressure_bar": 0.50665
+          },
+          "fold": 2,
+          "groupId": "normal:21106A4",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 61.88591206530715
+          },
+          "runId": "normal:21106A4",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 62.0,
+          "eventId": "cfig:21106B1",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 38.4638613,
+            "pressure_bar": 0.50665
+          },
+          "fold": 2,
+          "groupId": "normal:21106A4",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 59.06347059458152
+          },
+          "runId": "normal:21106B1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 63.0,
+          "eventId": "cfig:21106C1",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 37.7171369,
+            "pressure_bar": 0.50665
+          },
+          "fold": 2,
+          "groupId": "normal:21106A4",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 56.41621087242166
+          },
+          "runId": "normal:21106C1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 120.0,
+          "eventId": "cfig:21106D1",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 36.9281404,
+            "pressure_bar": 0.50665
+          },
+          "fold": 2,
+          "groupId": "normal:21106A4",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 53.619089664951915
+          },
+          "runId": "normal:21106D1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 20.0,
+          "eventId": "cfig:21106G6",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 20.97,
+            "pressure_bar": 0.50665
+          },
+          "fold": 2,
+          "groupId": "normal:21106A4",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21106G6",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 20.0,
+          "eventId": "cfig:21106G7",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 20.8586481,
+            "pressure_bar": 0.50665
+          },
+          "fold": 2,
+          "groupId": "normal:21106A4",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21106G7",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 14.0,
+          "eventId": "cfig:21106G9",
+          "features": {
+            "fuel": "50% butane",
+            "oxygen_mol_pct": 20.7473561,
+            "pressure_bar": 0.50665
+          },
+          "fold": 2,
+          "groupId": "normal:21106A4",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21106G9",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 44.0,
+          "eventId": "cfig:21112A2",
+          "features": {
+            "fuel": "propane",
+            "oxygen_mol_pct": 39.40449,
+            "pressure_bar": 0.9443956
+          },
+          "fold": 3,
+          "groupId": "normal:21112A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21112A2",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 95.0,
+          "eventId": "cfig:21112A3",
+          "features": {
+            "fuel": "propane",
+            "oxygen_mol_pct": 39.1274328,
+            "pressure_bar": 0.9443956
+          },
+          "fold": 3,
+          "groupId": "normal:21112A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21112A3",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 24.0,
+          "eventId": "cfig:21112A5",
+          "features": {
+            "fuel": "propane",
+            "oxygen_mol_pct": 37.9543758,
+            "pressure_bar": 0.9443956
+          },
+          "fold": 3,
+          "groupId": "normal:21112A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21112A5",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 259.0,
+          "eventId": "cfig:21112A6",
+          "features": {
+            "fuel": "propane",
+            "oxygen_mol_pct": 37.6528047,
+            "pressure_bar": 0.9443956
+          },
+          "fold": 3,
+          "groupId": "normal:21112A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21112A6",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 8.0,
+          "eventId": "cfig:21112F2",
+          "features": {
+            "fuel": "propane",
+            "oxygen_mol_pct": 21.25,
+            "pressure_bar": 1.0133
+          },
+          "fold": 3,
+          "groupId": "normal:21112A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21112F2",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 8.0,
+          "eventId": "cfig:21112F3",
+          "features": {
+            "fuel": "propane",
+            "oxygen_mol_pct": 21.2224743,
+            "pressure_bar": 1.0133
+          },
+          "fold": 3,
+          "groupId": "normal:21112A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21112F3",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 10.0,
+          "eventId": "cfig:21112F4",
+          "features": {
+            "fuel": "propane",
+            "oxygen_mol_pct": 21.2004554,
+            "pressure_bar": 1.0133
+          },
+          "fold": 3,
+          "groupId": "normal:21112A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21112F4",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 12.0,
+          "eventId": "cfig:21112H1",
+          "features": {
+            "fuel": "propane",
+            "oxygen_mol_pct": 21.1798144,
+            "pressure_bar": 1.0133
+          },
+          "fold": 3,
+          "groupId": "normal:21112A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21112H1",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 11.0,
+          "eventId": "cfig:21112H2",
+          "features": {
+            "fuel": "propane",
+            "oxygen_mol_pct": 21.1591749,
+            "pressure_bar": 1.0133
+          },
+          "fold": 3,
+          "groupId": "normal:21112A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": null
+          },
+          "runId": "normal:21112H2",
+          "unsupportedCategory": true
+        },
+        {
+          "actual": 8.0,
+          "eventId": "cfig:21125A2",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 39.45,
+            "pressure_bar": 1.0133
+          },
+          "fold": 4,
+          "groupId": "normal:21125A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": 78.4812169273084
+          },
+          "runId": "normal:21125A2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.0,
+          "eventId": "cfig:21125D1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 21.11,
+            "pressure_bar": 1.0133
+          },
+          "fold": 4,
+          "groupId": "normal:21125A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": 15.40818041831617
+          },
+          "runId": "normal:21125D1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.0,
+          "eventId": "cfig:21125D2",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 21.1072309,
+            "pressure_bar": 1.0133
+          },
+          "fold": 4,
+          "groupId": "normal:21125A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": 15.398657215186574
+          },
+          "runId": "normal:21125D2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 35.0,
+          "eventId": "cfig:21125K1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 39.4118729,
+            "pressure_bar": 1.0133
+          },
+          "fold": 4,
+          "groupId": "normal:21125A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": 78.35009413721666
+          },
+          "runId": "normal:21125K1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 17.0,
+          "eventId": "cfig:21125K2",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 38.9156864,
+            "pressure_bar": 1.0133
+          },
+          "fold": 4,
+          "groupId": "normal:21125A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 32.0,
+            "ridge_basic": 76.64366070047897
+          },
+          "runId": "normal:21125K2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.0,
+          "eventId": "cfig:21130A1",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.07,
+            "pressure_bar": 2.0266
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130A1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.0,
+          "eventId": "cfig:21130A2",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.0684692,
+            "pressure_bar": 2.0266
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130A2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.0,
+          "eventId": "cfig:21130A5",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.0654078,
+            "pressure_bar": 2.0266
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130A5",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.0,
+          "eventId": "cfig:21130A9",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.0623465,
+            "pressure_bar": 2.0266
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130A9",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.0,
+          "eventId": "cfig:21130G2",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.67,
+            "pressure_bar": 3.0399
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130G2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.0,
+          "eventId": "cfig:21130G3",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.6689654,
+            "pressure_bar": 3.0399
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130G3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.0,
+          "eventId": "cfig:21130G6",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.6668964,
+            "pressure_bar": 3.0399
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130G6",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 1.0,
+          "eventId": "cfig:21130G7",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.6663791,
+            "pressure_bar": 3.0399
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130G7",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 6.0,
+          "eventId": "cfig:21130M1",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.0615813,
+            "pressure_bar": 2.0266
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130M1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 7.0,
+          "eventId": "cfig:21130M2",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.050331,
+            "pressure_bar": 2.0266
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130M2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 5.0,
+          "eventId": "cfig:21130M3",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.0240854,
+            "pressure_bar": 2.0266
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130M3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 6.0,
+          "eventId": "cfig:21130N1",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.6661205,
+            "pressure_bar": 3.0399
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130N1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 6.0,
+          "eventId": "cfig:21130N2",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.6585869,
+            "pressure_bar": 3.0399
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130N2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 5.0,
+          "eventId": "cfig:21130N3",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.6435213,
+            "pressure_bar": 3.0399
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130N3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 5.0,
+          "eventId": "cfig:21130N4",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.6403828,
+            "pressure_bar": 3.0399
+          },
+          "fold": 5,
+          "groupId": "normal:21130A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 35.0,
+            "ridge_basic": 0.0
+          },
+          "runId": "normal:21130N4",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 19.0,
+          "eventId": "cfig:21137A1",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 39.96,
+            "pressure_bar": 1.0133
+          },
+          "fold": 6,
+          "groupId": "normal:21137A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.5,
+            "ridge_basic": 98.59709762020847
+          },
+          "runId": "normal:21137A1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 39.0,
+          "eventId": "cfig:21137A2",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 39.7258964,
+            "pressure_bar": 1.0133
+          },
+          "fold": 6,
+          "groupId": "normal:21137A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.5,
+            "ridge_basic": 97.67911366443155
+          },
+          "runId": "normal:21137A2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 124.0,
+          "eventId": "cfig:21137A3",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 39.4768875,
+            "pressure_bar": 1.0133
+          },
+          "fold": 6,
+          "groupId": "normal:21137A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.5,
+            "ridge_basic": 96.7026819690383
+          },
+          "runId": "normal:21137A3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 35.0,
+          "eventId": "cfig:21137A4",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 35.7498988,
+            "pressure_bar": 1.0133
+          },
+          "fold": 6,
+          "groupId": "normal:21137A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.5,
+            "ridge_basic": 82.08814451655189
+          },
+          "runId": "normal:21137A4",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 44.0,
+          "eventId": "cfig:21137A5",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 35.5683743,
+            "pressure_bar": 1.0133
+          },
+          "fold": 6,
+          "groupId": "normal:21137A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.5,
+            "ridge_basic": 81.37633752776392
+          },
+          "runId": "normal:21137A5",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 22.0,
+          "eventId": "cfig:21137A6",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 35.3678232,
+            "pressure_bar": 1.0133
+          },
+          "fold": 6,
+          "groupId": "normal:21137A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.5,
+            "ridge_basic": 80.58992205993934
+          },
+          "runId": "normal:21137A6",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 33.0,
+          "eventId": "cfig:21137A7",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 35.2403076,
+            "pressure_bar": 1.0133
+          },
+          "fold": 6,
+          "groupId": "normal:21137A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.5,
+            "ridge_basic": 80.08989867323677
+          },
+          "runId": "normal:21137A7",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 8.0,
+          "eventId": "cfig:21137C1",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 20.8927834,
+            "pressure_bar": 1.0133
+          },
+          "fold": 6,
+          "groupId": "normal:21137A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.5,
+            "ridge_basic": 23.82934983622125
+          },
+          "runId": "normal:21137C1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 8.0,
+          "eventId": "cfig:21137D1",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 21.0,
+            "pressure_bar": 1.0133
+          },
+          "fold": 6,
+          "groupId": "normal:21137A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.5,
+            "ridge_basic": 24.249775317046637
+          },
+          "runId": "normal:21137D1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 11.0,
+          "eventId": "cfig:21137D2",
+          "features": {
+            "fuel": "30% propane",
+            "oxygen_mol_pct": 20.9133851,
+            "pressure_bar": 1.0133
+          },
+          "fold": 6,
+          "groupId": "normal:21137A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 29.5,
+            "ridge_basic": 23.910134711215616
+          },
+          "runId": "normal:21137D2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 59.0,
+          "eventId": "cfig:21153A1",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 38.87,
+            "pressure_bar": 0.50665
+          },
+          "fold": 7,
+          "groupId": "normal:21153A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 24.0,
+            "ridge_basic": 111.50960163566593
+          },
+          "runId": "normal:21153A1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 88.0,
+          "eventId": "cfig:21153A2",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 37.5900202,
+            "pressure_bar": 0.50665
+          },
+          "fold": 7,
+          "groupId": "normal:21153A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 24.0,
+            "ridge_basic": 106.76823739379601
+          },
+          "runId": "normal:21153A2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 258.0,
+          "eventId": "cfig:21153A3",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 36.3879118,
+            "pressure_bar": 0.50665
+          },
+          "fold": 7,
+          "groupId": "normal:21153A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 24.0,
+            "ridge_basic": 102.31532822865805
+          },
+          "runId": "normal:21153A3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 34.0,
+          "eventId": "cfig:21153C1",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 39.85,
+            "pressure_bar": 2.0266
+          },
+          "fold": 7,
+          "groupId": "normal:21153A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 24.0,
+            "ridge_basic": 112.39883441517061
+          },
+          "runId": "normal:21153C1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 51.0,
+          "eventId": "cfig:21153C2",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 39.6626309,
+            "pressure_bar": 2.0266
+          },
+          "fold": 7,
+          "groupId": "normal:21153A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 24.0,
+            "ridge_basic": 111.7047725629669
+          },
+          "runId": "normal:21153C2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 123.0,
+          "eventId": "cfig:21153C3",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 39.4842385,
+            "pressure_bar": 2.0266
+          },
+          "fold": 7,
+          "groupId": "normal:21153A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 24.0,
+            "ridge_basic": 111.04396264519993
+          },
+          "runId": "normal:21153C3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 44.0,
+          "eventId": "cfig:21153C6",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 38.3585316,
+            "pressure_bar": 2.0266
+          },
+          "fold": 7,
+          "groupId": "normal:21153A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 24.0,
+            "ridge_basic": 106.87406368078953
+          },
+          "runId": "normal:21153C6",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 44.0,
+          "eventId": "cfig:21153F1",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 34.080788,
+            "pressure_bar": 0.50665
+          },
+          "fold": 7,
+          "groupId": "normal:21153A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 24.0,
+            "ridge_basic": 93.76916657291392
+          },
+          "runId": "normal:21153F1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 131.0,
+          "eventId": "cfig:21153G1",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 39.1980391,
+            "pressure_bar": 2.0266
+          },
+          "fold": 7,
+          "groupId": "normal:21153A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 24.0,
+            "ridge_basic": 109.9838087262048
+          },
+          "runId": "normal:21153G1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 43.0,
+          "eventId": "cfig:21162A1",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 39.97,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 97.1620646062764
+          },
+          "runId": "normal:21162A1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 71.0,
+          "eventId": "cfig:21162A2",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 39.4966671,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 95.87642898425756
+          },
+          "runId": "normal:21162A2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 232.0,
+          "eventId": "cfig:21162A3",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 39.0017987,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 94.53230005670684
+          },
+          "runId": "normal:21162A3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 304.0,
+          "eventId": "cfig:21162A4",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 37.2085537,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 89.66160619408461
+          },
+          "runId": "normal:21162A4",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 158.0,
+          "eventId": "cfig:21162B1",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 37.932621,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 91.6282700655776
+          },
+          "runId": "normal:21162B1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 19.0,
+          "eventId": "cfig:21162C1",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 21.0,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 45.63700106284326
+          },
+          "runId": "normal:21162C1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 11.0,
+          "eventId": "cfig:21162C2",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 20.9619681,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 45.53370132303422
+          },
+          "runId": "normal:21162C2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 9.0,
+          "eventId": "cfig:21162C3",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 20.9289501,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 45.44402000790102
+          },
+          "runId": "normal:21162C3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 9.0,
+          "eventId": "cfig:21162C4",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 20.892942,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 45.34621718024796
+          },
+          "runId": "normal:21162C4",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 9.0,
+          "eventId": "cfig:21162C5",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 20.8389559,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 45.19958369406123
+          },
+          "runId": "normal:21162C5",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 16.0,
+          "eventId": "cfig:21162D1",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 20.7540819,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 44.969054529950256
+          },
+          "runId": "normal:21162D1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 10.0,
+          "eventId": "cfig:21162F2",
+          "features": {
+            "fuel": "30% ethane",
+            "oxygen_mol_pct": 20.7221235,
+            "pressure_bar": 1.0133
+          },
+          "fold": 8,
+          "groupId": "normal:21162A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 31.0,
+            "ridge_basic": 44.882251230490766
+          },
+          "runId": "normal:21162F2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 21.0,
+          "eventId": "cfig:21174A1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 38.86,
+            "pressure_bar": 0.50665
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 57.529732605953015
+          },
+          "runId": "normal:21174A1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 29.0,
+          "eventId": "cfig:21174A2",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 38.317216,
+            "pressure_bar": 0.50665
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 55.67150833521123
+          },
+          "runId": "normal:21174A2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 54.0,
+          "eventId": "cfig:21174A3",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 37.8521822,
+            "pressure_bar": 0.50665
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 54.07946233924362
+          },
+          "runId": "normal:21174A3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 210.0,
+          "eventId": "cfig:21174A4",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 37.2051768,
+            "pressure_bar": 0.50665
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 51.86443548218629
+          },
+          "runId": "normal:21174A4",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 109.0,
+          "eventId": "cfig:21174B1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 35.5439854,
+            "pressure_bar": 0.50665
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 46.177336787627254
+          },
+          "runId": "normal:21174B1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 30.0,
+          "eventId": "cfig:21174C1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 39.85,
+            "pressure_bar": 2.0266
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 48.66560312183013
+          },
+          "runId": "normal:21174C1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 29.0,
+          "eventId": "cfig:21174C2",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 39.6546482,
+            "pressure_bar": 2.0266
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 47.996815066004785
+          },
+          "runId": "normal:21174C2",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 35.0,
+          "eventId": "cfig:21174C3",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 39.537253,
+            "pressure_bar": 2.0266
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 47.59491189658824
+          },
+          "runId": "normal:21174C3",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 90.0,
+          "eventId": "cfig:21174C4",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 39.4310549,
+            "pressure_bar": 2.0266
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 47.2313420659988
+          },
+          "runId": "normal:21174C4",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 251.0,
+          "eventId": "cfig:21174C6",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 38.9263058,
+            "pressure_bar": 2.0266
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 45.50333050291833
+          },
+          "runId": "normal:21174C6",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 83.0,
+          "eventId": "cfig:21174D1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 39.2491915,
+            "pressure_bar": 2.0266
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 46.60873162825631
+          },
+          "runId": "normal:21174D1",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 40.0,
+          "eventId": "cfig:21174F1",
+          "features": {
+            "fuel": "30% butane",
+            "oxygen_mol_pct": 39.0816348,
+            "pressure_bar": 2.0266
+          },
+          "fold": 9,
+          "groupId": "normal:21174A1",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 23.0,
+            "ridge_basic": 46.03510026354144
+          },
+          "runId": "normal:21174F1",
+          "unsupportedCategory": false
+        }
+      ],
+      "protocol": {
+        "id": "cfig-normal-hot-ignition-se",
+        "scope": "Recorded time for SE with hot ignition; AI/Data must resolve flow termination and protocol censoring before new-run inference."
+      },
+      "publicReadiness": "not_ready",
+      "reasons": [
+        "validation_plan_missing",
+        "exploratory_results_only"
+      ],
+      "reviewStatus": "unreviewed",
+      "runId": "20261115T095643715122Z-8de323ed",
+      "sources": {
+        "candidate.json": "43f6acd5828e7e31471d026f899af2d965881cfba6bc277217759107c0f27fd0",
+        "evaluation.json": "4e6204162f804003bc2ccae96434fe2b2222b7a1d0039e695e5fc5ca86eba6c8",
+        "metrics.json": "d7f3f2bbe4d1956bd8e435c865afacc0ae55055852bc66622f082ff4579ef405",
+        "model_card.md": "caca66e08e8bbf7e8e73a86cbf8b5fac12387419fdae407a22963c474a583bd0",
+        "predictions.json": "0524830a70ad063881837dd623a5390d8adf31ceb588b23b50e45916a2db3748"
+      },
+      "status": "blocked",
+      "target": "recorded_burn_duration",
+      "unit": "s"
+    },
+    {
+      "candidate": null,
+      "candidateAvailable": true,
+      "comparisons": {
+        "median": {
+          "comparisonEligible": true,
+          "coverageFraction": 1.0,
+          "groupMeanMae": 0.07238888888888888,
+          "groups": 12,
+          "rowMae": 0.07777777777777778,
+          "rows": 27,
+          "supportedRows": 27,
+          "totalRows": 27
+        },
+        "median_all_rows": {
+          "comparisonEligible": true,
+          "coverageFraction": 1.0,
+          "groupMeanMae": 0.07238888888888888,
+          "groups": 12,
+          "rowMae": 0.07777777777777778,
+          "rows": 27,
+          "supportedRows": 27,
+          "totalRows": 27
+        },
+        "ridge_basic": {
+          "comparisonEligible": true,
+          "coverageFraction": 1.0,
+          "groupMeanMae": 0.07479057465238828,
+          "groups": 12,
+          "rowMae": 0.08886635159402616,
+          "rows": 27,
+          "supportedRows": 27,
+          "totalRows": 27
+        }
+      },
+      "experiment": "cfi_droplet_khot",
+      "exploratoryResultsAvailable": true,
+      "features": [
+        "pressure_atm"
+      ],
+      "heldOut": [
+        {
+          "actual": 0.338,
+          "eventId": "cfi:1207",
+          "features": {
+            "pressure_atm": 1.0
+          },
+          "fold": 0,
+          "groupId": "1206",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.371,
+            "ridge_basic": 0.34296432374638497
+          },
+          "runId": "1207",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.36,
+          "eventId": "cfi:1208",
+          "features": {
+            "pressure_atm": 1.0
+          },
+          "fold": 0,
+          "groupId": "1206",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.371,
+            "ridge_basic": 0.34296432374638497
+          },
+          "runId": "1208",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.359,
+          "eventId": "cfi:1209",
+          "features": {
+            "pressure_atm": 1.0
+          },
+          "fold": 0,
+          "groupId": "1206",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.371,
+            "ridge_basic": 0.34296432374638497
+          },
+          "runId": "1209",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.403,
+          "eventId": "cfi:1210",
+          "features": {
+            "pressure_atm": 1.0
+          },
+          "fold": 0,
+          "groupId": "1206",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.371,
+            "ridge_basic": 0.34296432374638497
+          },
+          "runId": "1210",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.339,
+          "eventId": "cfi:1211",
+          "features": {
+            "pressure_atm": 1.0
+          },
+          "fold": 1,
+          "groupId": "1211",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.37,
+            "ridge_basic": 0.3483911539783383
+          },
+          "runId": "1211",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.338,
+          "eventId": "cfi:1254",
+          "features": {
+            "pressure_atm": 3.0
+          },
+          "fold": 10,
+          "groupId": "1254",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.371,
+            "ridge_basic": 0.4269111813711704
+          },
+          "runId": "1254",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.412,
+          "eventId": "cfi:1255",
+          "features": {
+            "pressure_atm": 3.0
+          },
+          "fold": 10,
+          "groupId": "1254",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.371,
+            "ridge_basic": 0.4269111813711704
+          },
+          "runId": "1255",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.35,
+          "eventId": "cfi:1256",
+          "features": {
+            "pressure_atm": 3.0
+          },
+          "fold": 10,
+          "groupId": "1254",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.371,
+            "ridge_basic": 0.4269111813711704
+          },
+          "runId": "1256",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.215,
+          "eventId": "cfi:1258",
+          "features": {
+            "pressure_atm": 3.0
+          },
+          "fold": 10,
+          "groupId": "1254",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.371,
+            "ridge_basic": 0.4269111813711704
+          },
+          "runId": "1258",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.588,
+          "eventId": "cfi:1259",
+          "features": {
+            "pressure_atm": 5.0
+          },
+          "fold": 11,
+          "groupId": "1259",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 0.3595,
+            "ridge_basic": 0.3156110098137615
+          },
+          "runId": "1259",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.488,
+          "eventId": "cfi:1260",
+          "features": {
+            "pressure_atm": 5.0
+          },
+          "fold": 11,
+          "groupId": "1259",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 0.3595,
+            "ridge_basic": 0.3156110098137615
+          },
+          "runId": "1260",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.618,
+          "eventId": "cfi:1261",
+          "features": {
+            "pressure_atm": 5.0
+          },
+          "fold": 11,
+          "groupId": "1259",
+          "outsideTrainBounds": true,
+          "outsideTrainJointDomain": true,
+          "predictions": {
+            "median": 0.3595,
+            "ridge_basic": 0.3156110098137615
+          },
+          "runId": "1261",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.189,
+          "eventId": "cfi:1213",
+          "features": {
+            "pressure_atm": 1.0
+          },
+          "fold": 2,
+          "groupId": "1212",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.37,
+            "ridge_basic": 0.35732044199331026
+          },
+          "runId": "1213",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.371,
+          "eventId": "cfi:1218",
+          "features": {
+            "pressure_atm": 1.0
+          },
+          "fold": 3,
+          "groupId": "1218",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.36,
+            "ridge_basic": 0.3423107505146921
+          },
+          "runId": "1218",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.427,
+          "eventId": "cfi:1226",
+          "features": {
+            "pressure_atm": 1.25
+          },
+          "fold": 3,
+          "groupId": "1218",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.36,
+            "ridge_basic": 0.34994012539771663
+          },
+          "runId": "1226",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.399,
+          "eventId": "cfi:1227",
+          "features": {
+            "pressure_atm": 2.0
+          },
+          "fold": 4,
+          "groupId": "1227",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.369,
+            "ridge_basic": 0.3891593229516414
+          },
+          "runId": "1227",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.49,
+          "eventId": "cfi:1231",
+          "features": {
+            "pressure_atm": 3.0
+          },
+          "fold": 4,
+          "groupId": "1227",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.369,
+            "ridge_basic": 0.4241212909017538
+          },
+          "runId": "1231",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.324,
+          "eventId": "cfi:1232",
+          "features": {
+            "pressure_atm": 3.0
+          },
+          "fold": 4,
+          "groupId": "1227",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.369,
+            "ridge_basic": 0.4241212909017538
+          },
+          "runId": "1232",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.11,
+          "eventId": "cfi:1233",
+          "features": {
+            "pressure_atm": 3.0
+          },
+          "fold": 4,
+          "groupId": "1227",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.369,
+            "ridge_basic": 0.4241212909017538
+          },
+          "runId": "1233",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.413,
+          "eventId": "cfi:1234",
+          "features": {
+            "pressure_atm": 3.0
+          },
+          "fold": 5,
+          "groupId": "1234",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.3645,
+            "ridge_basic": 0.4052950590030603
+          },
+          "runId": "1234",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.369,
+          "eventId": "cfi:1238",
+          "features": {
+            "pressure_atm": 0.5
+          },
+          "fold": 6,
+          "groupId": "1236",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.3655,
+            "ridge_basic": 0.33028657643092235
+          },
+          "runId": "1238",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.319,
+          "eventId": "cfi:1237",
+          "features": {
+            "pressure_atm": 0.5
+          },
+          "fold": 7,
+          "groupId": "1237",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.37,
+            "ridge_basic": 0.3345980500884096
+          },
+          "runId": "1237",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.333,
+          "eventId": "cfi:1242",
+          "features": {
+            "pressure_atm": 0.75
+          },
+          "fold": 8,
+          "groupId": "1242",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.371,
+            "ridge_basic": 0.3414081226368313
+          },
+          "runId": "1242",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.338,
+          "eventId": "cfi:1243",
+          "features": {
+            "pressure_atm": 0.75
+          },
+          "fold": 8,
+          "groupId": "1242",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.371,
+            "ridge_basic": 0.3414081226368313
+          },
+          "runId": "1243",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.409,
+          "eventId": "cfi:1248",
+          "features": {
+            "pressure_atm": 1.0
+          },
+          "fold": 9,
+          "groupId": "1248",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.3595,
+            "ridge_basic": 0.3302489678164541
+          },
+          "runId": "1248",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.426,
+          "eventId": "cfi:1249",
+          "features": {
+            "pressure_atm": 1.0
+          },
+          "fold": 9,
+          "groupId": "1248",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.3595,
+            "ridge_basic": 0.3302489678164541
+          },
+          "runId": "1249",
+          "unsupportedCategory": false
+        },
+        {
+          "actual": 0.47,
+          "eventId": "cfi:1253",
+          "features": {
+            "pressure_atm": 1.0
+          },
+          "fold": 9,
+          "groupId": "1248",
+          "outsideTrainBounds": false,
+          "outsideTrainJointDomain": false,
+          "predictions": {
+            "median": 0.3595,
+            "ridge_basic": 0.3302489678164541
+          },
+          "runId": "1253",
+          "unsupportedCategory": false
+        }
+      ],
+      "protocol": {
+        "id": "cfi-ndodecane-supported-he0-analyzed",
+        "scope": "Workbook khot for n-dodecane, supported droplets, He=0 and Completed Analysis?=Yes; O2/N2 basis remains unconfirmed."
+      },
+      "publicReadiness": "not_ready",
+      "reasons": [
+        "validation_plan_missing",
+        "exploratory_results_only"
+      ],
+      "reviewStatus": "unreviewed",
+      "runId": "20261115T095850995976Z-41afdc05",
+      "sources": {
+        "candidate.json": "9fb558956c26e43ea68fc9714c8863bae7df57a435438347eb7834748917db5c",
+        "evaluation.json": "4357f2ab1874f8e0d7e6be30bd8188e0aa2981f305bf224ea868bd4920dad5ce",
+        "metrics.json": "2b573b2b58e68a2ecca4564846104ddb5e3c61bbd04887adc89be2c456bcf795",
+        "model_card.md": "0af5572413b5b8b386030098b539823dce392c568590054bafddba8414703d36",
+        "predictions.json": "740b48e70cecc72fd4a7485227f7b385adf5780c1764d2cf015619a56b4be5fc"
+      },
+      "status": "blocked",
+      "target": "khot",
+      "unit": "mm^2/s"
+    },
+    {
+      "candidate": null,
+      "candidateAvailable": false,
+      "comparisons": null,
+      "experiment": "saffire_ii_spread",
+      "exploratoryResultsAvailable": false,
+      "features": [],
+      "heldOut": [],
+      "protocol": {
+        "id": "saffire-sibal-29x5-concurrent",
+        "scope": "One average microgravity spread-rate label per SIBAL burn; identical geometry and measurement protocol; campaign-level groups, frames never independent."
+      },
+      "publicReadiness": "not_ready",
+      "reasons": [
+        "at_least_three_groups_required",
+        "see additional_measurements in audit.json"
+      ],
+      "reviewStatus": "unreviewed",
+      "runId": "20261115T100452983197Z-b4f50360",
+      "sources": {
+        "evaluation.json": "5f8667e00baca23d41d4610b20b69d6ac1bb8beacdabe05c2f554a6264ab7c66",
+        "model_card.md": "646e9814377fb940aa8adf620341576f01204727a80407114a84429eab7ca4b1"
+      },
+      "status": "blocked",
+      "target": "flame_spread_rate",
+      "unit": "mm/s"
+    }
+  ],
+  "schemaVersion": 1,
+  "sourceNote": "Generated offline from AI-team notebook outputs that are not stored in git; the sha256 values pin the exact files used. Exploratory and unreviewed."
+}
