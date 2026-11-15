@@ -116,6 +116,11 @@
     </section>
     <button class="sheet-backdrop" id="sheet-backdrop" type="button" aria-label="Đóng bảng điều chỉnh" hidden></button>
     <aside id="controls" class="controls" aria-labelledby="controls-title">
+      <!-- Compatibility fallbacks for legacy listeners -->
+      <input type="hidden" id="morph" value="100">
+      <output id="morph-value" hidden>100%</output>
+      <output id="palette-name" hidden>Xanh lam</output>
+      <input type="hidden" id="custom-color" value="#153eff">
       <div class="controls-heading">
         <div>
           <h2 id="controls-title">Thiết lập Môi trường</h2>
