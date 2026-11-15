@@ -44,6 +44,31 @@ Re-run after merging b9bc971; results unchanged from the first run.
 - Backend stopped: /dashboard shows "Unable to load dashboard telemetry" with Retry; no mock
   numbers, no "Offline Fallback" label.
 
+## Merge with main 4a6f4f2 (PR #7 + frontend landing branch) — 2026-11-15
+Six frontend files conflicted (four landing components, `landing.test.tsx`, `explorer.test.tsx`);
+they are also the only files both sides changed, so no other file was merged silently.
+- Landing components and `landing.test.tsx`: main's rewritten landing kept. Its counts (24
+  studies, 1,926 runs) match the preview DB (24 `investigation`, 1926 `test_run`, all ISS/Cygnus).
+- Re-applied Prompt 8: "SoFIE" removed from the hero and `CoreIntelligenceSection` (SoFIE is not in
+  the release); LaTeX `$…$` text that rendered literally replaced with plain text.
+- `LandingFooter`: main's rewrite dropped the research-scope disclaimer from 5ad0413, so its own
+  test failed on main. Restored "Research scope & limitations" and the "not a fire-risk
+  probability" sentence; kept the NASA non-endorsement sentence; dropped the "NASA … Fire Safety
+  Protocol" heading.
+- `explorer.test.tsx`: readiness `next` link kept (pagination parses the offset).
+
+| Check | Result |
+| --- | --- |
+| FE `vitest` / `tsc --noEmit` / `npm run build` | 34 files, **389 passed** / exit 0 / compiled |
+| Root / BE suites (55435) | **138 passed** / **702 passed**, 0 skipped |
+| BE `ruff check .` / `ruff format --check .` | Passed |
+| Chat benchmark development / holdout | recall@4, top-1, abstention all 1.0 |
+| `verify_data_handoff.py` | psi PASS (71/2508); unified PASS (81/2574/10) |
+| Browser smoke, fresh target | landing without SoFIE/`$`; dashboard 24 studies, 1926 records, charts; explorer ISS/Cygnus; /explorer/flex tags + sourced objective, 274 runs; /mission 12 investigations; chat FLEX-007 1.87 mm and 1.82 mm with 2 sources; backend stopped → error + Retry, no mock numbers |
+
+Not changed (main content, outside this merge): the unlinked `/ember-zero` route still contains
+Vietnamese demo text with unsourced figures (e.g. "94.2%" match, "SoFIE-MIST").
+
 ## Not done / open
 - Backend upstream owner review is required before merge (`export.py` changes the imported
   snapshot: tags and `oxygenContext`; new read endpoints).

@@ -1,21 +1,25 @@
 """Lexical retrieval over admitted NASA chunks (AI-team owned algorithm)."""
 
 import re
-import unicodedata
 from dataclasses import dataclass
 
 from app.integrations.chat import CorpusPassage
 from app.integrations.rag.bm25 import BM25
+from app.integrations.rag.vocabulary import fold, message, terms
 from app.schemas.api.chat import Citation
 
-STOP = set(
-    (
-        "a an the what is are was were of to in on at for and or with does do how about "
-        "this that it its which why can could tell me please la gi cua co cac nhung va "
-        "ve thi sao toi ban mot hay cho biet nao nay hom gia con mau thuan "
-        "conflicting conflict discrepant difference versus vs run test record"
-    ).split()
+FAMILIES = {
+    "saffire": {"saffire-i", "saffire-ii", "saffire-iii"},
+    "acme": {"bre", "cfi-g", "cld-flame", "e-field", "flame-design", "s-flame"},
+    "bass": {"bass", "bass-ii"},
+    "same": {"same", "same-r"},
+}
+COMPARISON = re.compile(r"\b(?:compare|versus|vs|so sanh|khac nhau)\b")
+AGGREGATE = re.compile(
+    "\\b(?:highest|lowest|maximum|minimum|range|how many|list all|cao "
+    "nhat|thap nhat|bao nhieu|liet ke|khoang gia tri)\\b"
 )
+
 ALIASES = {
     "fan display": "fan voltage",
     "air display": "air response slow min",
@@ -45,45 +49,37 @@ PLANETARY_CONDITIONS = re.compile(
 )
 
 
-def fold(text):
-    text = text.lower().replace("đ", "d").replace("–", "-").replace("—", "-")
-    return "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
-
-
-def terms(text):
-    tokens = [t for t in re.findall(r"[a-z0-9]+", fold(text)) if t not in STOP]
-    return tokens + [
-        m.group(1) for token in tokens if (m := re.fullmatch(r"([a-z]{4,})x\d+", token))
-    ]
-
-
 def refusal(question):
     query = fold(question)
-    if len(set(re.findall(r"\bflex[- ]?(\d{3})\b", query))) > 1:
-        return "Please ask about one FLEX code at a time so I don't mix evidence from two runs."
-    if re.search(r"\bbass[- ]ii\b", query) and len(set(re.findall(r"\bb\d{1,5}\b", query))) > 1:
-        return "Please ask about one BASS-II code at a time so I don't mix evidence from two runs."
-    if re.search(r"\bsaffire[- ]iii\b", query) and len(set(re.findall(r"\bs\d{1,5}\b", query))) > 1:
-        return "Please ask about one Saffire-III code at a time so I don't mix evidence from two runs."
-    if len(set(re.findall(r"\b(?:run|test|record)\s*(?:#\s*)?([a-z]*\d[a-z0-9-]*)\b", query))) > 1:
-        return "Please ask about one record code at a time so I don't mix evidence from two runs."
-    if re.search(r"\b(safe|unsafe|an toan|certify|certified|xac suat chay)\b", query):
-        return (
-            "Cannot draw safety conclusions or certifications from this research dataset. "
-            "Please ask about test conditions or specific source content."
+    mixed = (
+        len(set(re.findall(r"\bflex[- ]?(\d{3})\b", query))) > 1
+        or (
+            re.search(r"\bbass[- ]ii\b", query) and len(set(re.findall(r"\bb\d{1,5}\b", query))) > 1
         )
+        or (
+            re.search(r"\bsaffire[- ]iii\b", query)
+            and len(set(re.findall(r"\bs\d{1,5}\b", query))) > 1
+        )
+        or len(set(re.findall(r"\b(?:run|test|record)\s*(?:#\s*)?([a-z]*\d[a-z0-9-]*)\b", query)))
+        > 1
+    )
+    if mixed:
+        return message("mixed", question)
+    if re.search(r"\b(safe|unsafe|an toan|certify|certified|xac suat chay)\b", query):
+        return message("safety", question)
     if re.search(r"\b(bitcoin|weather|thoi tiet|propulsion|stock price|gia co phieu)\b", query):
-        return "The question is outside the connected NASA combustion research document set."
+        return message("outside", question)
     if (
         PLANETARY_CONDITIONS.search(query)
         or GRAVITY_UNIT.search(query)
         or (PLANETARY_GRAVITY.search(query) and not MASS_CONTEXT.search(query))
     ):
-        return (
-            "No matching measurements found for Mars or Moon gravity conditions "
-            "in the connected dataset. "
-            "Microgravity experiments in this dataset can be queried."
-        )
+        return message("gravity", question)
+    named_run = re.search(
+        r"\bflex[- ]?\d{3}\b|\b(?:run|test|record)\s*#?\s*[a-z]*\d|\bb\d{1,5}\b", query
+    )
+    if AGGREGATE.search(query) and not named_run:
+        return message("aggregate", question)
     return None
 
 
@@ -102,6 +98,16 @@ class Hit:
 
 
 def anchors(question, study_slugs):
+    named, family, run = anchor_scope(question, study_slugs)
+    return named | family, run
+
+
+def anchor_scope(question, study_slugs):
+    """Return (explicitly named slugs, slugs added only by a family name, run id).
+
+    A family name ("ACME", "Saffire") widens to its cataloged members unless the
+    question already names one of those members ("ACME BRE" stays BRE).
+    """
     query = fold(question)
     run = re.search(r"\bflex[- ]?(\d{3})\b", query)
     slugs = set()
@@ -121,9 +127,22 @@ def anchors(question, study_slugs):
                 if not any(start < right and end > left for left, right in covered):
                     slugs.add(slug)
                     covered.append((start, end))
+    widened = set()
+    for family, members in FAMILIES.items():
+        if (
+            family == "same"
+            and "SAME" not in question
+            and not re.search(r"smoke|aerosol|khoi|^same$", query)
+        ):
+            continue
+        if (slugs & members) - {family}:
+            continue
+        if re.search(rf"(?<![a-z0-9-]){family}(?![a-z0-9-]| (?:ii|iii|r)\b)", query):
+            widened.update(members & set(study_slugs))
+    widened -= slugs
     if run:
-        return slugs | {"flex"}, f"flex-{int(run.group(1)):03d}"
-    return slugs, None
+        return slugs | {"flex"}, widened, f"flex-{int(run.group(1)):03d}"
+    return slugs, widened, None
 
 
 def explicit_records(question, slugs):
@@ -144,8 +163,20 @@ def explicit_records(question, slugs):
 def select_passages(question, passages, history=(), study_slugs=()):
     if refusal(question):
         return ()
-    study_slugs = set(study_slugs) | {p.slug for p in passages}
-    slugs, run = anchors(question, study_slugs)
+    indexed = {p.slug for p in passages}
+    study_slugs = set(study_slugs) | indexed
+
+    def scope(text):
+        named, family, run = anchor_scope(text, study_slugs)
+        # Named studies must all be answerable; a family name needs at least one
+        # indexed member, and cataloged members without passages are skipped.
+        if family and not family & indexed:
+            return None, run
+        return named | (family & indexed), run
+
+    slugs, run = scope(question)
+    if slugs is None:
+        return ()
     previous_ids = set()
     if (
         not slugs
@@ -153,7 +184,9 @@ def select_passages(question, passages, history=(), study_slugs=()):
         and re.search(r"\b(con|the|no|do|it|its|those|nguon|source|what about)\b", fold(question))
     ):
         for previous in reversed(history):
-            slugs, previous_run = anchors(previous, study_slugs)
+            slugs, previous_run = scope(previous)
+            if slugs is None:
+                return ()
             if slugs:
                 if refusal(previous):
                     return ()
@@ -181,6 +214,49 @@ def select_passages(question, passages, history=(), study_slugs=()):
         return ()
     if slugs - {p.slug for p in candidates}:
         return ()
+    if COMPARISON.search(fold(question)) and len(slugs) >= 2 and not records:
+        # Generic comparisons use objectives; specific topics need original evidence on each side.
+        name_terms = {t for slug in slugs for t in terms(slug)} | set(FAMILIES)
+        topics = set(terms(question)) - name_terms
+        # Round-robin families keeps each requested side represented within four citations.
+        groups = []
+        covered = set()
+        for family, members in FAMILIES.items():
+            if re.search(rf"\b{family}\b", fold(question)):
+                group = members & slugs
+                if group:
+                    groups.append(group)
+                    covered.update(group)
+        groups.extend([{slug} for slug in sorted(slugs - covered)])
+        choices = []
+        for group in groups:
+            group_passages = [
+                p
+                for p in candidates
+                if p.slug in group
+                and topics <= set(terms(p.text + " " + p.locator))
+                and (
+                    p.locator.startswith("JSON /objective")
+                    or p.locator.startswith("investigations/")
+                )
+            ]
+            group_passages.sort(
+                key=lambda p: (not p.locator.startswith("JSON /objective"), p.slug, p.locator)
+            )
+            # Prefer one objective for each study over several chunks of a single study.
+            distinct = []
+            for p in group_passages:
+                if p.slug not in {x.slug for x in distinct}:
+                    distinct.append(p)
+            if not distinct:
+                return ()
+            choices.append(distinct)
+        result = []
+        for turn in range(4):
+            for group in choices:
+                if turn < len(group) and len(result) < 4:
+                    result.append(Hit(group[turn], group[turn].text[:1800]))
+        return tuple(result)
     expanded = (
         question + " " + " ".join(value for key, value in ALIASES.items() if key in fold(question))
     )
@@ -196,13 +272,48 @@ def select_passages(question, passages, history=(), study_slugs=()):
         return ()
     query = sorted(content_terms or anchor_terms)
     documents = [terms(p.text + " " + p.title) for p in candidates]
-    ranking = BM25(documents).search(query, k=30)
+    ranking = BM25(documents).search(query, k=len(documents))
     if not ranking:
         return ()
+    query_words = set(query)
+
+    def relevance(item):
+        index, score = item
+        passage = candidates[index]
+        words = set(terms(passage.text))
+        # Topical evidence must occur in the excerpt, not merely the repeated title.
+        if content_terms and not (query_words & words):
+            return -1
+        if "pmma" in query_words and "pmma" not in words:
+            return -1
+        metadata = passage.locator.startswith(("JSON /objective", "investigations/"))
+        overview_query = bool(
+            re.search(r"\b(?:which|what|muc tieu|thi nghiem nao)\b", fold(question))
+        )
+        if overview_query and metadata and not records:
+            score = score * 2.5 + (20 if query_words & {"fuel", "objective", "hardware"} else 0)
+        if "suppress" in query_words and "suppress" in words:
+            score *= 2
+            if "co2" in query_words and "co2" in words:
+                score *= 2
+        if len(passage.text) < 80:
+            score *= 0.2
+        return score
+
+    ranking = sorted(ranking, key=relevance, reverse=True)
     hits = []
     seen = set()
+    seen_text = set()
+    seen_studies = set()
     for index, _score in ranking:
+        if relevance((index, _score)) <= 0:
+            continue
         p = candidates[index]
+        normalized = fold(p.text)
+        if normalized in seen_text or (not slugs and p.slug in seen_studies):
+            continue
+        seen_text.add(normalized)
+        seen_studies.add(p.slug)
         if (p.source_document_id, p.locator) in seen:
             continue
         seen.add((p.source_document_id, p.locator))

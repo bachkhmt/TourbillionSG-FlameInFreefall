@@ -1,0 +1,7 @@
+/* Small-screen adaptations for the supplied illustrations; physics is unchanged. */
+@media(max-width:620px){
+  [data-studio-demo="mist"] .maps,
+  [data-studio-demo="mist"] .sup,
+  [data-studio-demo="nca"] .nt{grid-template-columns:minmax(0,1fr)}
+  [data-studio-demo="mist"] .card:has(table){overflow-x:auto}
+}

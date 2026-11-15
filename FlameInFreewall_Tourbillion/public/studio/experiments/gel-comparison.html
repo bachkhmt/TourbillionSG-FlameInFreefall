@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="vi" data-theme="dark" data-studio-demo="gel-comparison"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GEL — Lửa 1g và vi trọng lực</title>
+<style>
+:root{--bg:#04070d;--fg:#c9d6ea}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:12px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;font-variant-numeric:tabular-nums}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+canvas:active{cursor:grabbing}
+.sep{position:fixed;left:50%;top:0;bottom:0;width:1px;background:#ffffff14}
+.lab{position:fixed;bottom:66px;width:50%;text-align:center;pointer-events:none;opacity:.8}
+.lab b{display:block;font-size:22px;font-weight:500;letter-spacing:.06em}
+.lab span{opacity:.65}
+#l1{left:0}#l2{left:50%}
+#bar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:96vw;padding:6px 12px;background:#0a101c99;border:1px solid #ffffff12;border-radius:10px;opacity:.55;transition:opacity .2s}
+#bar:hover,#bar:focus-within{opacity:1}
+label{display:flex;gap:6px;align-items:center}
+output{min-width:3.2em;opacity:.7}
+input[type=range]{width:90px;accent-color:#5b8cff}
+button{font:inherit;color:inherit;background:#ffffff0f;border:1px solid #ffffff22;border-radius:6px;padding:4px 9px;cursor:pointer}
+button:hover{background:#ffffff22}
+:focus-visible{outline:2px solid #7aa2ff;outline-offset:2px}
+#info{position:fixed;left:12px;top:10px;max-width:360px;opacity:.5;font-size:11px}
+#info:hover,#info[open]{opacity:.95}
+#info summary{cursor:pointer}
+#info p{margin:.4em 0;background:#04070dd9;padding:6px 8px;border-radius:6px}
+</style><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body>
+<canvas id="c"></canvas><div class="sep"></div>
+<div class="lab" id="l1"><b>1g</b><span id="s1"></span></div>
+<div class="lab" id="l2"><b>μg</b><span id="s2"></span></div>
+<details id="info"><summary>Chú thích</summary>
+<p>Quả cầu PMMA cháy trong môi trường tĩnh. Chuỗi mô phỏng: mồi lửa → tăng trưởng → đạt đỉnh → suy giảm → tắt dần khi bán kính còn khoảng 40% ban đầu hoặc khi O₂ quá thấp. Lửa μg tăng trưởng chậm hơn và tắt gọn hơn; lửa 1g bùng nhanh hơn và tắt trong lúc nhiễu động.</p>
+<p>Mô phỏng minh họa định tính, không phải CFD và không phải số đo NASA. Kéo chuột để xoay, cuộn để zoom, phím cách để tạm dừng.</p></details>
+<div id="bar">
+<label>O₂ <input id="o2" type="range" min="21" max="85" value="21"><output id="o2v">21%</output></label>
+<label>Đường kính <input id="dm" type="range" min="2" max="5" step=".1" value="4.5"><output id="dmv">4.5 cm</output></label>
+<label>Tốc độ <input id="sp" type="range" min="1" max="20" value="4"><output id="spv">4×</output></label>
+<button id="ig">Mồi lửa / Chạy lại</button><button id="n2">Xả N₂</button><button id="shot">Chụp ảnh</button>
+</div>
+<script src="/assets/vendor/three-r128.min.js"></script>
+<script>
+// ===================== CONFIG (chỉnh nhanh ở đây) =====================
+const CONFIG={
+  steps:48, minSteps:24, dpr:1.5, bg:0x04070d, cmPerSec:1,
+  g1:{ gain:1.0,        // độ sáng tổng
+       tail:2.4,        // chiều dài đuôi lửa (theo bán kính)
+       turb:1.0,        // biên độ nhiễu
+       scroll:1.9,      // tốc độ cuộn nhiễu lên trên
+       flick:.14,       // độ chập chờn
+       rise:.6, fall:.9, peak:1, k:.05,   // tăng/giảm cường độ, đỉnh, tốc độ đốt (cm/s)
+       c:{a:[.45,.04,0],b:[1,.36,.03],c:[1,.78,.22],d:[1,.95,.72],rim:[.1,.3,1]},
+       light:[1,.55,.2], glow:.55 },
+  ug:{ gain:1.5, shell:.36, thick:.5, noise:.05, breath:.04,
+       rise:.2, fall:.55, peak:.85, k:.035,
+       c:{deep:[.04,.14,.95],bright:[.3,.62,1],core:[.8,.93,1],soot:[1,.5,.1]},
+       light:[.15,.35,1], glow:.7 }
+};
+// ======================================================================
+const NOISE=`
+float h31(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
+ return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){return .5*vn(p)+.25*vn(p*2.03+7.1)+.125*vn(p*4.07+3.3);}
+float g2(float x){return exp(-x*x);}`;
+const VS=`varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`;
+const FF=NOISE+`
+uniform float uT,uR,uI,uO,uTurb,uMode,uGain,uTail,uShell,uThick,uScroll;
+uniform int uSteps;
+uniform vec3 uBoxC,uBoxH,uCa,uCb,uCc,uCd,uRim;
+varying vec3 vW;
+vec3 ramp(float t){vec3 c=mix(uCa,uCb,smoothstep(0.,.35,t));c=mix(c,uCc,smoothstep(.35,.7,t));return mix(c,uCd,smoothstep(.7,1.,t));}
+vec3 shade(vec3 p){
+ float r=length(p);float s=r/uR-1.;if(s<0.)return vec3(0);
+ float I=uI;
+ if(uMode>.5){ // ---- μg: vỏ cầu đồng tâm, gần laminar
+  float n=vn(p/uR*2.2+vec3(0.,0.,uT*.15))-.5;
+  float q=s+n*uTurb*2.;
+  float sc=uShell*(.55+.45*I)+.02, w=uThick*(.35+.65*I)*.62+.03;
+  float sh=g2((q-sc)/w);
+  float halo=.22*exp(-max(q-sc,0.)/.55)*smoothstep(0.,.08,q);
+  vec3 c=mix(uCa,uCb,smoothstep(.1,.7,sh))*(sh+halo)+uCc*pow(sh,6.)+uCd*exp(-s/.07)*.45*(.5+.5*sh);
+  return c;
+ }
+ // ---- 1g: lực nổi -> giọt nước + đuôi, nhiễu cuộn lên
+ vec3 q=p/uR;
+ vec3 np=vec3(q.x*1.3,q.y*.9-uT*uScroll,q.z*1.3);
+ float n1=fbm(np),n2=vn(np*1.7+vec3(5.,0.,9.));
+ float wp=smoothstep(0.,2.5,q.y+.5)*uTurb;
+ vec3 q2=q+vec3((n1-.5)*.9*wp,0.,(n2-.5)*.9*wp);
+ float s2=length(q2)-1.;
+ float ny=q.y/max(length(q),.001),up=smoothstep(-.3,1.,ny);
+ float th=.4+.6*I;
+ float sc=(.3+.9*up*up)*th, w=(.2+.5*up)*(.5+.5*I)+.03;
+ float d1=g2((s2-sc)/w);
+ float tl=uTail*(.3+.7*I);
+ float pw=max(.85-.09*max(q2.y,0.),.25);
+ float pl=g2(length(q2.xz)/pw)*smoothstep(.2,1.4,q2.y)*exp(-max(q2.y-1.2,0.)/tl);
+ float d=max((d1*(.55+.9*n1)+pl*(.4+1.1*n1))*(1.+(n1-.5)*uTurb*1.2),0.);
+ float tmp=clamp(d*.85,0.,1.)*(1.-.45*clamp(q.y/(tl*2.+1.),0.,1.));
+ vec3 c=ramp(tmp)*d;
+ c+=uRim*exp(-s/.07)*(1.-up)*.9;
+ c+=uCb*.15*exp(-s)*(.5+.5*up);
+ return c;
+}
+void main(){
+ vec3 ro=cameraPosition,rd=normalize(vW-ro);
+ vec3 inv=1./rd,t0=(uBoxC-uBoxH-ro)*inv,t1=(uBoxC+uBoxH-ro)*inv;
+ vec3 mn=min(t0,t1),mx=max(t0,t1);
+ float tn=max(max(mn.x,mn.y),max(mn.z,0.)),tf=min(min(mx.x,mx.y),mx.z);
+ if(tf<=tn)discard;
+ float b=dot(ro,rd),cc=dot(ro,ro)-uR*uR,d=b*b-cc; // che khuất: cầu tại gốc toạ độ
+ if(d>0.){float ts=-b-sqrt(d);if(ts>0.)tf=min(tf,ts);}
+ if(tf<=tn)discard;
+ float dt=(tf-tn)/float(uSteps);
+ float j=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+ vec3 acc=vec3(0.);
+ for(int i=0;i<48;i++){if(i>=uSteps)break;acc+=shade(ro+rd*(tn+(float(i)+j)*dt))*dt;}
+ acc*=uGain*pow(max(uI,0.),.7)*pow(uO,.3);
+ gl_FragColor=vec4(1.-exp(-acc),1.);
+}`;
+const SFF=NOISE+`
+uniform float uT,uBurn,uI,uMode;uniform vec3 uLC;
+varying vec3 vP,vN,vW;
+void main(){
+ vec3 n=normalize(vN),v=normalize(cameraPosition-vW);
+ float a=vn(vP*3.+3.),b=vn(vP*10.);
+ float ch=clamp(uBurn*1.6+(a-.5)*.9,0.,1.);
+ vec3 cream=vec3(.92,.88,.74)*(.82+.25*b);
+ vec3 base=mix(cream,vec3(.025,.02,.02),smoothstep(.3,.65,ch));
+ float em=smoothstep(.62,.82,vn(vP*7.+vec3(0.,uT*.25,0.)))*smoothstep(.35,.7,ch)*uI;
+ float lit=mix(.55+.45*n.y,1.,uMode);
+ float rim=pow(1.-max(dot(n,v),0.),2.5);
+ vec3 L=uLC*uI*(.5+1.1*lit);
+ vec3 col=base*(vec3(.05,.06,.09)+L)+cream*uLC*rim*.25*uI*(1.-ch)+vec3(1.,.22,.25)*em*1.6;
+ gl_FragColor=vec4(1.-exp(-col*1.1),1.);
+}`;
+const SVS=`varying vec3 vP,vN,vW;void main(){vP=position;vN=normalize(mat3(modelMatrix)*normal);vW=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(vW,1.);}`;
+const GVS=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+const GFF=`uniform vec3 uCol;uniform float uK;varying vec2 vUv;void main(){vec2 p=(vUv-.5)*2.;float r2=dot(p,p);float g=exp(-r2*4.)*.6+exp(-r2*12.)*.4;gl_FragColor=vec4(uCol*g*uK,1.);}`;
+
+const $=id=>document.getElementById(id),V3=a=>new THREE.Vector3(...a);
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x)),sm=(a,b,x)=>{x=clamp((x-a)/(b-a),0,1);return x*x*(3-2*x)};
+const rm=matchMedia('(prefers-reduced-motion: reduce)').matches,rmk=rm?.35:1;
+let steps=CONFIG.steps;
+const cv=$('c'),r=new THREE.WebGLRenderer({canvas:cv,antialias:false,preserveDrawingBuffer:true});
+r.setClearColor(CONFIG.bg,1);
+
+function mkPanel(m){
+  const c=m?CONFIG.ug:CONFIG.g1,cc=c.c,scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(32,1,.5,200);
+  const U={uT:{value:0},uR:{value:1},uI:{value:0},uO:{value:1},uTurb:{value:1},uMode:{value:m},uSteps:{value:steps},uGain:{value:c.gain},
+    uBoxC:{value:new THREE.Vector3(0,m?0:2.4,0)},uBoxH:{value:m?new THREE.Vector3(6,6,6):new THREE.Vector3(6.2,7.8,6.2)},
+    uTail:{value:CONFIG.g1.tail},uShell:{value:CONFIG.ug.shell},uThick:{value:CONFIG.ug.thick},uScroll:{value:CONFIG.g1.scroll*(rm?.5:1)},
+    uCa:{value:V3(m?cc.deep:cc.a)},uCb:{value:V3(m?cc.bright:cc.b)},uCc:{value:V3(m?cc.core:cc.c)},uCd:{value:V3(m?cc.soot:cc.d)},uRim:{value:V3(m?[0,0,0]:cc.rim)}};
+  const fire=new THREE.Mesh(new THREE.BoxGeometry(2,2,2),new THREE.ShaderMaterial({uniforms:U,vertexShader:VS,fragmentShader:FF,side:THREE.BackSide,transparent:true,blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false}));
+  fire.scale.copy(U.uBoxH.value);fire.position.copy(U.uBoxC.value);fire.renderOrder=2;fire.frustumCulled=false;
+  const SU={uT:U.uT,uI:U.uI,uMode:U.uMode,uBurn:{value:0},uLC:{value:V3(c.light)}};
+  const sph=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),new THREE.ShaderMaterial({uniforms:SU,vertexShader:SVS,fragmentShader:SFF}));
+  const stick=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,9,8),new THREE.MeshBasicMaterial({color:0x56606e}));
+  const GU={uCol:{value:V3(c.light)},uK:{value:0}};
+  const glow=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.ShaderMaterial({uniforms:GU,vertexShader:GVS,fragmentShader:GFF,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
+  glow.renderOrder=1;glow.frustumCulled=false;
+  scene.add(sph,stick,glow,fire);
+  return {scene,cam,U,SU,GU,fire,sph,stick,glow,m};
+}
+const P=[mkPanel(0),mkPanel(1)];
+const S=[0,1].map(m=>({m,cfg:m?CONFIG.ug:CONFIG.g1}));
+let flushing=false,paused=false,speed=4,A=0;
+
+function ignite(){S.forEach(s=>{s.t=0;s.I=0;s.R0=s.R=+$('dm').value/2;s.o2=+$('o2').value;s.out=false;s.st='mồi lửa'});flushing=false}
+function step(s,dt){
+  const c=s.cfg;s.t+=dt;
+  const fuel=clamp((s.R/s.R0-.4)/.35,0,1),ox=sm(15.5,19.5,s.o2);
+  let tgt=c.peak*fuel*ox*Math.min(1,.8+.2*s.o2/21);
+  if(s.t<.8)tgt=Math.min(tgt,.15);
+  s.I+=(tgt-s.I)*(1-Math.exp(-(tgt>s.I?c.rise:c.fall)*dt));
+  s.R=Math.max(s.R-c.k*s.I*Math.pow(s.o2/21,.6)*dt*CONFIG.cmPerSec,s.R0*.38);
+  s.o2=Math.max(8,s.o2-.012*s.I*dt-(flushing?.8*dt:0));
+  s.out=s.t>1&&s.I<.012&&tgt<.012;
+  s.st=s.out?'đã tắt':s.t<.8?'mồi lửa':(fuel<.97||tgt<s.I-.01)?'suy giảm':s.I>.9*c.peak?'đang cháy':'tăng trưởng';
+}
+// camera chung
+const cam={th:.35,ph:.1,d:27,ty:1.6};
+function place(p,asp){const k=p.cam,c=Math.cos(cam.ph);k.aspect=asp;k.updateProjectionMatrix();
+  k.position.set(cam.d*c*Math.sin(cam.th),cam.ty+cam.d*Math.sin(cam.ph),cam.d*c*Math.cos(cam.th));k.lookAt(0,cam.ty,0);k.updateMatrixWorld();}
+function update(){
+  P.forEach((p,i)=>{
+    const s=S[i],c=s.cfg,u=p.U;
+    let Id=s.I;
+    if(!i)Id*=1+c.flick*rmk*(Math.sin(A*9)*.5+Math.sin(A*15.7+1)*.5)*(1+(1-s.I)*2);
+    else Id*=1+c.breath*Math.sin(A*1.3)*rmk;
+    u.uT.value=A;u.uR.value=s.R;u.uI.value=Id;u.uO.value=s.o2/21;
+    u.uTurb.value=(i?c.noise:c.turb*(1+1.5*(1-s.I/c.peak)))*rmk;
+    p.fire.visible=Id>.004;
+    p.sph.scale.setScalar(s.R);p.SU.uBurn.value=clamp((1-s.R/s.R0)/.62,0,1);
+    p.stick.position.y=-s.R+.6-4.5;
+    p.GU.uK.value=Id*c.glow*Math.min(1.4,s.o2/21);
+    const cy=i?0:2.2,sz=.6+.4*s.I,dir=new THREE.Vector3(0,cy,0).sub(p.cam.position).normalize();
+    p.glow.position.set(0,cy,0).addScaledVector(dir,7);
+    p.glow.quaternion.copy(p.cam.quaternion);
+    p.glow.scale.set(i?13*sz:12*sz,i?13*sz:17*sz,1);
+    $('s'+(i+1)).textContent=`r ${s.R.toFixed(2)} cm · cường độ ${Math.round(clamp(s.I,0,1)*100)}% · ${s.st}`;
+  });
+  $('o2v').textContent=Math.round(S[0].o2)+'%';
+}
+function renderAll(){
+  const W=innerWidth,H=innerHeight;r.setScissorTest(true);
+  P.forEach((p,i)=>{const x=i*W/2;r.setViewport(x,0,W/2,H);r.setScissor(x,0,W/2,H);place(p,W/2/H);r.render(p.scene,p.cam);});
+}
+function size(){r.setPixelRatio(Math.min(devicePixelRatio,CONFIG.dpr));r.setSize(innerWidth,innerHeight,false);}
+addEventListener('resize',size);size();
+
+// điều khiển
+let drag=0;
+cv.onpointerdown=e=>{drag=1;cv.setPointerCapture(e.pointerId)};
+cv.onpointermove=e=>{if(drag){cam.th-=e.movementX*.006;cam.ph=clamp(cam.ph+e.movementY*.004,-.5,1.1)}};
+cv.onpointerup=()=>drag=0;
+cv.addEventListener('wheel',e=>{e.preventDefault();cam.d=clamp(cam.d*Math.exp(e.deltaY*.001),12,55)},{passive:false});
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();paused=!paused}});
+$('o2').oninput=e=>{flushing=false;S.forEach(s=>s.o2=+e.target.value)};
+$('dm').oninput=e=>{$('dmv').textContent=(+e.target.value).toFixed(1)+' cm';ignite()};
+$('sp').oninput=e=>{speed=+e.target.value;$('spv').textContent=speed+'×'};
+$('ig').onclick=ignite;
+$('n2').onclick=()=>{flushing=true};
+$('shot').onclick=()=>{renderAll();const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download='GEL-1g-vs-ug.png';a.click()};
+speed=+$('sp').value;ignite();
+
+// vòng lặp + tự hạ chất lượng
+let last=performance.now(),fn=0,ft=last;
+function loop(now){
+  requestAnimationFrame(loop);
+  const rdt=Math.min(.05,(now-last)/1000);last=now;
+  if(!paused){A+=rdt;S.forEach(s=>step(s,rdt*speed));}
+  update();renderAll();
+  fn++;if(now-ft>1000){const fps=fn*1000/(now-ft);fn=0;ft=now;
+    if(fps<30&&steps>CONFIG.minSteps){steps=steps>32?32:24;P.forEach(p=>p.U.uSteps.value=steps);}}
+}
+requestAnimationFrame(loop);
+</script></body></html>

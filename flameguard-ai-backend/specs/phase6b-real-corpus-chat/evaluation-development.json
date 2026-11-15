@@ -1,0 +1,381 @@
+{
+  "split": "development",
+  "provider_version": "nasa-extractive-v3",
+  "source_revision": "117e7ff954cd16fd88ad1e5a2e530d56871a355dee4285b595151595c3312cc0",
+  "corpus_version": "ea72b748a737e370e0ff3a31c98efecc0dcb2f53041f6303926a4226991b559b",
+  "corpus_version_kind": "offline-admitted-registry-sha256",
+  "corpus_registry_sha256": "ea72b748a737e370e0ff3a31c98efecc0dcb2f53041f6303926a4226991b559b",
+  "evaluation_sha256": "602ffb50b9f46bfa9cc74878cd1fb88a9f0effed1129ca71b6f0a79bb1c00dce",
+  "passages": 2574,
+  "cases": 30,
+  "answerable_cases": 20,
+  "abstention_cases": 10,
+  "recall_at_4": 1.0,
+  "top_one_accuracy": 1.0,
+  "correct_abstention": 1.0,
+  "full_comparison_coverage": 1.0,
+  "results": [
+    {
+      "id": "development-01-en",
+      "state": "answered",
+      "slugs": [
+        "flex",
+        "bass",
+        "bass-ii",
+        "fire-attire"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-01-vi",
+      "state": "answered",
+      "slugs": [
+        "flex",
+        "bass-ii",
+        "bass",
+        "flex-2"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-02-en",
+      "state": "answered",
+      "slugs": [
+        "flex",
+        "flex",
+        "flex",
+        "flex"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-02-vi",
+      "state": "answered",
+      "slugs": [
+        "flex",
+        "flex",
+        "flex",
+        "flex"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-03-en",
+      "state": "answered",
+      "slugs": [
+        "same-r",
+        "same-r",
+        "same-r"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-03-vi",
+      "state": "answered",
+      "slugs": [
+        "same-r",
+        "same-r",
+        "same-r",
+        "same-r"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-04-en",
+      "state": "answered",
+      "slugs": [
+        "same",
+        "same-r",
+        "same",
+        "same-r"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-04-vi",
+      "state": "answered",
+      "slugs": [
+        "same",
+        "same-r",
+        "same",
+        "same-r"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-05-en",
+      "state": "answered",
+      "slugs": [
+        "saffire-i",
+        "bass",
+        "saffire-ii",
+        "bass-ii"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": true
+    },
+    {
+      "id": "development-05-vi",
+      "state": "answered",
+      "slugs": [
+        "saffire-i",
+        "bass",
+        "saffire-ii",
+        "bass-ii"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": true
+    },
+    {
+      "id": "development-06-en",
+      "state": "answered",
+      "slugs": [
+        "bre",
+        "bre",
+        "bre",
+        "bre"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-06-vi",
+      "state": "answered",
+      "slugs": [
+        "bre",
+        "bre",
+        "bre",
+        "bre"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-07-en",
+      "state": "answered",
+      "slugs": [
+        "cfi-g",
+        "cfi-g",
+        "cfi-g",
+        "cfi-g"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-07-vi",
+      "state": "answered",
+      "slugs": [
+        "cfi-g",
+        "cfi-g",
+        "cfi-g",
+        "cfi-g"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-08-en",
+      "state": "answered",
+      "slugs": [
+        "e-field",
+        "e-field",
+        "e-field",
+        "e-field"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-08-vi",
+      "state": "answered",
+      "slugs": [
+        "e-field"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-09-en",
+      "state": "answered",
+      "slugs": [
+        "flex",
+        "flex"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-09-vi",
+      "state": "answered",
+      "slugs": [
+        "flex",
+        "flex"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-10-en",
+      "state": "answered",
+      "slugs": [
+        "spice",
+        "bass-ii",
+        "same",
+        "same-r"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-10-vi",
+      "state": "answered",
+      "slugs": [
+        "spice",
+        "bass-ii",
+        "same",
+        "same-r"
+      ],
+      "expected_state": "answered",
+      "recall_hit": true,
+      "top_one": true,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-11-en",
+      "state": "abstained",
+      "slugs": [],
+      "expected_state": "abstained",
+      "recall_hit": null,
+      "top_one": null,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-11-vi",
+      "state": "abstained",
+      "slugs": [],
+      "expected_state": "abstained",
+      "recall_hit": null,
+      "top_one": null,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-12-en",
+      "state": "abstained",
+      "slugs": [],
+      "expected_state": "abstained",
+      "recall_hit": null,
+      "top_one": null,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-12-vi",
+      "state": "abstained",
+      "slugs": [],
+      "expected_state": "abstained",
+      "recall_hit": null,
+      "top_one": null,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-13-en",
+      "state": "abstained",
+      "slugs": [],
+      "expected_state": "abstained",
+      "recall_hit": null,
+      "top_one": null,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-13-vi",
+      "state": "abstained",
+      "slugs": [],
+      "expected_state": "abstained",
+      "recall_hit": null,
+      "top_one": null,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-14-en",
+      "state": "abstained",
+      "slugs": [],
+      "expected_state": "abstained",
+      "recall_hit": null,
+      "top_one": null,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-14-vi",
+      "state": "abstained",
+      "slugs": [],
+      "expected_state": "abstained",
+      "recall_hit": null,
+      "top_one": null,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-15-en",
+      "state": "abstained",
+      "slugs": [],
+      "expected_state": "abstained",
+      "recall_hit": null,
+      "top_one": null,
+      "comparison_covered": null
+    },
+    {
+      "id": "development-15-vi",
+      "state": "abstained",
+      "slugs": [],
+      "expected_state": "abstained",
+      "recall_hit": null,
+      "top_one": null,
+      "comparison_covered": null
+    }
+  ]
+}

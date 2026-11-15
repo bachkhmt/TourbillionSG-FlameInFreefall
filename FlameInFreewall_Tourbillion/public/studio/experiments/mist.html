@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="vi" data-theme="dark" data-studio-demo="mist"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MIST – Mô phỏng mồi lửa và dập tắt</title>
+<style>
+:root{--bg:#f3f1ee;--fg:#1b1d22;--mut:#5f6672;--card:#fff;--bd:#d8d4cd;--acc:#c2410c;--ok:#2f855a;--bad:#c53030;--chip:#e9e5df;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--fg:#e9e7e3;--mut:#9aa1ad;--card:#1d2026;--bd:#31353d;--acc:#fb923c;--ok:#68d391;--bad:#fc8181;--chip:#262a31}}
+:root[data-theme="dark"]{--bg:#14161a;--fg:#e9e7e3;--mut:#9aa1ad;--card:#1d2026;--bd:#31353d;--acc:#fb923c;--ok:#68d391;--bad:#fc8181;--chip:#262a31}
+html{color-scheme:light dark;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif}
+.wrap{max-width:1020px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--mut);margin:0 0 12px;max-width:74ch}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.steps span{background:var(--chip);color:var(--mut);padding:3px 11px;border-radius:99px;font-size:13px}
+.steps span.on{background:var(--acc);color:#fff}
+canvas{display:block;width:100%;height:auto;border-radius:8px;background:#0b0f17}
+.stage{position:relative}.stage #fx{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;background:transparent}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-top:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 18px}
+label{display:block;font-size:13px;color:var(--mut)}
+label b{color:var(--fg);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--acc);margin:4px 0 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+button,select{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:6px;padding:7px 14px;cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+button.on{background:var(--fg);color:var(--bg)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.seg{display:flex}.seg button{border-radius:0}.seg button:first-child{border-radius:6px 0 0 6px}.seg button:last-child{border-radius:0 6px 6px 0}
+.ro{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px 14px}
+.ro div{font-size:12px;color:var(--mut)}.ro b{display:block;font-size:16px;color:var(--fg);font-weight:600}
+#msg{margin:8px 0 0;min-height:1.5em}
+.sup{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.sup div p{margin:4px 0 0;font-size:13px;color:var(--mut)}
+.maps{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px}
+.maps h2,.card h2{font-size:14px;margin:0 0 6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:4px 8px;border-bottom:1px solid var(--bd)}th{color:var(--mut);font-weight:500}
+.note{font-size:12px;color:var(--mut);margin-top:12px;max-width:90ch}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style><link rel="stylesheet" href="/assets/studio-experiment.css"><script src="/assets/studio-demo.js"></script></head><body><div class="wrap">
+<h1>MIST: mồi lửa và dập tắt trên que PMMA</h1>
+<p class="sub">Thí nghiệm của C. Fernandez-Pello (UC Berkeley) và M. Gollner. Mẫu nằm giữa ống trong suốt, tấm đốt gốm bao quanh, dây Kanthal mồi lửa ở hạ nguồn, lửa lan ngược chiều dòng. Các đường biên là số liệu giả định, chỉ giữ đúng xu hướng: bức xạ cao thì O₂ giới hạn thấp hơn.</p>
+<div class="steps" id="steps"><span>1 Gia nhiệt</span><span>2 Mồi lửa</span><span>3 Lan ngược dòng</span><span>4 Kết thúc hoặc dập</span></div>
+<div class="stage"><canvas id="rig" aria-label="Sơ đồ ống thí nghiệm MIST"></canvas><canvas id="fx" aria-hidden="true"></canvas></div>
+<div class="card">
+<div class="grid">
+<label>Thông lượng bức xạ ngoài <b id="vq"></b><input type="range" id="q" min="0" max="3.3" step="0.1" value="1.5"></label>
+<label>O₂ <b id="vo2"></b><input type="range" id="o2" min="15" max="40" step="1" value="21"></label>
+<label>Vận tốc dòng <b id="vv"></b><input type="range" id="v" min="0" max="40" step="1" value="10"></label>
+<label>Đường kính que <b id="vd"></b><input type="range" id="d" min="4" max="20" step="0.1" value="12.7"></label>
+</div>
+<div class="row">
+<div class="seg" role="group" aria-label="Mức trọng lực"><button id="g0" class="on">μg</button><button id="g1">1g</button></div>
+<select id="sp" aria-label="Tốc độ mô phỏng"><option value="10">Chậm ×10</option><option value="30" selected>Vừa ×30</option><option value="100">Nhanh ×100</option></select>
+<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="dep" checked>Buồng kín, O₂ giảm tự nhiên như trên ISS</label>
+<button id="go" class="pri">Chạy thí nghiệm</button><button id="rs">Đặt lại ống</button><button id="cl">Xóa bản đồ</button>
+</div></div>
+<div class="card"><div class="ro">
+<div>Giai đoạn<b id="rp"></b></div><div>Thời gian mô phỏng<b id="rt"></b></div><div>Công suất tấm đốt<b id="rpw"></b></div><div>T bề mặt (ước lượng)<b id="rts"></b></div>
+<div>O₂ hiện tại<b id="ro"></b></div><div>Dòng hiện tại<b id="rv"></b></div><div>Áp suất<b id="rP"></b></div><div>Lửa đã lan<b id="rx"></b></div></div>
+<p id="msg"></p></div>
+<div class="card"><h2>Dập lửa: ba cách độc lập, bấm khi lửa đang lan</h2>
+<div class="sup">
+<div><button id="bn">Pha loãng N₂</button><p id="mn">—</p></div>
+<div><button id="bf">Giảm dòng</button><p id="mf">—</p></div>
+<div><button id="bv">Xả khí</button><p id="mv">—</p></div></div></div>
+<div class="maps">
+<div class="card"><h2>Bản đồ mồi lửa: thông lượng × O₂</h2><canvas id="m1"></canvas></div>
+<div class="card"><h2>Bản đồ duy trì: dòng × O₂</h2><canvas id="m2"></canvas><p class="note" style="margin:6px 0 0">Đường cam là LOC-FS (lan lửa dừng). Hình thoi vàng: LOC-FS trong mô phỏng. Hình thoi đỏ: LOC-FR (lửa tắt hẳn). Chấm xanh hoặc đỏ: duy trì hoặc không, khi O₂ cố định.</p></div></div>
+<div class="card"><h2>Các lần chạy (thời gian mồi lửa theo thông lượng)</h2>
+<table><thead><tr><th>#</th><th>q (kW/m²)</th><th>O₂ (%)</th><th>Dòng (cm/s)</th><th>g</th><th>t mồi (s)</th><th>Kết quả</th></tr></thead><tbody id="lg"></tbody></table></div>
+<p class="note">Neo theo nguồn: LOC khoảng 15 % ở μg và khoảng 18 % ở 1g (que 12,7 mm, không bức xạ); bức xạ ngoài và áp suất cao hạ LOC; biên theo dòng có dạng chữ U; có hai điểm tắt LOC-FS và LOC-FR; lan lửa ở μg nhanh hơn 1g và nhanh hơn với que nhỏ; O₂ trong buồng kín giảm dần khi cháy. Giả định vì nguồn không nêu số: độ dốc theo bức xạ, thời gian mồi, độ lớn tốc độ lan, tốc độ dập, ngưỡng áp suất, số tấm đốt, kích thước ống. Chấm trên bản đồ giữ nguyên khi đổi đường kính hoặc g. Chỉ để minh họa, không dùng cho phân tích định lượng.</p>
+</div>
+<script>
+const $=id=>document.getElementById(id),cl=(x,a,b)=>Math.max(a,Math.min(b,x)),f=(x,n=1)=>x.toFixed(n).replace(".",",");
+const P={q:1.5,o2:21,v:10,d:12.7,g:0,dep:1};
+const extLim=(q,v,g,d)=>cl(14.7+5.3*Math.exp(-v/3)+.0035*v*v-.35*q+3*g+.22*(d-12.7),12,60);
+const ignLim=(q,v,g,d)=>extLim(q,v,g,d)-1;
+const tIgn=(q,m,g)=>(10+80/(1+1.1*q))*(1+2/(1+m))*(g?1.3:1);
+const idle=()=>({ph:"idle",t:0,T:0,Ts:25,Th:0,ig:0,xf:0,fl:0,o2:P.o2,v:P.v,p:100,sup:{n:0,f:0,v:0},used:0,dying:0,fz:0,fsd:0,o2fs:0,st:0,msg:"",R:{...P}});
+let S=idle(),speed=30,logs=[],cnt=0;const maps={ign:[],ext:[]};
+const ext=()=>extLim(S.R.q,S.v,S.R.g,S.R.d)+8*Math.pow(1-S.p/100,1.5)+2.5*Math.max(0,12-S.p);
+function setM(k,t){$("m"+k).textContent=t}
+function fin(k){
+ const R=S.R,a=[];S.ph="done";S.kind=k;S.ig=0;S.fl=0;let r;
+ if(k=="noign"){S.msg="Không mồi được: O₂ thấp hơn giới hạn mồi lửa ở thông lượng này.";maps.ign.push([R.q,R.o2,0]);r="Không mồi được"}
+ else{maps.ign.push([R.q,R.o2,1]);
+  if(k=="fr"){if(!S.fsd)S.o2fs=S.o2;maps.ext.push([R.v,S.o2fs,2],[R.v,S.o2,3]);S.msg="O₂ giảm tự nhiên: lan lửa dừng ở LOC-FS = "+f(S.o2fs)+" %, lửa tắt hẳn ở LOC-FR = "+f(S.o2)+" %.";r="Tắt tự nhiên, LOC-FS "+f(S.o2fs)+" %"}else if(k=="nosus"){S.msg="Mồi được nhưng lửa không duy trì: O₂ dưới giới hạn tắt ở dòng này.";maps.ext.push([R.v,R.o2,0]);r="Mồi được, không lan"}
+  else if(k=="burn"){S.xf=150;S.msg="Lửa lan hết đoạn mẫu 15 cm.";if(!S.used)maps.ext.push([R.v,S.o2,1]);r=S.used?"Cháy hết dù có can thiệp":"Duy trì, cháy hết";
+   if(S.sup.n)setM("n","Không dập được, mẫu cháy hết");if(S.sup.v)setM("v","Không dập được, mẫu cháy hết");if(S.sup.f&&!S.fz)setM("f","Không dập được, mẫu cháy hết")}
+  else{const t=f(S.t,0)+" s";
+   if(S.sup.n){a.push("N₂");setM("n","Tắt khi O₂ = "+f(S.o2)+" % (sau "+t+")")}
+   if(S.sup.f){a.push("giảm dòng");setM("f","Tắt khi dòng = "+f(S.v)+" cm/s (sau "+t+")")}
+   if(S.sup.v){a.push("xả khí");setM("v","Tắt khi P = "+f(S.p,0)+" kPa (sau "+t+")")}
+   S.msg="Lửa tắt nhờ "+a.join(" kết hợp ")+".";r="Dập bằng "+a.join(" + ")}}
+ logs.unshift({n:++cnt,q:R.q,o2:R.o2,v:R.v,g:R.g,ti:k=="noign"?null:R.ti,r});rl();drawMaps();
+}
+function step(dt){
+ const R=S.R;S.T+=dt;S.t+=dt;
+ S.Th+=(R.q/3.3-S.Th)*(1-Math.exp(-dt/20));S.Ts+=(25+40*R.q-S.Ts)*(1-Math.exp(-dt/60));
+ if(S.ph=="heat"){if(S.t>=120){S.ph="ign";S.t=0;S.ig=1}}
+ else if(S.ph=="ign"){
+  if(R.ti!=null&&S.t>=R.ti){S.ph="spread";S.t=0;S.ig=0;S.fl=.6;if(S.o2<ext()-1.5)S.dying=1}
+  else if(R.ti==null&&S.t>=120)fin("noign")}
+ else if(S.ph=="spread"){
+  if(S.sup.n)S.o2=Math.max(10,S.o2-.1*dt);
+  if(S.sup.f)S.v=Math.max(0,S.v-.15*dt);
+  if(S.sup.v)S.p=Math.max(3,S.p-.5*dt);
+  if(R.dep)S.o2=Math.max(10,S.o2-.014*S.fl*dt);
+  if(S.dying){S.fl-=dt/120;if(S.fl<=0)fin("nosus");return}
+  const lim=ext(),mg=S.o2-lim,mr=S.o2-lim+1.5;
+  if(mr<0){fin(S.sup.n||S.sup.f||S.sup.v?"supp":"fr");return}
+  if(mg<0){if(!S.fsd){S.fsd=1;S.o2fs=S.o2}S.st+=dt;if(S.st>60&&!R.dep&&!S.used){fin("nosus");return}}
+  S.fl+=(cl(.4+mr/10,.2,1)-S.fl)*Math.min(1,dt*.03);
+  S.vf=mg>=0?(.015+.004*Math.pow(Math.min(mg,25),2))*(1+.35*R.q)*Math.sqrt(12.7/R.d)*(R.g?.8:1):0;S.xf+=S.vf*dt;
+  if(S.sup.f&&S.v<=0&&!S.fz){S.fz=1;setM("f","Dòng về 0 nhưng lửa vẫn cháy (O₂ còn cao)")}
+  if(S.xf>=150)fin("burn")}
+}
+function rl(){$("lg").innerHTML=logs.slice(0,8).map(l=>`<tr><td>${l.n}</td><td>${f(l.q)}</td><td>${l.o2}</td><td>${l.v}</td><td>${l.g?"1g":"μg"}</td><td>${l.ti==null?"—":f(l.ti,0)}</td><td>${l.r}</td></tr>`).join("")}
+/* ---- rig ---- */
+const W=780,H=300,dpr=Math.min(2,devicePixelRatio||1),cv=$("rig"),c=cv.getContext("2d");cv.width=W*dpr;cv.height=H*dpr;
+const pts=Array.from({length:32},()=>({x:45+Math.random()*600,y:88+Math.random()*124}));
+const gc=a=>`rgb(${Math.round(40+215*Math.min(1,a*1.3))},${Math.round(30+90*a*a)},${Math.round(30+10*a)})`;
+function txt(s,x,y,al){c.fillStyle="#7f93ad";c.font="11px system-ui,sans-serif";c.textAlign=al||"left";c.fillText(s,x,y)}
+function draw(now,dtr){
+ c.setTransform(dpr,0,0,dpr,0,0);c.fillStyle="#0b0f17";c.fillRect(0,0,W,H);
+ const cy=150,rr=S.R.d*1.5,hot=S.Th,g1=S.R.g;
+ [46,232].forEach(y=>{c.save();c.fillStyle=gc(hot);if(hot>.15){c.shadowColor="rgba(255,120,30,.8)";c.shadowBlur=hot*22}c.fillRect(150,y,420,22);c.restore()});
+ c.fillStyle="rgba(120,170,220,.05)";c.fillRect(40,78,610,144);
+ c.strokeStyle="rgba(140,190,230,.6)";c.lineWidth=1.2;c.strokeRect(40,78,610,144);
+ c.strokeStyle="rgba(140,190,230,.18)";for(let x=40;x<=650;x+=61){c.beginPath();c.ellipse(x,150,9,72,0,0,6.283);c.stroke()}
+ c.setLineDash([4,6]);c.beginPath();c.moveTo(40,cy);c.lineTo(650,cy);c.stroke();c.setLineDash([]);
+ c.strokeStyle="rgba(150,200,255,.35)";c.lineWidth=1;
+ pts.forEach(p=>{p.x+=S.v*5*dtr;if(p.x>645){p.x=45;p.y=88+Math.random()*124}c.beginPath();c.moveTo(p.x,p.y);c.lineTo(p.x+4+S.v*.3,p.y);c.stroke()});
+ const fxr=580-3*S.xf,L=taperL(rr,S.R.q,S.xf),rad=x=>x<fxr?rr:rr*Math.max(0,1-(x-fxr)/L),tint=cl((S.Ts-25)/140,0,.55);
+ if(fxr>130){c.fillStyle="rgba(190,215,245,.30)";c.fillRect(130,cy-rr,fxr-130,2*rr);c.fillStyle=`rgba(255,110,140,${tint})`;c.fillRect(130,cy-rr,fxr-130,2*rr);c.strokeStyle="rgba(210,230,255,.7)";c.strokeRect(130,cy-rr,fxr-130,2*rr)}
+ if(S.xf>0&&fxr>=130||S.ph=="spread"){c.beginPath();c.moveTo(fxr,cy-rr);c.lineTo(fxr+L,cy);c.lineTo(fxr,cy+rr);c.closePath();c.fillStyle="rgba(190,215,245,.25)";c.fill();c.fillStyle=`rgba(255,110,140,${tint*.8})`;c.fill()}
+ if(!GL&&S.fl>.02){
+  const fx0=fxr-6,FL=Math.min(95*(.55+.45*S.fl),640-fx0),N=24,top=[],bot=[],fl=Math.pow(S.fl,.6);
+  for(let i=0;i<=N;i++){const t=i/N,x=fx0+FL*t,rb=rad(x),s=Math.pow(Math.sin(Math.PI*Math.min(1,.08+.92*t)),.7),
+   h=rb+(4+(g1?11:16)*t)*s*fl,wob=Math.sin(now/80+i*.9)*(g1?1.8:.5)*s,lift=g1?-20*t*fl:0;
+   top.push([x,cy+lift-h*(g1?1.2:1)-wob]);bot.push([x,cy+lift*.35+h*(g1?.75:1)])}
+  const gr=c.createLinearGradient(0,cy-50,0,cy+30);
+  if(g1){gr.addColorStop(0,"rgba(255,140,30,.85)");gr.addColorStop(.45,"rgba(255,205,115,.9)");gr.addColorStop(.8,"rgba(100,150,255,.7)");gr.addColorStop(1,"rgba(70,120,255,.5)")}
+  else{gr.addColorStop(0,"rgba(70,130,255,.55)");gr.addColorStop(.5,"rgba(190,225,255,.92)");gr.addColorStop(1,"rgba(70,130,255,.55)")}
+  c.save();c.globalCompositeOperation="lighter";c.globalAlpha=.4+.6*S.fl;c.shadowColor=g1?"rgba(255,150,50,.9)":"rgba(90,150,255,.9)";c.shadowBlur=20;c.fillStyle=gr;
+  c.beginPath();c.moveTo(top[0][0],top[0][1]);top.forEach(p=>c.lineTo(p[0],p[1]));for(let i=N;i>=0;i--)c.lineTo(bot[i][0],bot[i][1]);c.closePath();c.fill();c.restore()}
+ c.save();c.strokeStyle=S.ig?`rgb(255,${70+60*Math.sin(now/120)**2},40)`:"#777";c.lineWidth=2;if(S.ig){c.shadowColor="#ff4020";c.shadowBlur=16}
+ c.beginPath();for(let i=0;i<=8;i++)c.lineTo(566+i*4.5,cy+(i%2?-1:1)*(rr+8));c.stroke();c.restore();
+ const ix=716,iy=150;c.lineWidth=1.2;c.strokeStyle="rgba(140,190,230,.6)";c.beginPath();c.arc(ix,iy,38,0,6.283);c.stroke();
+ for(let k=0;k<6;k++){const a=k*Math.PI/3;c.beginPath();c.arc(ix,iy,46,a-.38,a+.38);c.strokeStyle=gc(hot);c.lineWidth=7;c.stroke()}
+ c.beginPath();c.arc(ix,iy,Math.max(2,rr*.9),0,6.283);c.fillStyle="rgba(200,225,255,.6)";c.fill();
+ txt("tấm đốt gốm",150,40);txt("que PMMA",134,cy-rr-8);txt("dây Kanthal",566,cy-rr-14);txt("mặt cắt, 6 tấm đốt",ix,iy+66,"center");
+ txt("thượng nguồn",45,262);txt("hạ nguồn",650,262,"right");
+ c.strokeStyle="#7fb2ff";c.fillStyle="#7fb2ff";c.lineWidth=1.5;c.beginPath();c.moveTo(70,280);c.lineTo(160,280);c.stroke();c.beginPath();c.moveTo(160,280);c.lineTo(152,275);c.lineTo(152,285);c.fill();txt("dòng khí",170,284);
+ c.strokeStyle="#ffa94d";c.fillStyle="#ffa94d";c.beginPath();c.moveTo(600,280);c.lineTo(500,280);c.stroke();c.beginPath();c.moveTo(500,280);c.lineTo(508,275);c.lineTo(508,285);c.fill();txt("lan lửa ngược dòng",340,284);
+}
+/* ---- flame: WebGL raymarching thể tích, nhìn ngang như ống thật ---- */
+const taperL=(rr,q,xf)=>Math.min(rr*(3+.7*q),3*xf+4);
+const fxc=$("fx"),rmk=matchMedia("(prefers-reduced-motion: reduce)").matches?.35:1;
+const FXV="attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
+const FXF=`
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform float uT,uSc,uFxr,uL,uRR,uI,uO,uG,uV,uFx0,uFL,uTurb;
+float h31(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
+ return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){return .5*vn(p)+.25*vn(p*2.03+7.1)+.125*vn(p*4.07+3.3);}
+float g2(float x){return exp(-x*x);}
+float rad(float x){return x<uFxr?uRR:uRR*max(0.,1.-(x-uFxr)/uL);}
+vec3 ramp(float t){vec3 c=mix(vec3(.45,.04,0.),vec3(1.,.36,.03),smoothstep(0.,.35,t));c=mix(c,vec3(1.,.78,.22),smoothstep(.35,.7,t));return mix(c,vec3(1.,.95,.72),smoothstep(.7,1.,t));}
+vec3 shade(vec3 p){
+ float rho=length(p.yz),rd=rad(p.x),s=rho-rd;
+ if(s<0.)return vec3(0.);
+ float t=(p.x-uFx0)/uFL,I=uI;
+ if(uG<.5){
+  if(t<-.12||t>1.06)return vec3(0.);
+  float sf=.6+.9/(1.+uV/12.);
+  float env=smoothstep(-.1,.12,t)*(1.-smoothstep(.8,1.04,t));
+  float tc=clamp(t,0.,1.);
+  float cl=sqrt(max(sin(3.14159*clamp(.08+.92*tc,0.,1.)),0.));
+  float sc=(3.+13.*tc)*sf*(.55+.45*I)*cl+1.;
+  float w=(2.5+3.*tc)*(.5+.5*I)*sqrt(sf)+1.5;
+  float n=vn(vec3(p.x/14.,p.y/14.,p.z/14.+uT*.2))-.5;
+  float q=s+n*5.*uTurb;
+  float sh=g2((q-sc)/w);
+  float halo=.25*exp(-max(q-sc,0.)/9.)*smoothstep(0.,2.,q);
+  vec3 c=mix(vec3(.04,.14,.95),vec3(.3,.62,1.),smoothstep(.1,.7,sh))*(sh+halo)+vec3(.8,.93,1.)*pow(sh,6.)+vec3(1.,.5,.1)*exp(-s/3.)*.4*(.5+.5*sh)*smoothstep(.4,.9,tc);
+  return c*env;
+ }
+ if(t<-.12||t>1.45)return vec3(0.);
+ float env=smoothstep(-.1,.12,t)*(1.-smoothstep(1.,1.45,t));
+ float tc=clamp(t,0.,1.);
+ vec3 q=p/16.;
+ vec3 np=vec3(q.x*1.2,q.y*.9-uT*1.9,q.z*1.2);
+ float n1=fbm(np),n2=vn(np*1.7+vec3(5.,0.,9.));
+ float wp=smoothstep(-.5,2.5,q.y)*uTurb;
+ vec3 pw=p+vec3((n1-.5)*16.*wp,0.,(n2-.5)*16.*wp);
+ float lift=22.*pow(tc,1.1)*(.4+.6*I);
+ float hb=rd*.6+5.+(8.+10.*tc)*(.45+.55*I);
+ float d1=g2(length(vec2(pw.y-lift,pw.z))/hb);
+ float xp=uFx0+uFL*.5+max(p.y,0.)*.45;
+ float pl=g2(length(vec2(pw.x-xp,pw.z))/11.)*smoothstep(4.,26.,p.y)*exp(-max(p.y-30.,0.)/(30.+40.*I));
+ float d=max(d1*(.55+.9*n1)+pl*(.4+1.1*n1),0.)*(1.+(n1-.5)*uTurb*1.2);
+ float tmp=clamp(d*.85,0.,1.)*(1.-.45*clamp(p.y/70.,0.,1.));
+ float ny=p.y/max(rho,.001),up=smoothstep(-.3,1.,ny);
+ vec3 c=ramp(tmp)*d+vec3(.1,.3,1.)*exp(-s/2.5)*(1.-up)*.9+vec3(1.,.36,.03)*.08*exp(-s/9.)*up;
+ c*=1.-smoothstep(52.,70.,abs(p.y));
+ return c*env;
+}
+void main(){
+ float x=gl_FragCoord.x/uSc,yv=gl_FragCoord.y/uSc-150.;
+ vec3 acc=vec3(0.);
+ float xmax=uFx0+uFL*(uG>.5?1.4:1.05)+6.;
+ if(x>uFx0-14.&&x<xmax&&abs(yv)<72.){
+  float R=uRR+56.,zm=sqrt(max(R*R-yv*yv,0.));
+  if(zm>0.){
+   float dz=2.*zm/32.,j=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+   for(int i=0;i<32;i++){acc+=shade(vec3(x,yv,-zm+(float(i)+j)*dz))*dz;}
+   acc*=(uG>.5?.075:.11)*pow(uI,.7)*pow(uO,.3);
+  }
+ }
+ float ex=(x-(uFx0+uFL*.5))/(uFL*.8+30.),ey=(yv-(uG>.5?8.:0.))/70.;
+ float inT=step(40.,x)*step(x,650.)*step(abs(yv),72.);
+ vec3 hc=uG>.5?vec3(1.,.5,.2):vec3(.2,.4,1.);
+ acc+=hc*exp(-(ex*ex+ey*ey)*2.)*uI*.16*inT;
+ vec3 c=1.-exp(-acc);
+ gl_FragColor=vec4(c,max(c.r,max(c.g,c.b)));
+}`;
+let GL=null,fi=0;const FU={};
+function fxInit(){
+ try{
+  const g=fxc.getContext("webgl",{premultipliedAlpha:true,alpha:true,antialias:false});if(!g)return;
+  const mk=(t,s)=>{const o=g.createShader(t);g.shaderSource(o,s);g.compileShader(o);if(!g.getShaderParameter(o,g.COMPILE_STATUS))throw g.getShaderInfoLog(o);return o};
+  const pr=g.createProgram();g.attachShader(pr,mk(g.VERTEX_SHADER,FXV));g.attachShader(pr,mk(g.FRAGMENT_SHADER,FXF));g.linkProgram(pr);
+  if(!g.getProgramParameter(pr,g.LINK_STATUS))throw "link";
+  g.useProgram(pr);g.bindBuffer(g.ARRAY_BUFFER,g.createBuffer());g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),g.STATIC_DRAW);
+  const a=g.getAttribLocation(pr,"a");g.enableVertexAttribArray(a);g.vertexAttribPointer(a,2,g.FLOAT,false,0,0);
+  ["uT","uSc","uFxr","uL","uRR","uI","uO","uG","uV","uFx0","uFL","uTurb"].forEach(n=>FU[n]=g.getUniformLocation(pr,n));
+  fxc.width=Math.round(W*Math.min(1.5,dpr));fxc.height=Math.round(H*Math.min(1.5,dpr));g.viewport(0,0,fxc.width,fxc.height);GL=g;
+ }catch(e){GL=null;fxc.style.display="none"}
+}
+fxInit();
+function fxDraw(now,dtr){
+ if(!GL)return;
+ fi+=(S.fl-fi)*Math.min(1,dtr*(S.fl>fi?3:7));
+ const g=GL;g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);
+ if(fi<.015)return;
+ const fxr=580-3*S.xf,L=taperL(S.R.d*1.5,S.R.q,S.xf),fx0=fxr-6,FL=Math.min(95*(.55+.45*fi),640-fx0);
+ g.uniform1f(FU.uT,now/1000);g.uniform1f(FU.uSc,fxc.width/W);g.uniform1f(FU.uFxr,fxr);g.uniform1f(FU.uL,L);g.uniform1f(FU.uRR,S.R.d*1.5);
+ g.uniform1f(FU.uI,fi);g.uniform1f(FU.uO,S.o2/21);g.uniform1f(FU.uG,S.R.g);g.uniform1f(FU.uV,S.v);g.uniform1f(FU.uFx0,fx0);g.uniform1f(FU.uFL,FL);
+ g.uniform1f(FU.uTurb,(S.R.g?1:.5)*rmk);
+ g.drawArrays(g.TRIANGLE_STRIP,0,4);
+}
+/* ---- maps ---- */
+function drawMap(cvs,o){
+ const w=300,h=215,L=38,Rr=10,T=10,B=34,k=cvs.getContext("2d");cvs.width=w*dpr;cvs.height=h*dpr;k.setTransform(dpr,0,0,dpr,0,0);
+ const X=x=>L+(x-o.x0)/(o.x1-o.x0)*(w-L-Rr),Y=y=>T+(40-y)/25*(h-T-B);
+ k.fillStyle="#0f141c";k.fillRect(0,0,w,h);
+ const bd=[];for(let px=L;px<=w-Rr;px++){const x=o.x0+(px-L)/(w-L-Rr)*(o.x1-o.x0),yl=Y(cl(o.fn(x),15,40));bd.push([px,yl]);
+  k.fillStyle="rgba(80,200,120,.20)";k.fillRect(px,T,1,yl-T);k.fillStyle="rgba(150,160,175,.14)";k.fillRect(px,yl,1,h-B-yl)}
+ k.strokeStyle="#ffa94d";k.lineWidth=2;k.beginPath();bd.forEach((p,i)=>i?k.lineTo(p[0],p[1]):k.moveTo(p[0],p[1]));k.stroke();
+ k.fillStyle="#8fa3bd";k.font="11px system-ui,sans-serif";k.strokeStyle="#2c3646";k.lineWidth=1;k.textAlign="center";
+ for(let i=0;i<=4;i++){const x=o.x0+(o.x1-o.x0)*i/4;k.fillText(o.fmt(x),X(x),h-B+14)}
+ k.textAlign="right";for(let y=15;y<=40;y+=5){k.fillText(y,L-5,Y(y)+4)}
+ k.textAlign="center";k.fillText(o.xl,(L+w-Rr)/2,h-6);k.save();k.translate(10,(T+h-B)/2);k.rotate(-Math.PI/2);k.fillText("O₂ (%)",0,0);k.restore();
+ k.strokeRect(L,T,w-L-Rr,h-T-B);
+ k.textAlign="left";k.fillStyle="rgba(120,230,160,.9)";k.fillText(o.lab[0],L+6,T+14);k.fillStyle="rgba(190,200,215,.85)";k.fillText(o.lab[1],L+6,h-B-8);
+ o.pts.forEach(p=>{const x=X(p[0]),y=Y(p[1]),t=p[2];k.beginPath();if(t>1){k.moveTo(x,y-6);k.lineTo(x+6,y);k.lineTo(x,y+6);k.lineTo(x-6,y);k.closePath()}else k.arc(x,y,4.5,0,6.283);k.fillStyle=t==2?"#ffd43b":t==3?"#ff6b6b":t?"#51cf66":"#ff6b6b";k.fill();k.strokeStyle="#0f141c";k.stroke()});
+ k.beginPath();k.arc(X(o.cur[0]),Y(o.cur[1]),8,0,6.283);k.strokeStyle="#fff";k.setLineDash([3,3]);k.stroke();k.setLineDash([]);
+}
+function drawMaps(){
+ drawMap($("m1"),{x0:0,x1:3.3,xl:"Thông lượng bức xạ (kW/m²)",fn:x=>ignLim(x,P.v,P.g,P.d),pts:maps.ign,cur:[P.q,P.o2],lab:["Mồi lửa","Không mồi"],fmt:x=>f(x)});
+ drawMap($("m2"),{x0:0,x1:40,xl:"Vận tốc dòng (cm/s)",fn:x=>extLim(P.q,x,P.g,P.d),pts:maps.ext,cur:[P.v,P.o2],lab:["Duy trì","Tắt"],fmt:x=>f(x,0)});
+}
+/* ---- ui ---- */
+const names={idle:"Sẵn sàng",heat:"1 Gia nhiệt",ign:"2 Mồi lửa",spread:"3 Lan ngược dòng",done:"4 Kết thúc"},idx={heat:0,ign:1,spread:2,done:3};
+const hints={heat:"Tấm đốt sáng dần, bề mặt que nóng lên.",ign:"Dây Kanthal đỏ sáng ở hạ nguồn, đang chờ mồi lửa.",spread:"Lửa lan ngược dòng. Bấm một hoặc nhiều cách dập bên dưới."};
+function ui(){
+ const R=S.R,busy=S.ph!="idle"&&S.ph!="done";
+ $("rp").textContent=names[S.ph];$("rt").textContent=f(S.T,0)+" s";$("rpw").textContent=f(R.q/3.3*800,0)+" W";$("rts").textContent=f(S.Ts,0)+" °C";
+ $("ro").textContent=f(S.o2)+" %";$("rv").textContent=f(S.v)+" cm/s";$("rP").textContent=f(S.p,0)+" kPa";$("rx").textContent=f(S.xf,0)+" / 150 mm";
+ [...$("steps").children].forEach((e,i)=>e.className=idx[S.ph]===i?"on":"");
+ ["q","o2","v","d","g0","g1","sp","dep"].forEach(i=>$(i).disabled=busy);$("go").disabled=busy;
+ $("msg").textContent=S.ph=="done"?S.msg:(hints[S.ph]||"");
+ ["n","f","v"].forEach(k=>{const b=$("b"+k);b.disabled=!(S.ph=="spread"&&!S.dying);b.classList.toggle("on",!!S.sup[k])});
+}
+function sync(){
+ $("vq").textContent=f(P.q)+" kW/m²";$("vo2").textContent=P.o2+" %";$("vv").textContent=P.v+" cm/s";$("vd").textContent=f(P.d)+" mm";
+ $("g0").classList.toggle("on",!P.g);$("g1").classList.toggle("on",!!P.g);
+ if(S.ph=="idle"||S.ph=="done")S=idle();drawMaps();
+}
+["q","o2","v","d"].forEach(k=>$(k).oninput=()=>{P[k]=+$(k).value;sync()});
+$("g0").onclick=()=>{P.g=0;sync()};$("g1").onclick=()=>{P.g=1;sync()};
+$("sp").onchange=()=>speed=+$("sp").value;$("dep").onchange=()=>{P.dep=$("dep").checked?1:0;sync()};
+$("go").onclick=()=>{
+ if(S.ph!="idle"&&S.ph!="done")return;
+ S=idle();const R=S.R;R.il=ignLim(R.q,R.v,R.g,R.d);R.ti=R.o2>=R.il?tIgn(R.q,R.o2-R.il,R.g):null;S.ph="heat";
+};
+$("rs").onclick=()=>{S=idle();sync()};
+$("cl").onclick=()=>{maps.ign=[];maps.ext=[];logs=[];cnt=0;["n","f","v"].forEach(k=>setM(k,"—"));rl();drawMaps()};
+[["bn","n"],["bf","f"],["bv","v"]].forEach(([b,k])=>$(b).onclick=()=>{if(S.ph=="spread"&&!S.dying){S.sup[k]^=1;S.used=1}});
+let last=performance.now();
+function loop(now){const dtr=Math.min(.05,(now-last)/1000);last=now;if(S.ph!="idle"&&S.ph!="done")step(dtr*speed);draw(now,dtr);fxDraw(now,dtr);ui();requestAnimationFrame(loop)}
+sync();requestAnimationFrame(loop);
+</script></body></html>

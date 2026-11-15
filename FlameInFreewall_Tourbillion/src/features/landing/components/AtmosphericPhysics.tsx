@@ -76,12 +76,6 @@ export const AtmosphericPhysics: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50/80 px-3 py-1 text-xs font-bold text-rose-700 shadow-2xs mb-4">
-            <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-            <span>Lunar Base Flammability Paradox</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-            <span>Equal ppO₂ ≠ Equal Fire Safety</span>
-          </div>
           <h2 className="text-3xl sm:text-5xl font-black text-zinc-950 tracking-tight mb-4">
             The <span className="text-rose-600">Moon Base Trap</span>: Why Space Habitats Burn Faster
           </h2>
@@ -103,7 +97,7 @@ export const AtmosphericPhysics: React.FC = () => {
                 className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all border cursor-pointer ${
                   isSelected
                     ? 'bg-[#0B2374] text-[#D4FC02] border-[#0B2374] shadow-xs scale-105'
-                    : 'bg-white text-zinc-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    : 'bg-gray-200/70 text-zinc-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                 }`}
                 data-testid={`atmo-tab-${preset.id}`}
               >
@@ -116,7 +110,7 @@ export const AtmosphericPhysics: React.FC = () => {
         {/* Infographic Main Container */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch mb-8">
           {/* Left Column: Molecular Gas Chamber SVG (5 cols) */}
-          <div className="lg:col-span-5 rounded-3xl border border-gray-200/80 bg-white p-6 shadow-2xs flex flex-col justify-between">
+          <div className="lg:col-span-5 rounded-[38px] bg-gray-200/50 p-6 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-bold uppercase text-zinc-500 flex items-center gap-1.5">
@@ -163,13 +157,13 @@ export const AtmosphericPhysics: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-3 text-xs">
-              <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl">
+            <div className="pt-4 grid grid-cols-2 gap-1.5 text-xs">
+              <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-2xl">
                 <span className="text-zinc-500 block text-[11px] font-semibold">Breathing ppO₂</span>
                 <span className="text-base font-black text-[#0B2374]">{ppO2} psia</span>
                 <span className="text-[10px] text-zinc-500 block mt-0.5">Alveolar match</span>
               </div>
-              <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl">
+              <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-2xl">
                 <span className="text-zinc-500 block text-[11px] font-semibold">Inert Dilution ppN₂</span>
                 <span className="text-base font-black text-zinc-900">{ppN2} psia</span>
                 <span className="text-[10px] text-zinc-500 block mt-0.5">Heat-sink capacity</span>
@@ -178,7 +172,7 @@ export const AtmosphericPhysics: React.FC = () => {
           </div>
 
           {/* Right Column: Paradox Mathematics & Risk Comparison (7 cols) */}
-          <div className="lg:col-span-7 rounded-3xl border border-gray-200/80 bg-white p-6 shadow-2xs flex flex-col justify-between">
+          <div className="lg:col-span-7 rounded-[38px] bg-gray-200/50 p-6 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-black text-xl text-zinc-950 flex items-center gap-2">
@@ -199,31 +193,30 @@ export const AtmosphericPhysics: React.FC = () => {
                 </span>
               </div>
 
-              <div className="space-y-4 text-xs sm:text-sm">
-                <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-zinc-900">Human Respiration Impact</span>
-                    <span className="text-xs text-lime-800 font-black flex items-center gap-1 bg-lime-100/80 px-2 py-0.5 rounded-md">
+              <div className="space-y-2 text-xs sm:text-sm">
+                <div className="bg-blue-50 p-4 rounded-3xl">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-zinc-900">Human Respiration</span>
+                    <span className="text-xs text-lime-800 font-bold flex items-center gap-1 bg-lime-100/80 px-2 py-0.5 rounded-md">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Nominal Oxygenation
                     </span>
                   </div>
                   <p className="text-xs text-zinc-600">
-                    At {ppO2} psia oxygen partial pressure, blood hemoglobin saturation is identical to sea-level Earth.
-                    Astronauts suffer no hypoxia and can transition to low-pressure spacesuits rapidly.
+                    At {ppO2} psia oxygen partial pressure, astronaut respiration is safe and identical to Earth sea level.
                   </p>
                 </div>
 
-                <div className="bg-rose-50/50 p-4 rounded-2xl border border-rose-200">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-rose-950">Spacecraft Fire Spread Multiplier</span>
-                    <span className="text-xs text-rose-800 font-black flex items-center gap-1 bg-rose-100 px-2 py-0.5 rounded-md">
+                <div className="bg-rose-50 p-4 rounded-3xl">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-rose-950">Fire Spread Multiplier</span>
+                    <span className="text-xs text-rose-800 font-bold flex items-center gap-1 bg-rose-100 px-2 py-0.5 rounded-md">
                       <Flame className="w-3.5 h-3.5" /> {current.flammabilityIndex.toFixed(1)}x Spread Rate
                     </span>
                   </div>
                   <p className="text-xs text-rose-900/80">
                     {current.id === 'earth'
-                      ? 'Standard 1.0x flammability index. Nitrogen absorbs 79% of gas thermal energy.'
-                      : `Oxygen mole fraction is ${o2MoleDiff}% higher than Earth! Inert nitrogen heat absorption drops by 38%, causing polymer combustion temperatures to spike by ~300 K.`}
+                      ? 'Baseline 1.0x spread. Dense nitrogen absorbs 79% of gas thermal energy.'
+                      : `Oxygen mole fraction is ${o2MoleDiff}% higher than Earth. Inert nitrogen heat sink drops by 38%, accelerating polymer flame spread.`}
                   </p>
                 </div>
               </div>
