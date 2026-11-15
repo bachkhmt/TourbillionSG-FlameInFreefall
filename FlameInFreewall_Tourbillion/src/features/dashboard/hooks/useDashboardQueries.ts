@@ -1,12 +1,16 @@
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
-import type { InvestigationFilterParamsDto } from '@/api/dto';
-import { mapDashboardSummaryDto } from '@/api/mappers';
-import { getDashboardSummary } from '@/api/services';
-import { getMockDashboardSummary } from '@/api/mockFallback';
-import type { MappedDashboardSummary } from '@/types/api';
-import type { ApiQueryOptions } from '@/hooks/api/queryHelpers';
-import { handleTimeoutFallback, shouldFallback } from '@/hooks/api/queryHelpers';
-import { apiQueryKeys } from '@/hooks/api/queryKeys';
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import type { InvestigationFilterParamsDto } from "@/api/dto";
+import { mapDashboardSummaryDto } from "@/api/mappers";
+import { getDashboardSummary } from "@/api/services";
+import { getMockDashboardSummary } from "@/api/mockFallback";
+import type { MappedDashboardSummary } from "@/types/api";
+import type { ApiQueryOptions } from "@/hooks/api/queryHelpers";
+import {
+  handleTimeoutFallback,
+  isTimeoutError,
+  shouldFallback,
+} from "@/hooks/api/queryHelpers";
+import { apiQueryKeys } from "@/hooks/api/queryKeys";
 
 /**
  * Queries dashboard summary KPIs and featured investigations (`GET /dashboard/summary`).
@@ -14,7 +18,7 @@ import { apiQueryKeys } from '@/hooks/api/queryKeys';
  */
 export function useDashboardSummaryQuery(
   filters?: InvestigationFilterParamsDto,
-  options?: ApiQueryOptions<MappedDashboardSummary>
+  options?: ApiQueryOptions<MappedDashboardSummary>,
 ): UseQueryResult<MappedDashboardSummary, Error> {
   return useQuery<MappedDashboardSummary, Error>({
     ...options,
@@ -24,7 +28,7 @@ export function useDashboardSummaryQuery(
         const dto = await getDashboardSummary(filters, signal);
         return mapDashboardSummaryDto(dto);
       } catch (err) {
-        if (shouldFallback(options?.enableFallback)) {
+        if (shouldFallback(options?.enableFallback) && isTimeoutError(err)) {
           handleTimeoutFallback(err);
           return getMockDashboardSummary(filters);
         }

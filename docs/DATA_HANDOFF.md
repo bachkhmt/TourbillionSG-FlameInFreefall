@@ -149,3 +149,10 @@ Mir và 3 spinoff chưa có chỗ lưu hợp lệ. Các phương án:
 - PSI-10 (license unknown, không index).
 - `facts`/`rankings`/`ml_*` của repo Data cũ: không có hash/locator theo dòng.
 - Mọi thay đổi schema, import DB, push.
+
+
+## Snapshot adapter update — 2026-11-15
+
+Adapter `source-tags-oxygen-context-v2` exports deterministic navigation tags (code, original hardware labels/acronyms, fuel-type, and unreviewed team pillar annotation) through existing tag tables. It also retains the release's explicit oxygenContext as a textual test_condition. No new tables/migration; 24 investigations, 1,926 source records, 81 sources and 2,574 passages are unchanged. Snapshot content/fingerprints change; fresh test-target import was used. Source revision and text corpus remain unchanged. Existing targets need a newly prepared/admitted bundle rather than silently reusing their prior snapshot.
+
+`GET /catalog/descriptive` counts all records within catalog-selected investigations, with denominators/missingness and original oxygen basis/context. `GET /investigations/{id}/overview` returns only corpus-policy-admitted original passages and fails closed if policy is missing or invalid. No scientific review is conferred by either endpoint.

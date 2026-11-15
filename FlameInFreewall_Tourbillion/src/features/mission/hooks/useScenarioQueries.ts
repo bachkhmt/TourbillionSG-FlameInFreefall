@@ -2,63 +2,46 @@ import {
   useMutation,
   useQuery,
   type UseMutationOptions,
-  type UseMutationResult,
-  type UseQueryResult,
-} from '@tanstack/react-query';
-import type { EvaluationDto, EvaluationRequestDto } from '@/api/dto';
-import { evaluateMissionScenario } from '@/api/services';
-import { getMockScenarioEvaluation } from '@/api/mockFallback';
-import type { ApiQueryOptions } from '@/hooks/api/queryHelpers';
-import { handleTimeoutFallback, shouldFallback } from '@/hooks/api/queryHelpers';
-import { apiQueryKeys } from '@/hooks/api/queryKeys';
+} from "@tanstack/react-query";
+import type { EvaluationDto, EvaluationRequestDto } from "@/api/dto";
+import { evaluateMissionScenario } from "@/api/services";
+import type { ApiQueryOptions } from "@/hooks/api/queryHelpers";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 
-function computeScenarioKey(request: EvaluationRequestDto): string {
-  const sc = request.scenario;
-  return `${sc.gravity?.value ?? '0g'}-${sc.oxygen?.value ?? '21%'}-${sc.pressure?.value ?? '14.7'}-${sc.material?.key ?? 'all'}`;
-}
-
-/**
- * Queries mission scenario evaluation across the 4 pillars (`POST /mission/scenarios/evaluate`).
- * Gracefully falls back to NASA PSI empirical baseline if backend is unavailable.
- */
 export function useScenarioEvaluationQuery(
   request: EvaluationRequestDto,
-  options?: ApiQueryOptions<EvaluationDto>
-): UseQueryResult<EvaluationDto, Error> {
-  const key = computeScenarioKey(request);
-
+  options?: ApiQueryOptions<EvaluationDto>,
+) {
   return useQuery<EvaluationDto, Error>({
     ...options,
-    queryKey: apiQueryKeys.scenarioEvaluation(key),
-    queryFn: async ({ signal }) => {
-      try {
-        return await evaluateMissionScenario(request, signal);
-      } catch (err) {
-        if (shouldFallback(options?.enableFallback)) {
-          handleTimeoutFallback(err);
-          return getMockScenarioEvaluation(request);
-        }
-        throw err;
-      }
-    },
-    enabled: options?.enabled ?? true,
+    queryKey: ["scenario-evaluation", request],
+    queryFn: ({ signal }) => evaluateMissionScenario(request, signal),
   });
 }
 
-/**
- * Imperative mutation to evaluate a mission scenario.
- */
 export function useEvaluateScenarioMutation(
-  options?: UseMutationOptions<EvaluationDto, Error, EvaluationRequestDto>
-): UseMutationResult<EvaluationDto, Error, EvaluationRequestDto> {
+  options?: UseMutationOptions<EvaluationDto, Error, EvaluationRequestDto>,
+) {
   return useMutation<EvaluationDto, Error, EvaluationRequestDto>({
     ...options,
-    mutationFn: async (payload) => {
-      try {
-        return await evaluateMissionScenario(payload);
-      } catch (err) {
-        return getMockScenarioEvaluation(payload);
-      }
+    mutationFn: (payload) => evaluateMissionScenario(payload),
+  });
+}
+
+export function useActiveScenarioEvaluation() {
+  const scenario = useWorkspaceStore((state) => state.activeScenario);
+  return useScenarioEvaluationQuery({
+    scenario: {
+      name: scenario.name,
+      material: { key: scenario.material },
+      gravity: { value: String(scenario.gravity), unit: "g" },
+      oxygen: {
+        value: String(scenario.oxygenPct),
+        unit: "%",
+        meaning: "ambient_oxygen_fraction_percent",
+      },
+      pressure: { value: String(scenario.pressurePsi), unit: "psia" },
+      airflow: { value: String(scenario.airflowVelocity), unit: "cm/s" },
     },
   });
 }

@@ -7,23 +7,24 @@ export interface ChatQuickPrompt {
 
 export const CHAT_QUICK_PROMPTS: ChatQuickPrompt[] = [
   {
-    id: 'flex-d0',
-    label: 'FLEX-007 source conflict',
-    query: 'FLEX-007 đường kính D0 có mâu thuẫn không?',
+    id: "flex-d0",
+    label: "FLEX-007 source conflict",
+    query: "FLEX-007 initial diameter D0 source conflict?",
   },
   {
-    id: 'bass-ii-caveats',
-    label: 'BASS-II instrument caveats',
-    query: 'BASS-II fan display và air display có giới hạn gì?',
+    id: "bass-ii-caveats",
+    label: "BASS-II instrument caveats",
+    query: "What are the BASS-II fan display and air display limitations?",
   },
   {
-    id: 'same-smoke',
-    label: 'Smoke detection research',
-    query: 'What does SAME measure about smoke aerosol particles and fire detection?',
+    id: "same-smoke",
+    label: "Smoke detection research",
+    query:
+      "What does SAME measure about smoke aerosol particles and fire detection?",
   },
   {
-    id: 'mars-gap',
-    label: 'Mars data coverage',
-    query: 'Dữ liệu cháy ở trọng lực Sao Hỏa 0.38g?',
+    id: "mars-gap",
+    label: "Mars data coverage",
+    query: "What combustion data is available at Mars gravity 0.38g?",
   },
 ];

@@ -1,13 +1,15 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 
-from app.api.dependencies import get_catalog
+from app.api.dependencies import get_catalog, get_descriptive
 from app.api.phase4_route import Phase4Route
 from app.schemas.api import models as dto
+from app.schemas.api.descriptive import Descriptive, DescriptiveQuery, StudyOverview
 from app.schemas.api.queries import CatalogQuery, PageQuery
 from app.services.catalog import CatalogService
+from app.services.descriptive import DescriptiveService
 
 router = APIRouter(route_class=Phase4Route, tags=["phase4"])
 ERRORS = {n: {"model": dto.Error} for n in (404, 422, 503, 500)}
@@ -72,3 +74,30 @@ async def listInvestigationTags(
     service: Annotated[CatalogService, Depends(get_catalog)],
 ):
     return await service.tags(investigationId, query)
+
+
+@router.get(
+    "/catalog/descriptive",
+    response_model=Descriptive,
+    responses=ERRORS,
+    operation_id="getCatalogDescriptive",
+)
+async def getCatalogDescriptive(
+    query: Annotated[DescriptiveQuery, Query()],
+    service: Annotated[DescriptiveService, Depends(get_descriptive)],
+):
+    return await service.descriptive(query)
+
+
+@router.get(
+    "/investigations/{investigationId}/overview",
+    response_model=StudyOverview,
+    responses=ERRORS,
+    operation_id="getInvestigationOverview",
+)
+async def getInvestigationOverview(
+    investigationId: UUID,
+    request: Request,
+    service: Annotated[DescriptiveService, Depends(get_descriptive)],
+):
+    return await service.overview(investigationId, request.app.state.settings)

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { motion, type Variants } from 'framer-motion';
+import React, { useMemo, useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { motion, type Variants } from "framer-motion";
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,21 +15,23 @@ import {
   BookOpen,
   Layers,
   Tag,
-} from 'lucide-react';
-import { ApiClientError } from '@/api/client';
+} from "lucide-react";
+import { ApiClientError } from "@/api/client";
 import type {
   MappedClaim,
   MappedInvestigationDetail,
   MappedObservation,
   MappedRun,
   MappedSource,
-} from '@/types/api';
-import { mapObservationDto, mapRunDto } from '@/api/mappers';
-import { listInvestigationMeasurements, listInvestigationRuns } from '@/api/services';
-import { getMockObservationsPage, getMockRunsPage } from '@/api/mockFallback';
-import { useWorkspaceStore } from '@/store/useWorkspaceStore';
-import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
-import { toast } from '@/components/toast/toast-store';
+} from "@/types/api";
+import { mapObservationDto, mapRunDto } from "@/api/mappers";
+import {
+  listInvestigationMeasurements,
+  listInvestigationRuns,
+} from "@/api/services";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
+import { ApiErrorBanner } from "@/components/ui/ApiErrorBanner";
+import { toast } from "@/components/toast/toast-store";
 import {
   useInvestigationClaimsQuery,
   useInvestigationDetailQuery,
@@ -45,9 +47,14 @@ import {
   PsiExportTab,
   ComparisonBar,
   ComparisonModal,
-} from '@/features/explorer';
+} from "@/features/explorer";
 
-export type StudyDetailTab = 'overview' | 'runs' | 'telemetry' | 'claims' | 'psi-export';
+export type StudyDetailTab =
+  | "overview"
+  | "runs"
+  | "telemetry"
+  | "claims"
+  | "psi-export";
 
 export interface StudyDetailClientProps {
   params?: Promise<{ id: string }>;
@@ -56,11 +63,11 @@ export interface StudyDetailClientProps {
 
 function isEntityNotFoundError(error: unknown): boolean {
   if (error instanceof ApiClientError) {
-    return error.status === 404 || error.code === 'ENTITY_NOT_FOUND';
+    return error.status === 404 || error.code === "ENTITY_NOT_FOUND";
   }
-  if (typeof error === 'object' && error !== null) {
+  if (typeof error === "object" && error !== null) {
     const rec = error as { status?: unknown; code?: unknown };
-    return rec.status === 404 || rec.code === 'ENTITY_NOT_FOUND';
+    return rec.status === 404 || rec.code === "ENTITY_NOT_FOUND";
   }
   return false;
 }
@@ -69,26 +76,37 @@ function observationKey(obs: MappedObservation): string {
   return `${obs.run.id}-${obs.measurement.id}`;
 }
 
-export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClientProps) {
+export function StudyDetailClient({
+  params,
+  study: propsStudy,
+}: StudyDetailClientProps) {
   const routerParams = useParams();
   const unwrappedParams = params ? React.use(params) : undefined;
 
   const id = useMemo(() => {
     if (propsStudy?.id) return propsStudy.id;
     if (routerParams?.id) {
-      return Array.isArray(routerParams.id) ? routerParams.id[0] : routerParams.id;
+      return Array.isArray(routerParams.id)
+        ? routerParams.id[0]
+        : routerParams.id;
     }
-    return unwrappedParams?.id ?? '';
+    return unwrappedParams?.id ?? "";
   }, [propsStudy, routerParams, unwrappedParams]);
 
-  const [activeTab, setActiveTab] = useState<StudyDetailTab>('overview');
+  const [activeTab, setActiveTab] = useState<StudyDetailTab>("overview");
 
   const compareList = useWorkspaceStore((state) => state.compareList);
   const toggleCompare = useWorkspaceStore((state) => state.toggleCompare);
-  const removeFromCompare = useWorkspaceStore((state) => state.removeFromCompare);
+  const removeFromCompare = useWorkspaceStore(
+    (state) => state.removeFromCompare,
+  );
   const clearCompare = useWorkspaceStore((state) => state.clearCompare);
-  const isComparisonModalOpen = useWorkspaceStore((state) => state.isComparisonModalOpen);
-  const setComparisonModalOpen = useWorkspaceStore((state) => state.setComparisonModalOpen);
+  const isComparisonModalOpen = useWorkspaceStore(
+    (state) => state.isComparisonModalOpen,
+  );
+  const setComparisonModalOpen = useWorkspaceStore(
+    (state) => state.setComparisonModalOpen,
+  );
 
   const detailQuery = useInvestigationDetailQuery(id, {
     enabled: !propsStudy && Boolean(id),
@@ -97,13 +115,21 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
   const resolvedStudyId = study?.id ?? null;
 
   const runsQuery = useInvestigationRunsQuery(resolvedStudyId, { limit: 100 });
-  const measurementsQuery = useInvestigationMeasurementsQuery(resolvedStudyId, { limit: 100 });
-  const sourcesQuery = useInvestigationSourcesQuery(resolvedStudyId, { limit: 100 });
-  const claimsQuery = useInvestigationClaimsQuery(resolvedStudyId, { limit: 100 });
+  const measurementsQuery = useInvestigationMeasurementsQuery(resolvedStudyId, {
+    limit: 100,
+  });
+  const sourcesQuery = useInvestigationSourcesQuery(resolvedStudyId, {
+    limit: 100,
+  });
+  const claimsQuery = useInvestigationClaimsQuery(resolvedStudyId, {
+    limit: 100,
+  });
 
   // Accumulated states for additional pages beyond the first 100
   const [accumulatedRuns, setAccumulatedRuns] = useState<MappedRun[]>([]);
-  const [accumulatedObservations, setAccumulatedObservations] = useState<MappedObservation[]>([]);
+  const [accumulatedObservations, setAccumulatedObservations] = useState<
+    MappedObservation[]
+  >([]);
   const [isLoadingMoreRuns, setIsLoadingMoreRuns] = useState(false);
   const [isFetchingAllData, setIsFetchingAllData] = useState(false);
 
@@ -145,19 +171,11 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
     try {
       const currentOffset = effectiveRuns.length;
       let newRuns: MappedRun[] = [];
-      try {
-        const res = await listInvestigationRuns(resolvedStudyId, {
-          offset: currentOffset,
-          limit: 100,
-        });
-        newRuns = res.items.map(mapRunDto);
-      } catch {
-        const fb = getMockRunsPage(resolvedStudyId, {
-          offset: currentOffset,
-          limit: 100,
-        });
-        newRuns = fb.items;
-      }
+      const res = await listInvestigationRuns(resolvedStudyId, {
+        offset: currentOffset,
+        limit: 100,
+      });
+      newRuns = res.items.map(mapRunDto);
 
       setAccumulatedRuns((prev) => {
         const base = prev.length > 0 ? prev : effectiveRuns;
@@ -174,14 +192,17 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
 
       if (newRuns.length > 0) {
         toast.success(
-          'Loaded additional runs',
-          `Retrieved ${newRuns.length} more test runs from NASA PSI catalog.`
+          "Loaded additional runs",
+          `Retrieved ${newRuns.length} more test runs from NASA PSI catalog.`,
         );
       } else {
-        toast.info('All runs loaded', 'No additional test runs found.');
+        toast.info("All runs loaded", "No additional test runs found.");
       }
     } catch (err) {
-      toast.error('Unable to load more runs', err instanceof Error ? err.message : String(err));
+      toast.error(
+        "Unable to load more runs",
+        err instanceof Error ? err.message : String(err),
+      );
     } finally {
       setIsLoadingMoreRuns(false);
     }
@@ -200,28 +221,25 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
         let hasMore = false;
         let total = 0;
 
-        try {
-          const res = await listInvestigationRuns(resolvedStudyId, {
-            offset: currentOffset,
-            limit: 100,
-          });
-          items = res.items.map(mapRunDto);
-          hasMore = Boolean(res.next || (res.total > 0 && currentOffset + items.length < res.total));
-          total = res.total;
-        } catch {
-          const fb = getMockRunsPage(resolvedStudyId, {
-            offset: currentOffset,
-            limit: 100,
-          });
-          items = fb.items;
-          hasMore = fb.hasMore;
-          total = fb.total;
-        }
+        const res = await listInvestigationRuns(resolvedStudyId, {
+          offset: currentOffset,
+          limit: 100,
+        });
+        items = res.items.map(mapRunDto);
+        hasMore = Boolean(
+          res.next ||
+            (res.total > 0 && currentOffset + items.length < res.total),
+        );
+        total = res.total;
 
         allNewRuns = [...allNewRuns, ...items];
         currentOffset += items.length;
 
-        if (!hasMore || items.length === 0 || (total > 0 && currentOffset >= total)) {
+        if (
+          !hasMore ||
+          items.length === 0 ||
+          (total > 0 && currentOffset >= total)
+        ) {
           keepFetching = false;
         }
       }
@@ -240,11 +258,14 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
       });
 
       toast.success(
-        'Complete runs catalog loaded',
-        `Total ${effectiveRuns.length + allNewRuns.length} test runs are now available.`
+        "Complete runs catalog loaded",
+        `Total ${effectiveRuns.length + allNewRuns.length} test runs are now available.`,
       );
     } catch (err) {
-      toast.error('Failed to load all runs', err instanceof Error ? err.message : String(err));
+      toast.error(
+        "Failed to load all runs",
+        err instanceof Error ? err.message : String(err),
+      );
     } finally {
       setIsLoadingMoreRuns(false);
     }
@@ -262,26 +283,23 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
         let items: MappedRun[] = [];
         let hasMore = false;
         let total = 0;
-        try {
-          const res = await listInvestigationRuns(resolvedStudyId, {
-            offset: currentRunsOffset,
-            limit: 100,
-          });
-          items = res.items.map(mapRunDto);
-          hasMore = Boolean(res.next || (res.total > 0 && currentRunsOffset + items.length < res.total));
-          total = res.total;
-        } catch {
-          const fb = getMockRunsPage(resolvedStudyId, {
-            offset: currentRunsOffset,
-            limit: 100,
-          });
-          items = fb.items;
-          hasMore = fb.hasMore;
-          total = fb.total;
-        }
+        const res = await listInvestigationRuns(resolvedStudyId, {
+          offset: currentRunsOffset,
+          limit: 100,
+        });
+        items = res.items.map(mapRunDto);
+        hasMore = Boolean(
+          res.next ||
+            (res.total > 0 && currentRunsOffset + items.length < res.total),
+        );
+        total = res.total;
         allNewRuns = [...allNewRuns, ...items];
         currentRunsOffset += items.length;
-        if (!hasMore || items.length === 0 || (total > 0 && currentRunsOffset >= total)) {
+        if (
+          !hasMore ||
+          items.length === 0 ||
+          (total > 0 && currentRunsOffset >= total)
+        ) {
           keepFetchingRuns = false;
         }
       }
@@ -309,26 +327,23 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
         let items: MappedObservation[] = [];
         let hasMore = false;
         let total = 0;
-        try {
-          const res = await listInvestigationMeasurements(resolvedStudyId, {
-            offset: currentObsOffset,
-            limit: 100,
-          });
-          items = res.items.map(mapObservationDto);
-          hasMore = Boolean(res.next || (res.total > 0 && currentObsOffset + items.length < res.total));
-          total = res.total;
-        } catch {
-          const fb = getMockObservationsPage(resolvedStudyId, {
-            offset: currentObsOffset,
-            limit: 100,
-          });
-          items = fb.items;
-          hasMore = fb.hasMore;
-          total = fb.total;
-        }
+        const res = await listInvestigationMeasurements(resolvedStudyId, {
+          offset: currentObsOffset,
+          limit: 100,
+        });
+        items = res.items.map(mapObservationDto);
+        hasMore = Boolean(
+          res.next ||
+            (res.total > 0 && currentObsOffset + items.length < res.total),
+        );
+        total = res.total;
         allNewObs = [...allNewObs, ...items];
         currentObsOffset += items.length;
-        if (!hasMore || items.length === 0 || (total > 0 && currentObsOffset >= total)) {
+        if (
+          !hasMore ||
+          items.length === 0 ||
+          (total > 0 && currentObsOffset >= total)
+        ) {
           keepFetchingObs = false;
         }
       }
@@ -350,11 +365,14 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
       }
 
       toast.success(
-        'Complete investigation dataset retrieved',
-        'All test runs and scalar observations are ready for raw export.'
+        "Complete investigation dataset retrieved",
+        "All test runs and scalar observations are ready for raw export.",
       );
     } catch (err) {
-      toast.error('Unable to fetch complete dataset', err instanceof Error ? err.message : String(err));
+      toast.error(
+        "Unable to fetch complete dataset",
+        err instanceof Error ? err.message : String(err),
+      );
     } finally {
       setIsFetchingAllData(false);
     }
@@ -364,7 +382,11 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
     return <StudyDetailShimmer />;
   }
 
-  if (!propsStudy && detailQuery.isError && !isEntityNotFoundError(detailQuery.error)) {
+  if (
+    !propsStudy &&
+    detailQuery.isError &&
+    !isEntityNotFoundError(detailQuery.error)
+  ) {
     return (
       <div className="w-full max-w-4xl mx-auto py-10 px-4 space-y-4">
         <ApiErrorBanner
@@ -394,10 +416,13 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
           <AlertCircle className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl font-black text-zinc-950">Investigation Not Found</h1>
+          <h1 className="text-2xl font-black text-zinc-950">
+            Investigation Not Found
+          </h1>
           <p className="text-sm text-zinc-600 max-w-md mx-auto">
             The requested NASA PSI study identifier &ldquo;
-            <span className="text-[#0B2374] font-bold">{id}</span>&rdquo; could not be found in the current catalog.
+            <span className="text-[#0B2374] font-bold">{id}</span>&rdquo; could
+            not be found in the current catalog.
           </p>
         </div>
         <div>
@@ -416,13 +441,22 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
 
   const isCompared = compareList.includes(study.id);
 
-  const tabs: { id: StudyDetailTab; label: string; icon: React.ElementType }[] = [
-    { id: 'overview', label: 'Chamber Overview', icon: Flame },
-    { id: 'runs', label: `Test Runs (${effectiveRuns.length}${runsQuery.data?.total && runsQuery.data.total > effectiveRuns.length ? `/${runsQuery.data.total}` : ''})`, icon: Activity },
-    { id: 'telemetry', label: 'Scalar Telemetry', icon: Gauge },
-    { id: 'claims', label: `Evidence Claims (${claims.length})`, icon: FileText },
-    { id: 'psi-export', label: 'PSI Raw Export', icon: Download },
-  ];
+  const tabs: { id: StudyDetailTab; label: string; icon: React.ElementType }[] =
+    [
+      { id: "overview", label: "Chamber Overview", icon: Flame },
+      {
+        id: "runs",
+        label: `Test Runs (${effectiveRuns.length}${runsQuery.data?.total && runsQuery.data.total > effectiveRuns.length ? `/${runsQuery.data.total}` : ""})`,
+        icon: Activity,
+      },
+      { id: "telemetry", label: "Scalar Telemetry", icon: Gauge },
+      {
+        id: "claims",
+        label: `Evidence Claims (${claims.length})`,
+        icon: FileText,
+      },
+      { id: "psi-export", label: "PSI Raw Export", icon: Download },
+    ];
 
   const pageContainerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -495,14 +529,18 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
                   onClick={() => setActiveTab(tab.id)}
                   className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-colors shrink-0 cursor-pointer ${
                     isActive
-                      ? 'text-white'
-                      : 'text-zinc-600 hover:text-zinc-950 hover:bg-gray-100/70'
+                      ? "text-white"
+                      : "text-zinc-600 hover:text-zinc-950 hover:bg-gray-100/70"
                   }`}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="active-detail-tab-pill"
-                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 380,
+                        damping: 32,
+                      }}
                       className="absolute inset-0 bg-[#0B2374] rounded-xl shadow-xs"
                     />
                   )}
@@ -524,7 +562,7 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
             aria-label="Tab Content"
             className="min-w-0"
           >
-            {activeTab === 'overview' && (
+            {activeTab === "overview" && (
               <ChamberOverviewTab
                 study={study}
                 sources={sources}
@@ -533,7 +571,7 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
                 onRetrySources={() => sourcesQuery.refetch()}
               />
             )}
-            {activeTab === 'runs' && (
+            {activeTab === "runs" && (
               <TestRunsTable
                 study={study}
                 runs={effectiveRuns}
@@ -547,12 +585,15 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
                 hasMore={runsQuery.data?.hasMore}
               />
             )}
-            {activeTab === 'telemetry' && (
+            {activeTab === "telemetry" && (
               <TelemetryPane
                 study={study}
                 runs={effectiveRuns}
                 observations={effectiveObservations}
-                isLoading={(runsQuery.isLoading || measurementsQuery.isLoading) && effectiveRuns.length === 0}
+                isLoading={
+                  (runsQuery.isLoading || measurementsQuery.isLoading) &&
+                  effectiveRuns.length === 0
+                }
                 error={runsQuery.error ?? measurementsQuery.error}
                 onRetry={() => {
                   runsQuery.refetch();
@@ -560,17 +601,16 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
                 }}
               />
             )}
-            {activeTab === 'claims' && (
+            {activeTab === "claims" && (
               <ClaimsList
                 study={study}
                 claims={claims}
-                sources={sources}
                 isLoading={claimsQuery.isLoading}
                 error={claimsQuery.error}
                 onRetry={() => claimsQuery.refetch()}
               />
             )}
-            {activeTab === 'psi-export' && (
+            {activeTab === "psi-export" && (
               <PsiExportTab
                 study={study}
                 runs={effectiveRuns}

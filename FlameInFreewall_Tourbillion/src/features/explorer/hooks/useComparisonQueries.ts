@@ -4,18 +4,22 @@ import {
   type UseMutationOptions,
   type UseMutationResult,
   type UseQueryResult,
-} from '@tanstack/react-query';
-import type { ComparisonRequestDto } from '@/api/dto';
-import { mapComparisonDto } from '@/api/mappers';
-import { compareInvestigations } from '@/api/services';
-import { getMockComparisonResult } from '@/api/mockFallback';
-import type { MappedComparisonResult } from '@/types/api';
-import type { ApiQueryOptions } from '@/hooks/api/queryHelpers';
-import { handleTimeoutFallback, shouldFallback } from '@/hooks/api/queryHelpers';
-import { apiQueryKeys } from '@/hooks/api/queryKeys';
+} from "@tanstack/react-query";
+import type { ComparisonRequestDto } from "@/api/dto";
+import { mapComparisonDto } from "@/api/mappers";
+import { compareInvestigations } from "@/api/services";
+import { getMockComparisonResult } from "@/api/mockFallback";
+import type { MappedComparisonResult } from "@/types/api";
+import type { ApiQueryOptions } from "@/hooks/api/queryHelpers";
+import {
+  handleTimeoutFallback,
+  isTimeoutError,
+  shouldFallback,
+} from "@/hooks/api/queryHelpers";
+import { apiQueryKeys } from "@/hooks/api/queryKeys";
 
 function normalizeComparisonIds(
-  investigationIds: ReadonlyArray<string>
+  investigationIds: ReadonlyArray<string>,
 ): string[] {
   const seen = new Set<string>();
   for (const id of investigationIds) {
@@ -35,7 +39,7 @@ function normalizeComparisonIds(
 export function useComparisonQuery(
   investigationIds: string[],
   pagination?: { observationOffset?: number; observationLimit?: number },
-  options?: ApiQueryOptions<MappedComparisonResult>
+  options?: ApiQueryOptions<MappedComparisonResult>,
 ): UseQueryResult<MappedComparisonResult, Error> {
   const normalizedIds = normalizeComparisonIds(investigationIds);
   const isValidSelection =
@@ -56,11 +60,11 @@ export function useComparisonQuery(
               ? { observationLimit: pagination.observationLimit }
               : {}),
           },
-          signal
+          signal,
         );
         return mapComparisonDto(dto);
       } catch (err) {
-        if (shouldFallback(options?.enableFallback)) {
+        if (shouldFallback(options?.enableFallback) && isTimeoutError(err)) {
           handleTimeoutFallback(err);
           return getMockComparisonResult(normalizedIds);
         }
@@ -77,8 +81,8 @@ export function useComparisonQuery(
 export function useCompareInvestigationsMutation(
   options?: Omit<
     UseMutationOptions<MappedComparisonResult, Error, ComparisonRequestDto>,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ): UseMutationResult<MappedComparisonResult, Error, ComparisonRequestDto> {
   return useMutation<MappedComparisonResult, Error, ComparisonRequestDto>({
     ...options,

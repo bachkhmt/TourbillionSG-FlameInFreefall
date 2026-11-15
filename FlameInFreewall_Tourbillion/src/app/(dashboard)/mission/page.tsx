@@ -1,22 +1,18 @@
-'use client';
+"use client";
 
-import React, { Suspense } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
-import {
-  Rocket,
-  Layers,
-  Sparkles,
-} from 'lucide-react';
-import { EndOfListIndicator } from '@/components/ui/EndOfListIndicator';
+import React, { Suspense } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import { Rocket, Layers, Sparkles } from "lucide-react";
+import { EndOfListIndicator } from "@/components/ui/EndOfListIndicator";
 import {
   ScenarioConfigForm,
   ConditionGapMatrix,
   RankedEvidenceList,
   PredictiveLabPanel,
-} from '@/features/mission';
+} from "@/features/mission";
 
-type MissionView = 'evidence' | 'prediction';
+type MissionView = "evidence" | "prediction";
 
 function MissionContent() {
   const router = useRouter();
@@ -24,11 +20,11 @@ function MissionContent() {
   const searchParams = useSearchParams();
 
   const currentView: MissionView =
-    searchParams.get('view') === 'prediction' ? 'prediction' : 'evidence';
+    searchParams.get("view") === "prediction" ? "prediction" : "evidence";
 
   const handleViewChange = (view: MissionView) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('view', view);
+    params.set("view", view);
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -62,11 +58,11 @@ function MissionContent() {
             <button
               type="button"
               data-testid="view-tab-evidence"
-              onClick={() => handleViewChange('evidence')}
+              onClick={() => handleViewChange("evidence")}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                currentView === 'evidence'
-                  ? 'bg-white text-zinc-950 border border-gray-200 shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-gray-100/60'
+                currentView === "evidence"
+                  ? "bg-white text-zinc-950 border border-gray-200 shadow-xs"
+                  : "text-zinc-600 hover:text-zinc-900 hover:bg-gray-100/60"
               }`}
             >
               <Layers className="w-3.5 h-3.5 text-[#0B2374]" />
@@ -76,15 +72,15 @@ function MissionContent() {
             <button
               type="button"
               data-testid="view-tab-prediction"
-              onClick={() => handleViewChange('prediction')}
+              onClick={() => handleViewChange("prediction")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                currentView === 'prediction'
-                  ? 'bg-white text-zinc-950 border border-gray-200 shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-gray-100/60'
+                currentView === "prediction"
+                  ? "bg-white text-zinc-950 border border-gray-200 shadow-xs"
+                  : "text-zinc-600 hover:text-zinc-900 hover:bg-gray-100/60"
               }`}
             >
               <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-              <span>Predictive Lab (Could Have)</span>
+              <span>Predictive Lab</span>
             </button>
           </div>
         </div>
@@ -94,7 +90,7 @@ function MissionContent() {
       <ScenarioConfigForm />
 
       {/* Main View Area */}
-      {currentView === 'evidence' ? (
+      {currentView === "evidence" ? (
         <div data-testid="evidence-view-container" className="space-y-6">
           {/* Condition Gap Matrix Audit */}
           <ConditionGapMatrix />
@@ -105,7 +101,9 @@ function MissionContent() {
       ) : (
         <div data-testid="prediction-view-container" className="space-y-6">
           {/* Predictive Lab Panel */}
-          <PredictiveLabPanel onSwitchToEvidence={() => handleViewChange('evidence')} />
+          <PredictiveLabPanel
+            onSwitchToEvidence={() => handleViewChange("evidence")}
+          />
         </div>
       )}
 

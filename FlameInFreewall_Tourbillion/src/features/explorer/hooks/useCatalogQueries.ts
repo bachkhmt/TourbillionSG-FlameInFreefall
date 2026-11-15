@@ -1,41 +1,45 @@
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
-import type { InvestigationListParamsDto, PaginationParamsDto } from '@/api/dto';
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import type {
+  InvestigationListParamsDto,
+  PaginationParamsDto,
+} from "@/api/dto";
 import {
   mapCatalogCapabilitiesDto,
   mapInvestigationDetailDto,
   mapInvestigationDto,
   mapPaginatedPage,
   mapTagDto,
-} from '@/api/mappers';
+} from "@/api/mappers";
 import {
   getCatalogCapabilities,
   getInvestigationById,
   getInvestigationBySlug,
   getInvestigationTags,
   listInvestigations,
-} from '@/api/services';
+} from "@/api/services";
 import {
   FALLBACK_CONTEXT,
   getMockCatalogCapabilities,
   getMockInvestigationDetail,
   getMockInvestigationsPage,
-} from '@/api/mockFallback';
+} from "@/api/mockFallback";
 import type {
   MappedCatalogCapabilities,
   MappedInvestigation,
   MappedInvestigationDetail,
   MappedPage,
   MappedTag,
-} from '@/types/api';
+} from "@/types/api";
 import {
   type ApiQueryOptions,
   handleTimeoutFallback,
+  isTimeoutError,
   isUuid,
   normalizeNonEmptyId,
   shouldFallback,
   useScopedPaginatedQuery,
-} from '@/hooks/api/queryHelpers';
-import { apiQueryKeys } from '@/hooks/api/queryKeys';
+} from "@/hooks/api/queryHelpers";
+import { apiQueryKeys } from "@/hooks/api/queryKeys";
 
 export { isUuid };
 
@@ -44,7 +48,7 @@ export { isUuid };
  * Seamlessly falls back to mock capabilities when backend is unavailable.
  */
 export function useCatalogCapabilitiesQuery(
-  options?: ApiQueryOptions<MappedCatalogCapabilities>
+  options?: ApiQueryOptions<MappedCatalogCapabilities>,
 ): UseQueryResult<MappedCatalogCapabilities, Error> {
   return useQuery<MappedCatalogCapabilities, Error>({
     ...options,
@@ -54,7 +58,7 @@ export function useCatalogCapabilitiesQuery(
         const dto = await getCatalogCapabilities(signal);
         return mapCatalogCapabilitiesDto(dto);
       } catch (err) {
-        if (shouldFallback(options?.enableFallback)) {
+        if (shouldFallback(options?.enableFallback) && isTimeoutError(err)) {
           handleTimeoutFallback(err);
           return getMockCatalogCapabilities();
         }
@@ -71,7 +75,7 @@ export function useCatalogCapabilitiesQuery(
  */
 export function useInvestigationsQuery(
   params?: InvestigationListParamsDto,
-  options?: ApiQueryOptions<MappedPage<MappedInvestigation>>
+  options?: ApiQueryOptions<MappedPage<MappedInvestigation>>,
 ): UseQueryResult<MappedPage<MappedInvestigation>, Error> {
   return useQuery<MappedPage<MappedInvestigation>, Error>({
     ...options,
@@ -81,7 +85,7 @@ export function useInvestigationsQuery(
         const page = await listInvestigations(params, signal);
         return mapPaginatedPage(page, mapInvestigationDto);
       } catch (err) {
-        if (shouldFallback(options?.enableFallback)) {
+        if (shouldFallback(options?.enableFallback) && isTimeoutError(err)) {
           handleTimeoutFallback(err);
           return getMockInvestigationsPage(params);
         }
@@ -98,7 +102,7 @@ export function useInvestigationsQuery(
  */
 export function useInvestigationDetailQuery(
   idOrSlug: string | undefined | null,
-  options?: ApiQueryOptions<MappedInvestigationDetail>
+  options?: ApiQueryOptions<MappedInvestigationDetail>,
 ): UseQueryResult<MappedInvestigationDetail, Error> {
   const trimmed = normalizeNonEmptyId(idOrSlug);
 
@@ -112,7 +116,7 @@ export function useInvestigationDetailQuery(
           : await getInvestigationBySlug(trimmed, signal);
         return mapInvestigationDetailDto(dto);
       } catch (err) {
-        if (shouldFallback(options?.enableFallback)) {
+        if (shouldFallback(options?.enableFallback) && isTimeoutError(err)) {
           handleTimeoutFallback(err);
           return getMockInvestigationDetail(trimmed);
         }
@@ -129,7 +133,7 @@ export function useInvestigationDetailQuery(
 export function useInvestigationTagsQuery(
   investigationId: string | undefined | null,
   pagination?: PaginationParamsDto,
-  options?: ApiQueryOptions<MappedPage<MappedTag>>
+  options?: ApiQueryOptions<MappedPage<MappedTag>>,
 ): UseQueryResult<MappedPage<MappedTag>, Error> {
   return useScopedPaginatedQuery({
     id: investigationId,

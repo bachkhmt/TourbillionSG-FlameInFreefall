@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * LandingHero Component
@@ -6,8 +6,8 @@
  * and clean typography directing users into the research modules.
  */
 
-import React from 'react';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
 import {
   Flame,
   ArrowRight,
@@ -16,11 +16,14 @@ import {
   ShieldAlert,
   Activity,
   Layers,
-} from 'lucide-react';
+} from "lucide-react";
 
 export const LandingHero: React.FC = () => {
   return (
-    <section className="relative w-full overflow-hidden bg-[#F8F9FA]" data-testid="landing-hero">
+    <section
+      className="relative w-full overflow-hidden bg-[#F8F9FA]"
+      data-testid="landing-hero"
+    >
       {/* Top Space Apps Announcement Banner */}
       <div
         data-testid="announcement-banner"
@@ -73,16 +76,28 @@ export const LandingHero: React.FC = () => {
 
           {/* Nav Links */}
           <div className="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-100">
-            <a href="#flame-physics" className="hover:text-[#D4FC02] transition-colors">
+            <a
+              href="#flame-physics"
+              className="hover:text-[#D4FC02] transition-colors"
+            >
               Flame Physics (0g vs 1g)
             </a>
-            <a href="#lunar-paradox" className="hover:text-[#D4FC02] transition-colors">
+            <a
+              href="#lunar-paradox"
+              className="hover:text-[#D4FC02] transition-colors"
+            >
               Lunar Flammability Paradox
             </a>
-            <a href="#mission-modules" className="hover:text-[#D4FC02] transition-colors">
+            <a
+              href="#mission-modules"
+              className="hover:text-[#D4FC02] transition-colors"
+            >
               Research Workspace
             </a>
-            <Link href="/explorer" className="hover:text-[#D4FC02] transition-colors">
+            <Link
+              href="/explorer"
+              className="hover:text-[#D4FC02] transition-colors"
+            >
               PSI Studies
             </Link>
           </div>
@@ -116,7 +131,7 @@ export const LandingHero: React.FC = () => {
 
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] text-zinc-950 mb-6">
-            Microgravity Combustion &amp;{' '}
+            Microgravity Combustion &amp;{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0B2374] via-[#1E40AF] to-indigo-700">
               Spacecraft Fire Safety
             </span>
@@ -124,9 +139,10 @@ export const LandingHero: React.FC = () => {
 
           {/* Subheading */}
           <p className="text-base sm:text-lg md:text-xl text-zinc-600 max-w-2xl mx-auto leading-relaxed mb-10">
-            Evidence-first intelligence platform synthesizing 20 NASA Physical Sciences Informatics
-            (PSI) microgravity investigations. Uncover why flames burn spherical and blue in freefall,
-            and resolve the lethal flammability paradox of lunar exploration habitats.
+            Evidence-first intelligence platform exploring NASA Physical
+            Sciences Informatics (PSI) microgravity investigations. Uncover why
+            flames burn spherical and blue in freefall, and resolve the lethal
+            flammability paradox of lunar exploration habitats.
           </p>
 
           {/* Action Buttons */}
@@ -145,7 +161,7 @@ export const LandingHero: React.FC = () => {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-zinc-900 font-bold text-sm sm:text-base border border-gray-200/90 hover:border-gray-300 shadow-2xs hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <Layers className="w-5 h-5 text-[#0B2374]" />
-              <span>Explore 20 PSI Studies</span>
+              <span>Explore PSI Studies</span>
             </Link>
 
             <Link
@@ -165,9 +181,11 @@ export const LandingHero: React.FC = () => {
                 <span>PSI Archive</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
-                20 Studies
+                PSI Studies
               </div>
-              <p className="text-xs text-zinc-500 mt-1">BASS, ACME, FLEX, SoFIE flight tests</p>
+              <p className="text-xs text-zinc-500 mt-1">
+                BASS, ACME, FLEX, SoFIE flight tests
+              </p>
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
@@ -176,9 +194,11 @@ export const LandingHero: React.FC = () => {
                 <span>Test Runs</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
-                148+ Runs
+                Source records
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Quench diameters &amp; spread rates</p>
+              <p className="text-xs text-zinc-500 mt-1">
+                Quench diameters &amp; spread rates
+              </p>
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
@@ -189,7 +209,9 @@ export const LandingHero: React.FC = () => {
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
                 0g vs 1g
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Pure diffusion vs buoyant plume</p>
+              <p className="text-xs text-zinc-500 mt-1">
+                Pure diffusion vs buoyant plume
+              </p>
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
@@ -200,7 +222,9 @@ export const LandingHero: React.FC = () => {
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
                 0 &lt; g &lt; 1
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Lunar &amp; Mars flammability paradox</p>
+              <p className="text-xs text-zinc-500 mt-1">
+                Lunar &amp; Mars flammability paradox
+              </p>
             </div>
           </div>
         </div>

@@ -1,407 +1,212 @@
-import React, { act } from 'react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import React, { act } from "react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { screen, fireEvent, waitFor, renderHook } from "@testing-library/react";
+import { QueryClientProvider } from "@tanstack/react-query";
 import {
   ScenarioConfigForm,
   ConditionGapMatrix,
   RankedEvidenceList,
   PredictiveLabPanel,
-} from '@/features/mission';
-import MissionPage from '../src/app/(dashboard)/mission/page';
-import { useWorkspaceStore, DEFAULT_SCENARIO } from '../src/store/useWorkspaceStore';
-import { toastStore } from '../src/components/toast/toast-store';
-import { SCENARIO_PRESETS } from '../src/data/presets';
-import { evaluateGapMatrix } from '../src/lib/gapMatrixEngine';
-import { evaluatePredictiveLab } from '../src/lib/predictiveLabEngine';
-import { calculateTopicalRankings } from '../src/lib/rankingEngine';
+} from "@/features/mission";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
+import { renderWithQuery, createTestQueryClient } from "./test-utils";
+import {
+  evaluateMissionScenario,
+  getPredictionReadiness,
+} from "@/api/services";
+import { useScenarioEvaluationQuery } from "@/features/mission/hooks/useScenarioQueries";
+import type { EvaluationDto, EvaluationRequestDto } from "@/api/dto";
 
-const mockPush = vi.fn();
-let mockSearchParams = new URLSearchParams();
-
-expect.extend({
-  toBeInTheDocument(received) {
-    const pass = Boolean(received);
-    return {
-      pass,
-      message: () => `expected element ${pass ? 'not ' : ''}to be in document`,
-    };
+vi.mock("@/api/services", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  evaluateMissionScenario: vi.fn(),
+  getPredictionReadiness: vi.fn(),
+}));
+const evaluation: EvaluationDto = {
+  scenario: {
+    original: {},
+    digest: "test-only",
+    fieldStates: {},
+    unavailableFields: [],
   },
+  context: {
+    collectionId: "TEST_ONLY",
+    origin: "real",
+    reviewState: "unreviewed",
+    caveats: [],
+  },
+  scope: {},
+  coverage: {
+    state: "unavailable",
+    reasonCodes: ["SCIENTIFIC_REVIEW_NOT_ACCEPTED"],
+    examinedRuns: 0,
+    requiredConditionsComplete: null,
+    collectionTraversalComplete: false,
+  },
+  rankings: {
+    state: "unavailable",
+    reasonCodes: ["RANKING_PROVIDER_UNAVAILABLE"],
+  },
+  pillarEvidence: {
+    state: "unavailable",
+    reasonCodes: ["CLASSIFICATION_UNAVAILABLE"],
+  },
+};
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  useWorkspaceStore.getState().resetWorkspace();
+  vi.mocked(evaluateMissionScenario).mockResolvedValue(evaluation);
+  vi.mocked(getPredictionReadiness).mockResolvedValue({
+    state: "not_ready",
+    reasons: ["model_selection_required"],
+    modelId: null,
+    modelVersion: null,
+  });
 });
 
-vi.mock('next/navigation', () => ({
-  usePathname: () => '/mission',
-  useRouter: () => ({
-    push: mockPush,
-    replace: vi.fn(),
-    prefetch: vi.fn(),
-  }),
-  useSearchParams: () => mockSearchParams,
-}));
-
-describe('Mission Scenario, Evidence Gap Matrix & Predictive Lab (/mission)', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    useWorkspaceStore.getState().resetWorkspace();
-    toastStore.clear();
-    mockSearchParams = new URLSearchParams();
+describe("Mission displays backend evidence states", () => {
+  it("keeps scenario controls and calculates input partial pressure without a safety classification", () => {
+    renderWithQuery(<ScenarioConfigForm />);
+    expect(screen.getByTestId("badge-ppo2").textContent).toContain("3.09 psia");
+    expect(screen.getByTestId("badge-ppo2").textContent).toContain(
+      "not a safety assessment",
+    );
+    fireEvent.change(screen.getByTestId("slider-oxygen"), {
+      target: { value: "30" },
+    });
+    fireEvent.change(screen.getByTestId("slider-pressure"), {
+      target: { value: "10.2" },
+    });
+    expect(screen.getByTestId("badge-ppo2").textContent).toContain("3.06 psia");
   });
-
-  describe('ScenarioConfigForm Component', () => {
-    it('renders planetary presets and interactive configuration controls', () => {
-      render(<ScenarioConfigForm />);
-
-      expect(screen.getByTestId('scenario-config-form')).toBeDefined();
-      expect(screen.getByTestId('preset-iss-baseline')).toBeDefined();
-      expect(screen.getByTestId('preset-artemis-lunar-base')).toBeDefined();
-      expect(screen.getByTestId('preset-mars-surface-habitat')).toBeDefined();
-      expect(screen.getByTestId('preset-custom-sandbox')).toBeDefined();
-
-      expect(screen.getByTestId('slider-gravity')).toBeDefined();
-      expect(screen.getByTestId('slider-oxygen')).toBeDefined();
-      expect(screen.getByTestId('slider-pressure')).toBeDefined();
-      expect(screen.getByTestId('select-material')).toBeDefined();
-      expect(screen.getByTestId('slider-airflow')).toBeDefined();
-    });
-
-    it('calculates and displays live Oxygen Partial Pressure (ppO2) telemetry badge', () => {
-      // Default: 14.7 psia * 21% = 3.087 psia -> 3.09 psia
-      render(<ScenarioConfigForm />);
-
-      const ppo2Badge = screen.getByTestId('badge-ppo2');
-      expect(ppo2Badge).toBeDefined();
-      expect(ppo2Badge.textContent).toContain('ppO₂: 3.09 psia');
-      expect(ppo2Badge.textContent).toContain('Normoxic Alveolar Target');
-    });
-
-    it('updates ppO2 telemetry when pressure and oxygen sliders change', () => {
-      render(<ScenarioConfigForm />);
-
-      const oxygenSlider = screen.getByTestId('slider-oxygen');
-      const pressureSlider = screen.getByTestId('slider-pressure');
-
-      // Set 30% O2 and 10.2 psia (Artemis atmosphere: 10.2 * 0.30 = 3.06 psia)
-      act(() => {
-        fireEvent.change(oxygenSlider, { target: { value: '30' } });
-        fireEvent.change(pressureSlider, { target: { value: '10.2' } });
-      });
-
-      const ppo2Badge = screen.getByTestId('badge-ppo2');
-      expect(ppo2Badge.textContent).toContain('ppO₂: 3.06 psia');
-    });
-
-    it('switches scenario parameters when a planetary preset is selected', () => {
-      render(<ScenarioConfigForm />);
-
-      const artemisBtn = screen.getByTestId('preset-artemis-lunar-base');
-      act(() => {
-        fireEvent.click(artemisBtn);
-      });
-
-      const active = useWorkspaceStore.getState().activeScenario;
-      expect(active.id).toBe('artemis-lunar-base');
-      expect(active.gravity).toBe(0.16);
-      expect(active.oxygenPct).toBe(30.0);
-      expect(active.pressurePsi).toBe(10.2);
-
-      const marsBtn = screen.getByTestId('preset-mars-surface-habitat');
-      act(() => {
-        fireEvent.click(marsBtn);
-      });
-
-      const activeMars = useWorkspaceStore.getState().activeScenario;
-      expect(activeMars.id).toBe('mars-surface-habitat');
-      expect(activeMars.gravity).toBe(0.38);
-      expect(activeMars.material).toBe('Nomex');
-    });
-
-    it('updates material selection via dropdown', () => {
-      render(<ScenarioConfigForm />);
-
-      const materialSelect = screen.getByTestId('select-material') as HTMLSelectElement;
-      act(() => {
-        fireEvent.change(materialSelect, { target: { value: 'Nomex' } });
-      });
-
-      expect(useWorkspaceStore.getState().activeScenario.material).toBe('Nomex');
-    });
-
-    it('updates gravity and airflow sliders', () => {
-      render(<ScenarioConfigForm />);
-
-      const gravitySlider = screen.getByTestId('slider-gravity');
-      act(() => {
-        fireEvent.change(gravitySlider, { target: { value: '0.16' } });
-      });
-      expect(useWorkspaceStore.getState().activeScenario.gravity).toBe(0.16);
-
-      const airflowSlider = screen.getByTestId('slider-airflow');
-      act(() => {
-        fireEvent.change(airflowSlider, { target: { value: '12.5' } });
-      });
-      expect(useWorkspaceStore.getState().activeScenario.airflowVelocity).toBe(12.5);
-    });
+  it("loads an illustrative lunar preset as user input", () => {
+    renderWithQuery(<ScenarioConfigForm />);
+    fireEvent.click(screen.getByTestId("preset-artemis-lunar-base"));
+    expect(useWorkspaceStore.getState().activeScenario.gravity).toBe(0.16);
   });
-
-  describe('ConditionGapMatrix Component', () => {
-    it('audits all 6 dimensions (gravity, material, oxygen, pressure, airflow, combined)', () => {
-      render(<ConditionGapMatrix />);
-
-      expect(screen.getByTestId('condition-gap-matrix')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-gravity')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-material')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-oxygen')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-pressure')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-airflow')).toBeDefined();
-      expect(screen.getByTestId('dimension-card-combined')).toBeDefined();
-    });
-
-    it('renders MATCH status and matched test runs for ISS baseline scenario', () => {
-      render(<ConditionGapMatrix />);
-
-      const overallBadge = screen.getByTestId('badge-overall-status');
-      expect(overallBadge.textContent).toContain('OVERALL MATCH');
-      expect(overallBadge.className).toContain('bg-lime-50');
-      expect(overallBadge.className).toContain('text-lime-900');
-      expect(overallBadge.className).not.toContain('emerald');
-
-      const matchedRuns = screen.getByTestId('badge-matched-runs');
-      expect(matchedRuns).toBeDefined();
-
-      const gravBadge = screen.getByTestId('badge-dim-gravity');
-      expect(gravBadge.textContent).toContain('MATCH');
-    });
-
-    it('flags partial gravity gap and displays safety warning when Moon or Mars gravity is set', () => {
-      act(() => {
-        useWorkspaceStore.getState().setActiveScenario({
-          ...DEFAULT_SCENARIO,
-          gravity: 0.16,
-          name: 'Artemis Moon Base',
-        });
-      });
-
-      render(<ConditionGapMatrix />);
-
-      const gravBadge = screen.getByTestId('badge-dim-gravity');
-      expect(gravBadge.textContent).toContain('GAP');
-
-      const warningBanner = screen.getByTestId('partial-gravity-warning');
-      expect(warningBanner).toBeDefined();
-      expect(warningBanner.textContent).toContain('NASA Safety Guardrail — Partial Gravity Empirical Gap');
-      expect(warningBanner.textContent).toContain('Cannot conclude safe or unsafe');
-    });
-
-    it('handles the mandatory NASA safety guardrail disclaimer when present', () => {
-      render(<ConditionGapMatrix />);
-
-      const disclaimer = screen.queryByTestId('nasa-safety-disclaimer');
-      if (disclaimer) {
-        expect(disclaimer.textContent).toContain('Cannot conclude safe or unsafe');
-      }
-    });
+  it("shows real unavailable coverage, reasons and scenario filters", async () => {
+    renderWithQuery(<ConditionGapMatrix />);
+    await screen.findByText("scientific review not accepted");
+    expect(screen.getByTestId("condition-gap-matrix").textContent).toContain(
+      "unavailable",
+    );
+    const link = screen.getByRole("link", { name: /Inspect source records/ });
+    expect(link.getAttribute("href")).toContain("material=PMMA");
+    expect(link.getAttribute("href")).toContain("gravityRaw=microgravity");
+    expect(
+      screen.queryByText(/Matched PSI Runs|VERIFIED|100% Match/),
+    ).toBeNull();
   });
-
-  describe('RankedEvidenceList Component', () => {
-    it('renders topical investigation rankings with rank numbers and similarity badges', () => {
-      render(<RankedEvidenceList />);
-
-      expect(screen.getByTestId('ranked-evidence-list')).toBeDefined();
-
-      // For default ISS PMMA scenario, BASS is top ranked
-      const bassCard = screen.getByTestId('ranked-study-card-bass');
-      expect(bassCard).toBeDefined();
-      expect(bassCard.textContent).toContain('01');
-      expect(bassCard.textContent).toContain('BASS');
-
-      const similarityBadge = screen.getByTestId('similarity-badge-bass');
-      expect(similarityBadge.textContent).toContain('% Match');
-    });
-
-    it('displays closest test run telemetry for top study', () => {
-      render(<RankedEvidenceList />);
-
-      const closestRun = screen.getByTestId('closest-run-bass');
-      expect(closestRun).toBeDefined();
-      expect(closestRun.textContent).toContain('Closest PSI Run:');
-      expect(closestRun.textContent).toContain('BASS-RUN-01');
-    });
-
-    it('links each ranked study to Explorer with /explorer/[id]', () => {
-      render(<RankedEvidenceList />);
-
-      const inspectLink = screen.getByTestId('inspect-study-btn-bass');
-      expect(inspectLink).toBeDefined();
-      expect(inspectLink.getAttribute('href')).toBe('/explorer/bass');
-    });
+  it("shows backend ranking reason without an invented replacement list", async () => {
+    renderWithQuery(<RankedEvidenceList />);
+    await screen.findByText("ranking provider unavailable");
+    expect(
+      screen.queryByText(/tested PMMA directly|SoFIE|100% Match/),
+    ).toBeNull();
   });
-
-  describe('PredictiveLabPanel Component', () => {
-    it('executes in-bounds predictions for ISS baseline PMMA scenario', () => {
-      act(() => {
-        useWorkspaceStore.getState().setActiveScenario({ ...DEFAULT_SCENARIO });
-      });
-
-      render(<PredictiveLabPanel />);
-
-      expect(screen.getByTestId('predictive-lab-panel')).toBeDefined();
-
-      // Status badge should be online
-      const statusBadge = screen.getByTestId('model-status-badge');
-      expect(statusBadge.textContent).toContain('MODEL ONLINE / VALIDATED DOMAIN');
-
-      // All 3 readiness requirements must be verified
-      expect(screen.getByTestId('readiness-req-req-01').textContent).toContain('VERIFIED');
-      expect(screen.getByTestId('readiness-req-req-02').textContent).toContain('VERIFIED');
-      expect(screen.getByTestId('readiness-req-req-03').textContent).toContain('VERIFIED');
-
-      // Outputs: spread rate, quench limit, uncertainty bounds
-      expect(screen.getByTestId('predicted-spread-rate')).toBeDefined();
-      expect(screen.getByTestId('predicted-quench-limit')).toBeDefined();
-      expect(screen.getByTestId('predicted-uncertainty-bounds')).toBeDefined();
-
-      const spreadRateText = screen.getByTestId('predicted-spread-rate').textContent;
-      expect(spreadRateText).toContain('mm/s');
-
-      const quenchLimitText = screen.getByTestId('predicted-quench-limit').textContent;
-      expect(quenchLimitText).toContain('17.5'); // PMMA LOI
-    });
-
-    it('locks prediction with DOMAIN OUT OF BOUNDS when partial gravity (0.16g) is selected', () => {
-      act(() => {
-        useWorkspaceStore.getState().setActiveScenario({
-          ...DEFAULT_SCENARIO,
-          gravity: 0.16,
-          name: 'Artemis Moon Base',
-        });
-      });
-
-      render(<PredictiveLabPanel />);
-
-      const statusBadge = screen.getByTestId('model-status-badge');
-      expect(statusBadge.textContent).toContain('MODEL OFFLINE / DOMAIN OUT OF BOUNDS');
-
-      const lockedCard = screen.getByTestId('predictive-lab-locked-state');
-      expect(lockedCard).toBeDefined();
-      expect(lockedCard.textContent).toContain('Guarded Execution Locked');
-      expect(lockedCard.textContent).toContain('Partial-gravity intermediate buoyancy regimes (0.16g) lack long-duration orbital microgravity test baselines');
-
-      // REQ-01 and REQ-02 should be BLOCKED
-      expect(screen.getByTestId('readiness-req-req-01').textContent).toContain('BLOCKED');
-      expect(screen.getByTestId('readiness-req-req-02').textContent).toContain('BLOCKED');
-    });
-
-    it('locks prediction when material is uncalibrated fabric without model version support', () => {
-      act(() => {
-        useWorkspaceStore.getState().setActiveScenario({
-          ...DEFAULT_SCENARIO,
-          material: 'Cotton',
-        });
-      });
-
-      render(<PredictiveLabPanel />);
-
-      const statusBadge = screen.getByTestId('model-status-badge');
-      expect(statusBadge.textContent).toContain('MODEL OFFLINE / DOMAIN OUT OF BOUNDS');
-
-      const lockedCard = screen.getByTestId('predictive-lab-locked-state');
-      expect(lockedCard.textContent).toContain('MATERIAL UNCALIBRATED');
-    });
-
-    it('triggers onSwitchToEvidence callback when inspect evidence button is clicked in locked state', () => {
-      act(() => {
-        useWorkspaceStore.getState().setActiveScenario({
-          ...DEFAULT_SCENARIO,
-          gravity: 0.38,
-          name: 'Mars Habitat',
-        });
-      });
-
-      const onSwitchSpy = vi.fn();
-      render(<PredictiveLabPanel onSwitchToEvidence={onSwitchSpy} />);
-
-      const inspectEvidenceBtn = screen.getByTestId('inspect-evidence-cta-btn');
-      act(() => {
-        fireEvent.click(inspectEvidenceBtn);
-      });
-
-      expect(onSwitchSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('displays mandatory predictive safety disclaimer warning', () => {
-      render(<PredictiveLabPanel />);
-
-      const disclaimer = screen.getByTestId('predictive-safety-disclaimer');
-      expect(disclaimer).toBeDefined();
-      expect(disclaimer.textContent).toContain('Never issue operational safe / unsafe certification');
-    });
+  it("sends updated airflow and every scenario input to the backend", async () => {
+    renderWithQuery(<ConditionGapMatrix />);
+    await waitFor(() =>
+      expect(evaluateMissionScenario).toHaveBeenCalledTimes(1),
+    );
+    act(() =>
+      useWorkspaceStore.getState().updateActiveScenario({ airflowVelocity: 9 }),
+    );
+    await waitFor(() =>
+      expect(evaluateMissionScenario).toHaveBeenCalledTimes(2),
+    );
+    expect(
+      vi.mocked(evaluateMissionScenario).mock.calls[1][0].scenario.airflow
+        ?.value,
+    ).toBe("9");
   });
-
-  describe('MissionPage (/mission) Full Assembly', () => {
-    it('renders workbench with NASA Evidence Analysis view by default', () => {
-      render(<MissionPage />);
-
-      expect(screen.getByTestId('mission-workbench')).toBeDefined();
-      expect(screen.getByTestId('scenario-config-form')).toBeDefined();
-      expect(screen.getByTestId('evidence-view-container')).toBeDefined();
-      expect(screen.getByTestId('condition-gap-matrix')).toBeDefined();
-      expect(screen.getByTestId('ranked-evidence-list')).toBeDefined();
-      expect(screen.queryByTestId('prediction-view-container')).toBeNull();
-    });
-
-    it('switches to Predictive Lab view when tab is clicked', () => {
-      render(<MissionPage />);
-
-      const predictionTab = screen.getByTestId('view-tab-prediction');
-      act(() => {
-        fireEvent.click(predictionTab);
-      });
-
-      expect(mockPush).toHaveBeenCalledWith('/mission?view=prediction');
-    });
-
-    it('renders Predictive Lab view when view=prediction in searchParams', () => {
-      mockSearchParams = new URLSearchParams('view=prediction');
-      render(<MissionPage />);
-
-      expect(screen.getByTestId('prediction-view-container')).toBeDefined();
-      expect(screen.getByTestId('predictive-lab-panel')).toBeDefined();
-      expect(screen.queryByTestId('evidence-view-container')).toBeNull();
-    });
-
-    it('preserves scenario state changes when switching between views', () => {
-      render(<MissionPage />);
-
-      // Switch preset to Artemis Moon
-      const artemisBtn = screen.getByTestId('preset-artemis-lunar-base');
-      act(() => {
-        fireEvent.click(artemisBtn);
-      });
-
-      expect(useWorkspaceStore.getState().activeScenario.gravity).toBe(0.16);
-
-      // Now switch searchParams to prediction
-      mockSearchParams = new URLSearchParams('view=prediction');
-      render(<MissionPage />);
-
-      // In predictive lab, 0.16g should cause locked state
-      expect(screen.getByTestId('predictive-lab-locked-state')).toBeDefined();
-      expect(screen.getByTestId('model-status-badge').textContent).toContain('MODEL OFFLINE');
-    });
+  it("surfaces evaluation failure and supports retry", async () => {
+    vi.mocked(evaluateMissionScenario).mockRejectedValueOnce(
+      new Error("Network unavailable"),
+    );
+    renderWithQuery(<RankedEvidenceList />);
+    await screen.findByRole("alert");
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    await screen.findByText("ranking provider unavailable");
   });
-
-  describe('Mission Scenario Light Theme', () => {
-    it('renders scenario configuration and gap matrix with light white cards and badges', () => {
-      render(<MissionPage />);
-      expect(screen.getAllByText(/Mission Scenario/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/Evidence Gap Matrix/i).length).toBeGreaterThan(0);
-      expect(screen.getByTestId('mission-workbench')).toBeInTheDocument();
-      expect(screen.getByTestId('scenario-config-form')).toBeInTheDocument();
-      expect(screen.getByTestId('condition-gap-matrix')).toBeInTheDocument();
-      expect(screen.getByTestId('ranked-evidence-list')).toBeInTheDocument();
-
-      const indicator = screen.getByTestId('end-of-list-indicator');
-      expect(indicator).toBeInTheDocument();
-      expect(indicator.textContent).toContain('You have reached the end of the mission scenario evidence list');
-    });
+  it("renders readiness without generated predictions", async () => {
+    renderWithQuery(<PredictiveLabPanel />);
+    await screen.findByText(/No validated model/);
+    expect(screen.getByTestId("model-status-badge").textContent).toContain(
+      "not_ready",
+    );
+    expect(screen.getByText("model selection required")).toBeDefined();
+    expect(
+      screen.queryByText(/MODEL ONLINE|NASA-PSI-SPM|95% CI|0.23/),
+    ).toBeNull();
   });
+  it("surfaces readiness error instead of a mock model", async () => {
+    vi.mocked(getPredictionReadiness).mockRejectedValue(
+      new Error("Readiness unavailable"),
+    );
+    renderWithQuery(<PredictiveLabPanel />);
+    await screen.findByRole("alert");
+    expect(screen.queryByText(/No validated model/)).toBeNull();
+  });
+  it("keeps differing request meaning, pillar, pages, bindings and null state in separate cache entries", async () => {
+    const client = createTestQueryClient();
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    );
+    const { rerender } = renderHook(
+      ({ request }: { request: EvaluationRequestDto }) =>
+        useScenarioEvaluationQuery(request),
+      { initialProps: { request: { scenario: {} } }, wrapper },
+    );
+    await waitFor(() =>
+      expect(evaluateMissionScenario).toHaveBeenCalledTimes(1),
+    );
+    const variants: EvaluationRequestDto[] = [
+      { scenario: { material: null } },
+      { scenario: {}, pillar: "detection" },
+      { scenario: {}, pages: { limit: 5 } },
+      { scenario: {}, expectedBindings: { collectionId: "another" } },
+      {
+        scenario: {
+          oxygen: {
+            value: "21",
+            unit: "%",
+            meaning: "oxidizer_oxygen_fraction_percent",
+          },
+        },
+      },
+    ];
+    for (const [index, request] of variants.entries()) {
+      rerender({ request });
+      await waitFor(() =>
+        expect(evaluateMissionScenario).toHaveBeenCalledTimes(index + 2),
+      );
+    }
+  });
+});
+
+it('renders an evaluated ranking only from the backend items and rationale', async () => {
+  vi.mocked(evaluateMissionScenario).mockResolvedValue({ ...evaluation, rankings: { state: 'evaluated', reasonCodes: [], items: [{ position: 1, rank: 1, investigation: { investigationId: 'TEST_ONLY', psiId: 'PSI-TEST', slug: 'test-source' }, externalExperimentId: 'TEST_ONLY', scenarioRelevanceScore: '0.5', catalogUsefulnessScore: null, rationale: 'TEST_ONLY backend rationale.' }] } });
+  renderWithQuery(<RankedEvidenceList />);
+  await screen.findByText('TEST_ONLY backend rationale.', { exact: false });
+  expect(screen.getByRole('link', { name: 'PSI-TEST' }).getAttribute('href')).toBe('/explorer/test-source');
+  expect(screen.queryByText(/100% Match|verified/i)).toBeNull();
+});
+
+it('shows declared model identity when readiness is ready without computing a prediction', async () => {
+  vi.mocked(getPredictionReadiness).mockResolvedValue({ state: 'ready', reasons: [], modelId: 'TEST_ONLY_DECLARED_MODEL', modelVersion: 'test-revision' });
+  renderWithQuery(<PredictiveLabPanel />);
+  await screen.findByText(/TEST_ONLY_DECLARED_MODEL/);
+  expect(screen.getByTestId('model-status-badge').textContent).toContain('ready');
+  expect(screen.queryByText(/Predicted Spread Rate|95% CI/)).toBeNull();
+});
+
+it('does not fabricate coverage for a partial-gravity scenario', async () => {
+  useWorkspaceStore.getState().updateActiveScenario({ gravity: .38, material: 'Nomex' });
+  renderWithQuery(<ConditionGapMatrix />);
+  await screen.findByText('scientific review not accepted');
+  expect(vi.mocked(evaluateMissionScenario).mock.calls[0][0].scenario.gravity?.value).toBe('0.38');
+  expect(screen.getByRole('link', { name: /Inspect source records/ }).getAttribute('href')).toContain('gravityRaw=0.38g');
+  expect(screen.queryByText(/Matched PSI Runs|SUPPORTED/)).toBeNull();
 });
