@@ -15,6 +15,7 @@ import {
 import type { MappedClaim, MappedClaimSource, MappedInvestigationDetail } from '@/types/api';
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import { useClaimSourcesQuery } from '@/features/explorer/hooks/useEvidenceQueries';
+import { browserSourceUrl } from '@/lib/psiLinks';
 
 export interface ClaimsListProps {
   study: MappedInvestigationDetail;
@@ -164,7 +165,7 @@ const ClaimCard: React.FC<ClaimCardProps> = ({ claim }) => {
                   </a>
                 )}
                 <a
-                  href={src.source.sourceUrl}
+                  href={browserSourceUrl(src.source.sourceUrl) ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-[#0B2374] hover:underline text-[11px] font-semibold"

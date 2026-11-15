@@ -5,6 +5,7 @@ import { ApiClientError } from '@/api/client';
 import { useChatSourceQuery } from '../hooks';
 import type { MappedChatCitation } from '@/types/api';
 import { chatButton } from './chatStyles';
+import { browserSourceUrl, psiInvestigationUrl } from '@/lib/psiLinks';
 
 export interface CitationBadgeProps {
   citation: MappedChatCitation;
@@ -22,11 +23,6 @@ function sourceError(error: unknown): string {
     return 'Source unavailable in the current corpus.';
   }
   return 'Source unavailable right now. Try again later.';
-}
-
-function psiInvestigationUrl(sourceUrl: string | null): string | null {
-  const study = sourceUrl?.match(/^https:\/\/psi\.nasa\.gov\/geode-py\/ws\/studies\/(PSI-\d+)\/download(?:\?|$)/i);
-  return study ? `https://psi.nasa.gov/physci/repo/data/investigations/${study[1]}` : null;
 }
 
 /** One cited source passage: verbatim excerpt plus revision-pinned file metadata on demand. */
@@ -75,7 +71,7 @@ export const CitationBadge: React.FC<CitationBadgeProps> = ({
                   </a>
                 )}
                 {sourceData.sourceUrl && (
-                  <a className="text-[#0B2374] underline" href={sourceData.sourceUrl} target="_blank" rel="noreferrer">
+                  <a className="text-[#0B2374] underline" href={browserSourceUrl(sourceData.sourceUrl) ?? undefined} target="_blank" rel="noreferrer">
                     {studyUrl ? 'Open raw file' : 'Open original source'} ↗
                   </a>
                 )}

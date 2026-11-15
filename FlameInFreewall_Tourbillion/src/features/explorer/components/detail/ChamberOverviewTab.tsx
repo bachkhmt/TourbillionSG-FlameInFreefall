@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { MappedInvestigationDetail, MappedSource } from "@/types/api";
 import { ApiErrorBanner } from "@/components/ui/ApiErrorBanner";
+import { browserSourceUrl } from '@/lib/psiLinks';
 
 export interface ChamberOverviewTabProps {
   study: MappedInvestigationDetail;
@@ -211,7 +212,7 @@ export const ChamberOverviewTab: React.FC<ChamberOverviewTabProps> = ({
                     </a>
                   )}
                   <a
-                    href={src.sourceUrl}
+                    href={browserSourceUrl(src.sourceUrl) ?? undefined}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white border border-gray-200 text-zinc-800 hover:bg-gray-100 text-[11px] font-semibold"

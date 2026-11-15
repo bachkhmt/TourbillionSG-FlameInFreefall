@@ -435,6 +435,26 @@ describe('Grounded AI assistant (NASA chat style) backed by the backend chat API
       fireEvent.click(await screen.findByRole('button', { name: 'View source 1' }));
     }
 
+    it('opens the raw file itself, not the NASA redirect=false text response', async () => {
+      services.getChatSource.mockResolvedValue({
+        source_document_id: SOURCE_ID,
+        locator: 'CSV row 8',
+        corpus_version: CORPUS,
+        filename: 'PSI-69_Experimental table_FLEX.csv',
+        source_url:
+          'https://psi.nasa.gov/geode-py/ws/studies/PSI-69/download?file=PSI-69_Experimental+table_FLEX.csv&version=1&redirect=false',
+        sha256: 'b'.repeat(64),
+        license: 'CC0-1.0',
+        title: 'FLEX',
+        review_status: 'unreviewed',
+      });
+      await sendAndOpenSource();
+      const raw = await screen.findByRole('link', { name: /Open raw file/ });
+      expect(raw.getAttribute('href')).toBe(
+        'https://psi.nasa.gov/geode-py/ws/studies/PSI-69/download?file=PSI-69_Experimental+table_FLEX.csv&version=1'
+      );
+    });
+
     it('opens revision-pinned source metadata for a citation', async () => {
       const fileUrl = 'https://psi.nasa.gov/geode-py/ws/studies/PSI-69/download?fileId=example';
       services.getChatSource.mockResolvedValue({
