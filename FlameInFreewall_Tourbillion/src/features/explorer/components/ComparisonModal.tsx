@@ -79,7 +79,7 @@ const ComparisonModalDialog: React.FC<ComparisonModalDialogProps> = ({
     if (compareList.length < 2) return;
     onClose();
     router.push(`/mission?compare=${compareList.join(',')}`);
-    toast.info('Loading Mission Workbench', 'Transferring selected studies to Gap Matrix.');
+    toast.info('Opening Mission Workbench', 'Analyze evidence to see the selected investigations.');
   };
 
   return (

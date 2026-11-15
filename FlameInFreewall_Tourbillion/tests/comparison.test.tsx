@@ -305,6 +305,7 @@ describe('Multi-Study Comparison System (Backend Wired)', () => {
 
       fireEvent.click(screen.getByTestId('open-mission-workbench-btn'));
       expect(mockPush).toHaveBeenCalledWith(`/mission?compare=${INV_1_ID},${INV_2_ID}`);
+      expect(toastStore.getToasts().some((t) => t.description?.includes('Gap Matrix'))).toBe(false);
 
       fireEvent.click(screen.getByTestId('close-comparison-modal-btn'));
       fireEvent.click(screen.getByTestId('comparison-modal-close-icon'));

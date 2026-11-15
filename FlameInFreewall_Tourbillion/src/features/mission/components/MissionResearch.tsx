@@ -9,7 +9,9 @@ import type { ResearchBrief } from '@/types/missionResearch';
 const labels = { match: 'Matched', mismatch: 'Different', unknown: 'Unknown', related: 'Related regime' };
 const colors = { match: 'bg-blue-50 text-blue-900', mismatch: 'bg-amber-50 text-amber-900', unknown: 'bg-slate-100 text-slate-700', related: 'bg-violet-50 text-violet-900' };
 
-export function MissionResearch() {
+const NO_FOCUS: string[] = [];
+
+export function MissionResearch({ focusKeys = NO_FOCUS }: { focusKeys?: string[] }) {
   const scenario = useWorkspaceStore(s => s.activeScenario);
   const [purpose, setPurpose] = useState('prevention');
   const [result, setResult] = useState<ResearchBrief | null>(null);
@@ -19,6 +21,9 @@ export function MissionResearch() {
   const live = useRef(signature); live.current = signature;
   const controller = useRef<AbortController | null>(null);
   const completed = useRef('');
+  const focusSignature = focusKeys.join(',');
+  const [showAll, setShowAll] = useState(false);
+  useEffect(() => setShowAll(false), [focusSignature]);
   useEffect(() => {
     controller.current?.abort(); setResult(null); setError(''); setBusy(false);
     return () => controller.current?.abort();
@@ -47,6 +52,10 @@ export function MissionResearch() {
     }
   }
   const shown = completed.current === signature ? result : null;
+  const focus = new Set(focusKeys);
+  const focused = focus.size > 0 && !showAll;
+  const rows = shown ? (focused ? shown.rows.filter(r => focus.has(r.investigationId)) : shown.rows) : [];
+  const missing = shown ? [...focus].filter(k => !shown.rows.some(r => r.investigationId === k)).length : 0;
   return <section className="rounded-3xl bg-white border border-slate-200 p-5 space-y-5" aria-label="Mission API evidence">
     <div className="flex flex-wrap items-end gap-4">
       <label className="text-sm font-bold">Research purpose<select className="block mt-2 rounded-xl border p-2" value={purpose} onChange={e => setPurpose(e.target.value)}>
@@ -55,21 +64,26 @@ export function MissionResearch() {
       <button className="rounded-xl bg-[#D4FC02] px-4 py-3 text-sm font-bold disabled:opacity-50" onClick={analyze} disabled={busy}>{busy ? 'Analyzing…' : 'Analyze evidence'}</button>
     </div>
     <p className="text-xs leading-6 text-slate-600">Research lookup, not a safety verdict. O₂ target uses volume percent in the chamber; apparatus streams with a different scope are not treated as matches. Unknown is distinct from different; a microgravity regime is not measured 0g.</p>
+    {focus.size > 0 && <div data-testid="compare-focus" className="flex flex-wrap items-center gap-3 rounded-xl bg-blue-50 p-3 text-xs text-blue-900">
+      <span>{focus.size} investigation{focus.size === 1 ? '' : 's'} selected in Comparison. {showAll ? 'Showing every related investigation.' : 'Results are limited to this selection.'}</span>
+      {shown && <button type="button" className="font-bold underline" onClick={() => setShowAll(v => !v)}>{showAll ? 'Show only selected' : `Show all ${shown.rows.length} related investigations`}</button>}
+    </div>}
     {busy && <p role="status">Reading admitted NASA evidence…</p>}
     {error && <p role="alert" className="text-sm text-red-800">{error} No sample results have been substituted.</p>}
     {!shown && !busy && !error && <p className="text-sm text-slate-500">Choose a purpose and analyze your scenario. Editing conditions clears previous results.</p>}
     {shown && <>
-      <p className="text-sm"><b>{shown.rows.length}</b> related investigations · source-checked, independently unreviewed. Release <span title={shown.revision}>{shown.revision.slice(0,12)}</span></p>
+      <p className="text-sm" data-testid={focused ? 'compare-focus-count' : undefined}><b>{focused ? `${rows.length} of ${shown.rows.length}` : shown.rows.length}</b> related investigations · source-checked, independently unreviewed. Release <span title={shown.revision}>{shown.revision.slice(0,12)}</span></p>
       {!shown.rows.length && <p>No investigations classified for this purpose in the connected release.</p>}
+      {missing > 0 && <p data-testid="compare-focus-missing" className="text-xs text-amber-900">{missing} selected investigation{missing === 1 ? ' is' : 's are'} not among the investigations returned for {shown.workflowId} in this release. This is not a finding about {missing === 1 ? 'that study' : 'those studies'}.</p>}
       <div className="overflow-x-auto" tabIndex={0} aria-label="Condition comparison table"><table className="w-full text-left text-xs border-separate border-spacing-y-3">
         <caption className="sr-only">Same-record conditions and research relevance</caption>
         <thead><tr><th scope="col">Investigation</th>{['Oxygen','Pressure','Airflow','Gravity','Material'].map(n => <th scope="col" key={n}>{n}</th>)}</tr></thead>
-        <tbody>{shown.rows.map(row => <tr key={row.investigationId}>
+        <tbody>{rows.map(row => <tr key={row.investigationId}>
           <th scope="row" className="pr-4 min-w-32"><Link href={`/explorer/${row.investigationId}`} className="text-[#0B2374] underline">{row.code}</Link><p className="mt-2 font-normal">{row.availability.records} records · {row.availability.independentlyReviewedRecords ?? 'Unknown'} reviewed</p><p className="mt-2 font-normal">{row.record?.externalRunKey ?? 'No admitted record'}</p></th>
           {row.dimensions.length ? row.dimensions.map(d => <td key={d.dimension} className="p-1 align-top"><div className={`rounded-xl p-3 min-w-28 ${colors[d.status]}`}><b>{labels[d.status]}</b><p className="mt-2">{d.observed ?? 'Unknown'} {d.observed != null ? d.unit : ''}</p><p className="mt-1">{d.basis?.replaceAll('_',' ')}</p><p className="mt-2 leading-5">{d.reason}</p></div></td>) : <td colSpan={5}>No source records available for this comparison.</td>}
         </tr>)}</tbody>
       </table></div>
-      {shown.rows.map(row => <details key={row.investigationId} className="rounded-xl border p-4 text-sm"><summary className="cursor-pointer font-bold">{row.code} · why relevant, sources & limitations</summary>
+      {rows.map(row => <details key={row.investigationId} className="rounded-xl border p-4 text-sm"><summary className="cursor-pointer font-bold">{row.code} · why relevant, sources & limitations</summary>
         <p className="my-3 text-xs">{row.selectionReason}</p>
         {row.passages.map((p,i) => <p key={i} className="my-3 text-xs leading-6"><b>{p.kind}:</b> {p.text} [{p.citationId}]</p>)}
         {row.record?.observations.map((o,i) => <p key={i} className="my-2 text-xs">Recorded {o.name}: raw {o.raw}; normalized {o.value ?? 'Unknown'} {o.unit}; original unit {o.originalUnit}; {o.status} [{o.citationId}]</p>)}
