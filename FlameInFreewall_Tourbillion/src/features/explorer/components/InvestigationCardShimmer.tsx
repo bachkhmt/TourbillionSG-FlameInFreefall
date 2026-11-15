@@ -51,7 +51,7 @@ export const InvestigationCardShimmer: React.FC<InvestigationCardShimmerProps> =
                   duration: 0.35,
                 }
           }
-          className="w-full bg-gray-200/50 p-5 rounded-3xl flex flex-col justify-between relative overflow-hidden select-none min-h-[250px]"
+          className="w-full bg-gray-200/50 p-5 rounded-3xl md:rounded-[36px] flex flex-col justify-between relative overflow-hidden select-none min-h-[250px]"
         >
           <div>
             {/* Top row: Badges */}
@@ -106,31 +106,47 @@ export const InvestigationCardShimmer: React.FC<InvestigationCardShimmerProps> =
               />
             </div>
 
-            {/* Telemetry box shimmer */}
-            <motion.div
-              variants={isTest ? undefined : shimmerVariants}
-              initial={isTest ? undefined : 'initial'}
-              animate={isTest ? undefined : 'animate'}
-              style={shimmerStyle}
-              className="h-16 w-full rounded-2xl mb-4 bg-white/70"
-            />
+            {/* Minimalist Tags Strip Shimmer matching real InvestigationCard */}
+            <div className="mt-3.5 flex flex-wrap items-center gap-1.5 py-2 px-3 rounded-2xl bg-white/70 border border-gray-100/60 mb-4">
+              <motion.div
+                variants={isTest ? undefined : shimmerVariants}
+                initial={isTest ? undefined : 'initial'}
+                animate={isTest ? undefined : 'animate'}
+                style={shimmerStyle}
+                className="h-4 w-16 rounded-full"
+              />
+              <motion.div
+                variants={isTest ? undefined : shimmerVariants}
+                initial={isTest ? undefined : 'initial'}
+                animate={isTest ? undefined : 'animate'}
+                style={shimmerStyle}
+                className="h-4 w-20 rounded-full"
+              />
+              <motion.div
+                variants={isTest ? undefined : shimmerVariants}
+                initial={isTest ? undefined : 'initial'}
+                animate={isTest ? undefined : 'animate'}
+                style={shimmerStyle}
+                className="h-4 w-14 rounded-full"
+              />
+            </div>
           </div>
 
-          {/* Footer shimmer */}
-          <div className="pt-3 border-t border-black/5 flex items-center justify-between">
+          {/* Footer Metrics Row Shimmer matching real InvestigationCard */}
+          <div className="pt-3 mt-4 border-t border-black/5 flex items-center justify-between">
             <motion.div
               variants={isTest ? undefined : shimmerVariants}
               initial={isTest ? undefined : 'initial'}
               animate={isTest ? undefined : 'animate'}
               style={shimmerStyle}
-              className="h-5 w-24 rounded-full"
+              className="h-4 w-28 rounded-md"
             />
             <motion.div
               variants={isTest ? undefined : shimmerVariants}
               initial={isTest ? undefined : 'initial'}
               animate={isTest ? undefined : 'animate'}
               style={shimmerStyle}
-              className="h-4 w-20 rounded-md"
+              className="h-4 w-16 rounded-md"
             />
           </div>
         </motion.div>

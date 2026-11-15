@@ -1,171 +1,171 @@
-# Dữ liệu NASA combustion cho FlameGuard AI
+# NASA Combustion Data for FlameGuard AI
 
-Ngày nghiên cứu: **10-11-2026**. Đây là nghiên cứu đầu vào, chưa phải đặc tả được duyệt hoặc phần ingestion đã triển khai.
+Research date: **2026-11-10**. This is input research, not yet an approved specification or implemented ingestion pipeline.
 
-**Có đủ dữ liệu thật để bắt đầu ingestion và RAG ngay theo từng họ thí nghiệm.** Khó khăn chính là khác biệt về mức chi tiết, định dạng, calibration và provenance. Không nên chờ một bộ dữ liệu NASA thống nhất, cũng không nên coi tất cả CSV là bảng run hoặc nhúng toàn bộ raw data vào vector database.
+**There is sufficient real data to begin ingestion and RAG immediately by experiment family.** The main challenges are discrepancies in level of detail, format, calibration, and provenance. We should not wait for a unified NASA dataset, nor should we treat all CSVs as run tables or embed all raw data into a vector database.
 
-## 1. Phạm vi đã kiểm tra thực tế
+## 1. Scope Actually Inspected
 
-- Đọc metadata JSON của **18 investigations**, tải **20 bảng CSV** tương ứng.
-- Đọc file manifest của **6 investigations**: FLEX, BASS-II, Saffire-I, Saffire-II, SAME và ACME CLD Flame.
-- Tải thêm **5 file TXT** của FLEX và **3 tài liệu DOCX** hướng dẫn FLEX/BASS-II/Saffire. Tổng 28 artifact nhỏ: **339.134 byte**, giữ nguyên byte và SHA-256.
-- Lấy metadata và bản fulltext do NTRS cung cấp của 4 báo cáo; đọc các mục liên quan đến phương pháp, đơn vị và nguồn dữ liệu. Không đọc toàn bộ mọi paper hoặc kiểm tra mọi hình.
-- Chỉ thêm tài liệu nghiên cứu; chưa ghi vào DB, chưa thay đổi app, ERD, migrations hoặc FE.
+- Read JSON metadata for **18 investigations**, downloaded the corresponding **20 CSV tables**.
+- Read file manifests for **6 investigations**: FLEX, BASS-II, Saffire-I, Saffire-II, SAME, and ACME CLD Flame.
+- Downloaded an additional **5 TXT files** for FLEX and **3 DOCX guide documents** for FLEX/BASS-II/Saffire. Total of 28 small artifacts: **339,134 bytes**, preserving original bytes and SHA-256.
+- Retrieved metadata and NTRS-provided fulltext for 4 reports; read sections related to methodology, units, and data sources. Did not read every paper in full or inspect every figure.
+- Only added research documentation; no writes to DB, no changes to app, ERD, migrations, or FE.
 
-Nguồn và cách truy cập nằm trong [sources.json](sources.json). Metadata, header và version trong [catalog-snapshot.json](evidence/catalog-snapshot.json); file đã tải trong [artifacts.json](evidence/artifacts.json). Số dòng bên dưới được tính trên file gốc, không lấy số hàng UI làm số test đã xác minh.
+Sources and access methods are in [sources.json](sources.json). Metadata, headers, and versions are in [catalog-snapshot.json](evidence/catalog-snapshot.json); downloaded files are in [artifacts.json](evidence/artifacts.json). Line counts below are calculated from the original files, without treating UI row counts as verified test counts.
 
-## 2. Nguồn nào dùng cho mục đích nào
+## 2. Which Sources Serve Which Purposes
 
-| Nguồn | Dùng được cho | Giới hạn đã quan sát |
+| Source | Usable for | Observed Limitations |
 | --- | --- | --- |
-| [NASA PSI](https://psi.nasa.gov/physci/repo/) | Accession, DOI, version, experimental tables, raw/analyzed files, calibration, tài liệu và publications | Trang là SPA; HTML rỗng không có nghĩa thiếu dữ liệu. Các endpoint website đã hoạt động khi kiểm tra nhưng chưa tìm thấy hợp đồng API PSI được công bố |
-| [NASA NTRS](https://www.sti.nasa.gov/harvesting-data-from-ntrs/) | Báo cáo, phương pháp, limitations, giải nghĩa dữ liệu, citations cho RAG | Metadata công khai không bảo đảm mọi fulltext đều có cùng quyền sử dụng; đọc tình trạng từng record |
-| NASA experiment/mission pages | Discovery, mục tiêu, hardware và bối cảnh | Mục tiêu nghiên cứu không phải kết quả đã đo; ảnh minh họa không phải telemetry |
-| [NASA PSI trên AWS](https://registry.opendata.aws/nasa-psi/) | Một đường truy cập dữ liệu PSI được giới thiệu chính thức | Root bucket kiểm tra chỉ hiện `DSI/`, `OASIS/`, `pk4/`; không đủ cơ sở coi đây là mirror combustion |
+| [NASA PSI](https://psi.nasa.gov/physci/repo/) | Accession, DOI, version, experimental tables, raw/analyzed files, calibration, documents, and publications | Site is an SPA; empty HTML does not mean missing data. Website endpoints were functional during testing, but no published PSI API contract was found |
+| [NASA NTRS](https://www.sti.nasa.gov/harvesting-data-from-ntrs/) | Reports, methodology, limitations, data interpretation, citations for RAG | Public metadata does not guarantee all fulltext has the same usage rights; check the status of each record |
+| NASA experiment/mission pages | Discovery, objectives, hardware, and context | Research objectives are not measured results; illustrative photos are not telemetry |
+| [NASA PSI on AWS](https://registry.opendata.aws/nasa-psi/) | An officially promoted access route for PSI data | Inspected root bucket only shows `DSI/`, `OASIS/`, `pk4/`; insufficient basis to consider this a combustion mirror |
 
-[PSI Database Guide](https://assets.science.nasa.gov/content/dam/science/bps/bps-general/bps-data_osdr_psi/Complete_PSI_Database_Guide.pdf), mục Experiment Table / Data Files / Version History, xác nhận cách phân loại và tải dữ liệu. Metadata của 18 bộ đã kiểm tra khai báo `CC0-1.0`; vẫn giữ DOI và version khi trích dẫn. Đây không phải kết luận về mọi tài liệu liên kết ngoài PSI.
+[PSI Database Guide](https://assets.science.nasa.gov/content/dam/science/bps/bps-general/bps-data_osdr_psi/Complete_PSI_Database_Guide.pdf), sections Experiment Table / Data Files / Version History, confirms data categorization and download procedures. Metadata for the 18 examined datasets declares `CC0-1.0`; retain DOI and version when citing. This is not a conclusion regarding all externally linked documents outside PSI.
 
-## 3. Bản đồ các họ thí nghiệm
+## 3. Map of Experiment Families
 
-Các accession dưới đây đã lấy được JSON và CSV. “Dòng” là dòng dữ liệu không rỗng sau header, **không đồng nghĩa số run độc lập**. Chỉ số scope là snapshot ngày nghiên cứu, không phải toàn bộ NASA.
+The accessions below have had their JSON and CSV retrieved. "Rows" refers to non-empty data rows after the header, **not synonymous with independent run counts**. Scope numbers represent the snapshot on the research date, not all of NASA.
 
-| Họ / accession | Dữ liệu quan sát trong CSV | Mức chi tiết và ý nghĩa với ingestion |
+| Family / Accession | Observed Data in CSV | Level of Detail and Ingestion Implications |
 | --- | --- | --- |
-| [FLEX, PSI-69](https://psi.nasa.gov/physci/repo/data/investigations/PSI-69) | 274 dòng; test ID, fuel, áp suất mmHg, thành phần khí, đường kính, burning rate, burn time, test end | Phù hợp làm pilot run-level; cần đối chiếu test sheet và báo cáo phương pháp |
-| [FLEX-2, PSI-68](https://psi.nasa.gov/physci/repo/data/investigations/PSI-68) | 8 dòng nhiên liệu/hỗn hợp, các dải diameter, oxygen, pressure, flow | Bảng miền thử nghiệm; không tạo 8 run và không lấy tích Descartes các dải làm thí nghiệm thật |
-| [BASS, PSI-26](https://psi.nasa.gov/physci/repo/data/investigations/PSI-26) | 122 dòng; ngày, as-run test, test, sample, vật liệu | Có định danh test/sample; thiếu điều kiện đầy đủ trong bảng tóm tắt |
-| [BASS-II, PSI-25](https://psi.nasa.gov/physci/repo/data/investigations/PSI-25) | 129 dòng; PI/test/sample, mô tả vật liệu, fan/air display, O2/CO2/CO trước-sau | Rất phù hợp cho bài toán solid materials, nhưng phải đọc README, test matrices và calibration |
-| [Saffire-I, PSI-98](https://psi.nasa.gov/physci/repo/data/investigations/PSI-98) | 4 dòng, gồm 2 mẫu và 2 dòng flow-visualization | Phân loại sample, flow record và camera asset riêng |
-| [Saffire-II, PSI-99](https://psi.nasa.gov/physci/repo/data/investigations/PSI-99) | 15 dòng: 9 sample, 2 flow records, 4 notes | Có vật liệu/geometry/flow/outcome; nhiều ô chứa đơn vị hoặc kết quả định tính |
-| [Saffire-III, PSI-100](https://psi.nasa.gov/physci/repo/data/investigations/PSI-100) | 2 dòng sample, có geometry và hướng dòng | Dataset riêng với DOI/version riêng; không gộp vào Saffire-I |
-| ACME [BRE, PSI-20](https://psi.nasa.gov/physci/repo/data/investigations/PSI-20), [CLD, PSI-21](https://psi.nasa.gov/physci/repo/data/investigations/PSI-21), [E-FIELD, PSI-22](https://psi.nasa.gov/physci/repo/data/investigations/PSI-22), [s-Flame, PSI-23](https://psi.nasa.gov/physci/repo/data/investigations/PSI-23) | Lần lượt 18, 32, 32, 18 dòng; ngày thử, nhóm cấu hình, số flames và notes | Chủ yếu bảng tổng hợp theo ngày/cấu hình. E-FIELD còn có dòng tiếp diễn, không có test-day riêng |
-| [ACME Flame Design, PSI-10](https://psi.nasa.gov/physci/repo/data/investigations/PSI-10) | Hai bảng normal/inverse: 207 và 120 dòng; Test, composition, mass flow, pressure đầu/cuối, Zst, Tad | Có test keys và số liệu phong phú; không coi mọi cột số là measurement trực tiếp |
-| [ACME CFI-G, PSI-159](https://psi.nasa.gov/physci/repo/data/investigations/PSI-159) | Normal 179 dòng; inverse 154 dòng không rỗng trong 1.015 dòng sau header | Có failed ignition, self-extinction/flow termination và comments; phải bỏ blank records có kiểm soát |
-| [CFI, PSI-39](https://psi.nasa.gov/physci/repo/data/investigations/PSI-39) | 87 dòng; FLEX number, CIR key, pressure, gases, fiber, fuel, local time | Không nhầm với CFI-G; thời gian có nhãn `est`, không tự gắn UTC |
-| [SLICE, PSI-106](https://psi.nasa.gov/physci/repo/data/investigations/PSI-106), [SPICE, PSI-107](https://psi.nasa.gov/physci/repo/data/investigations/PSI-107) | SLICE: 12 dòng ngày/fuel; SPICE: 469 dòng với giờ, nozzle, fuel/air flows | Hai cấu trúc khác nhau; một dòng SPICE chưa đủ chứng minh một ignition độc lập |
-| [SAME, PSI-102](https://psi.nasa.gov/physci/repo/data/investigations/PSI-102), [SAME-R, PSI-101](https://psi.nasa.gov/physci/repo/data/investigations/PSI-101) | SAME: 8 dòng sample/conditions; SAME-R: 109 dòng test với aging/mixing time | Mở rộng corpus về smoke/aerosol; không chuyển dữ liệu aerosol thành flame-spread measurement |
+| [FLEX, PSI-69](https://psi.nasa.gov/physci/repo/data/investigations/PSI-69) | 274 rows; test ID, fuel, pressure mmHg, gas composition, diameter, burning rate, burn time, test end | Suitable as a run-level pilot; requires cross-referencing test sheets and methodology reports |
+| [FLEX-2, PSI-68](https://psi.nasa.gov/physci/repo/data/investigations/PSI-68) | 8 rows of fuel/mixture, diameter ranges, oxygen, pressure, flow | Test domain table; do not create 8 runs and do not take Cartesian product of ranges as real experiments |
+| [BASS, PSI-26](https://psi.nasa.gov/physci/repo/data/investigations/PSI-26) | 122 rows; date, as-run test, test, sample, material | Contains test/sample identifiers; lacks complete conditions in summary table |
+| [BASS-II, PSI-25](https://psi.nasa.gov/physci/repo/data/investigations/PSI-25) | 129 rows; PI/test/sample, material description, fan/air display, pre/post O2/CO2/CO | Highly suitable for solid materials tasks, but requires reading README, test matrices, and calibration |
+| [Saffire-I, PSI-98](https://psi.nasa.gov/physci/repo/data/investigations/PSI-98) | 4 rows, including 2 samples and 2 flow-visualization rows | Classify sample, flow record, and camera assets separately |
+| [Saffire-II, PSI-99](https://psi.nasa.gov/physci/repo/data/investigations/PSI-99) | 15 rows: 9 samples, 2 flow records, 4 notes | Contains material/geometry/flow/outcome; several cells contain units or qualitative results |
+| [Saffire-III, PSI-100](https://psi.nasa.gov/physci/repo/data/investigations/PSI-100) | 2 sample rows, with geometry and flow direction | Distinct dataset with distinct DOI/version; do not merge into Saffire-I |
+| ACME [BRE, PSI-20](https://psi.nasa.gov/physci/repo/data/investigations/PSI-20), [CLD, PSI-21](https://psi.nasa.gov/physci/repo/data/investigations/PSI-21), [E-FIELD, PSI-22](https://psi.nasa.gov/physci/repo/data/investigations/PSI-22), [s-Flame, PSI-23](https://psi.nasa.gov/physci/repo/data/investigations/PSI-23) | Respectively 18, 32, 32, 18 rows; test date, configuration group, flame count, and notes | Primarily summary tables by date/configuration. E-FIELD also contains continuation rows without distinct test-days |
+| [ACME Flame Design, PSI-10](https://psi.nasa.gov/physci/repo/data/investigations/PSI-10) | Two tables normal/inverse: 207 and 120 rows; Test, composition, mass flow, initial/final pressure, Zst, Tad | Rich test keys and metrics; do not treat all numerical columns as direct measurements |
+| [ACME CFI-G, PSI-159](https://psi.nasa.gov/physci/repo/data/investigations/PSI-159) | Normal 179 rows; inverse 154 non-empty rows out of 1,015 rows after header | Contains failed ignitions, self-extinction/flow termination, and comments; must filter blank records in a controlled manner |
+| [CFI, PSI-39](https://psi.nasa.gov/physci/repo/data/investigations/PSI-39) | 87 rows; FLEX number, CIR key, pressure, gases, fiber, fuel, local time | Do not confuse with CFI-G; time labeled `est`, do not automatically assign UTC |
+| [SLICE, PSI-106](https://psi.nasa.gov/physci/repo/data/investigations/PSI-106), [SPICE, PSI-107](https://psi.nasa.gov/physci/repo/data/investigations/PSI-107) | SLICE: 12 rows date/fuel; SPICE: 469 rows with time, nozzle, fuel/air flows | Two different structures; a single SPICE row is insufficient proof of an independent ignition |
+| [SAME, PSI-102](https://psi.nasa.gov/physci/repo/data/investigations/PSI-102), [SAME-R, PSI-101](https://psi.nasa.gov/physci/repo/data/investigations/PSI-101) | SAME: 8 rows sample/conditions; SAME-R: 109 test rows with aging/mixing time | Expands corpus to smoke/aerosol; do not convert aerosol data into flame-spread measurements |
 
-ACME là một suite các thí nghiệm khí; BRE dùng burner để mô phỏng cháy condensed fuels, không phải đo trực tiếp mọi vật liệu solid được nhắc tới. Báo cáo [NTRS 20220005205](https://ntrs.nasa.gov/citations/20220005205), phần 2-3, cũng mô tả chamber constant-volume và nhiều diagnostics; áp suất/composition đầu-cuối không mặc định không đổi trong run.
+ACME is a suite of gaseous experiments; BRE uses burners to simulate combustion of condensed fuels, not directly measuring every mentioned solid material. Report [NTRS 20220005205](https://ntrs.nasa.gov/citations/20220005205), sections 2-3, also describes constant-volume chambers and multiple diagnostics; initial/final pressure/composition are not assumed constant during a run by default.
 
-## 4. Raw data thực sự trông như thế nào
+## 4. What Raw Data Actually Looks Like
 
-[Manifest snapshot](evidence/manifest-summaries.json) chứa request body đã dùng và selected entries để kiểm tra lại:
+[Manifest snapshot](evidence/manifest-summaries.json) contains the request body used and selected entries for re-checking:
 
-| Investigation | File entries trong manifest | Định dạng đáng chú ý |
+| Investigation | File entries in manifest | Notable formats |
 | --- | ---: | --- |
-| FLEX | 6.555 | TXT, ZIP, PDF, RTF, MP4, XLS, CSV, DOCX |
+| FLEX | 6,555 | TXT, ZIP, PDF, RTF, MP4, XLS, CSV, DOCX |
 | BASS-II | 695 | MP4, ZIP, PDF, XLSX, DOCX, PPTX, JPG, CSV |
 | Saffire-I | 76 | ZIP, XLSX, DOCX, PDF, CSV |
 | Saffire-II | 222 | ZIP, XLSX, DOCX, PDF, CSV |
-| SAME | 105 | XLS đời cũ, XLSX, XML, ZIP, PDF, video, documents |
-| ACME CLD | 4.883 | CSV, TXT, LOG, ZIP, MP4, XLSX, PDF và extensions chuyên dụng |
+| SAME | 105 | Legacy XLS, XLSX, XML, ZIP, PDF, video, documents |
+| ACME CLD | 4,883 | CSV, TXT, LOG, ZIP, MP4, XLSX, PDF and specialized extensions |
 
-Đây là file entries bên ngoài archive, không phải danh sách mọi frame bên trong ZIP. Không tải/giải nén video hay toàn bộ archives trong lần nghiên cứu này. `totalFileSize` trong catalog khai báo FLEX khoảng 0,924 TB và CLD khoảng 2,006 TB theo byte thập phân; không phải số byte đã tải, dung lượng unique hoặc chi phí storage đã kiểm chứng.
+These are file entries outside archives, not a list of every frame inside ZIPs. Did not download/extract videos or entire archives in this research phase. `totalFileSize` in the catalog reports FLEX as approximately 0.924 TB and CLD as approximately 2.006 TB in decimal bytes; this is not downloaded byte count, unique capacity, or verified storage cost.
 
-Mẫu FLEX-007 đã đọc trực tiếp:
+Sample FLEX-007 inspected directly:
 
-- `TestSheet.txt`: điều kiện ambient, CIR identifier, fuel, fiber và phần nhận xét chất lượng quan sát.
-- `DropletData.txt`: chuỗi thời gian, đường kính và vị trí; có thời gian âm và các ô vị trí trống.
-- `LLUVData.txt`: một timebase khác, flame diameter, standoff và vị trí; có ô trống.
-- Calibration TXT: chamber gas note và testpoint settings. Đuôi `.txt` có thể chứa bảng phân cách tab hoặc CSV, không chỉ văn xuôi.
+- `TestSheet.txt`: ambient conditions, CIR identifier, fuel, fiber, and observation quality remarks.
+- `DropletData.txt`: time series, diameter, and position; contains negative timestamps and empty position cells.
+- `LLUVData.txt`: a different timebase, flame diameter, standoff, and position; contains empty cells.
+- Calibration TXT: chamber gas notes and testpoint settings. The `.txt` extension may contain tab-delimited tables or CSV, not just prose.
 
-Thiết kế asset/time-series phải giữ channel, unit, time origin và missingness. Không ép mọi channel về cùng sampling grid nếu chưa có phương pháp resampling được duyệt. Xem [artifacts.json](evidence/artifacts.json) để truy lại file/version/hash.
+Asset/time-series design must preserve channel, unit, time origin, and missingness. Do not force all channels onto the same sampling grid without an approved resampling methodology. See [artifacts.json](evidence/artifacts.json) to trace file/version/hash.
 
-## 5. Các vấn đề chất lượng đã chứng minh bằng file
+## 5. Quality Issues Proven by Files
 
-Chi tiết, locator và đối chiếu trong [quality-findings.md](evidence/quality-findings.md).
+Details, locators, and cross-references in [quality-findings.md](evidence/quality-findings.md).
 
-1. **Nguồn có thể mâu thuẫn.** FLEX-007/20CAL13: CSV ghi initial diameter `1.87`, burning-rate value `0.67`; test sheet ghi `1.82` và `0.68`. Không chọn một giá trị hoặc lấy trung bình âm thầm.
-2. **Header không đủ để hiểu đơn vị.** FLEX CSV ghi `Burning rate; mm`; test sheet và [NTRS 20150023456](https://ntrs.nasa.gov/citations/20150023456), Appendix A/Table IX, dùng `mm²/s` cho burning-rate constant. Lưu cả nhãn gốc và mapping có nguồn xác nhận.
-3. **Có hướng dẫn sửa ngữ cảnh thời gian.** BASS-II README giải thích ngày trên video lệch một ngày vì xử lý leap year; GMT trong bảng là day-of-year. Không dùng metadata video làm ngày thí nghiệm mà bỏ qua hướng dẫn.
-4. **Calibration ảnh hưởng ý nghĩa số đo.** BASS-II README định nghĩa fan display, độ trễ air display, radiometer chưa calibration tuyệt đối và O2 đã hiệu chỉnh offset. `OR` là vượt thang `>1000 ppm`, không phải missing hoặc giá trị chính xác 1000.
-5. **Missing, qualitative và anomaly phải khác nhau.** Có `none`, `n/a`, `Insignificant`, khoảng số, nhiều mức flow trong một ô và số CO âm. BASS-II T28b có final O2 `40.4` trong cả CSV và fulltext báo cáo; cần review, chưa đủ cơ sở tự sửa thành số khác.
-6. **Chất lượng biểu diễn khác nhau.** FLEX CSV không decode được UTF-8; CP1252 đọc được. CFI-G inverse có 861 dòng rỗng. Một số bảng chứa notes hoặc dòng tiếp diễn. Parser phải kiểm tra encoding và loại hàng trước khi tạo records.
-7. **Filename có thể chứa identity cũ.** Metadata ZIP của BASS-II nằm dưới PSI-25 nhưng tên còn chứa `PSI-101`; accession hiện tại PSI-101 là SAME-R. Canonical identity phải theo record/manifest hiện tại, không lấy một mã PSI bất kỳ từ filename.
+1. **Sources can conflict.** FLEX-007/20CAL13: CSV lists initial diameter `1.87`, burning-rate value `0.67`; test sheet lists `1.82` and `0.68`. Do not choose one value or take an average silently.
+2. **Headers are insufficient to understand units.** FLEX CSV lists `Burning rate; mm`; test sheet and [NTRS 20150023456](https://ntrs.nasa.gov/citations/20150023456), Appendix A/Table IX, use `mm²/s` for the burning-rate constant. Store both original labels and validated source mappings.
+3. **Instructions exist for correcting time context.** BASS-II README explains that dates on videos are off by one day due to leap-year handling; GMT in tables is day-of-year. Do not use video metadata as the experiment date while ignoring the instructions.
+4. **Calibration affects measurement meaning.** BASS-II README defines fan display, air display lag, radiometer without absolute calibration, and offset-corrected O2. `OR` means over-range `>1000 ppm`, not missing or exactly 1000.
+5. **Missing, qualitative, and anomaly values must be distinguished.** Values include `none`, `n/a`, `Insignificant`, ranges, multiple flow levels in a single cell, and negative CO values. BASS-II T28b has final O2 `40.4` in both CSV and report fulltext; requires review, insufficient grounds to modify to another number unilaterally.
+6. **Representation quality varies.** FLEX CSV cannot be decoded as UTF-8; CP1252 reads cleanly. CFI-G inverse has 861 empty rows. Some tables contain notes or continuation rows. Parsers must check encoding and row types before generating records.
+7. **Filenames may contain stale identities.** BASS-II ZIP metadata resides under PSI-25, but the filename still contains `PSI-101`; current accession PSI-101 is SAME-R. Canonical identity must follow current record/manifest, not an arbitrary PSI code from a filename.
 
-## 6. Thiết kế ingestion nên bắt đầu như thế nào
+## 6. How Ingestion Design Should Begin
 
-Đây là đề xuất từ kết quả khảo sát, **chưa thay đổi hợp đồng hoặc schema hiện có**.
+This is a proposal based on survey results, **without altering existing contracts or schemas**.
 
 ```mermaid
 flowchart LR
-  P[PSI metadata và file manifest] --> O[Original assets và checksums]
-  N[NTRS records và tài liệu] --> O
-  O --> D[Parser theo dataset và loại file]
-  D --> S[Staging với raw values và locators]
-  S --> Q[Kiểm tra đơn vị, calibration, identity và conflicts]
-  Q --> C[Curator review]
-  C --> R[Relational data đã duyệt]
-  C --> T[Text và table chunks có nguồn]
-  R --> H[Structured queries và retrieval]
+  P["PSI metadata and file manifest"] --> O["Original assets and checksums"]
+  N["NTRS records and documents"] --> O
+  O --> D["Parser by dataset and file type"]
+  D --> S["Staging with raw values and locators"]
+  S --> Q["Check units, calibration, identity, and conflicts"]
+  Q --> C["Curator review"]
+  C --> R["Approved relational data"]
+  C --> T["Sourced text and table chunks"]
+  R --> H["Structured queries and retrieval"]
   T --> H
-  H --> A[Trả lời kèm citations và limitations]
+  H --> A["Answers with citations and limitations"]
 ```
 
-**Discovery và acquisition:** bắt đầu từ accession + DOI + study version; lấy manifest trước, ưu tiên README/data dictionary/calibration và experimental table. Fetch file nhỏ có chọn lọc; chỉ tải raw archives cho câu hỏi cụ thể. Signed download URL là đường vận chuyển tạm thời; identity phải gồm accession, version, file ID/path và checksum.
+**Discovery and acquisition:** begin from accession + DOI + study version; retrieve manifest first, prioritizing README/data dictionary/calibration and experimental table. Fetch small files selectively; only download raw archives for specific inquiries. Signed download URLs are temporary transport channels; identity must include accession, version, file ID/path, and checksum.
 
-**Staging:** giữ nguyên file gốc; mỗi giá trị có raw text, parsed value, original unit, source locator, parser version và trạng thái review. Phân loại cấp độ `investigation / campaign / test-day / sample / run / frame / time-series`, không tạo run giả từ dải tham số. Các nhãn này là đề xuất staging, không phải enum mới trong DB.
+**Staging:** preserve original files; each value contains raw text, parsed value, original unit, source locator, parser version, and review status. Categorize hierarchy as `investigation / campaign / test-day / sample / run / frame / time-series`, without creating fake runs from parameter ranges. These labels are staging proposals, not new DB enums.
 
-**Normalization:** xử lý Decimal; O2 mole fraction và phần trăm có mapping tường minh; phân biệt pressure tuyệt đối và relative nếu nguồn cho biết; lưu các đơn vị mmHg/atm/bar trước khi đổi sang đơn vị hiển thị. Không suy ra cm/s từ mass flow mg/s hoặc standard volumetric flow khi thiếu khí, trạng thái chuẩn và geometry. Không dùng `Tad` như nhiệt độ đo bằng sensor khi chưa rõ phương pháp.
+**Normalization:** handle Decimal; explicit mapping between O2 mole fraction and percentage; distinguish absolute and relative pressure if source indicates; preserve original mmHg/atm/bar units prior to conversion to display units. Do not infer cm/s from mass flow mg/s or standard volumetric flow when gas, standard conditions, and geometry are unspecified. Do not treat `Tad` as sensor-measured temperature when methodology is unknown.
 
-**Validation:** kiểm tra run identity, liên kết asset, vocabulary, calibration và phạm vi coverage. Chỉ gom dữ liệu tương thích trong cùng run/ngữ cảnh. Re-import cùng file/version/hash phải idempotent; bản mới là revision, không ghi đè evidence lịch sử. Conflict giữ cả hai ứng viên và mở `ImportIssue`.
+**Validation:** verify run identity, asset linkages, vocabulary, calibration, and coverage scope. Only aggregate compatible data within the same run/context. Re-importing identical file/version/hash must be idempotent; new versions are revisions, not overwriting historical evidence. On conflict, retain both candidates and open an `ImportIssue`.
 
-## 7. Mapping vào backend hiện tại
+## 7. Mapping to Current Backend
 
-| Đầu vào / tác vụ | Entity đang có | Điều phải giữ hoặc khoảng trống |
+| Input / Task | Existing Entity | Requirements to Preserve or Gaps |
 | --- | --- | --- |
-| Metadata investigation | `Investigation`, `Tag`, `InvestigationTag` | `psi_id` giữ accession. DOI/license/version metadata đầy đủ vẫn cần manifest; không nhét vào title |
-| Test đã xác nhận | `TestRun` | `external_run_key` chỉ một trường; FLEX cho thấy cần giữ thêm alias trong staging/manifest hoặc xin duyệt storage mapping |
-| Điều kiện ban đầu / categorical | `TestCondition` | Giữ variable, numeric/text, unit và data_status; không nạp range summary thành điều kiện của run giả |
-| Scalar observation | `Measurement` | Chỉ ghi khi hiểu observable/unit; uncertainty thiếu thì null. Không có cột thời gian cho mỗi sample telemetry |
-| File/time-series | `Measurement.raw_asset_ref` và kho original assets | Asset manifest cần version/channel/time/calibration mapping; chưa có contract được duyệt |
-| Dataset/doc và claim | `SourceDocument`, `EvidenceClaim`, `ClaimSource` | Claim chỉ được xuất bản sau review. Giữ nhiều nguồn và locator; không tự sinh finding từ mục Objectives |
-| RAG | `DocumentChunk`, `ChatSession`, `ChatMessage`, `MessageCitation` | Trích về source + locator; chunk index/embedding phải gắn với đúng source revision |
-| Theo dõi import | `IngestionJob`, `ImportIssue` | Không có FK từ job đến mọi row/asset đã import; giữ execution manifest trước khi đề xuất schema mở rộng |
+| Investigation metadata | `Investigation`, `Tag`, `InvestigationTag` | `psi_id` holds accession. Full DOI/license/version metadata still requires manifest; do not stuff into title |
+| Verified test | `TestRun` | `external_run_key` is a single field; FLEX demonstrates the need to preserve additional aliases in staging/manifest or seek approval for storage mapping |
+| Initial / categorical conditions | `TestCondition` | Preserve variable, numeric/text, unit, and data_status; do not ingest range summaries as conditions for fake runs |
+| Scalar observation | `Measurement` | Record only when observable/unit is understood; missing uncertainty is null. No timestamp column for each telemetry sample |
+| File/time-series | `Measurement.raw_asset_ref` and original asset store | Asset manifest needs version/channel/time/calibration mapping; no approved contract yet |
+| Dataset/doc and claim | `SourceDocument`, `EvidenceClaim`, `ClaimSource` | Claims published only after review. Preserve multiple sources and locators; do not auto-generate findings from Objectives sections |
+| RAG | `DocumentChunk`, `ChatSession`, `ChatMessage`, `MessageCitation` | Cite back to source + locator; chunk index/embedding must bind to the correct source revision |
+| Import tracking | `IngestionJob`, `ImportIssue` | No FK from job to every imported row/asset; maintain execution manifest before proposing schema extensions |
 
-**Các quyết định cần chốt trước ingestion production:** manifest/object storage contract; alias và revision identity; measurement-to-source/calibration provenance; encoding outcome định tính/boolean và interval/censoring; thuật ngữ status/unit; chính sách nguồn mâu thuẫn. Không tự thêm cột hoặc coi association gián tiếp cùng investigation là bằng chứng trực tiếp cho một measurement.
+**Decisions to finalize before production ingestion:** manifest/object storage contract; alias and revision identity; measurement-to-source/calibration provenance; qualitative/boolean outcome and interval/censoring encoding; status/unit terminology; conflicting source policy. Do not add columns arbitrarily or treat indirect association within the same investigation as direct evidence for a measurement.
 
-## 8. RAG phù hợp với dữ liệu này
+## 8. RAG Tailored to This Data
 
-Nên kết hợp **truy vấn dữ liệu có cấu trúc và tìm tài liệu**, với routing theo câu hỏi:
+Recommend combining **structured data queries and document retrieval**, with query routing:
 
-- Hỏi mục tiêu/hardware/phương pháp: retrieve metadata, README, reports theo investigation; trả rõ đây là mô tả nghiên cứu.
-- Hỏi test nào có material/O2/pressure/airflow cụ thể: lọc relational data đã duyệt, rồi lấy source rows và diễn giải. Không để vector similarity thay việc kiểm tra điều kiện.
-- Hỏi kết quả số: tính bằng query/code trên các giá trị và unit tương thích; đưa kết quả tính cùng source rows cho LLM. Không đếm dòng summary như số test.
-- Hỏi chuỗi thời gian hoặc hình ảnh: dùng asset adapter riêng; text embedding của filename không chứng minh nội dung video hay sensor history.
-- Hỏi Moon/Mars: tách quan sát microgravity khỏi extrapolation sang partial gravity; không biến topical relevance thành kết luận an toàn.
+- Questions on objectives/hardware/methodology: retrieve metadata, READMEs, reports by investigation; clarify that these represent study descriptions.
+- Questions on which tests feature specific material/O2/pressure/airflow: filter approved relational data, then fetch source rows and explanations. Do not let vector similarity replace condition filtering.
+- Questions on numerical outcomes: compute via queries/code across compatible values and units; pass computed results alongside source rows to LLM. Do not count summary rows as test counts.
+- Questions on time series or imagery: use a dedicated asset adapter; text embeddings of filenames do not prove video content or sensor history.
+- Questions on Moon/Mars: separate microgravity observations from extrapolation to partial gravity; do not turn topical relevance into safety conclusions.
 
-Chunk theo section/paragraph/table row, gắn accession, study/file version, locator và identity test khi có. Với PDF, giữ printed page/table/figure; bản fulltext NTRS có thể chứa markup và mất layout nên cần QA bảng/hình trước khi dùng số liệu. Với DOCX, giữ heading/paragraph/table và quan hệ với ảnh; trích XML không đọc được bảng sensor nằm trong hình.
+Chunk by section/paragraph/table row, binding accession, study/file version, locator, and test identity when available. For PDFs, preserve printed page/table/figure; NTRS fulltext may contain markup and lose layout, requiring table/figure QA prior to utilizing figures. For DOCX, preserve heading/paragraph/table and image relationships; XML extraction cannot read sensor tables embedded within images.
 
-Không ép tất cả tài liệu thành `EvidenceClaim`: một README có thể hữu ích trực tiếp cho RAG mà chưa có scientific finding đã duyệt. Khi thiếu nguồn hoặc có conflict, trả lời sự thiếu/mâu thuẫn đó và dẫn cả hai nguồn.
+Do not force all documents into `EvidenceClaim`: a README can be directly useful for RAG without having an approved scientific finding. When sources are missing or conflicting, state the absence/conflict explicitly and cite both sources.
 
-## 9. Thứ tự triển khai đề xuất
+## 9. Proposed Implementation Order
 
-1. **Pilot kép FLEX + BASS-II:** một droplet test và một nhóm solid-material tests; thử metadata, CSV, TXT, DOCX, calibration, alias và conflicts. Nạp staging trước, chưa publish hàng loạt.
-2. **RAG về phương pháp có citations:** README và các mục báo cáo đã review; bộ câu hỏi kiểm tra gồm units, missing values, calibration và nguồn mâu thuẫn.
-3. **Run ingestion đã duyệt:** mở rộng có chọn lọc BASS-II/FLEX, bổ sung Saffire-II để thử notes, geometry và categorical outcomes.
-4. **Các ACME phong phú hơn:** Flame Design/CFI-G để kiểm tra normal/inverse, mixture, derived variables và changing conditions; tách BRE/CLD/E-FIELD summary khỏi run-level records.
-5. **SAME/SAME-R và assets lớn:** thêm aerosol semantics và telemetry/image processing khi đã có nhu cầu, manifest contract và tiêu chí verification cụ thể.
+1. **Dual pilot FLEX + BASS-II:** one droplet test and one solid-material test group; test metadata, CSV, TXT, DOCX, calibration, aliases, and conflicts. Populate staging first, do not publish en masse yet.
+2. **Methodology RAG with citations:** READMEs and reviewed report sections; test query suite covers units, missing values, calibration, and conflicting sources.
+3. **Approved run ingestion:** selective expansion of BASS-II/FLEX, adding Saffire-II to test notes, geometry, and categorical outcomes.
+4. **Richer ACME datasets:** Flame Design/CFI-G to verify normal/inverse, mixtures, derived variables, and changing conditions; separate BRE/CLD/E-FIELD summaries from run-level records.
+5. **SAME/SAME-R and large assets:** add aerosol semantics and telemetry/image processing once required, with defined manifest contracts and verification criteria.
 
-Pilot đạt khi có thể truy từ câu trả lời về đúng file/version/row; re-import không nhân bản; `OR` không biến thành zero; summary không biến thành run; FLEX conflict được giữ; và câu hỏi không đủ coverage nhận câu trả lời giới hạn thích hợp. Đây là acceptance criteria đề xuất, chưa phải test đã chạy.
+Pilot passes when answers can trace back to the exact file/version/row; re-imports do not duplicate; `OR` does not become zero; summaries do not become runs; FLEX conflicts are preserved; and queries lacking sufficient coverage receive appropriate limitation statements. These are proposed acceptance criteria, not executed tests.
 
-## 10. Giới hạn và việc chưa xác minh
+## 10. Limitations and Unverified Items
 
-- Search từ khóa `combustion` trả 26 hits, trong đó 24 gắn Research Area = Combustion Science; đây không phải chứng minh toàn bộ catalog có đúng 24 investigation combustion. Cần filter/pagination để làm census.
-- Search `Saffire` chỉ trả I/II/III; tài liệu Saffire V có trên NTRS. Chưa xác minh raw public package của IV/V/VI. Search `SoFIE` chỉ trả BASS-II có nhắc SoFIE; không kết luận SoFIE không có dữ liệu ở nguồn khác.
-- Chưa tải các spreadsheet telemetry/calibration, nội dung bên trong ZIP và video; chưa xác minh mọi channel, sampling rate, sensor error hay khả năng liên kết file-run ở toàn bộ corpus.
-- Web reader không mở được hai PDF FLEX/BASS-II lớn khoảng 43/49 MB; thay bằng fulltext liên kết trong record NTRS. Chưa visual QA bảng/hình của hai PDF này.
-- Chưa tìm thấy tài liệu hợp đồng API PSI chính thức. Các endpoint quan sát được cần adapter, retry/backoff và fallback tải thủ công; không mặc định dùng API OSDR omics cho accession PSI.
-- Chưa có embedding/model/vector store được chọn hoặc chạy, chưa đánh giá retrieval quality, chưa chứng minh prediction khả dụng.
+- Keyword search for `combustion` returns 26 hits, 24 of which are tagged Research Area = Combustion Science; this does not prove the entire catalog has exactly 24 combustion investigations. Filtering/pagination is needed for a full census.
+- Search for `Saffire` returns only I/II/III; Saffire V documents exist on NTRS. Raw public packages for IV/V/VI are unverified. Search for `SoFIE` only returns BASS-II mentioning SoFIE; does not imply SoFIE lacks data in other sources.
+- Did not download telemetry/calibration spreadsheets, contents inside ZIPs, or videos; did not verify all channels, sampling rates, sensor errors, or file-to-run linking capability across the entire corpus.
+- Web reader could not open two large FLEX/BASS-II PDFs (~43/49 MB); replaced with linked fulltext from NTRS records. No visual QA performed on tables/figures of these two PDFs.
+- No official PSI API contract documentation found. Observed endpoints require adapters, retry/backoff, and manual download fallbacks; do not assume OSDR omics API applies to PSI accessions.
+- No embedding/model/vector store selected or evaluated, no retrieval quality benchmarked, no prediction capability proven.
 
-## Tài liệu đi kèm
+## Accompanying Documents
 
-- [Ghi chú truy cập và nguồn](evidence/access-and-provenance.md)
-- [Các phát hiện chất lượng với locator](evidence/quality-findings.md)
-- [Nguồn đã đọc](sources.json)
+- [Access and provenance notes](evidence/access-and-provenance.md)
+- [Quality findings with locators](evidence/quality-findings.md)
+- [Read sources](sources.json)
 - [Catalog snapshot](evidence/catalog-snapshot.json), [discovery snapshot](evidence/discovery-snapshot.json)
 - [Manifest summaries](evidence/manifest-summaries.json), [artifact registry](evidence/artifacts.json)
 
-Các file dưới `evidence/samples/` là dữ liệu gốc từ nguồn, không phải seed data của ứng dụng hay dữ liệu đã được curator duyệt.
+Files under `evidence/samples/` are original data from source, not application seed data or curator-approved data.
 
-Kiểm tra offline đã chạy: JSON hợp lệ; đủ 18 metadata projections và 20 CSV; header/số dòng khớp các file; toàn bộ 28 artifact khớp SHA-256 và kích thước metadata; links Markdown nội bộ tồn tại. Không chạy app tests hay kiểm chứng kết quả khoa học của các thí nghiệm.
+Offline checks performed: valid JSON; all 18 metadata projections and 20 CSVs present; headers/row counts match files; all 28 artifacts match SHA-256 and metadata sizes; internal Markdown links exist. Did not run app tests or validate scientific findings of the experiments.

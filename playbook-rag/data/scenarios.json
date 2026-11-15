@@ -1,0 +1,68 @@
+{
+  "moon_base": {
+    "label": "Căn cứ Mặt Trăng (Artemis)",
+    "hint": "can cu mat trang oxy 30% ap suat 10,2 psi trong luc 0,16g",
+    "description": "Trọng lực 0.16g, nồng độ oxy cao 30-34%, áp suất thấp 8.2-10.2 psi. Đối lưu tự nhiên rất yếu, vùng rủi ro bắt cháy chưa từng được thử nghiệm đầy đủ.",
+    "gravity": "0.16g",
+    "o2": 32,
+    "pressure": 9.2,
+    "airflow": 5,
+    "targetPillars": ["prevention", "suppression"],
+    "alert": "CẢNH BÁO VÙNG MÙ: PSI chưa có dữ liệu kiểm chứng trực tiếp ở 0.16g ngoại trừ LUCI."
+  },
+  "iss_std": {
+    "label": "Trạm ISS (Vi trọng lực 0g)",
+    "hint": "iss vi trong luc 0g khong khi 21% oxy 14,7 psi gio thong gio",
+    "description": "Vi trọng lực 0g, 21% O₂, 14.7 psi. Không có đối lưu tự nhiên; luồng thông gió nhân tạo 5-20 cm/s là nguồn cung oxy chủ yếu.",
+    "gravity": "0g",
+    "o2": 21,
+    "pressure": 14.7,
+    "airflow": 15,
+    "targetPillars": ["prevention", "detection", "suppression"],
+    "alert": "Kho dữ liệu NASA PSI có nhiều thí nghiệm nhất ở môi trường này (BASS, CIR, SAME)."
+  },
+  "suit": {
+    "label": "Bộ đồ du hành EVA",
+    "hint": "bo do du hanh eva 4,3 psi 100% oxy",
+    "description": "0g đến 0.16g, 100% O₂ tinh khiết ở áp suất thấp 4.3 psi. Môi trường siêu dễ bắt cháy, nguy cơ phóng điện tĩnh điện.",
+    "gravity": "0g / 0.16g",
+    "o2": 100,
+    "pressure": 4.3,
+    "airflow": 10,
+    "targetPillars": ["prevention"],
+    "alert": "Yêu cầu tuyệt đối về vật liệu không bắt cháy (Non-flammable Materials)."
+  },
+  "saffire_cargo": {
+    "label": "Khoang tàu hàng Cygnus (Saffire)",
+    "hint": "saffire tau hang cygnus mau lon ap suat bien thien 8,2 psi",
+    "description": "0g quy mô lớn (mẫu 1m²), áp suất biến thiên 8.2-14.7 psi, nồng độ O₂ tới 28%. Thử nghiệm lửa kích thước thật trên tàu không người.",
+    "gravity": "0g",
+    "o2": 26,
+    "pressure": 10.5,
+    "airflow": 25,
+    "targetPillars": ["prevention", "detection", "suppression"],
+    "alert": "Quy mô nhiệt lên tới 10 kW, kiểm nghiệm hệ thống dập lửa tự động."
+  },
+  "mars_base": {
+    "label": "Căn cứ Sao Hỏa (Tương lai)",
+    "hint": "sao hoa trong luc 0,38g oxy 25% ap suat 9 psi",
+    "description": "Trọng lực 0.38g, áp suất khí quyển nội vi ~9 psi, oxy 25-30%.",
+    "gravity": "0.38g",
+    "o2": 28,
+    "pressure": 9.0,
+    "airflow": 8,
+    "targetPillars": ["prevention", "suppression"],
+    "alert": "Hoàn toàn chưa có dữ liệu thực nghiệm đốt cháy trong vi trọng lực Sao Hỏa."
+  },
+  "earth": {
+    "label": "Trái Đất (1g Benchmark)",
+    "hint": "trai dat 1g tieu chuan 21% oxy 14,7 psi nasa-std-6001b",
+    "description": "Trọng lực 1g, 21% O₂, 14.7 psi. Chuẩn thử nghiệm NASA-STD-6001B Test 1 (hướng lên).",
+    "gravity": "1g",
+    "o2": 21,
+    "pressure": 14.7,
+    "airflow": 0,
+    "targetPillars": ["prevention"],
+    "alert": "Lưu ý: Olson (2004) chỉ ra bài test 1g chưa chắc là trường hợp xấu nhất trong vũ trụ!"
+  }
+}

@@ -89,14 +89,30 @@ For data and resources related to this challenge, refer to the [Resources tab](h
 
 ---
 
-## Mã nguồn trong repo
+## Repository Source Code
 
-| Thư mục | Nội dung |
+### Current Product Scope
+
+As decided on November 15, 2026, the interface focuses on discovering, summarizing,
+comparing, and interpreting NASA combustion research evidence across three goals:
+prevention, detection, and suppression. The Predictive Lab and local prediction engines
+have been removed from the product. Legacy Mission links with `view=prediction` open the evidence flow.
+
+Mission fetches results from `POST /api/v1/mission/research`, without generating results
+via seed engines or falling back to mock data when the API errors. The full release lookup API
+is hash-bound to the imported snapshot and admitted by the backend. Legacy targets must
+declare a new policy via the Data helper before using Mission; missing policies return clear
+errors. See [Mission integration guide](docs/MISSION_API.md).
+The upstream prediction API remains only as a compatibility contract; there is no prediction UI.
+
+Verification and scope of changes: [record](docs/EVIDENCE_ONLY_SCOPE.md).
+
+| Directory | Contents |
 | --- | --- |
-| `flameguard-ai-backend/` | Backend FastAPI (catalog, evidence, scenario, chat, prediction readiness); RAG extractive ở `app/integrations/rag/` (`CHAT_PROVIDER=extractive`) |
-| `FlameInFreewall_Tourbillion/` | Frontend Next.js (dashboard, explorer, mission, AI assistant) |
-| `integrations/nasa_data/` | Data adapter offline: build release NASA PSI, xuất snapshot 21 bảng và registry corpus cho chat |
-| `integration_tests/`, `scripts/` | Test cho integrations; container PostgreSQL test và launcher preview |
+| `flameguard-ai-backend/` | FastAPI backend (catalog, evidence, scenario, chat, prediction readiness); extractive RAG in `app/integrations/rag/` (`CHAT_PROVIDER=extractive`) |
+| `FlameInFreewall_Tourbillion/` | Next.js frontend (dashboard, explorer, mission, AI assistant) |
+| `integrations/nasa_data/` | Offline data adapter: build NASA PSI releases, export 21-table snapshot, and corpus registry for chat |
+| `integration_tests/`, `scripts/` | Tests for integrations; test PostgreSQL container and preview launcher |
 
-Luồng chatbot, giới hạn và cách chạy: [docs/CHATBOT_FLOW.md](docs/CHATBOT_FLOW.md).
-Quy ước cho agent: [AGENTS.md](AGENTS.md).
+Chatbot flow, limitations, and how to run: [docs/CHATBOT_FLOW.md](docs/CHATBOT_FLOW.md).
+Agent conventions: [AGENTS.md](AGENTS.md).

@@ -114,12 +114,13 @@ describe('Layout System & StructPaper DockPill Navigation', () => {
   });
 
   describe('Sidebar Navigation Dock', () => {
-    it('renders all primary routes (/dashboard, /explorer, /mission) and no settings', () => {
+    it('renders all primary routes (/dashboard, /explorer, /mission, /resources) and no settings', () => {
       render(<Sidebar />);
 
       expect(screen.getByTestId('nav-pill-dashboard')).toBeDefined();
       expect(screen.getByTestId('nav-pill-explorer')).toBeDefined();
       expect(screen.getByTestId('nav-pill-mission')).toBeDefined();
+      expect(screen.getByTestId('nav-pill-resources')).toBeDefined();
       expect(screen.queryByTestId('nav-pill-settings')).toBeNull();
     });
 
@@ -242,6 +243,7 @@ describe('Layout System & StructPaper DockPill Navigation', () => {
       expect(screen.getByTestId('bottom-nav-dashboard')).toBeDefined();
       expect(screen.getByTestId('bottom-nav-explorer')).toBeDefined();
       expect(screen.getByTestId('bottom-nav-mission')).toBeDefined();
+      expect(screen.getByTestId('bottom-nav-resources')).toBeDefined();
       expect(screen.queryByTestId('bottom-nav-settings')).toBeNull();
     });
   });

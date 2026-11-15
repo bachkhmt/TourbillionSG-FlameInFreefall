@@ -63,7 +63,7 @@ async def test_real_answer_history_source_binding_and_scientific_regression(clie
     assert ready["provider_version"] == VERSION and ready["passages"] == 2574
     assert ready["review_status"] == "unreviewed"
     identity = await new_session(client)
-    response = await ask(client, identity, "FLEX-007 D0 đường kính mâu thuẫn?")
+    response = await ask(client, identity, "FLEX-007 D0 diameter contradiction?")
     assert response.status_code == 201, response.text
     answer = response.json()["assistant"]["answer"]
     assert (answer["state"], answer["origin"], answer["review_status"]) == (
@@ -89,9 +89,9 @@ async def test_real_answer_history_source_binding_and_scientific_regression(clie
     stored = await history(client, identity)
     assert [m["role"] for m in stored] == ["user", "assistant"]
     assert stored[1]["answer"] == answer
-    follow = await ask(client, identity, "còn áp suất thì sao?")
+    follow = await ask(client, identity, "what about the pressure?")
     assert follow.status_code == 201 and follow.json()["assistant"]["answer"]["citations"]
-    mars = await ask(client, identity, "Dữ liệu cháy ở trọng lực Sao Hỏa 0.38g?")
+    mars = await ask(client, identity, "Combustion data at Mars gravity 0.38g?")
     assert mars.status_code == 201
     gap = mars.json()["assistant"]["answer"]
     assert gap["state"] == "abstained" and not gap["citations"]
@@ -163,11 +163,11 @@ async def test_provider_cannot_invent_citations_or_partial_pairs(client):
     class Inflated(ExtractiveProvider):
         async def answer(self, request):
             answer = await super().answer(request)
-            return answer.model_copy(update={"text": answer.text + "\nGiá trị đúng là 9.99 mm."})
+            return answer.model_copy(update={"text": answer.text + "\nThe correct value is 9.99 mm."})
 
     for factory in (Forged, Inflated):
         app.state.chat_provider_factory = factory
-        response = await ask(client, identity, "FLEX-007 D0 đường kính mâu thuẫn?")
+        response = await ask(client, identity, "FLEX-007 D0 diameter contradiction?")
         assert response.status_code == 502, response.text
     assert await history(client, identity) == []
 

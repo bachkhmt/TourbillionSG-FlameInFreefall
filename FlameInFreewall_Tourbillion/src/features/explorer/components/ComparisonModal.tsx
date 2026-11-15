@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, ArrowRight, Columns3, Flame, Table2, LayoutGrid } from 'lucide-react';
 import { useComparisonQuery } from '../hooks/useComparisonQueries';
@@ -12,6 +12,7 @@ import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
 import { ComparisonColumn } from './ComparisonColumn';
 import { ComparisonMatrixTable } from './ComparisonMatrixTable';
 import { ParameterDeltaSummary } from './ParameterDeltaSummary';
+import { ComparisonModalShimmer } from './ComparisonModalShimmer';
 
 export interface ComparisonModalProps {
   isOpen?: boolean;
@@ -34,7 +35,17 @@ const ComparisonModalDialog: React.FC<ComparisonModalDialogProps> = ({
   onRemove,
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const prevPathnameRef = React.useRef(pathname);
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
+
+  useEffect(() => {
+    if (prevPathnameRef.current !== pathname) {
+      onClose();
+      useWorkspaceStore.getState().closeComparisonModal();
+    }
+    prevPathnameRef.current = pathname;
+  }, [pathname, onClose]);
 
   const comparisonQuery = useComparisonQuery(
     compareList,
@@ -160,10 +171,7 @@ const ComparisonModalDialog: React.FC<ComparisonModalDialogProps> = ({
               </p>
             </div>
           ) : comparisonQuery.isLoading ? (
-            <div data-testid="comparison-loading-shimmer" className="space-y-4">
-              <div className="h-28 rounded-3xl bg-gray-200/70" />
-              <div className="h-64 rounded-3xl bg-gray-200/70" />
-            </div>
+            <ComparisonModalShimmer />
           ) : comparisonQuery.isError ? (
             <ApiErrorBanner
               title="Unable to load study comparison"
@@ -175,14 +183,14 @@ const ComparisonModalDialog: React.FC<ComparisonModalDialogProps> = ({
             <>
               <ParameterDeltaSummary comparison={comparison} />
               {viewMode === 'table' ? (
-                <ComparisonMatrixTable studies={comparison.studies} onRemove={onRemove} />
+                <ComparisonMatrixTable studies={comparison.studies} onRemove={onRemove} onInspect={onClose} />
               ) : (
                 <div
                   data-testid="comparison-grid"
                   className={`grid gap-4 ${comparison.studies.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}
                 >
                   {comparison.studies.map((study) => (
-                    <ComparisonColumn key={study.investigation.id} study={study} onRemove={onRemove} />
+                    <ComparisonColumn key={study.investigation.id} study={study} onRemove={onRemove} onInspect={onClose} />
                   ))}
                 </div>
               )}

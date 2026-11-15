@@ -42,7 +42,7 @@ and frontend acceptance remain separately gated.
 
 ## Owner approval recorded
 
-On 2026-11-13 the owner replied “duyệt rồi làm đi” to this concrete proposal.
+On 2026-11-13 the owner replied "approved, go ahead and do it" to this concrete proposal.
 The stateless storage decision, additive API and independent implementation and
 isolated PostgreSQL verification are approved. External scientific and frontend
 acceptance remain pending.

@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import {
   AlertCircle,
   ArrowLeft,
@@ -12,6 +12,9 @@ import {
   FileText,
   Download,
   Gauge,
+  BookOpen,
+  Layers,
+  Tag,
 } from 'lucide-react';
 import { ApiClientError } from '@/api/client';
 import type {
@@ -421,115 +424,167 @@ export function StudyDetailClient({ params, study: propsStudy }: StudyDetailClie
     { id: 'psi-export', label: 'PSI Raw Export', icon: Download },
   ];
 
+  const pageContainerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.35,
+        ease: [0.16, 1, 0.3, 1],
+        staggerChildren: 0.08,
+        delayChildren: 0.04,
+      },
+    },
+  };
+
+  const columnVariants: Variants = {
+    hidden: { opacity: 0, y: 14 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.45,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  };
+
   return (
     <motion.div
       data-testid="study-detail-page"
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full max-w-7xl mx-auto space-y-6 py-2 pb-24"
+      variants={pageContainerVariants}
+      initial="hidden"
+      animate="visible"
+      className="w-full max-w-[1600px] mx-auto py-2 pb-24 lg:pb-2 lg:h-full lg:overflow-hidden flex flex-col"
     >
-      <StudyHeader
-        study={study}
-        isComparing={isCompared}
-        onToggleCompare={(sid) => toggleCompare(sid)}
-      />
+      {/* 2-Column Responsive Split Layout with Independent Column Scrolling */}
+      <div className="grid grid-cols-1 lg:grid-cols-[38%_62%] xl:grid-cols-[420px_1fr] 2xl:grid-cols-[450px_1fr] gap-6 items-start lg:flex-1 lg:min-h-0 lg:h-full lg:overflow-hidden">
+        {/* LEFT COLUMN: Entire Study Header Card (Independent Scroll Container) */}
+        <motion.div
+          variants={columnVariants}
+          className="lg:h-full lg:overflow-y-auto lg:pr-2 pb-8 lg:pb-6"
+        >
+          <StudyHeader
+            study={study}
+            sources={sources}
+            isComparing={isCompared}
+            onToggleCompare={(sid) => toggleCompare(sid)}
+          />
+        </motion.div>
 
-      {/* Detail Navigation Tabs */}
-      <div
-        role="tablist"
-        aria-label="Investigation Detail Views"
-        className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-gray-200/80"
-      >
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              role="tab"
-              aria-selected={isActive}
-              data-testid={`tab-${tab.id}`}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
-                isActive
-                  ? 'bg-[#0B2374] text-white shadow-xs'
-                  : 'bg-white text-zinc-600 hover:text-zinc-950 hover:bg-gray-100 border border-gray-200/70'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
+        {/* RIGHT COLUMN: Segmented Tabs & Active Tab Data Explorer (Independent Scroll Container) */}
+        <motion.div
+          variants={columnVariants}
+          className="space-y-4 min-w-0 lg:h-full lg:overflow-y-auto lg:pr-2 pb-8 lg:pb-6"
+        >
+          {/* Segmented Filter Control Navigation Bar (Sticky at top of right column) */}
+          <div
+            role="tablist"
+            aria-label="Investigation Detail Views"
+            className="sticky top-0 z-20 flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-2xs overflow-x-auto scrollbar-none"
+          >
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  aria-selected={isActive}
+                  data-testid={`tab-${tab.id}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-colors shrink-0 cursor-pointer ${
+                    isActive
+                      ? 'text-white'
+                      : 'text-zinc-600 hover:text-zinc-950 hover:bg-gray-100/70'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-detail-tab-pill"
+                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                      className="absolute inset-0 bg-[#0B2374] rounded-xl shadow-xs"
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{tab.label}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Tab View with smooth transition */}
+          <motion.section
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            aria-label="Tab Content"
+            className="min-w-0"
+          >
+            {activeTab === 'overview' && (
+              <ChamberOverviewTab
+                study={study}
+                sources={sources}
+                isSourcesLoading={sourcesQuery.isLoading}
+                sourcesError={sourcesQuery.error}
+                onRetrySources={() => sourcesQuery.refetch()}
+              />
+            )}
+            {activeTab === 'runs' && (
+              <TestRunsTable
+                study={study}
+                runs={effectiveRuns}
+                totalRuns={runsQuery.data?.total}
+                isLoading={runsQuery.isLoading && effectiveRuns.length === 0}
+                error={runsQuery.error}
+                onRetry={() => runsQuery.refetch()}
+                onLoadMore={handleLoadMoreRuns}
+                onLoadAll={handleLoadAllRuns}
+                isLoadingMore={isLoadingMoreRuns}
+                hasMore={runsQuery.data?.hasMore}
+              />
+            )}
+            {activeTab === 'telemetry' && (
+              <TelemetryPane
+                study={study}
+                runs={effectiveRuns}
+                observations={effectiveObservations}
+                isLoading={(runsQuery.isLoading || measurementsQuery.isLoading) && effectiveRuns.length === 0}
+                error={runsQuery.error ?? measurementsQuery.error}
+                onRetry={() => {
+                  runsQuery.refetch();
+                  measurementsQuery.refetch();
+                }}
+              />
+            )}
+            {activeTab === 'claims' && (
+              <ClaimsList
+                study={study}
+                claims={claims}
+                isLoading={claimsQuery.isLoading}
+                error={claimsQuery.error}
+                onRetry={() => claimsQuery.refetch()}
+              />
+            )}
+            {activeTab === 'psi-export' && (
+              <PsiExportTab
+                study={study}
+                runs={effectiveRuns}
+                observations={effectiveObservations}
+                sources={sources}
+                claims={claims}
+                totalRuns={runsQuery.data?.total}
+                totalObservations={measurementsQuery.data?.total}
+                onFetchAllData={handleFetchAllData}
+                isFetchingAll={isFetchingAllData}
+              />
+            )}
+          </motion.section>
+        </motion.div>
       </div>
-
-      <motion.section
-        key={activeTab}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.28, ease: 'easeOut' }}
-        aria-label="Tab Content"
-      >
-        {activeTab === 'overview' && (
-          <ChamberOverviewTab
-            study={study}
-            sources={sources}
-            isSourcesLoading={sourcesQuery.isLoading}
-            sourcesError={sourcesQuery.error}
-            onRetrySources={() => sourcesQuery.refetch()}
-          />
-        )}
-        {activeTab === 'runs' && (
-          <TestRunsTable
-            study={study}
-            runs={effectiveRuns}
-            totalRuns={runsQuery.data?.total}
-            isLoading={runsQuery.isLoading && effectiveRuns.length === 0}
-            error={runsQuery.error}
-            onRetry={() => runsQuery.refetch()}
-            onLoadMore={handleLoadMoreRuns}
-            onLoadAll={handleLoadAllRuns}
-            isLoadingMore={isLoadingMoreRuns}
-            hasMore={runsQuery.data?.hasMore}
-          />
-        )}
-        {activeTab === 'telemetry' && (
-          <TelemetryPane
-            study={study}
-            runs={effectiveRuns}
-            observations={effectiveObservations}
-            isLoading={(runsQuery.isLoading || measurementsQuery.isLoading) && effectiveRuns.length === 0}
-            error={runsQuery.error ?? measurementsQuery.error}
-            onRetry={() => {
-              runsQuery.refetch();
-              measurementsQuery.refetch();
-            }}
-          />
-        )}
-        {activeTab === 'claims' && (
-          <ClaimsList
-            study={study}
-            claims={claims}
-            isLoading={claimsQuery.isLoading}
-            error={claimsQuery.error}
-            onRetry={() => claimsQuery.refetch()}
-          />
-        )}
-        {activeTab === 'psi-export' && (
-          <PsiExportTab
-            study={study}
-            runs={effectiveRuns}
-            observations={effectiveObservations}
-            sources={sources}
-            claims={claims}
-            totalRuns={runsQuery.data?.total}
-            totalObservations={measurementsQuery.data?.total}
-            onFetchAllData={handleFetchAllData}
-            isFetchingAll={isFetchingAllData}
-          />
-        )}
-      </motion.section>
 
       <ComparisonBar
         compareList={compareList}

@@ -5,14 +5,12 @@ import {
   ScenarioConfigForm,
   ConditionGapMatrix,
   RankedEvidenceList,
-  PredictiveLabPanel,
 } from '@/features/mission';
 import MissionPage from '../src/app/(dashboard)/mission/page';
 import { useWorkspaceStore, DEFAULT_SCENARIO } from '../src/store/useWorkspaceStore';
 import { toastStore } from '../src/components/toast/toast-store';
 import { SCENARIO_PRESETS } from '../src/data/presets';
 import { evaluateGapMatrix } from '../src/lib/gapMatrixEngine';
-import { evaluatePredictiveLab } from '../src/lib/predictiveLabEngine';
 import { calculateTopicalRankings } from '../src/lib/rankingEngine';
 
 const mockPush = vi.fn();
@@ -38,7 +36,7 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => mockSearchParams,
 }));
 
-describe('Mission Scenario, Evidence Gap Matrix & Predictive Lab (/mission)', () => {
+describe('Mission Scenario & Evidence Gap Matrix (/mission)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useWorkspaceStore.getState().resetWorkspace();
@@ -70,7 +68,7 @@ describe('Mission Scenario, Evidence Gap Matrix & Predictive Lab (/mission)', ()
       const ppo2Badge = screen.getByTestId('badge-ppo2');
       expect(ppo2Badge).toBeDefined();
       expect(ppo2Badge.textContent).toContain('ppO₂: 3.09 psia');
-      expect(ppo2Badge.textContent).toContain('Normoxic Alveolar Target');
+      expect(ppo2Badge.textContent).toContain('Derived value; not a safety rating');
     });
 
     it('updates ppO2 telemetry when pressure and oxygen sliders change', () => {
@@ -235,157 +233,31 @@ describe('Mission Scenario, Evidence Gap Matrix & Predictive Lab (/mission)', ()
     });
   });
 
-  describe('PredictiveLabPanel Component', () => {
-    it('executes in-bounds predictions for ISS baseline PMMA scenario', () => {
-      act(() => {
-        useWorkspaceStore.getState().setActiveScenario({ ...DEFAULT_SCENARIO });
-      });
-
-      render(<PredictiveLabPanel />);
-
-      expect(screen.getByTestId('predictive-lab-panel')).toBeDefined();
-
-      // Status badge should be online
-      const statusBadge = screen.getByTestId('model-status-badge');
-      expect(statusBadge.textContent).toContain('MODEL ONLINE / VALIDATED DOMAIN');
-
-      // All 3 readiness requirements must be verified
-      expect(screen.getByTestId('readiness-req-req-01').textContent).toContain('VERIFIED');
-      expect(screen.getByTestId('readiness-req-req-02').textContent).toContain('VERIFIED');
-      expect(screen.getByTestId('readiness-req-req-03').textContent).toContain('VERIFIED');
-
-      // Outputs: spread rate, quench limit, uncertainty bounds
-      expect(screen.getByTestId('predicted-spread-rate')).toBeDefined();
-      expect(screen.getByTestId('predicted-quench-limit')).toBeDefined();
-      expect(screen.getByTestId('predicted-uncertainty-bounds')).toBeDefined();
-
-      const spreadRateText = screen.getByTestId('predicted-spread-rate').textContent;
-      expect(spreadRateText).toContain('mm/s');
-
-      const quenchLimitText = screen.getByTestId('predicted-quench-limit').textContent;
-      expect(quenchLimitText).toContain('17.5'); // PMMA LOI
-    });
-
-    it('locks prediction with DOMAIN OUT OF BOUNDS when partial gravity (0.16g) is selected', () => {
-      act(() => {
-        useWorkspaceStore.getState().setActiveScenario({
-          ...DEFAULT_SCENARIO,
-          gravity: 0.16,
-          name: 'Artemis Moon Base',
-        });
-      });
-
-      render(<PredictiveLabPanel />);
-
-      const statusBadge = screen.getByTestId('model-status-badge');
-      expect(statusBadge.textContent).toContain('MODEL OFFLINE / DOMAIN OUT OF BOUNDS');
-
-      const lockedCard = screen.getByTestId('predictive-lab-locked-state');
-      expect(lockedCard).toBeDefined();
-      expect(lockedCard.textContent).toContain('Guarded Execution Locked');
-      expect(lockedCard.textContent).toContain('Partial-gravity intermediate buoyancy regimes (0.16g) lack long-duration orbital microgravity test baselines');
-
-      // REQ-01 and REQ-02 should be BLOCKED
-      expect(screen.getByTestId('readiness-req-req-01').textContent).toContain('BLOCKED');
-      expect(screen.getByTestId('readiness-req-req-02').textContent).toContain('BLOCKED');
-    });
-
-    it('locks prediction when material is uncalibrated fabric without model version support', () => {
-      act(() => {
-        useWorkspaceStore.getState().setActiveScenario({
-          ...DEFAULT_SCENARIO,
-          material: 'Cotton',
-        });
-      });
-
-      render(<PredictiveLabPanel />);
-
-      const statusBadge = screen.getByTestId('model-status-badge');
-      expect(statusBadge.textContent).toContain('MODEL OFFLINE / DOMAIN OUT OF BOUNDS');
-
-      const lockedCard = screen.getByTestId('predictive-lab-locked-state');
-      expect(lockedCard.textContent).toContain('MATERIAL UNCALIBRATED');
-    });
-
-    it('triggers onSwitchToEvidence callback when inspect evidence button is clicked in locked state', () => {
-      act(() => {
-        useWorkspaceStore.getState().setActiveScenario({
-          ...DEFAULT_SCENARIO,
-          gravity: 0.38,
-          name: 'Mars Habitat',
-        });
-      });
-
-      const onSwitchSpy = vi.fn();
-      render(<PredictiveLabPanel onSwitchToEvidence={onSwitchSpy} />);
-
-      const inspectEvidenceBtn = screen.getByTestId('inspect-evidence-cta-btn');
-      act(() => {
-        fireEvent.click(inspectEvidenceBtn);
-      });
-
-      expect(onSwitchSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('displays mandatory predictive safety disclaimer warning', () => {
-      render(<PredictiveLabPanel />);
-
-      const disclaimer = screen.getByTestId('predictive-safety-disclaimer');
-      expect(disclaimer).toBeDefined();
-      expect(disclaimer.textContent).toContain('Never issue operational safe / unsafe certification');
-    });
-  });
-
-  describe('MissionPage (/mission) Full Assembly', () => {
-    it('renders workbench with NASA Evidence Analysis view by default', () => {
+  describe('MissionPage evidence-only workspace', () => {
+    it('renders configuration, condition gaps and related investigations', () => {
       render(<MissionPage />);
-
-      expect(screen.getByTestId('mission-workbench')).toBeDefined();
       expect(screen.getByTestId('scenario-config-form')).toBeDefined();
+      expect(screen.getByRole('region', {name: 'Mission API evidence'})).toBeDefined();
+      expect(screen.queryByTestId('ranked-evidence-list')).toBeNull();
+      expect(screen.queryByTestId('mission-view-switcher')).toBeNull();
+      expect(screen.queryByText(/MODEL ONLINE/)).toBeNull();
+    });
+
+    it('keeps legacy prediction URLs on evidence without loading a predictive panel', () => {
+      mockSearchParams = new URLSearchParams('view=prediction');
+      render(<MissionPage />);
       expect(screen.getByTestId('evidence-view-container')).toBeDefined();
-      expect(screen.getByTestId('condition-gap-matrix')).toBeDefined();
-      expect(screen.getByTestId('ranked-evidence-list')).toBeDefined();
-      expect(screen.queryByTestId('prediction-view-container')).toBeNull();
+      expect(screen.queryByTestId('predictive-lab-panel')).toBeNull();
+      expect(screen.queryByTestId('view-tab-prediction')).toBeNull();
+      expect(mockPush).not.toHaveBeenCalled();
     });
 
-    it('switches to Predictive Lab view when tab is clicked', () => {
+    it('keeps the selected habitat scenario in the evidence workspace', () => {
       render(<MissionPage />);
-
-      const predictionTab = screen.getByTestId('view-tab-prediction');
-      act(() => {
-        fireEvent.click(predictionTab);
-      });
-
-      expect(mockPush).toHaveBeenCalledWith('/mission?view=prediction');
-    });
-
-    it('renders Predictive Lab view when view=prediction in searchParams', () => {
-      mockSearchParams = new URLSearchParams('view=prediction');
-      render(<MissionPage />);
-
-      expect(screen.getByTestId('prediction-view-container')).toBeDefined();
-      expect(screen.getByTestId('predictive-lab-panel')).toBeDefined();
-      expect(screen.queryByTestId('evidence-view-container')).toBeNull();
-    });
-
-    it('preserves scenario state changes when switching between views', () => {
-      render(<MissionPage />);
-
-      // Switch preset to Artemis Moon
-      const artemisBtn = screen.getByTestId('preset-artemis-lunar-base');
-      act(() => {
-        fireEvent.click(artemisBtn);
-      });
-
+      fireEvent.click(screen.getByTestId('preset-artemis-lunar-base'));
       expect(useWorkspaceStore.getState().activeScenario.gravity).toBe(0.16);
-
-      // Now switch searchParams to prediction
-      mockSearchParams = new URLSearchParams('view=prediction');
-      render(<MissionPage />);
-
-      // In predictive lab, 0.16g should cause locked state
-      expect(screen.getByTestId('predictive-lab-locked-state')).toBeDefined();
-      expect(screen.getByTestId('model-status-badge').textContent).toContain('MODEL OFFLINE');
+      expect(screen.getByText(/a microgravity regime is not measured 0g/)).toBeDefined();
+      expect(screen.queryByTestId('ranked-evidence-list')).toBeNull();
     });
   });
 
@@ -393,11 +265,11 @@ describe('Mission Scenario, Evidence Gap Matrix & Predictive Lab (/mission)', ()
     it('renders scenario configuration and gap matrix with light white cards and badges', () => {
       render(<MissionPage />);
       expect(screen.getAllByText(/Mission Scenario/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/Evidence Gap Matrix/i).length).toBeGreaterThan(0);
+      expect(screen.getByRole('button', {name: 'Analyze evidence'})).toBeDefined();
       expect(screen.getByTestId('mission-workbench')).toBeInTheDocument();
       expect(screen.getByTestId('scenario-config-form')).toBeInTheDocument();
-      expect(screen.getByTestId('condition-gap-matrix')).toBeInTheDocument();
-      expect(screen.getByTestId('ranked-evidence-list')).toBeInTheDocument();
+      expect(screen.queryByTestId('condition-gap-matrix')).toBeNull();
+      expect(screen.queryByTestId('ranked-evidence-list')).toBeNull();
 
       const indicator = screen.getByTestId('end-of-list-indicator');
       expect(indicator).toBeInTheDocument();

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Check, Plus, Tag, Layers } from 'lucide-react';
 import type { MappedInvestigation } from '@/types/api';
@@ -17,9 +18,18 @@ export const InvestigationCard: React.FC<InvestigationCardProps> = ({
   isComparing,
   onToggleCompare,
 }) => {
+  const router = useRouter();
   const visibleTags = investigation.tags.slice(0, 3);
   const extraTagCount = Math.max(0, investigation.tagsTotal - visibleTags.length);
   const unavailableCount = Object.keys(investigation.unavailableFields).length;
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // If the click is inside a button or anchor link, let that element handle it natively
+    if ((e.target as HTMLElement).closest('button, a')) {
+      return;
+    }
+    router.push(`/explorer/${investigation.routeKey}`);
+  };
 
   return (
     <motion.div
@@ -27,6 +37,7 @@ export const InvestigationCard: React.FC<InvestigationCardProps> = ({
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
+      onClick={handleCardClick}
       className={`group relative rounded-3xl md:rounded-[36px] p-5 flex flex-col justify-between transition-all duration-300 cursor-pointer bg-gray-200/50 hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] select-none ${
         isComparing
           ? 'ring-2 ring-[#D4FC02] shadow-[0_8px_30px_rgba(212,252,2,0.3)] bg-white'

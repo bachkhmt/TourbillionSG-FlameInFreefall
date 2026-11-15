@@ -312,6 +312,21 @@ describe('Multi-Study Comparison System (Backend Wired)', () => {
       fireEvent.keyDown(window, { key: 'Escape' });
       expect(handleClose).toHaveBeenCalledTimes(5);
     });
+
+    it('clicking Inspect Study in comparison view closes the comparison modal', async () => {
+      const handleClose = vi.fn();
+      renderWithQuery(
+        <ComparisonModal isOpen={true} onClose={handleClose} compareList={[INV_1_ID, INV_2_ID]} />
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId(`comparison-column-details-${INV_1_ID}`)).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId(`comparison-column-details-${INV_1_ID}`));
+      expect(handleClose).toHaveBeenCalled();
+      expect(useWorkspaceStore.getState().isComparisonModalOpen).toBe(false);
+    });
   });
 
   // ---------------------------------------------------------------------------

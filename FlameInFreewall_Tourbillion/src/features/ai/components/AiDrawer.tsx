@@ -226,7 +226,7 @@ const AiDrawerPanel: React.FC = () => {
         aria-hidden="true"
       />
 
-      <aside className="absolute inset-y-4 right-4 flex w-[calc(100%_-_2rem)] max-w-lg flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
+      <aside className="absolute inset-y-4 right-4 flex w-[calc(100%_-_2rem)] max-w-lg flex-col overflow-hidden rounded-[48px] border border-slate-200 bg-white shadow-2xl">
         <header className="flex shrink-0 items-center justify-between gap-3 bg-[#0B2374] px-5 py-4 text-white">
           <h2 className="font-bold text-[#D4FC02]">FlameGuard AI</h2>
           <button

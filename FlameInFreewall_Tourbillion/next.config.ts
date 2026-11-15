@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
         source: '/api/proxy/:path*',
         destination: `${backendUrl}/:path*`,
       },
+      {
+        source: '/studio',
+        destination: '/studio.html',
+      },
     ];
   },
 };

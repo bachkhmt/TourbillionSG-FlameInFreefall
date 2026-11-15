@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flame in Freefall · Tra cứu có nguồn</title>
+<style>
+:root{--bg:#f7f8fa;--paper:#fff;--ink:#182332;--muted:#596777;--line:#dce2e9;--blue:#245cc0;--soft:#edf3ff;--orange:#98501e;--warm:#fff5e9;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}*{box-sizing:border-box}body{margin:0;font-size:15px;line-height:1.65}h1,h2,h3,p{margin:0}h1{font-size:19px;letter-spacing:-.5px}h2{font-size:clamp(25px,4vw,34px);letter-spacing:-.8px;line-height:1.3}h3{font-size:16px}button,input,select,textarea{font:inherit;color:inherit}button,summary{cursor:pointer}button:disabled{opacity:.5;cursor:default}a{color:var(--blue);text-underline-offset:3px}:focus-visible{outline:3px solid #8ab5ff;outline-offset:3px}[hidden]{display:none!important}.wrap{max-width:1160px;margin:auto;padding:0 28px}header{background:white;border-bottom:1px solid var(--line)}.brand-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;padding:20px 0 16px}.brand{display:flex;gap:11px;align-items:center}.mark{height:31px;width:9px;border-radius:8px;background:#da6a30;transform:rotate(15deg)}.brand small,.muted{color:var(--muted);font-size:13px}.brand small{font-size:12px}.connection{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}.dot{height:7px;width:7px;border-radius:50%;background:#94a3b8}.dot.online{background:#267153}.dot.offline{background:#b17030}.link-button{border:0;background:transparent;color:var(--blue);font-size:12px;padding:4px}.tabs{display:flex;gap:25px;overflow:auto}.tabs button{background:none;border:0;border-bottom:2px solid transparent;white-space:nowrap;font-size:14px;padding:12px 0;color:var(--muted)}.tabs [aria-selected=true]{border-color:var(--blue);color:var(--blue);font-weight:600}main{padding-top:34px!important;padding-bottom:42px!important;min-height:75vh}.intro{max-width:720px;margin-bottom:24px}.intro p{color:var(--muted);margin-top:10px}.eyebrow{font-size:11px;font-weight:700;letter-spacing:1.6px;color:var(--orange);margin-bottom:8px}.ask-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:24px;align-items:start}.card{border:1px solid var(--line);border-radius:12px;padding:23px;background:white;min-width:0}.field-label{display:block;font-size:14px;font-weight:600;margin-bottom:9px}textarea{width:100%;min-height:116px;border:1px solid #bac6d5;border-radius:8px;padding:13px 14px;resize:vertical;line-height:1.6}textarea::placeholder{color:#7a8696}.form-bottom,.row{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}.form-bottom{margin-top:10px}.primary{background:var(--blue);border:1px solid var(--blue);color:white;padding:9px 18px;border-radius:7px;font-weight:600}.button{padding:7px 12px;background:white;border:1px solid var(--line);border-radius:7px;font-size:13px}.button:hover,.sample:hover{border-color:#9aafd0;background:var(--soft)}.options{margin-top:15px}.options summary{font-size:13px;color:var(--muted)}.controls{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}.controls label{display:grid;gap:5px;font-size:12px;color:var(--muted);flex:1;min-width:150px}select,input[type=search]{border:1px solid #c6d0dd;background:white;border-radius:7px;padding:8px 10px;min-width:0;max-width:100%}.sample-title{font-size:13px;color:var(--muted);margin:24px 0 10px;font-weight:600}.samples{display:grid;gap:8px}.sample{display:flex;gap:11px;background:transparent;border:1px solid var(--line);border-radius:8px;padding:11px 13px;font-size:13px;text-align:left;line-height:1.5}.sample>span:first-child{font-size:11px;color:var(--blue);font-weight:600;padding-top:2px}.source-card{position:sticky;top:20px}.empty{padding:32px 3px;color:var(--muted);font-size:13px;line-height:1.8}.empty b{display:block;font-size:14px;color:var(--ink);margin-bottom:8px}.source-item{border:1px solid var(--line);border-radius:8px;margin-top:10px;font-size:13px}.source-item summary{padding:12px;list-style:none}.source-item summary:before{content:'＋';color:var(--blue);margin-right:7px}.source-item[open] summary:before{content:'−'}.source-item summary::-webkit-details-marker{display:none}.source-item.highlight{border-color:var(--blue);box-shadow:0 0 0 2px var(--soft)}.source-status{display:block;color:var(--muted);font-size:11px;margin:5px 0 0 21px}.source-content{padding:0 13px 13px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8}.source-content p{margin-bottom:9px}.source-content code{font-size:11px;color:var(--muted)}.result{margin-top:20px;padding-top:20px;border-top:1px solid var(--line)}.tags{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 16px}.tag{display:inline-block;font-size:11px;background:#eef1f5;color:var(--muted);border-radius:5px;padding:2px 7px}.tag.blue{background:var(--soft);color:var(--blue)}.tag.orange{background:var(--warm);color:var(--orange)}.answer{font-size:15px;line-height:1.9}.answer p{margin-bottom:13px;overflow-wrap:anywhere}.cite{border:1px solid #b6caf0;background:var(--soft);border-radius:4px;color:var(--blue);font-size:11px;margin-left:5px;padding:1px 6px}.system-note{border-left:2px solid #d5ae86;padding-left:12px;color:var(--muted)}.note{background:var(--warm);color:#81471f;border-radius:8px;padding:12px 14px;font-size:13px;margin:18px 0}.error{background:#fff0f1;color:#a82330;padding:12px;border-radius:7px;font-size:14px;margin-top:12px}.status{font-size:13px;min-height:21px;margin-top:10px;color:var(--muted)}.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:20px 0}.toolbar input{flex:1;min-width:150px}.list{display:grid;gap:12px}.investigation{padding:18px 20px}.investigation p{font-size:13px;color:var(--muted);margin-top:8px}.score{font-size:13px;text-align:right;color:var(--blue)}.score small{display:block;color:var(--muted);font-size:11px}.detail{margin-top:13px;font-size:13px}.detail summary{color:var(--blue)}.detail-body{padding-top:8px}.weights{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:18px 0}.weights label{font-size:12px;color:var(--muted)}.weights input{width:100%;accent-color:var(--blue)}.weights output{float:right}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:white}table{width:100%;min-width:620px;border-collapse:collapse;font-size:13px}th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}th{background:#f3f5f8;font-weight:600}tr:last-child td{border-bottom:0}.matrix td{padding:8px;text-align:center}.map-cell{width:100%;min-height:43px;border:1px solid #d8e0ec;border-radius:5px;background:white;color:var(--muted)}.map-cell.has-data{background:var(--soft);border-color:#adc5ed;color:var(--blue)}.map-cell.target{border-style:dashed;border-color:#c98851}.gravity{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0 10px}.gravity div{padding:14px;border:1px solid var(--line);border-radius:8px;background:white;font-size:13px}.gravity .gap{background:var(--warm);border-style:dashed}.gravity small{display:block;color:var(--muted)}.checklist{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.checklist label{padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:white;font-size:13px}.checklist input{accent-color:var(--blue)}.exports{display:flex;gap:9px;flex-wrap:wrap;margin:17px 0}.glossary{display:grid;grid-template-columns:1fr 1fr;gap:12px}.glossary p{font-size:13px;color:var(--muted);margin-top:7px}.skip{position:absolute;top:-100px;left:15px;background:white;padding:9px;z-index:10}.skip:focus{top:10px}footer{border-top:1px solid var(--line);color:var(--muted);font-size:12px;padding:20px 0}footer .wrap{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+@media(max-width:800px){.wrap{padding-left:18px;padding-right:18px}.brand-row{align-items:start}.connection{max-width:175px;justify-content:flex-end;flex-wrap:wrap}.ask-layout{grid-template-columns:1fr}.source-card{position:static}.card{padding:18px}.weights,.gravity{grid-template-columns:1fr 1fr}.glossary{grid-template-columns:1fr}main{padding-top:25px!important}}
+@media(max-width:430px){h1{font-size:16px}.brand small{font-size:10px}.connection{max-width:125px;font-size:11px}.tabs{gap:20px}.tabs button{font-size:13px}.weights{grid-template-columns:1fr}.controls label{min-width:100%}.score{text-align:left}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style></head><body>
+<a class="skip" href="#main">Đến nội dung chính</a>
+<header><div class="wrap"><div class="brand-row"><div class="brand"><span class="mark" aria-hidden="true"></span><div><h1>Flame in Freefall</h1><small>NASA Space Apps · Tra cứu có nguồn</small></div></div><a href="/flame" class="button" style="margin-left:auto;text-decoration:none;white-space:nowrap">Lửa 3D ↗</a><div class="connection" role="status"><span id="connection-dot" class="dot" aria-hidden="true"></span><span id="connection-text">Đang kết nối…</span><button id="reconnect" class="link-button" type="button" aria-label="Kiểm tra lại kết nối">Thử lại</button></div></div><nav class="tabs" role="tablist" aria-label="Các màn hình">
+<button id="tab-ask" role="tab" aria-selected="true" aria-controls="pane-ask" data-tab="ask">Hỏi đáp</button><button id="tab-brief" role="tab" aria-selected="false" aria-controls="pane-brief" data-tab="brief" tabindex="-1">Thí nghiệm</button><button id="tab-map" role="tab" aria-selected="false" aria-controls="pane-map" data-tab="map" tabindex="-1">Bản đồ</button><button id="tab-compare" role="tab" aria-selected="false" aria-controls="pane-compare" data-tab="compare" tabindex="-1">So sánh & xuất</button><button id="tab-glossary" role="tab" aria-selected="false" aria-controls="pane-glossary" data-tab="glossary" tabindex="-1">Thuật ngữ</button></nav></div></header>
+<main id="main" class="wrap">
+<section id="pane-ask" role="tabpanel" aria-labelledby="tab-ask"><div class="intro"><div class="eyebrow">ASK & VERIFY</div><h2>Hỏi về thí nghiệm cháy.</h2><p>Tra cứu trong Playbook, đọc câu trả lời và đối chiếu từng đoạn nguồn. Công cụ trình bày bằng chứng, không đưa kết luận an toàn.</p></div><div class="ask-layout"><div><div class="card">
+<form id="ask-form"><label class="field-label" for="ask-input">Bạn muốn tìm hiểu điều gì?</label><textarea id="ask-input" minlength="2" maxlength="500" required placeholder="Ví dụ: FLEX dập lửa bằng cách nào?"></textarea><div class="form-bottom"><span class="muted">Kho tài liệu: Playbook</span><button id="ask-submit" class="primary" type="submit">Tìm câu trả lời →</button></div><details class="options"><summary>Tùy chọn trả lời</summary><div class="controls"><label>Cách giải thích<select id="ask-mode"><option value="engineer">Kỹ thuật</option><option value="student">Dễ hiểu</option></select></label><label>Kịch bản<select id="ask-scenario"><option value="">Không chọn kịch bản</option></select></label></div></details></form><p id="request-status" class="status" role="status"></p><div id="request-error" role="alert" hidden></div>
+<section id="result" class="result" aria-labelledby="result-title" hidden><h3 id="result-title">Câu trả lời</h3><div id="result-meta" class="tags"></div><div id="answer-body" class="answer"></div><div id="missing-box" class="note" hidden></div><p class="muted">Mức phủ do pipeline ước tính. Hãy kiểm tra nội dung nguồn trước khi sử dụng.</p></section></div><div class="sample-title">5 câu hỏi để thử <span style="font-weight:400">· Chọn một câu, rồi bấm tìm</span></div><div id="samples" class="samples"></div></div>
+<aside class="card source-card" aria-label="Nguồn cho câu trả lời"><div class="row"><h3>Đoạn nguồn</h3><span id="source-count" class="muted">0 đoạn</span></div><p class="muted">Bấm [số] trong câu trả lời để mở đoạn tương ứng.</p><div id="sources"><div class="empty"><b>Bắt đầu từ một câu hỏi.</b>Các đoạn tài liệu được truy xuất sẽ xuất hiện ở đây, kèm liên kết để bạn kiểm tra.</div></div></aside></div></section>
+<section id="pane-brief" role="tabpanel" aria-labelledby="tab-brief" hidden><div class="intro"><div class="eyebrow">MISSION BRIEF</div><h2>Tìm thí nghiệm liên quan.</h2><p>Chọn kịch bản để xem cách xếp hạng thay đổi.</p></div><p class="note">Dữ liệu giao diện là minh họa, chưa kiểm chứng từng trường. Điểm phù hợp không phải xác suất an toàn hay độ phủ PSI.</p><div class="toolbar"><label for="mission-scenario" class="muted">Kịch bản</label><select id="mission-scenario"></select><input id="investigation-search" type="search" placeholder="Tìm tên, vật liệu hoặc thiết bị…" aria-label="Tìm thí nghiệm"></div><details class="card options"><summary>Điều chỉnh trọng số xếp hạng</summary><div id="weights" class="weights"></div><button id="reset-weights" class="button" type="button">Đặt lại</button><p class="muted">Trọng số được chuẩn hóa khi tính điểm. Điều kiện thiếu hiện là “chưa rõ”.</p></details><p id="catalog-count" class="muted" style="margin:18px 0"></p><div id="ranked-list" class="list"></div><details class="card detail" style="margin-top:20px"><summary>Mốc nghiên cứu ngoài PSI · xem riêng</summary><p class="muted" style="margin:12px 0">Không tham gia bảng xếp hạng hay bản đồ PSI minh họa. Theo Playbook, LUCI có kết quả công bố; tình trạng bay của FM2 cần xác minh.</p><div id="external-list" class="list"></div></details></section>
+<section id="pane-map" role="tabpanel" aria-labelledby="tab-map" hidden><div class="intro"><div class="eyebrow">EVIDENCE MAP</div><h2>Nhìn rõ phạm vi dữ liệu.</h2><p>Bản đồ dải điều kiện của các hồ sơ minh họa. Nguồn ngoài PSI được xem riêng ở mục Thí nghiệm.</p></div><p class="note">Ô có hồ sơ nghĩa là các dải thông số bao phủ ô đó. Chưa có dữ liệu từng test để xác nhận hai điều kiện đã được thử cùng nhau.</p><div class="toolbar"><label for="map-axis">Trục dọc</label><select id="map-axis"><option value="airflow">Luồng khí (cm/s)</option><option value="pressure">Áp suất (psi)</option></select><span class="muted">Số trong ô = số hồ sơ minh họa · nét đứt = vùng O₂ mục tiêu Mặt Trăng</span></div><div class="table-wrap"><table id="evidence-map" class="matrix"><caption class="muted" style="padding:12px;text-align:left">Trục ngang: nồng độ O₂ (%)</caption></table></div><div id="map-selection" class="note" role="status" hidden></div><div class="gravity"><div><b>~0g</b><small>Vi trọng lực</small></div><div class="gap"><b>0,16g</b><small>Mặt Trăng · khoảng trống PSI theo Playbook</small></div><div class="gap"><b>0,38g</b><small>Sao Hỏa · khoảng trống PSI theo Playbook</small></div><div><b>1g</b><small>Trọng lực Trái Đất</small></div></div><p class="muted">Không nội suy trọng lực thành số đo. Kết quả LUCI ngoài PSI cần được gắn nhãn riêng.</p></section>
+<section id="pane-compare" role="tabpanel" aria-labelledby="tab-compare" hidden><div class="intro"><div class="eyebrow">COMPARE & EXTRACT</div><h2>So sánh cùng một bảng.</h2><p>Chọn 2–4 thí nghiệm. File xuất chỉ chứa các mục bạn đang chọn.</p></div><p class="note">Thông số là dữ liệu minh họa chưa kiểm chứng. Nhãn này được giữ trong file xuất.</p><div id="compare-picker" class="checklist"></div><p id="compare-status" class="muted" role="status"></p><div id="compare-table-wrap" class="table-wrap" style="margin-top:13px"><table id="compare-table"></table></div><div class="exports"><button class="button" data-export="csv" type="button">Tải CSV</button><button class="button" data-export="json" type="button">Tải JSON</button><button class="button" data-export="card" type="button">Tải Data Card</button><button class="button" data-export="notebook" type="button">Notebook mẫu</button></div></section>
+<section id="pane-glossary" role="tabpanel" aria-labelledby="tab-glossary" hidden><div class="intro"><div class="eyebrow">GLOSSARY</div><h2>Đọc hiểu thuật ngữ.</h2><p>Định nghĩa lấy từ Playbook. Nguồn cho từng câu trả lời nằm ở màn Hỏi đáp.</p></div><div class="toolbar"><input id="glossary-search" type="search" placeholder="Tìm CIR, MDCA, RAG…" aria-label="Tìm thuật ngữ"></div><div id="glossary-list" class="glossary"></div></section>
+</main><footer><div class="wrap"><span>Flame in Freefall · Bản thử nghiệm</span><span>Tham khảo nghiên cứu · Không dùng để phán quyết an toàn</span></div></footer><script>
+'use strict';
+const INVESTIGATIONS = [
+  {
+    id: "bass",
+    name: "BASS",
+    fullName: "Burning and Suppression of Solids",
+    fuelType: "solid",
+    fuelDetail: "PMMA, Cotton, Nomex tấm phẳng và thanh trụ",
+    apparatus: "MSG (Microgravity Science Glovebox)",
+    chamber: "Glovebox kín",
+    pillars: ["prevention", "suppression"],
+    o2Range: [15, 21],
+    airflowRange: [0, 53],
+    pressureRange: [14.7, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 5,
+    status: "placeholder",
+    ntrsId: "20160000593",
+    summary: "Đốt mẫu vật liệu rắn tấm phẳng và que hình trụ trong buồng MSG. Khảo sát giới hạn dập tắt bằng luồng khí đối lưu cưỡng bức và chất dập khí trơ.",
+    keyFindings: "Ở luồng khí dưới 1 cm/s ngọn lửa rất mờ nhưng ổn định. Khi luồng khí tăng đột ngột, lửa bùng phát nhanh do được nạp dưỡng khí kịp thời."
+  },
+  {
+    id: "bass-ii",
+    name: "BASS-II",
+    fullName: "Burning and Suppression of Solids - II",
+    fuelType: "solid",
+    fuelDetail: "Acrylic, Cotton blend, Nomex hình học phức tạp",
+    apparatus: "MSG (Microgravity Science Glovebox)",
+    chamber: "Glovebox kín",
+    pillars: ["prevention", "suppression"],
+    o2Range: [16, 21],
+    airflowRange: [0, 55],
+    pressureRange: [14.7, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 5,
+    status: "placeholder",
+    ntrsId: "20160000593",
+    summary: "Hơn 100 lần thử nghiệm đốt và dập tắt vật liệu rắn tấm dày trong các luồng khí cưỡng bức từ 0 đến 55 cm/s.",
+    keyFindings: "Vận tốc thông gió cabin (5-20 cm/s) là yếu tố quyết định tốc độ lan truyền ngọn lửa trong vi trọng lực; loại trừ giả định lửa tự tắt khi không có gió."
+  },
+  {
+    id: "flex",
+    name: "FLEX",
+    fullName: "Flame Extinguishment Experiment",
+    fuelType: "liquid",
+    fuelDetail: "Methanol, Heptane, Decane dạng giọt tự do",
+    apparatus: "CIR / MDCA",
+    chamber: "Combustion Integrated Rack",
+    pillars: ["suppression"],
+    o2Range: [12, 21],
+    airflowRange: [0, 0],
+    pressureRange: [7.3, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 4,
+    status: "placeholder",
+    ntrsId: "20150023456",
+    summary: "284 thử nghiệm đốt giọt nhiên liệu hình cầu đối xứng, đo giới hạn oxy tối thiểu để dập lửa bằng cách pha loãng CO₂ và Heli.",
+    keyFindings: "Heli dập tắt lửa qua cơ chế dẫn nhiệt cao, trong khi CO₂ dập tắt qua làm lạnh bức xạ và pha loãng nhiệt dung khí quyển."
+  },
+  {
+    id: "flex-2",
+    name: "FLEX-2",
+    fullName: "Flame Extinguishment Experiment - 2",
+    fuelType: "liquid",
+    fuelDetail: "Hydrocarbon droplets, Alkane blends",
+    apparatus: "CIR / MDCA",
+    chamber: "Combustion Integrated Rack",
+    pillars: ["suppression", "prevention"],
+    o2Range: [10, 21],
+    airflowRange: [0, 0],
+    pressureRange: [5.0, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 4,
+    status: "placeholder",
+    ntrsId: "20140009372",
+    summary: "Mở rộng FLEX với các mảng giọt lỏng tương tác và khảo sát nồng độ oxy giới hạn (LOI) trong áp suất cabin thấp.",
+    keyFindings: "Khám phá hiện tượng cháy mát (cool flame) tiếp diễn tự phát sau khi ngọn lửa nhìn thấy được bằng mắt thường đã tắt hoàn toàn."
+  },
+  {
+    id: "cfi",
+    name: "CFI",
+    fullName: "Cool Flames Investigation",
+    fuelType: "liquid",
+    fuelDetail: "Alkanes lỏng phân tử lớn",
+    apparatus: "CIR / MDCA",
+    chamber: "Combustion Integrated Rack",
+    pillars: ["prevention", "suppression"],
+    o2Range: [15, 21],
+    airflowRange: [0, 0],
+    pressureRange: [7.3, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 3,
+    status: "placeholder",
+    ntrsId: "20170009414",
+    summary: "Nghiên cứu cơ chế đốt cháy ở nhiệt độ thấp (400-600°C) không phát xạ ánh sáng nhìn thấy, không tạo muội than.",
+    keyFindings: "Nguy cơ cháy ngầm vô hình trong khoang kín: phản ứng oxy hóa bậc thấp vẫn giải phóng CO và chất độc hại dù không thấy lửa."
+  },
+  {
+    id: "cfi-g",
+    name: "CFI-G",
+    fullName: "Cool Flames Investigation with Gaseous Fuels",
+    fuelType: "gas",
+    fuelDetail: "Ethylene, Propane pha loãng khí trơ",
+    apparatus: "CIR / ACME",
+    chamber: "Combustion Integrated Rack",
+    pillars: ["prevention"],
+    o2Range: [21, 85],
+    airflowRange: [0, 30],
+    pressureRange: [7.3, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 4,
+    status: "placeholder",
+    ntrsId: "20210022542",
+    summary: "Khảo sát ngọn lửa mát với nhiên liệu thể khí trong buồng ACME với luồng nồng độ oxy cực cao (tới 85%).",
+    keyFindings: "Xác định ranh giới duy trì phản ứng nhiệt độ thấp trong môi trường giàu dưỡng khí (rich oxygen environments)."
+  },
+  {
+    id: "acme-bre",
+    name: "ACME BRE",
+    fullName: "Burning Rate Emulator",
+    fuelType: "gas",
+    fuelDetail: "Béc đốt xốp phẳng mô phỏng chất rắn bốc hơi",
+    apparatus: "CIR / ACME",
+    chamber: "Combustion Integrated Rack",
+    pillars: ["prevention", "suppression"],
+    o2Range: [15, 40],
+    airflowRange: [0, 10],
+    pressureRange: [7.0, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 5,
+    status: "placeholder",
+    ntrsId: "20210022542",
+    summary: "Mô phỏng tốc độ bốc hơi và cháy của vật liệu rắn trong không khí tĩnh và luồng khí đối lưu cực nhẹ bằng béc đốt xốp phẳng.",
+    keyFindings: "Vật liệu vẫn có thể duy trì cháy âm ỉ hàng chục phút trong môi trường hoàn toàn tĩnh nếu có nồng độ oxy cao."
+  },
+  {
+    id: "same",
+    name: "SAME / SAME-R",
+    fullName: "Smoke and Aerosol Measurement Experiment",
+    fuelType: "solid",
+    fuelDetail: "Dây điện quá nhiệt, vỏ bọc Teflon, mẫu vải Cotton",
+    apparatus: "MSG",
+    chamber: "Microgravity Science Glovebox",
+    pillars: ["detection"],
+    o2Range: [21, 21],
+    airflowRange: [0, 20],
+    pressureRange: [14.7, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 5,
+    status: "placeholder",
+    ntrsId: "20130000422",
+    summary: "Đo kích thước và sự phân bố mật độ hạt khói sinh ra từ sự cố quá nhiệt dây điện và vật liệu cabin trong vi trọng lực.",
+    keyFindings: "Hạt khói trong 0g nhỏ hơn đáng kể (<500 nm) so với Trái Đất do thiếu đối lưu nhiệt kết tụ; cảm biến quang điện truyền thống dễ báo động trễ."
+  },
+  {
+    id: "daft",
+    name: "DAFT / DAFT-2",
+    fullName: "Dust and Aerosol Measurement Feasibility Test",
+    fuelType: "aerosol",
+    fuelDetail: "Hạt khói và sol khí lơ lửng trong vi trọng lực",
+    apparatus: "P-Trak counter in MSG",
+    chamber: "Glovebox & cabin",
+    pillars: ["detection"],
+    o2Range: [21, 21],
+    airflowRange: [0, 10],
+    pressureRange: [14.7, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 4,
+    status: "placeholder",
+    ntrsId: "20050215648",
+    summary: "Đánh giá thiết bị đo hạt bụi siêu mịn P-Trak (từ thí nghiệm SAME) trong môi trường dài ngày trên trạm ISS.",
+    keyFindings: "Máy đếm hạt ngưng tụ siêu mịn phát hiện được tiền chất cháy trước khi mắt thường hoặc cảm biến khói tiêu chuẩn nhận biết được."
+  },
+  {
+    id: "saffire-1",
+    name: "Saffire I-III",
+    fullName: "Spacecraft Fire Safety Demonstration I–III",
+    fuelType: "solid",
+    fuelDetail: "Mẫu PMMA và SIBAL khổ lớn 0,4m × 1,0m",
+    apparatus: "Cygnus Cargo Vehicle",
+    chamber: "Khoang hàng Cygnus kín",
+    pillars: ["prevention", "detection", "suppression"],
+    o2Range: [15, 21],
+    airflowRange: [10, 30],
+    pressureRange: [14.7, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 5,
+    status: "placeholder",
+    ntrsId: "20170008805",
+    summary: "Thử nghiệm đốt cháy mẫu vật liệu kích thước thật trên tàu tiếp tế Cygnus tự hành sau khi tách khỏi ISS, trước khi tái nhập khí quyển.",
+    keyFindings: "Lửa quy mô lớn phát triển công suất nhiệt tới 10 kW; tốc độ suy giảm oxy trong khoang và sản sinh CO là mối đe dọa sinh tử."
+  },
+  {
+    id: "saffire-4",
+    name: "Saffire IV-VI",
+    fullName: "Spacecraft Fire Safety IV, V, VI",
+    fuelType: "solid",
+    fuelDetail: "Vải cabin, composite Nomex, mẫu vật liệu kỹ thuật",
+    apparatus: "Cygnus Cargo Vehicle",
+    chamber: "Khoang hàng Cygnus áp suất biến thiên",
+    pillars: ["prevention", "detection", "suppression"],
+    o2Range: [14, 28],
+    airflowRange: [10, 40],
+    pressureRange: [8.2, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 5,
+    status: "placeholder",
+    ntrsId: "20240002981",
+    summary: "Thử nghiệm cháy trong điều kiện khí quyển khám phá (áp suất thấp, tăng % oxy) và dập tắt bằng vòi phun chữa cháy tự động.",
+    keyFindings: "Xác nhận tính dễ cháy gia tăng mạnh trong khí quyển giảm áp (8.2 psi) dù % oxy chỉ tăng nhẹ; kiểm nghiệm hệ thống lọc khói hậu chữa cháy."
+  },
+  {
+    id: "luci",
+    name: "LUCI",
+    fullName: "Lunar Combustion Investigation",
+    fuelType: "solid",
+    fuelDetail: "Vật liệu polyme chuẩn mẫu phẳng",
+    apparatus: "Sounding Rocket (quay ly tâm)",
+    chamber: "Payload ly tâm tạo gia tốc",
+    pillars: ["prevention"],
+    o2Range: [21, 35],
+    airflowRange: [0, 15],
+    pressureRange: [10.2, 14.7],
+    gravityLevels: ["0.16g"],
+    habitatRelevance: 5,
+    status: "placeholder",
+    ntrsId: "20250010653",
+    summary: "Thí nghiệm bay tên lửa thăm dò tạo lực ly tâm tương đương trọng lực Mặt Trăng 0.16g trong hơn 25 giây.",
+    keyFindings: "Bằng chứng thực nghiệm đầu tiên xác nhận đối lưu nhiệt yếu ở 0.16g vẫn tạo luồng cấp oxy cục bộ, khiến lửa không tự ngạt như 0g."
+  },
+  {
+    id: "fm2",
+    name: "FM2",
+    fullName: "Fire and Materials in Microgravity (Lunar Mission)",
+    fuelType: "solid",
+    fuelDetail: "Vải cabin thế hệ mới, cách điện tàu đổ bộ Artemis",
+    apparatus: "Module hạ cánh Mặt Trăng tương lai",
+    chamber: "Khoang thử nghiệm tự hành",
+    pillars: ["prevention", "suppression"],
+    o2Range: [30, 34],
+    airflowRange: [0, 20],
+    pressureRange: [8.2, 10.2],
+    gravityLevels: ["0.16g"],
+    habitatRelevance: 5,
+    status: "placeholder",
+    ntrsId: "20240015307",
+    summary: "Dự án nghiên cứu khả năng bắt cháy của vật liệu trong khí quyển căn cứ Mặt Trăng (8.2 psi, 34% O₂). Đang chuẩn bị tích hợp dữ liệu vào PSI.",
+    keyFindings: "Đưa ra giả thuyết rằng giới hạn oxy bắt cháy cực tiểu (LOI) có thể rơi vào vùng nguy hiểm nhất ở gần mức trọng lực Mặt Trăng."
+  },
+  {
+    id: "sofie",
+    name: "SoFIE",
+    fullName: "Solid Fuel Ignition and Extinction",
+    fuelType: "solid",
+    fuelDetail: "PMMA dày, vải dệt đa lớp, màng mỏng",
+    apparatus: "CIR (Combustion Integrated Rack)",
+    chamber: "Buồng CIR cải tiến",
+    pillars: ["prevention", "suppression"],
+    o2Range: [15, 30],
+    airflowRange: [0, 25],
+    pressureRange: [10.2, 14.7],
+    gravityLevels: ["0g"],
+    habitatRelevance: 5,
+    status: "placeholder",
+    ntrsId: "20200000361",
+    summary: "Bộ 5 thí nghiệm đốt và dập vật liệu rắn thế hệ mới nhất trên CIR (chạy từ 2023). Khảo sát độ dày mẫu, hướng gió và vật liệu đa lớp.",
+    keyFindings: "Cung cấp số liệu cập nhật thay thế cho các tiêu chuẩn thử nghiệm 1g truyền thống, xây dựng dữ liệu nền cho chương trình Artemis."
+  }
+];
+
+
+const GLOSSARY=[["PSI", "Physical Sciences Informatics. Kho dữ liệu công khai của NASA về thí nghiệm khoa học vật lý, gồm cả cháy. Mỗi nghiên cứu có dữ liệu thô, dữ liệu đã xử lý, tài liệu, hình ảnh và danh sách công bố."], ["Investigation", "Một thí nghiệm hoặc dự án thí nghiệm trong PSI, ví dụ BASS. App của đội xoay quanh đơn vị này."], ["Vi trọng lực, 0g, 1g", "Vi trọng lực là gần như không có trọng lực, như trên ISS. 1g là trọng lực Trái Đất. Mặt Trăng khoảng 0,16g, Sao Hỏa khoảng 0,38g."], ["Partial gravity", "Trọng lực một phần, giữa 0g và 1g. PSI hiện chưa có dữ liệu cháy ở mức này."], ["ISS", "Trạm Vũ trụ Quốc tế, nơi chạy hầu hết các thí nghiệm trong đề."], ["O₂ (nồng độ oxy)", "Phần trăm oxy trong không khí. Không khí Trái Đất khoảng 21%. Oxy càng cao vật liệu càng dễ cháy."], ["psi", "Đơn vị áp suất. Mực nước biển là 14,7 psi."], ["Dòng khí (airflow)", "Tốc độ khí thổi qua mẫu cháy, tính bằng cm/s. Trong vi trọng lực không có đối lưu tự nhiên nên yếu tố này rất quan trọng."], ["LOI", "Limiting Oxygen Index. Mức oxy thấp nhất để lửa còn duy trì được. Olson (2004) nêu LOI ở 1g khoảng 16,5% O₂."], ["Prevention, Detection, Suppression", "Phòng ngừa, phát hiện, dập lửa. Ba trụ cột an toàn cháy của NASA."], ["BASS, BASS-II", "Burning and Suppression of Solids. Đốt vật liệu rắn như vải và nhựa, thử luồng khí và dập. Chạy trong Glovebox."], ["SPICE, SLICE", "Smoke Point In Co-flow Experiment và Structure and Liftoff In Combustion Experiment. Cùng BASS dùng chung khung dòng khí dựng cho SPICE."], ["Saffire", "Spacecraft Fire Safety Demonstration. Đốt mẫu lớn trên tàu hàng tiếp tế ISS, không có người bên cạnh."], ["SAME, SAME-R", "Smoke and Aerosol Measurement Experiment. Đo hạt khói để cải thiện cảm biến phát hiện cháy."], ["DAFT, DAFT-2", "Dust and Aerosol Measurement Feasibility Test. Dùng lại một thiết bị đo của SAME để đo bụi."], ["FLEX, FLEX-2", "Flame Extinguishment Experiment. Dập giọt lỏng đang cháy bằng cách pha loãng khí quyển với CO₂ hoặc heli."], ["CFI, CFI-G", "Cool Flames Investigation. CFI dùng giọt lỏng. CFI-G thuộc ACME, dùng khí, có luồng oxy tới 85%."], ["ACME", "Advanced Combustion via Microgravity Experiments. Sáu thí nghiệm lửa khí, cùng một bộ phần cứng module trong CIR."], ["BRE", "Burning Rate Emulator, thuộc ACME. Đốt khí nhưng nghiên cứu độ bắt cháy của vật liệu trong khí quyển tĩnh."], ["E-FIELD Flames", "Thí nghiệm ACME dùng điện trường tác động lên ion trong lửa, mô phỏng một phần hiệu ứng trọng lực."], ["CIR", "Combustion Integrated Rack. Tủ thí nghiệm cháy trên ISS."], ["MSG", "Microgravity Science Glovebox. Hộp găng tay kín để làm thí nghiệm trên ISS."], ["MDCA", "Multi-user Droplet Combustion Apparatus. Thiết bị đốt giọt lỏng trong CIR, dùng cho FLEX, FLEX-2 và CFI."], ["LUCI, FM2", "Hai thí nghiệm trọng lực Mặt Trăng. Đề kỳ vọng dữ liệu của chúng sẽ được thêm vào PSI sau. LUCI đã có kết quả công bố."], ["NTRS", "NASA Technical Reports Server. Kho báo cáo kỹ thuật công khai của NASA, có API."], ["SI", "Viết tắt “super intelligence” trong đề. Trong thực tế đội dùng AI và LLM."], ["RAG", "Retrieval-Augmented Generation. Tìm các đoạn tài liệu liên quan trước, rồi mới nhờ AI trả lời chỉ dựa trên các đoạn đó."], ["Chunk", "Đoạn tài liệu nhỏ, mỗi đoạn một ý, có id và nguồn để trích dẫn."], ["BM25", "Cách tìm theo từ khóa có trọng số. Tốt với thuật ngữ chính xác như BASS hay CIR."], ["Vector, embedding", "Cách tìm theo nghĩa. Tốt khi câu hỏi diễn đạt xa từ khóa."], ["RRF", "Reciprocal Rank Fusion. Gộp hai danh sách xếp hạng thành một."], ["Reranker", "Bước chấm lại các đoạn đã tìm được để giữ vài đoạn tốt nhất."], ["Coverage", "Mức bằng chứng đủ để trả lời: full, partial hoặc none."], ["Jev", "Model của TypeSafe AI chỉ chọn nhãn hoặc chấm điểm rất nhanh, không viết văn bản. Dùng làm bộ quyết định trong RAG."]];
+
+const API_BASE=location.protocol==='file:'?'http://127.0.0.1:8000':'';
+const OUTSIDE_PSI=new Set(['saffire-4','luci','fm2','sofie']);
+const CATALOG=INVESTIGATIONS.map(i=>({...i,status:'placeholder',sourceScope:OUTSIDE_PSI.has(i.id)?'outside_psi':'psi_demo'}));
+const PSI=CATALOG.filter(i=>i.sourceScope==='psi_demo');
+const SCENARIOS={moon_base:{label:'Căn cứ Mặt Trăng',o2:30,pressure:10.2,gravity:.16},iss:{label:'ISS',o2:21,pressure:14.7,gravity:0},suit:{label:'Bộ đồ du hành',o2:100,pressure:4.3,gravity:null},earth:{label:'Trái Đất',o2:21,pressure:14.7,gravity:1}};
+const QUESTIONS=['FLEX dập lửa bằng cách nào?','Saffire-III khác Saffire-I thế nào về dòng khí?','Có dữ liệu cháy ở trọng lực Mặt Trăng trong PSI không?','Vải này dùng trong rover 30% O₂ có an toàn không?','Thời tiết Houston hôm nay?'];
+const DEFAULT_WEIGHTS={fuel:.25,o2:.25,flow:.15,description:.15,pressure:.1,gravity:.1};
+let weights={...DEFAULT_WEIGHTS},selected=new Set(['bass-ii','saffire-1','flex-2']),sourceElements=new Map(),pending=false;
+const $=id=>document.getElementById(id);
+function node(t,text,cls){const e=document.createElement(t);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e;}
+function tag(text,cls=''){return node('span',text,'tag '+cls);}
+function rangeText(a,unit=''){if(!Array.isArray(a)||a.some(x=>x==null))return 'Chưa rõ';return(a[0]===a[1]?a[0]:a.join('–'))+(unit?' '+unit:'');}
+function openTab(name,focus=false){
+ if(!['ask','brief','map','compare','glossary'].includes(name))name='ask';
+ document.querySelectorAll('[data-tab]').forEach(b=>{const active=b.dataset.tab===name;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;$('pane-'+b.dataset.tab).hidden=!active;if(active&&focus)b.focus();});
+ history.replaceState(null,'','#'+name);
+}
+document.querySelectorAll('[data-tab]').forEach((b,i,buttons)=>{b.addEventListener('click',()=>openTab(b.dataset.tab));b.addEventListener('keydown',e=>{let n;if(e.key==='ArrowRight')n=(i+1)%buttons.length;if(e.key==='ArrowLeft')n=(i+buttons.length-1)%buttons.length;if(e.key==='Home')n=0;if(e.key==='End')n=buttons.length-1;if(n!=null){e.preventDefault();openTab(buttons[n].dataset.tab,true);}});});
+async function health(){
+ $('connection-text').textContent='Đang kết nối…';
+ try{const r=await fetch(API_BASE+'/api/health',{signal:AbortSignal.timeout(4000)});if(!r.ok)throw Error();const d=await r.json();$('connection-dot').className='dot online';$('connection-text').textContent=d.llm?'Đã kết nối · Có LLM':'Đã kết nối · Chỉ truy xuất';$('connection-text').title=d.chunks+' đoạn trong kho';}
+ catch{$('connection-dot').className='dot offline';$('connection-text').textContent='Chưa kết nối máy chủ';}
+}
+$('reconnect').addEventListener('click',health);
+async function loadScenarios(){try{const r=await fetch(API_BASE+'/api/scenarios',{signal:AbortSignal.timeout(4000)});if(!r.ok)return;Object.entries(await r.json()).forEach(([id,v])=>{const o=node('option',v.label);o.value=id;$('ask-scenario').append(o);});}catch{/* Asking without a scenario remains available. */}}
+QUESTIONS.forEach((q,i)=>{const b=node('button',null,'sample');b.type='button';b.append(node('span',String(i+1).padStart(2,'0')),node('span',q));b.addEventListener('click',()=>{$('ask-input').value=q;$('ask-input').focus();});$('samples').append(b);});
+function sourceUrl(raw){
+ if(typeof raw!=='string')return null;
+ if(/^https?:\/\//i.test(raw)){try{const u=new URL(raw);return ['http:','https:'].includes(u.protocol)?u.href:null;}catch{return null;}}
+ if(/^[^\/:?#]+(?:#[^\s]*)?$/.test(raw)){const [name,anchor]=raw.split('#');return API_BASE+'/sources/'+encodeURIComponent(name)+(anchor?'#'+encodeURIComponent(anchor):'');}
+ return null;
+}
+function highlightSource(id){const el=sourceElements.get(id);if(!el)return;sourceElements.forEach(e=>e.classList.remove('highlight'));el.open=true;el.classList.add('highlight');el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'});el.querySelector('summary').focus({preventScroll:true});}
+function renderSources(chunks,cited){
+ sourceElements=new Map();$('sources').replaceChildren();$('source-count').textContent=chunks.length+' đoạn';
+ if(!chunks.length){$('sources').append(node('div','Không có đoạn nguồn cho câu trả lời này.','empty'));return;}
+ const statuses={'source-text':'Từ Playbook · chưa xác minh độc lập','link-confirmed':'Link có thật · số liệu chưa được xác minh','needs-check':'Cần đối chiếu nguồn','unconfirmed':'Nguồn chưa xác nhận','verified':'Đã gắn nhãn kiểm chứng trong kho','unverified':'Chưa kiểm chứng','placeholder':'Dữ liệu minh họa'};
+ chunks.forEach((c,i)=>{const item=node('details',null,'source-item');item.open=i===0&&cited.has(c.id);const title=node('summary');title.append(node('b','['+(i+1)+'] '+(c.heading||c.sourceRef?.title||'Đoạn tài liệu')),node('span',statuses[c.status]||'Trạng thái chưa rõ','source-status'));const content=node('div',null,'source-content');content.append(node('p',c.text||''),node('code',c.id));const url=sourceUrl(c.sourceRef?.url);if(url){const a=node('a','Mở tài liệu ↗');a.href=url;a.target='_blank';a.rel='noopener noreferrer';content.append(node('br'),a);}item.append(title,content);$('sources').append(item);sourceElements.set(c.id,item);});
+}
+function renderAnswer(d){
+ if(!d?.answer||!Array.isArray(d.answer.segments)||!Array.isArray(d.chunks))throw Error('Phản hồi chưa đúng định dạng. Hãy thử lại.');
+ $('result').hidden=false;$('result-meta').replaceChildren();$('answer-body').replaceChildren();
+ const coverage={full:'Theo kho: đủ',partial:'Theo kho: một phần',none:'Theo kho: chưa đủ'},modes={full:'Có LLM',retrieval_only:'Chỉ truy xuất',cached:'Từ bộ nhớ đệm',refusal:'Từ chối trả lời'};
+ $('result-meta').append(tag(coverage[d.answer.coverage]||coverage.none,d.answer.coverage==='full'?'blue':'orange'),tag(modes[d.meta?.mode]||'Kết quả từ backend'),tag((d.meta?.latencyMs??'—')+' ms'));
+ const ids=new Map(d.chunks.map((c,i)=>[c.id,i+1])),cited=new Set();
+ d.answer.segments.forEach(seg=>{const p=node('p',seg.text||'',seg.system?'system-note':'');(seg.citations||[]).forEach(id=>{if(!ids.has(id))return;cited.add(id);const b=node('button','['+ids.get(id)+']','cite');b.type='button';b.setAttribute('aria-label','Xem nguồn '+ids.get(id));b.addEventListener('click',()=>highlightSource(id));p.append(b);});$('answer-body').append(p);});
+ const missing=Array.isArray(d.answer.missing)?d.answer.missing.filter(m=>typeof m==='string'):[];$('missing-box').hidden=!missing.length;$('missing-box').textContent=missing.length?'Thông tin còn thiếu: '+missing.join('; '):'';renderSources(d.chunks,cited);
+}
+$('ask-form').addEventListener('submit',async e=>{
+ e.preventDefault();const q=$('ask-input').value.trim();if(q.length<2||pending)return;
+ pending=true;$('ask-submit').disabled=true;$('ask-submit').textContent='Đang tìm…';$('ask-form').setAttribute('aria-busy','true');$('request-status').textContent='Đang tìm trong kho tài liệu…';$('request-error').hidden=true;$('result').hidden=true;$('sources').replaceChildren(node('div','Đang tìm đoạn nguồn…','empty'));$('source-count').textContent='—';
+ try{const r=await fetch(API_BASE+'/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,mode:$('ask-mode').value,scenarioId:$('ask-scenario').value||null}),signal:AbortSignal.timeout(20000)});
+ if(!r.ok)throw Error(r.status===429?'Bạn đã hỏi quá nhanh. Hãy thử lại sau một phút.':r.status===422?'Câu hỏi cần từ 2 đến 500 ký tự.':'Máy chủ chưa xử lý được câu hỏi (HTTP '+r.status+'). Hãy thử lại.');
+ renderAnswer(await r.json());$('request-status').textContent='Đã nhận kết quả từ máy chủ.';$('connection-dot').className='dot online';health();
+ }catch(err){$('result').hidden=true;$('request-error').className='error';$('request-error').hidden=false;$('request-error').textContent=err.name==='TimeoutError'?'Máy chủ trả lời quá lâu. Hãy thử lại.':err instanceof TypeError?'Không kết nối được máy chủ. Khởi động máy chủ rồi bấm tìm lại.':err.message;$('request-status').textContent='Chưa có kết quả cho câu hỏi này.';renderSources([],new Set());health();}
+ finally{pending=false;$('ask-submit').disabled=false;$('ask-submit').textContent='Tìm câu trả lời →';$('ask-form').setAttribute('aria-busy','false');}
+});
+
+function proximity(target,a,scale){if(target==null||!Array.isArray(a)||a.some(x=>x==null))return null;return target>=a[0]&&target<=a[1]?1:Math.max(0,1-Math.min(Math.abs(target-a[0]),Math.abs(target-a[1]))/scale);}
+function rank(inv,sc){
+ const parts={fuel:inv.fuelType==='solid'?1:.25,o2:proximity(sc.o2,inv.o2Range,100),flow:null,pressure:proximity(sc.pressure,inv.pressureRange,15),gravity:sc.gravity==null?null:inv.gravityLevels.includes(sc.gravity+'g')?1:null,description:inv.habitatRelevance==null?null:inv.habitatRelevance/5};
+ let total=0,used=0;Object.entries(parts).forEach(([key,value])=>{if(value!=null){total+=weights[key]*value;used+=weights[key];}});return {score:used?total/used:null,parts};
+}
+function invCard(inv,res){
+ const card=node('article',null,'card investigation'),head=node('div',null,'row'),title=node('div');title.append(node('h3',inv.name),tag('Minh họa · chưa kiểm chứng','orange'));head.append(title);
+ if(res){const score=node('div',res.score==null?'Chưa tính điểm':Math.round(res.score*100)+'/100','score');score.append(node('small','Điểm phù hợp minh họa'));head.append(score);}
+ card.append(head,node('p',inv.summary));const meta=node('div',null,'tags');meta.append(tag(rangeText(inv.o2Range,'% O₂')),tag(rangeText(inv.airflowRange,'cm/s')),tag(rangeText(inv.pressureRange,'psi')));card.append(meta);
+ const details=node('details',null,'detail');details.append(node('summary','Chi tiết & nguồn tham khảo'));const body=node('div',null,'detail-body');body.append(node('p',inv.fullName),node('p','Thiết bị: '+inv.apparatus),node('p',inv.keyFindings));
+ if(res){const labels={fuel:'Nhiên liệu',o2:'O₂',flow:'Luồng khí',description:'Liên quan mô tả',pressure:'Áp suất',gravity:'Trọng lực'};body.append(node('p',Object.entries(res.parts).map(([k,v])=>labels[k]+': '+(v==null?'chưa rõ':Math.round(v*100)+'/100')).join(' · ')));}
+ if(inv.ntrsId){const a=node('a','Xem tài liệu tham khảo ↗');a.href='https://ntrs.nasa.gov/citations/'+encodeURIComponent(inv.ntrsId);a.target='_blank';a.rel='noopener noreferrer';body.append(a);}details.append(body);card.append(details);return card;
+}
+function renderCatalog(){
+ const sc=SCENARIOS[$('mission-scenario').value],q=$('investigation-search').value.trim().toLocaleLowerCase('vi');
+ const rows=PSI.filter(i=>(i.name+' '+i.summary+' '+i.fuelDetail+' '+i.apparatus).toLocaleLowerCase('vi').includes(q)).map(i=>({inv:i,res:rank(i,sc)})).sort((a,b)=>(b.res.score??-1)-(a.res.score??-1));
+ $('ranked-list').replaceChildren(...rows.map(i=>invCard(i.inv,i.res)));$('catalog-count').textContent=rows.length+' hồ sơ minh họa · '+sc.o2+'% O₂ · '+sc.pressure+' psi · '+(sc.gravity==null?'chưa đặt trọng lực':sc.gravity+'g')+($('mission-scenario').value==='moon_base'?' (ví dụ tại biên điều kiện trong Playbook)':'');if(!rows.length)$('ranked-list').append(node('p','Không tìm thấy hồ sơ phù hợp.','muted'));
+}
+Object.entries(SCENARIOS).forEach(([id,sc])=>{const o=node('option',sc.label);o.value=id;$('mission-scenario').append(o);});
+const WEIGHT_LABELS={fuel:'Loại nhiên liệu',o2:'Nồng độ O₂',flow:'Luồng khí',description:'Liên quan mô tả',pressure:'Áp suất',gravity:'Trọng lực'};
+Object.entries(WEIGHT_LABELS).forEach(([key,label])=>{const l=node('label',label),out=node('output',weights[key].toFixed(2)),input=node('input');out.id='weight-output-'+key;input.type='range';input.id='weight-'+key;input.min='0';input.max='1';input.step='.05';input.value=weights[key];input.setAttribute('aria-label','Trọng số '+label);if(key==='flow'){input.disabled=true;input.title='Chưa có mục tiêu luồng khí cho kịch bản';}input.addEventListener('input',()=>{weights[key]=Number(input.value);out.value=weights[key].toFixed(2);renderCatalog();});l.append(out,input);$('weights').append(l);});
+$('reset-weights').addEventListener('click',()=>{weights={...DEFAULT_WEIGHTS};Object.keys(weights).forEach(k=>{$('weight-'+k).value=weights[k];$('weight-output-'+k).value=weights[k].toFixed(2);});renderCatalog();});
+$('mission-scenario').addEventListener('change',renderCatalog);$('investigation-search').addEventListener('input',renderCatalog);
+CATALOG.filter(i=>i.sourceScope==='outside_psi').forEach(i=>$('external-list').append(invCard(i)));
+function renderMap(){
+ const axis=$('map-axis').value,ys=axis==='airflow'?[0,1,5,10,20,40]:[4.3,8.2,10.2,14.7],xs=[15,21,25,30,34,50,85,100];$('evidence-map').querySelectorAll('thead,tbody').forEach(n=>n.remove());
+ const head=node('thead'),hr=node('tr');hr.append(node('th',axis==='airflow'?'cm/s ↓ · O₂ →':'psi ↓ · O₂ →'));xs.forEach(x=>hr.append(node('th',x+'%')));head.append(hr);const body=node('tbody');
+ ys.forEach(y=>{const row=node('tr');row.append(node('th',String(y)));xs.forEach(x=>{const matches=PSI.filter(i=>x>=i.o2Range[0]&&x<=i.o2Range[1]&&y>=(axis==='airflow'?i.airflowRange:i.pressureRange)[0]&&y<=(axis==='airflow'?i.airflowRange:i.pressureRange)[1]);
+ const td=node('td'),b=node('button',matches.length||'—','map-cell'+(matches.length?' has-data':'')+(x>=30&&x<=40?' target':''));b.type='button';b.setAttribute('aria-label',x+'% oxy, '+y+' '+(axis==='airflow'?'cm/s':'psi')+': '+matches.length+' hồ sơ minh họa');b.addEventListener('click',()=>{$('map-selection').hidden=false;$('map-selection').textContent=x+'% O₂ · '+y+' '+(axis==='airflow'?'cm/s':'psi')+' — '+(matches.length?matches.map(i=>i.name).join(', '):'Chưa có hồ sơ minh họa bao phủ ô này.')+' Đây không phải xác nhận một test đã chạy tại tổ hợp điều kiện này.';});td.append(b);row.append(td);});body.append(row);});$('evidence-map').append(head,body);$('map-selection').hidden=true;
+}
+$('map-axis').addEventListener('change',renderMap);
+function renderCompare(){
+ const chosen=PSI.filter(i=>selected.has(i.id));document.querySelectorAll('#compare-picker input').forEach(c=>{c.checked=selected.has(c.value);c.disabled=!c.checked&&selected.size>=4;});$('compare-status').textContent='Đã chọn '+selected.size+'/4'+(selected.size<2?' · Chọn ít nhất 2 để so sánh.':' · Tất cả thông số chưa kiểm chứng.');$('compare-table-wrap').hidden=chosen.length<2;document.querySelectorAll('[data-export]').forEach(b=>b.disabled=chosen.length<2);
+ const head=node('thead'),hr=node('tr');hr.append(node('th','Thông số'));chosen.forEach(i=>hr.append(node('th',i.name)));head.append(hr);const body=node('tbody');
+ [['Nhiên liệu',i=>i.fuelDetail],['Thiết bị',i=>i.apparatus],['O₂',i=>rangeText(i.o2Range,'%')],['Luồng khí',i=>rangeText(i.airflowRange,'cm/s')],['Áp suất',i=>rangeText(i.pressureRange,'psi')],['Trọng lực',i=>i.gravityLevels.join(', ')],['Trạng thái',()=> 'Minh họa · chưa kiểm chứng']].forEach(([label,get])=>{const row=node('tr');row.append(node('th',label));chosen.forEach(i=>row.append(node('td',get(i))));body.append(row);});$('compare-table').replaceChildren(head,body);
+}
+PSI.forEach(i=>{const label=node('label'),input=node('input');input.type='checkbox';input.value=i.id;input.addEventListener('change',()=>{if(input.checked&&selected.size<4)selected.add(i.id);else selected.delete(i.id);renderCompare();});label.append(input,document.createTextNode(' '+i.name));$('compare-picker').append(label);});
+function download(content,name,type){const url=URL.createObjectURL(new Blob([content],{type})),a=node('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function exportSelected(kind){
+ const items=PSI.filter(i=>selected.has(i.id));if(items.length<2)return;const note='DỮ LIỆU MINH HỌA CHƯA KIỂM CHỨNG. Không dùng để kết luận an toàn.';
+ if(kind==='json')download(JSON.stringify({title:'Flame in Freefall — UI demo',status:'placeholder',note,investigations:items},null,2),'flame-demo-selected.json','application/json');
+ if(kind==='csv'){const fields=['id','name','fuelType','o2_min_pct','o2_max_pct','airflow_min_cm_s','airflow_max_cm_s','pressure_min_psi','pressure_max_psi','status','sourceScope','note'],rows=items.map(i=>[i.id,i.name,i.fuelType,...i.o2Range,...i.airflowRange,...i.pressureRange,'placeholder',i.sourceScope,note]);const csv=[fields,...rows].map(row=>row.map(x=>'"'+String(x??'').replaceAll('"','""')+'"').join(',')).join('\r\n');download('\ufeff'+csv,'flame-demo-selected.csv','text/csv;charset=utf-8');}
+ if(kind==='card')download(note+'\n\n'+items.map(i=>i.name+'\n'+i.summary+'\nO₂: '+rangeText(i.o2Range,'%')+'; Luồng khí: '+rangeText(i.airflowRange,'cm/s')+'; Áp suất: '+rangeText(i.pressureRange,'psi')+'\nNguồn tham khảo chưa đối chiếu: '+(i.ntrsId?'https://ntrs.nasa.gov/citations/'+i.ntrsId:'chưa rõ')).join('\n\n'),'flame-demo-data-card.txt','text/plain;charset=utf-8');
+ if(kind==='notebook'){const nb={nbformat:4,nbformat_minor:5,metadata:{kernelspec:{display_name:'Python 3',language:'python',name:'python3'}},cells:[{id:'notice',cell_type:'markdown',metadata:{},source:['# Flame in Freefall\n',note+'\n','Tải JSON của các mục đã chọn, đặt cạnh notebook rồi chạy ô dưới.']},{id:'load',cell_type:'code',metadata:{},execution_count:null,outputs:[],source:['import json\n','from pathlib import Path\n',"data = json.loads(Path('flame-demo-selected.json').read_text(encoding='utf-8'))\n","assert data['status'] == 'placeholder'\n","[(i['name'], i['o2Range']) for i in data['investigations']]"]}]};download(JSON.stringify(nb,null,2),'flame-demo-analysis.ipynb','application/x-ipynb+json');}
+}
+document.querySelectorAll('[data-export]').forEach(b=>b.addEventListener('click',()=>exportSelected(b.dataset.export)));
+function renderGlossary(){const q=$('glossary-search').value.toLocaleLowerCase('vi').trim(),rows=GLOSSARY.filter(g=>g.join(' ').toLocaleLowerCase('vi').includes(q));$('glossary-list').replaceChildren(...rows.map(([term,meaning])=>{const c=node('article',null,'card');c.append(node('h3',term),node('p',meaning));return c;}));if(!rows.length)$('glossary-list').append(node('p','Không tìm thấy thuật ngữ.','muted'));}
+$('glossary-search').addEventListener('input',renderGlossary);
+openTab(location.hash.slice(1)||'ask');renderCatalog();renderMap();renderCompare();renderGlossary();health();loadScenarios();
+</script></body></html>

@@ -1,0 +1,151 @@
+{
+ "recall@5": 1.0,
+ "mrr": 0.813,
+ "refusal_accuracy": 1.0,
+ "rows": [
+  {
+   "q": "What is Saffire-II used to test in low gravity?",
+   "kind": "retrieval",
+   "rank": 2,
+   "ok": true
+  },
+  {
+   "q": "How does FLEX extinguish fire?",
+   "kind": "retrieval",
+   "rank": 2,
+   "ok": true
+  },
+  {
+   "q": "Which experiment measures smoke and aerosols to improve fire detection sensors?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Which experiment has an oxygen flow up to 85%?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Which experiment uses electric fields to simulate partial gravity?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "What does CIR stand for?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "What kind of device is MDCA?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "What is the spacesuit pressure in psi?",
+   "kind": "retrieval",
+   "rank": 2,
+   "ok": true
+  },
+  {
+   "q": "What are the expected oxygen concentration and pressure for the lunar base?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "What is RRF used for?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "How long is the timeout when calling the LLM?",
+   "kind": "retrieval",
+   "rank": 5,
+   "ok": true
+  },
+  {
+   "q": "When does the hackathon start?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "What does the server-side citation validator do?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "What does the app do when the LLM fails?",
+   "kind": "retrieval",
+   "rank": 4,
+   "ok": true
+  },
+  {
+   "q": "How does Saffire-III differ from Saffire-I regarding airflow?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "What does LOI mean?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "Is NASA data called directly at runtime?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "What is the Recall@5 target?",
+   "kind": "retrieval",
+   "rank": 1,
+   "ok": true
+  },
+  {
+   "q": "What is BM25 good at?",
+   "kind": "retrieval",
+   "rank": 2,
+   "ok": true
+  },
+  {
+   "q": "How does rocket fuel burn?",
+   "kind": "refuse",
+   "reason": "off_topic",
+   "ok": true
+  },
+  {
+   "q": "What is the weather in Houston today?",
+   "kind": "refuse",
+   "reason": "off_topic",
+   "ok": true
+  },
+  {
+   "q": "Is there combustion data in lunar gravity?",
+   "kind": "refuse",
+   "reason": "no_data_gap",
+   "ok": true
+  },
+  {
+   "q": "Is this fabric safe for use in a 30% O₂ rover?",
+   "kind": "refuse",
+   "reason": "safety_verdict",
+   "ok": true
+  },
+  {
+   "q": "Materials that pass the 1g test are safe on the Moon",
+   "kind": "refuse",
+   "reason": "no_data_gap",
+   "ok": true
+  }
+ ]
+}
