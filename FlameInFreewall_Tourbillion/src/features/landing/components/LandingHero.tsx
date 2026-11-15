@@ -4,9 +4,10 @@
  * LandingHero Component
  * StructPaper light aesthetic with Space Apps Electric Lime (#D4FC02) accents
  * and clean typography directing users into the research modules.
+ * Features a sticky navigation bar with scroll-reactive translucency and backdrop-blur-sm.
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Flame,
@@ -19,8 +20,20 @@ import {
 } from 'lucide-react';
 
 export const LandingHero: React.FC = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 32);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <section className="relative w-full overflow-hidden bg-[#F8F9FA]" data-testid="landing-hero">
+    <section className="relative w-full overflow-hidden bg-[#F8F9FA] font-sans" data-testid="landing-hero">
       {/* Top Space Apps Announcement Banner */}
       <div
         data-testid="announcement-banner"
@@ -28,7 +41,7 @@ export const LandingHero: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-zinc-950 text-[#D4FC02] px-2.5 py-0.5 text-xs font-black uppercase tracking-wider">
+            <span className="inline-flex items-center rounded-full bg-zinc-950 text-[#D4FC02] px-2.5 py-0.5 text-xs font-black uppercase tracking-wider font-mono">
               Space Apps 2026
             </span>
             <span className="font-bold text-zinc-950">
@@ -48,24 +61,28 @@ export const LandingHero: React.FC = () => {
         </div>
       </div>
 
-      {/* Space Apps Navigation Bar */}
+      {/* Space Apps Navigation Bar - Sticky with scroll-reactive translucency and backdrop-blur-sm */}
       <nav
         data-testid="landing-navbar"
-        className="sticky top-0 z-40 w-full border-b border-gray-200 bg-[#0B2374]/80 backdrop-blur-md shadow-xs"
+        className={`sticky top-0 z-50 w-full transition-all duration-300 border-b ${
+          isScrolled
+            ? 'bg-[#0B2374]/85 backdrop-blur-sm border-white/10 shadow-md h-14'
+            : 'bg-[#0B2374] border-gray-200/40 shadow-xs h-16'
+        }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
           {/* Logo & Space Apps Identity */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#D4FC02] to-[#4CC9F0] p-0.5 flex items-center justify-center shadow-md shadow-[#D4FC02]/20 group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-[#D4FC02] to-[#4CC9F0] p-0.5 flex items-center justify-center shadow-md shadow-[#D4FC02]/20 group-hover:scale-105 transition-transform">
               <div className="w-full h-full bg-[#0B2374] rounded-[10px] flex items-center justify-center">
-                <Flame className="w-5 h-5 text-[#D4FC02]" />
+                <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-[#D4FC02]" />
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-base tracking-tight text-white flex items-center gap-1.5">
+              <span className="font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
                 FlameGuard <span className="text-[#D4FC02]">AI</span>
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-200">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-200 font-mono">
                 NASA Space Apps 2026
               </span>
             </div>
@@ -86,7 +103,7 @@ export const LandingHero: React.FC = () => {
               Earth Spinoffs
             </a>
             <a href="#mission-modules" className="hover:text-[#D4FC02] transition-colors">
-              Workspace
+              Research Workspace
             </a>
             <Link href="/explorer" className="hover:text-[#D4FC02] transition-colors">
               PSI Studies
@@ -97,10 +114,10 @@ export const LandingHero: React.FC = () => {
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#D4FC02] hover:bg-[#c3e802] text-zinc-950 text-xs sm:text-sm font-bold shadow-xs hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-2xl bg-[#D4FC02] hover:bg-[#c3e802] text-zinc-950 text-xs sm:text-sm font-bold shadow-xs hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <span>Launch Console</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
@@ -131,8 +148,8 @@ export const LandingHero: React.FC = () => {
           {/* Subheading */}
           <p className="text-base sm:text-lg md:text-xl text-zinc-600 max-w-2xl mx-auto leading-relaxed mb-10">
             Evidence-first intelligence platform synthesizing 20 NASA Physical Sciences Informatics
-            (PSI) microgravity investigations. Uncover why flames burn spherical and blue in freefall,
-            and resolve the lethal flammability paradox of lunar exploration habitats.
+            (PSI) investigations. Discover why flames burn spherical and blue in freefall,
+            and resolve the lethal flammability paradox of exploration habitats.
           </p>
 
           {/* Action Buttons */}
@@ -166,18 +183,18 @@ export const LandingHero: React.FC = () => {
           {/* Telemetry Highlight Badges in StructPaper Light Cards */}
           <div className="mt-14 w-full grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-left">
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-blue-700 text-xs font-bold uppercase mb-1">
+              <div className="flex items-center gap-1.5 text-[#0B2374] text-xs font-bold uppercase mb-1 font-mono">
                 <Activity className="w-3.5 h-3.5 text-[#0B2374]" />
                 <span>PSI Archive</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
                 20 Studies
               </div>
-              <p className="text-xs text-zinc-500 mt-1">BASS, ACME, FLEX, SoFIE flight tests</p>
+              <p className="text-xs text-zinc-500 mt-1">BASS, ACME, CIR, SoFIE flight logs</p>
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-amber-600 text-xs font-bold uppercase mb-1">
+              <div className="flex items-center gap-1.5 text-amber-600 text-xs font-bold uppercase mb-1 font-mono">
                 <Flame className="w-3.5 h-3.5 text-amber-500" />
                 <span>Test Runs</span>
               </div>
@@ -188,7 +205,7 @@ export const LandingHero: React.FC = () => {
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-purple-700 text-xs font-bold uppercase mb-1">
+              <div className="flex items-center gap-1.5 text-purple-700 text-xs font-bold uppercase mb-1 font-mono">
                 <Compass className="w-3.5 h-3.5 text-purple-600" />
                 <span>Physics Model</span>
               </div>
@@ -199,14 +216,14 @@ export const LandingHero: React.FC = () => {
             </div>
 
             <div className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all">
-              <div className="flex items-center gap-1.5 text-rose-600 text-xs font-bold uppercase mb-1">
+              <div className="flex items-center gap-1.5 text-rose-600 text-xs font-bold uppercase mb-1 font-mono">
                 <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
                 <span>Exploration Gap</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
                 0 &lt; g &lt; 1
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Lunar &amp; Mars flammability paradox</p>
+              <p className="text-xs text-zinc-500 mt-1">Lunar &amp; Mars low-g flammability void</p>
             </div>
           </div>
         </div>

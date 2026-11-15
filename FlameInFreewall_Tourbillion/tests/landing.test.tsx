@@ -40,7 +40,7 @@ describe('Kurzgesagt Art Style Landing Page (/)', () => {
       render(<LandingHero />);
       const navbar = screen.getByTestId('landing-navbar');
       expect(navbar).toBeDefined();
-      expect(navbar.className).toContain('bg-[#0B2374]/80');
+      expect(navbar.className).toContain('bg-[#0B2374]');
       expect(screen.getByText('FlameGuard')).toBeDefined();
       expect(screen.getByText('Flame Physics (0g vs 1g)')).toBeDefined();
       expect(screen.getByText('Lunar Flammability Paradox')).toBeDefined();
