@@ -2,11 +2,12 @@
 
 /**
  * TerrestrialSpinoffsSection Component
+ * Synchronized with StructPaper light & Kurzgesagt scientific aesthetic.
  * Highlights the translation of NASA microgravity combustion research into life-saving
  * next-generation safety systems and commercial spinoff technologies on Earth:
- * 1. Zero-Leak High-Pressure Water Mist Valves (EV Battery vaults & Data Centers)
- * 2. Early Optical Smoke Sensors (Low-convection underground mines & secure storage)
- * 3. Next-Gen Firefighter Breathing Apparatus & Thermal Textiles (Urban & wildland first responders)
+ * 1. Zero-Leak High-Pressure Water Mist Extinguishing Valves (EV Battery vaults & Data Centers)
+ * 2. Early Optical Smoke Sensors for Low-Convection Regimes (Deep underground mining & nuclear storage)
+ * 3. Next-Gen Lightweight SCBA & Flashover-Resistant Textiles (Urban & wildland first responders)
  */
 
 import React from 'react';
@@ -19,7 +20,6 @@ import {
   CheckCircle2,
   ArrowRight,
   Sparkles,
-  Flame,
   Activity,
 } from 'lucide-react';
 
@@ -28,7 +28,7 @@ interface TerrestrialSpinoff {
   number: string;
   category: string;
   title: string;
-  englishTitle: string;
+  subtitle: string;
   heritageSource: string;
   environment: string;
   description: string;
@@ -41,55 +41,55 @@ const SPINOFFS: TerrestrialSpinoff[] = [
   {
     id: 'water-mist',
     number: '01',
-    category: 'PCCC Pin Lithium & Trung Tâm Dữ Liệu',
-    title: 'Van Phun Sương Áp Suất Cao Không Dẫn Điện',
-    englishTitle: 'Zero-Leak High-Pressure Water Mist Extinguishing Valve',
+    category: 'EV Batteries & Mission-Critical Infrastructure',
+    title: 'Zero-Leak High-Pressure Water Mist Valve',
+    subtitle: 'Micro-Droplet Heat Sink for Lithium Thermal Runaway',
     heritageSource: 'NASA CIR / FLEX Droplet Extinction Research',
-    environment: 'Kho lưu trữ pin xe điện (EV Lithium-ion), Tàu ngầm & Data Centers',
+    environment: 'EV Lithium-Ion Battery Storage, Naval Submarines & Hyperscale Data Centers',
     description:
-      'Nghiên cứu dập lửa giọt chất lỏng trong vi trọng lực đã chứng minh kích thước giọt nước < 50 micron có khả năng hấp thụ nhiệt gấp 7 lần so với vòi phun thông thường. Công nghệ van áp suất cao tạo màn sương vi mô bốc hơi tức thì, dập tắt quá trình thoát nhiệt (thermal runaway) của pin lithium mà không gây ngập nước hay chập cháy linh kiện máy chủ.',
-    primaryMetric: { value: '-90%', label: 'Lượng nước tiêu thụ' },
-    secondaryMetric: { value: '0.00%', label: 'Rủi ro rò rỉ dẫn điện' },
+      'Microgravity liquid droplet investigations demonstrated that micro-droplets under 50 microns achieve 7x higher thermal absorption surface area than conventional deluge systems. High-pressure rapid-flash nozzles vaporize instantly upon touching the flame front, suppressing thermal runaway in high-voltage lithium battery packs without water logging or causing dielectric short-circuit arcing.',
+    primaryMetric: { value: '-90%', label: 'Water Volume Required' },
+    secondaryMetric: { value: '0.00%', label: 'Dielectric Conductivity Risk' },
     features: [
-      'Dập tắt đám cháy pin lithium dưới 45 giây',
-      'An toàn tuyệt đối cho thiết bị điện hạ thế và cao thế',
-      'Được kiểm chuẩn cho không gian kín áp suất cao',
+      'Suppresses thermal runaway in battery racks within 45 seconds',
+      'Zero electrical conductivity hazard for high-voltage server racks',
+      'Certified for hermetically sealed, high-pressure environments',
     ],
   },
   {
     id: 'smoke-sensor',
     number: '02',
-    category: 'Cảm Biến Khói Không Đối Lưu',
-    title: 'Cảm Biến Khói Quang Học Phát Hiện Hạt Muội Sớm',
-    englishTitle: 'Early Optical Smoke Detection for Low-Convection Regimes',
+    category: 'Stagnant-Air Early Warning Systems',
+    title: 'Early Optical Smoke Sensor for Low-Convection Regimes',
+    subtitle: 'Multi-Wavelength Nano-Soot Particulate Discrimination',
     heritageSource: 'NASA SAME (Spacecraft Atmosphere Monitor Experiments)',
-    environment: 'Hầm mỏ ngầm sâu, Kho vật liệu hạt nhân, Phòng máy bay kín',
+    environment: 'Deep Underground Mining Shafts, Nuclear Material Archives & Cargo Aircraft',
     description:
-      'Trên mặt đất, cảm biến khói thông thường phụ thuộc vào luồng khí nóng đối lưu bốc lên trần nhà. Trong hầm mỏ sâu hoặc phòng kín thiếu gió, khói âm ỉ lan tỏa chậm và không chạm tới cảm biến trần. Cảm biến quang phổ đa bước sóng kế thừa từ NASA SAME đo trực tiếp mật độ hạt muội nano lơ lửng trong không khí tĩnh, cảnh báo sớm hơn 3 phút trước khi bùng phát lửa hở.',
-    primaryMetric: { value: '+180s', label: 'Cảnh báo sớm hơn' },
-    secondaryMetric: { value: '99.4%', label: 'Triệt tiêu báo động giả' },
+      'Standard terrestrial smoke alarms rely on hot buoyant plumes to carry soot up to ceiling sensors. In stagnant deep-shaft mines, submarine compartments, or dead-air storage silos, smoldering smoke hovers near the floor. Derived from ISS cabin particle monitors, multi-wavelength optical sensors sample sub-micron soot particulates directly from stagnant air, alerting operators over 3 minutes earlier.',
+    primaryMetric: { value: '+180s', label: 'Earlier Hazard Alert' },
+    secondaryMetric: { value: '99.4%', label: 'False-Alarm Rejection' },
     features: [
-      'Phát hiện khói âm ỉ (smoldering) trong môi trường đối lưu chết',
-      'Phân biệt hạt bụi than/độ ẩm với hạt muội cháy thực tế',
-      'Độ bền cảm biến trên 10 năm trong môi trường khắc nghiệt',
+      'Detects quiescent smoldering in dead-convection ventilation zones',
+      'Distinguishes harmless coal dust / humidity from combustion soot',
+      '10+ year operational sensor life in corrosive industrial air',
     ],
   },
   {
     id: 'firefighter-gear',
     number: '03',
-    category: 'Thiết Bị Cứu Hỏa Thế Hệ Mới',
-    title: 'Bình Dưỡng Khí & Trang Phục Chống Flashover Thế Hệ Mới',
-    englishTitle: 'Next-Gen Lightweight SCBA & Flashover Resistant Textiles',
+    category: 'Next-Gen First Responder Life Support',
+    title: 'Lightweight SCBA & Flashover-Resistant Protective Gear',
+    subtitle: 'Spaceflight Composite Pressure Vessels & Thermal Fabrics',
     heritageSource: 'NASA SoFIE-GEL & Material Flammability Standards',
-    environment: 'Lực lượng Cứu hỏa Đô thị, Chữa cháy Rừng & Cứu nạn Không gian hẹp',
+    environment: 'Urban Firefighting, Wildland Fire Suppression & Confined Rescue',
     description:
-      'Các đợt thử nghiệm giới hạn dập tắt (GEL) của sợi dệt trên trạm ISS cung cấp dữ liệu chính xác về nhiệt độ phân hủy polymer dưới các dải áp suất khác nhau. Ứng dụng vật liệu composite sợi carbon tiên tiến và van điều áp không gian giúp chế tạo bình dưỡng khí (SCBA) siêu nhẹ, giảm tải trọng gù lưng và bảo vệ lính cứu hỏa trước hiện tượng bùng cháy toàn diện (flashover).',
-    primaryMetric: { value: '-40%', label: 'Trọng lượng bình khí thở' },
-    secondaryMetric: { value: '+35%', label: 'Thời gian sống sót an toàn' },
+      'Polymer pyrolysis models and extinction boundary tests conducted inside the ISS Combustion Integrated Rack guided next-generation 300-bar carbon-composite breathing cylinders and multi-layer thermal protective suits. The resulting system drastically reduces back fatigue while shielding first responders against sudden 1,100°C flashover temperature spikes.',
+    primaryMetric: { value: '-40%', label: 'Breathing Cylinder Weight' },
+    secondaryMetric: { value: '+35%', label: 'First-Responder Safe Working Window' },
     features: [
-      'Vỏ bình sợi carbon chịu áp suất 300 bar siêu nhẹ',
-      'Vải dệt chống cháy chịu nhiệt bức xạ cực đoan đến 1,100°C',
-      'Tích hợp màn hình HUD hiển thị áp suất khí thở thời gian thực',
+      'Ultra-lightweight 300-bar carbon-fiber breathing apparatus',
+      'Spaceflight thermal weave withstands direct 1,100°C flashover',
+      'Integrated real-time cylinder pressure telemetry HUD',
     ],
   },
 ];
@@ -117,9 +117,9 @@ export const TerrestrialSpinoffsSection: React.FC = () => {
           </h2>
 
           <p className="text-zinc-600 text-sm sm:text-base md:text-lg leading-relaxed">
-            Khi ngọn lửa được bóc trần khỏi lực đẩy Archimedes trong vi trọng lực, chúng ta thấu hiểu
-            bản chất nhiệt động lực học và hóa học tinh khiết nhất của sự cháy. Những nguyên lý này
-            không chỉ giữ an toàn trên quỹ đạo mà đang bảo vệ hàng triệu công trình và sinh mạng nơi mặt đất.
+            When combustion is stripped of buoyant Archimedes forces in microgravity, physicists observe
+            its purest chemical and thermodynamic mechanisms. The fundamental insights gained in orbit
+            do not remain in space; they directly protect human lives, critical facilities, and first responders on Earth.
           </p>
         </div>
 
@@ -155,19 +155,19 @@ export const TerrestrialSpinoffsSection: React.FC = () => {
                     {spinoff.title}
                   </h3>
                   <div className="text-xs font-mono text-zinc-500 mb-4 line-clamp-1">
-                    {spinoff.englishTitle}
+                    {spinoff.subtitle}
                   </div>
 
                   {/* Heritage Source Tag */}
                   <div className="mb-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gray-100 text-zinc-700 font-mono text-xs">
                     <span className="w-1.5 h-1.5 rounded-full bg-lime-500" />
-                    <span className="font-semibold text-zinc-900">Di sản NASA:</span>
+                    <span className="font-semibold text-zinc-900">NASA Flight Heritage:</span>
                     <span>{spinoff.heritageSource}</span>
                   </div>
 
                   {/* Target Environment */}
                   <div className="text-xs font-sans text-[#0B2374] font-medium mb-4 bg-blue-50/60 p-3 rounded-xl border border-blue-200/70">
-                    <span className="font-bold">Ứng dụng mục tiêu:</span> {spinoff.environment}
+                    <span className="font-bold">Deployment Scope:</span> {spinoff.environment}
                   </div>
 
                   <p className="text-sm text-zinc-600 font-sans leading-relaxed mb-6">
@@ -225,8 +225,8 @@ export const TerrestrialSpinoffsSection: React.FC = () => {
               &quot;The safest fire on Earth is the one understood in the stillness of space.&quot;
             </h3>
             <p className="text-slate-300 text-sm leading-relaxed font-sans">
-              FlameGuard AI cung cấp bộ công cụ mô phỏng để các viện nghiên cứu PCCC và doanh nghiệp
-              mặt đất trực tiếp tra cứu thông số nhiệt động học từ 20 đề tài vũ trụ.
+              FlameGuard AI provides simulation tools and empirical correlation indexes so terrestrial fire safety
+              institutes and engineering teams can directly harness thermodynamic data from 20 spaceflight experiments.
             </p>
           </div>
 
@@ -236,13 +236,13 @@ export const TerrestrialSpinoffsSection: React.FC = () => {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-[#D4FC02] hover:bg-[#c3e802] text-zinc-950 font-bold text-sm shadow-xs transition-all"
             >
               <Activity className="w-4 h-4 text-zinc-950" />
-              <span>Xem Dữ Liệu Thực Nghiệm</span>
+              <span>Explore Telemetry Data</span>
             </Link>
             <Link
               href="/explorer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition-all"
             >
-              <span>Khám Phá 20 Nghiên Cứu</span>
+              <span>Review 20 PSI Studies</span>
               <ArrowRight className="w-4 h-4 text-white" />
             </Link>
           </div>

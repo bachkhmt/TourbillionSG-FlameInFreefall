@@ -2,10 +2,11 @@
 
 /**
  * CoreIntelligenceSection Component
+ * Synchronized with the StructPaper light & Kurzgesagt scientific aesthetic.
  * Highlights the 3 core technological contributions of FlameGuard AI beyond raw NASA data:
- * 1. Cross-Study Harmonization (20 PSI studies unified)
- * 2. Evidence Gap Matrix (Pinpointing unverified partial-g regimes like Moon 0.16g)
- * 3. Guarded Predictive Physics (Locking predictions & preventing AI hallucination)
+ * 1. Cross-Study Harmonization (20 PSI flight studies unified)
+ * 2. Evidence Gap Matrix (Mapping unverified partial-g regimes like Lunar 0.16g)
+ * 3. Guarded Predictive Physics (Zero-hallucination safety interlocks)
  * And provides an interactive Ignition Source & Mechanism Inference workbench.
  */
 
@@ -23,7 +24,6 @@ import {
   Sliders,
   CheckCircle2,
   Lock,
-  Unlock,
   Info,
 } from 'lucide-react';
 
@@ -32,14 +32,14 @@ export type IgnitionModeId = 'hot-wire' | 'spark' | 'radiant' | 'smolder';
 export interface IgnitionMode {
   id: IgnitionModeId;
   name: string;
-  vietnameseTitle: string;
+  tagline: string;
   icon: React.ComponentType<{ className?: string }>;
   psiStudyMatch: string;
   delayRange: string;
   minEnergy: string;
-  dangerLevel: 'Cao' | 'Rất cao' | 'Cực kỳ nguy cấp';
+  dangerLevel: 'Elevated' | 'High' | 'Critical Flashover Risk';
   mechanism: string;
-  preventionInsight: string;
+  guardrailInsight: string;
   flightAnalog: string;
 }
 
@@ -47,69 +47,69 @@ const IGNITION_MODES: Record<IgnitionModeId, IgnitionMode> = {
   'hot-wire': {
     id: 'hot-wire',
     name: 'Hot-Wire Overload',
-    vietnameseTitle: 'Dây dẫn quá nhiệt & Tiếp xúc nóng',
+    tagline: 'Conductor Overheating & Contact Ignition',
     icon: Flame,
     psiStudyMatch: 'NASA SoFIE-MIST (Material Ignition and Suppression Test)',
     delayRange: '1.8s – 4.5s',
     minEnergy: '12 – 18 Joules',
-    dangerLevel: 'Rất cao',
+    dangerLevel: 'High',
     mechanism:
-      'Trong vi trọng lực, luồng khí không thể tự đối lưu để làm mát bề mặt dây dẫn. Dòng điện quá tải làm nhiệt độ cuộn dây tăng nhanh gấp 2.2 lần so với mặt đất, kích hoạt quá trình nhiệt phân polymer cách điện.',
-    preventionInsight:
-      'Hệ thống FlameGuard AI đối chiếu dòng tải và vận tốc thông gió khoang bay (0.05–0.1 m/s) để cảnh báo ngưỡng kích nhiệt trước khi bốc khói.',
-    flightAnalog: 'SoFIE-MIST Flight Run #14 (34% O₂ / 56 kPa / PMMA sample)',
+      'In microgravity, the absence of natural buoyant chimney draft eliminates convective surface cooling. Overcurrent wires experience temperature rise rates 2.2x steeper than terrestrial baselines, accelerating polymer insulation pyrolysis and igniting neighboring payloads.',
+    guardrailInsight:
+      'FlameGuard AI cross-references wiring bundle load currents with local compartment ventilation velocities (0.05–0.1 m/s) to flag thermal runaway thresholds before visible smoke generates.',
+    flightAnalog: 'SoFIE-MIST Flight Run #14 (34% O₂ / 56 kPa / PMMA substrate)',
   },
   'spark': {
     id: 'spark',
     name: 'Electrical Arc & Spark',
-    vietnameseTitle: 'Tia lửa hồ quang & Phóng điện áp thấp',
+    tagline: 'Low-Pressure Dielectric Breakdown',
     icon: Zap,
     psiStudyMatch: 'NASA ACME (Advanced Combustion via Microgravity Experiments)',
-    delayRange: '< 0.05s (Tức thì)',
+    delayRange: '< 0.05s (Instantaneous)',
     minEnergy: '0.2 – 0.8 mJ',
-    dangerLevel: 'Cực kỳ nguy cấp',
+    dangerLevel: 'Critical Flashover Risk',
     mechanism:
-      'Định luật Paschen chứng minh điện áp đánh thủng không khí giảm mạnh khi áp suất khoang giảm xuống 56–70 kPa trong các module Artemis. Tia lửa tĩnh điện nhỏ dễ dàng đạt năng lượng mồi cháy MIE trong môi trường giàu oxy (34% O₂).',
-    preventionInsight:
-      'Khóa tự động các rơ-le cao áp khi nồng độ O₂ cục bộ vượt 30% và cảnh báo giới hạn tích điện tĩnh trên bề mặt vải du hành.',
+      'Governed by Paschen’s Law, the breakdown voltage of air drops sharply as exploration cabin pressures decrease to 56–70 kPa (Artemis habitat envelope). Minor electrostatic discharges easily exceed the drastically lowered Minimum Ignition Energy (MIE) in 34% O₂ atmospheres.',
+    guardrailInsight:
+      'Automated interlocks evaluate local oxygen mole fractions and surface triboelectric potential, triggering relay shutdowns whenever the local environment approaches critical spark-flashover envelopes.',
     flightAnalog: 'ACME Spark Ignition Calibration Matrix (0.00g chamber)',
   },
   'radiant': {
     id: 'radiant',
     name: 'Radiant Heat Flashover',
-    vietnameseTitle: 'Bức xạ nhiệt bề mặt & Flashover',
+    tagline: 'Surface Thermal Flux & Flashover',
     icon: Radio,
     psiStudyMatch: 'NASA BASS-II (Burning and Suppression of Solids - II)',
     delayRange: '12s – 25s',
     minEnergy: '25 – 40 kW/m²',
-    dangerLevel: 'Cao',
+    dangerLevel: 'Elevated',
     mechanism:
-      'Nhiệt bức xạ từ thiết bị sưởi ấm hoặc lò phản ứng thí nghiệm truyền trực tiếp vào bề mặt vật liệu đặc mà không bị tản mát bởi gió đối lưu tự nhiên, làm giảm đáng kể chỉ số giới hạn oxy (LOI) của vật liệu.',
-    preventionInsight:
-      'Tính toán phân bố thông lượng bức xạ (Radiant Flux) và mô phỏng điểm bắt lửa bùng phát (Flashover) trên các tấm vật liệu Nomex và Polycarbonate.',
+      'Radiant heat emitted by experiment furnaces, avionics bays, or power converters impinges directly upon solid fabrics. Lacking convective cooling drafts, thermal energy accumulates unchecked, severely depressing material Limiting Oxygen Indexes (LOI).',
+    guardrailInsight:
+      'Predictive radiant flux mapping calculates surface temperature profiles across Nomex and Polycarbonate panels, providing real-time safe standoff distance recommendations for habitat crew.',
     flightAnalog: 'BASS-II Radiant Heating Curve #09 (Flat fabric in quiescent air)',
   },
   'smolder': {
     id: 'smolder',
-    name: 'Quiescent Smoldering Ignition',
-    vietnameseTitle: 'Cháy âm ỉ trong khoang không đối lưu',
+    name: 'Quiescent Smoldering',
+    tagline: 'Non-Convective Incubation & Fan Rush',
     icon: Sliders,
-    psiStudyMatch: 'NASA SAME / CIR (Sensor Atmosphere & Droplet Extinction)',
-    delayRange: '15 phút – 2 giờ',
-    minEnergy: 'Rất thấp (Nhiệt tích lũy)',
-    dangerLevel: 'Cực kỳ nguy cấp',
+    psiStudyMatch: 'NASA SAME / CIR (Sensors & Droplet Extinction Investigations)',
+    delayRange: '15 min – 2 hours',
+    minEnergy: 'Ultra-Low (Cumulative Heat)',
+    dangerLevel: 'Critical Flashover Risk',
     mechanism:
-      'Nguy cơ chết người nhất trong trạm không gian: Vật liệu cháy âm ỉ không tạo ra ngọn lửa thấy được hoặc khói bốc lên cao vì thiếu đối lưu. Khi hệ thống quạt thông gió bật lên, luồng oxy ùa vào sẽ biến đám cháy âm ỉ thành biển lửa trong tích tắc.',
-    preventionInsight:
-      'Sử dụng thuật toán nhận diện nồng độ CO/CO₂ vi mô từ đề tài SAME để phát hiện quá trình oxy hóa chậm trước khi xuất hiện ngọn lửa hở.',
-    flightAnalog: 'SAME Particulate Telemetry Flight Series (ISS Cupola module)',
+      'The most insidious spacecraft fire hazard: porous fuels smolder quietly for hours without producing buoyant smoke plumes or visible flames. The moment emergency ventilation or HVAC air fans kick in, the sudden forced oxygen rush triggers catastrophic deflagration.',
+    guardrailInsight:
+      'Integrates micro-particulate and CO/CO₂ ratiometric algorithms from the NASA SAME study to detect slow, non-flaming oxidative decomposition hours before thermal runaway occurs.',
+    flightAnalog: 'SAME Particulate Telemetry Series (ISS Cupola & Destiny module)',
   },
 };
 
 export const CoreIntelligenceSection: React.FC = () => {
   const [selectedIgnition, setSelectedIgnition] = useState<IgnitionModeId>('hot-wire');
   const activeMode = IGNITION_MODES[selectedIgnition];
-  const Icon = activeMode.icon;
+  const ActiveIcon = activeMode.icon;
 
   return (
     <section
@@ -124,7 +124,7 @@ export const CoreIntelligenceSection: React.FC = () => {
             <Sparkles className="w-3.5 h-3.5 text-[#0B2374]" />
             <span>Beyond Raw NASA Data</span>
             <span className="h-1.5 w-1.5 rounded-full bg-[#D4FC02]" />
-            <span>Ignition Mechanism &amp; AI Safety Guardrails</span>
+            <span>Ignition Inference &amp; AI Safety Guardrails</span>
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-black text-zinc-950 tracking-tight mb-5 leading-tight">
@@ -133,15 +133,15 @@ export const CoreIntelligenceSection: React.FC = () => {
           </h2>
 
           <p className="text-zinc-600 text-sm sm:text-base md:text-lg leading-relaxed">
-            Kho dữ liệu NASA PSI cung cấp các tệp dữ liệu thực nghiệm bay quý giá, nhưng dữ liệu thô
-            không thể tự cứu sống phi hành đoàn. FlameGuard AI biến 20 đề tài nghiên cứu phân mảnh
-            thành nền tảng trí tuệ an toàn với khả năng truy vết nguồn bắt lửa và rào chắn chống AI ảo giác.
+            NASA PSI archives provide invaluable raw flight logs, but unstructured data alone cannot protect
+            astronaut lives. FlameGuard AI transforms 20 fragmented investigations into actionable safety
+            intelligence through cross-study synthesis, empirical gap discovery, and grounded predictive physics.
           </p>
         </div>
 
-        {/* 3 Core Contributions Beyond Raw Data Cards */}
+        {/* 3 Core Contributions Beyond Raw Data */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-16">
-          {/* Contribution 1: Cross-Study Harmonization */}
+          {/* Card 1: Cross-Study Harmonization */}
           <div
             className="rounded-3xl border border-gray-200/80 bg-white p-7 shadow-2xs hover:shadow-xs hover:border-[#0B2374]/30 transition-all flex flex-col justify-between"
             data-testid="contribution-card-harmonization"
@@ -152,33 +152,33 @@ export const CoreIntelligenceSection: React.FC = () => {
                   <Layers className="w-5 h-5 text-[#0B2374]" />
                 </div>
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-[#0B2374]/5 text-[#0B2374]">
-                  Đột phá 01
+                  Pillar 01
                 </span>
               </div>
 
               <h3 className="text-xl font-bold text-zinc-950 mb-2">
-                Đồng bộ hóa Đa nghiên cứu (Cross-Study Harmonization)
+                Cross-Study Data Harmonization
               </h3>
               <p className="text-sm text-zinc-600 leading-relaxed mb-6 font-sans">
-                NASA lưu trữ 20 đề tài độc lập (BASS, ACME, CIR, FLEX, SoFIE) với định dạng và tài liệu
-                rời rạc. FlameGuard AI trích xuất và chuẩn hóa toàn bộ thành một cơ sở tri thức đồng nhất,
-                cho phép so sánh chéo đa biến giữa nhiên liệu rắn, lỏng và khí.
+                NASA stores 20 investigations (BASS, ACME, CIR, FLEX, SoFIE) across disparate schemas, PDFs,
+                and telemetry charts. FlameGuard AI harmonizes all 1,200+ test runs into a structured,
+                multi-variable knowledge base for apples-to-apples solid, droplet, and gaseous comparisons.
               </p>
             </div>
 
             <div className="pt-4 border-t border-gray-100 space-y-2">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-zinc-500">Quy mô đã xử lý:</span>
-                <span className="font-bold text-[#0B2374]">20 Đề tài / 1,200+ Runs</span>
+                <span className="text-zinc-500">Indexed Flight Scale:</span>
+                <span className="font-bold text-[#0B2374]">20 Studies / 1,200+ Runs</span>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-lime-800 font-semibold font-mono">
                 <CheckCircle2 className="w-3.5 h-3.5 text-lime-600" />
-                <span>Không so sánh khập khiễng (Apple-to-Apple)</span>
+                <span>Zero apples-to-oranges parameter mismatches</span>
               </div>
             </div>
           </div>
 
-          {/* Contribution 2: Evidence Gap Matrix */}
+          {/* Card 2: Evidence Gap Matrix */}
           <div
             className="rounded-3xl border border-gray-200/80 bg-white p-7 shadow-2xs hover:shadow-xs hover:border-amber-300 transition-all flex flex-col justify-between"
             data-testid="contribution-card-gap-matrix"
@@ -189,33 +189,33 @@ export const CoreIntelligenceSection: React.FC = () => {
                   <AlertTriangle className="w-5 h-5 text-amber-600" />
                 </div>
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-amber-50 text-amber-800 border border-amber-200">
-                  Đột phá 02
+                  Pillar 02
                 </span>
               </div>
 
               <h3 className="text-xl font-bold text-zinc-950 mb-2">
-                Bản đồ Lỗ hổng Thực nghiệm (Evidence Gap Matrix)
+                Evidence Gap Matrix Engine
               </h3>
               <p className="text-sm text-zinc-600 leading-relaxed mb-6 font-sans">
-                Chỉ ra chính xác những gì NASA <span className="font-bold text-zinc-900">chưa có dữ liệu</span>.
-                Khu vực trọng lực yếu ($0 &lt; g &lt; 1$) như Mặt Trăng ($0.16g$) và Sao Hỏa ($0.38g$)
-                hoàn toàn thiếu các đợt đốt thực nghiệm trực tiếp, cảnh báo nguy cơ ngọn lửa không tự dập tắt.
+                Identifies precisely what NASA <span className="font-bold text-zinc-900">lacks in empirical data</span>.
+                Partial-gravity regimes ($0 &lt; g &lt; 1$) such as Lunar ($0.16g$) and Martian ($0.38g$)
+                possess zero direct burn tests, creating a perilous low-convection zone where flames neither quench nor self-extinguish.
               </p>
             </div>
 
             <div className="pt-4 border-t border-gray-100 space-y-2">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-zinc-500">Vùng mù dữ liệu:</span>
-                <span className="font-bold text-rose-600">Mặt Trăng (0.16g) RED GAP</span>
+                <span className="text-zinc-500">Unverified Gravity Void:</span>
+                <span className="font-bold text-rose-600">Moon (0.16g) CRITICAL GAP</span>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-amber-800 font-semibold font-mono">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                <span>Kiểm toán 6 chiều tham số vật lý</span>
+                <span>6-dimension parameter audit (g, P, O₂, flow, T, fuel)</span>
               </div>
             </div>
           </div>
 
-          {/* Contribution 3: Guarded Predictive Physics */}
+          {/* Card 3: Guarded Predictive Physics */}
           <div
             className="rounded-3xl border border-gray-200/80 bg-white p-7 shadow-2xs hover:shadow-xs hover:border-[#0B2374]/30 transition-all flex flex-col justify-between"
             data-testid="contribution-card-guarded-physics"
@@ -226,28 +226,28 @@ export const CoreIntelligenceSection: React.FC = () => {
                   <ShieldCheck className="w-5 h-5 text-lime-700" />
                 </div>
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-[#D4FC02]/20 text-zinc-950 border border-lime-300">
-                  Đột phá 03
+                  Pillar 03
                 </span>
               </div>
 
               <h3 className="text-xl font-bold text-zinc-950 mb-2">
-                Cỗ máy Dự đoán Có Rào chắn (Guarded Physics)
+                Guarded Predictive Physics
               </h3>
               <p className="text-sm text-zinc-600 leading-relaxed mb-6 font-sans">
-                Khác biệt hoàn toàn với các mô hình AI thông thường hay "đoán mò" (hallucination) khi thiếu dữ liệu,
-                FlameGuard AI khóa tự động dự đoán (*Prediction Locked*) khi chưa đủ $\ge 3$ lượt bay thực nghiệm,
-                chuyển hướng sang gợi ý đề tài bay tương đồng đã xác thực (*SoFIE-MIST 94.2%*).
+                Unlike generic generative models that fabricate plausible hallucinations when data is missing,
+                FlameGuard AI enforces strict aerospace interlocks. If empirical flight runs are insufficient (&lt;3 runs),
+                predictions are locked and the system surfaces verified flight analogues (SoFIE-MIST 94.2% match).
               </p>
             </div>
 
             <div className="pt-4 border-t border-gray-100 space-y-2">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-zinc-500">Độ tin cậy hàng không:</span>
-                <span className="font-bold text-lime-700">100% Zero-Hallucination</span>
+                <span className="text-zinc-500">Aerospace Reliability:</span>
+                <span className="font-bold text-lime-700">Zero-Hallucination Interlocks</span>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-[#0B2374] font-semibold font-mono">
                 <Lock className="w-3.5 h-3.5 text-[#0B2374]" />
-                <span>3 Điều kiện tiên quyết kiểm toán bắt buộc</span>
+                <span>3 Mandatory prerequisites: Conservation, Data, Uncertainty</span>
               </div>
             </div>
           </div>
@@ -269,16 +269,16 @@ export const CoreIntelligenceSection: React.FC = () => {
                 </span>
               </div>
               <h3 className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight">
-                Dự đoán Nguồn &amp; Cơ chế Bắt lửa Tiềm ẩn (Ignition Source Inference)
+                Ignition Source &amp; Mechanism Inference
               </h3>
             </div>
 
             <div className="text-xs text-zinc-500 max-w-sm font-sans">
-              Khi kỹ sư thiết lập thông số khoang bay trong trang <Link href="/mission" className="text-[#0B2374] font-bold underline">Mission Scenario</Link>, thuật toán đối chiếu dữ liệu đốt thực tế của NASA để nhận diện cơ chế bắt lửa nguy cơ cao nhất:
+              When engineers configure mission envelopes in the <Link href="/mission" className="text-[#0B2374] font-bold underline">Mission Scenario Lab</Link>, our algorithmic engine correlates flight physics to isolate the most probable ignition triggers:
             </div>
           </div>
 
-          {/* Selector Buttons for 4 Ignition Modes */}
+          {/* 4 Ignition Mode Selector Tabs */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-8">
             {(Object.keys(IGNITION_MODES) as IgnitionModeId[]).map((modeKey) => {
               const item = IGNITION_MODES[modeKey];
@@ -318,30 +318,30 @@ export const CoreIntelligenceSection: React.FC = () => {
                       isSelected ? 'text-blue-100' : 'text-zinc-500'
                     }`}
                   >
-                    {item.vietnameseTitle}
+                    {item.tagline}
                   </div>
                 </button>
               );
             })}
           </div>
 
-          {/* Selected Ignition Details Pane */}
+          {/* Active Ignition Details Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-            {/* Left 7 cols: Physical Mechanism & Analysis */}
+            {/* Left 7 cols: Physics Breakdown & Safeguard Insights */}
             <div className="lg:col-span-7 space-y-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-serif font-black text-2xl text-[#0B2374]">
-                  {activeMode.vietnameseTitle}
+                  {activeMode.name}
                 </span>
                 <span className="px-2.5 py-1 rounded font-mono text-xs font-bold uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-200">
-                  Mức độ rủi ro: {activeMode.dangerLevel}
+                  Risk Level: {activeMode.dangerLevel}
                 </span>
               </div>
 
               <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200/80 text-zinc-800 text-sm leading-relaxed">
                 <div className="font-bold text-[#0B2374] text-xs font-mono uppercase tracking-wider mb-1 flex items-center gap-1.5">
                   <Info className="w-4 h-4 text-[#0B2374]" />
-                  Cơ chế kích hoạt vật lý trong vi trọng lực:
+                  Physical Activation Dynamics in Low Gravity:
                 </div>
                 <p className="font-sans text-zinc-700">{activeMode.mechanism}</p>
               </div>
@@ -349,20 +349,20 @@ export const CoreIntelligenceSection: React.FC = () => {
               <div className="p-4 rounded-2xl bg-lime-50/60 border border-lime-300 text-zinc-800 text-sm leading-relaxed">
                 <div className="font-bold text-lime-900 text-xs font-mono uppercase tracking-wider mb-1 flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-lime-700" />
-                  Đóng góp phòng ngừa của FlameGuard AI:
+                  FlameGuard AI Safeguard Intervention:
                 </div>
-                <p className="font-sans text-zinc-700">{activeMode.preventionInsight}</p>
+                <p className="font-sans text-zinc-700">{activeMode.guardrailInsight}</p>
               </div>
             </div>
 
-            {/* Right 5 cols: Telemetry & Flight Matching Specs */}
+            {/* Right 5 cols: Telemetry Metrics & Empirical Reference */}
             <div className="lg:col-span-5 rounded-2xl bg-gray-50 border border-gray-200/80 p-5 space-y-4 font-mono text-xs">
               <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-gray-200 pb-2">
-                Bằng chứng thực nghiệm NASA tương đồng:
+                Calibrated NASA PSI Flight Evidence:
               </div>
 
               <div>
-                <span className="text-zinc-500 block">Đề tài đối chiếu:</span>
+                <span className="text-zinc-500 block">Correlated NASA Flight Investigation:</span>
                 <span className="font-bold text-[#0B2374] text-sm font-sans block mt-0.5">
                   {activeMode.psiStudyMatch}
                 </span>
@@ -370,17 +370,17 @@ export const CoreIntelligenceSection: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-200">
                 <div>
-                  <span className="text-zinc-500 block">Độ trễ bắt lửa:</span>
+                  <span className="text-zinc-500 block">Ignition Delay (t_delay):</span>
                   <span className="font-bold text-zinc-950 text-sm">{activeMode.delayRange}</span>
                 </div>
                 <div>
-                  <span className="text-zinc-500 block">Năng lượng MIE:</span>
+                  <span className="text-zinc-500 block">Min Ignition Energy (MIE):</span>
                   <span className="font-bold text-zinc-950 text-sm">{activeMode.minEnergy}</span>
                 </div>
               </div>
 
               <div className="pt-2 border-t border-gray-200">
-                <span className="text-zinc-500 block">Lượt chạy thực nghiệm tham chiếu:</span>
+                <span className="text-zinc-500 block">Benchmark Empirical Flight Run:</span>
                 <span className="font-semibold text-zinc-800 text-[11px] block mt-0.5">
                   {activeMode.flightAnalog}
                 </span>
@@ -391,7 +391,7 @@ export const CoreIntelligenceSection: React.FC = () => {
                   href="/mission"
                   className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0B2374] hover:bg-[#0B2374]/90 text-[#D4FC02] font-bold transition-all shadow-xs"
                 >
-                  <span>Mô phỏng kịch bản này trong Mission Lab</span>
+                  <span>Evaluate Scenario in Mission Lab</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
