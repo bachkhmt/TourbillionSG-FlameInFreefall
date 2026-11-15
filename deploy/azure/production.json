@@ -14,7 +14,7 @@
   },
   "collection": {
     "sourceRevision": "117e7ff954cd16fd88ad1e5a2e530d56871a355dee4285b595151595c3312cc0",
-    "snapshotContentSha256": "cca688e00a7213d2753523df6e1de17915b2636d72b05d5c0a4c3e9fa269e54f",
+    "snapshotContentSha256": "da2157070a526c6d35674f4f1a17a12eeccd5c00f231ebdef2a71a28d130f395",
     "target": {
       "host": "pg-flameguard.postgres.database.azure.com",
       "port": 5432,
