@@ -193,17 +193,17 @@ function step(p,dt){
   const burning=p.g==='ug'?bu:bg,m=S.O-(p.g==='ug'?lu:lg),dir=S.spread==='conc'?1:-1;
   if(p.ph==='ignite'){p.t+=dt;p.I=Math.min(.85,p.t/.9*.85);if(p.t>1.4)p.ph='burn'}
   else if(p.ph==='burn'){
-    if(p.consumed||(p.front>=.97&&dir>0)||(p.front<=.03&&dir<0)){p.consumed=true;p.I-=dt*.6;p.reason='hết mẫu'}
+    if(p.consumed||(p.front>=.97&&dir>0)||(p.front<=.03&&dir<0)){p.consumed=true;p.I-=dt*.6;p.reason='fuel consumed'}
     else if(burning){p.I+=(clamp(.3+m/5,.3,1)-p.I)*Math.min(1,dt*1.5);p.front+=dir*.075*p.I*dt}
     else{p.I-=dt*(.2+.06*Math.max(0,-m));p.front-=dir*.02*dt}
     p.front=clamp(p.front,.03,.97);
-    if(p.I<.04){p.ph='out';p.I=0;if(!p.consumed)p.reason=(p.g==='1g'||S.V>4)?'bị thổi tắt':'gió quá yếu, mất nhiệt'}
+    if(p.I<.04){p.ph='out';p.I=0;if(!p.consumed)p.reason=(p.g==='1g'||S.V>4)?'blowoff':'flow too weak, heat loss'}
   }
 }
 function badge(p,el){let t,k='';const burning=p.g==='ug'?bu:bg;
-  if(p.ph==='ready')t='Sẵn sàng';else if(p.ph==='ignite')t='Đang châm lửa';
-  else if(p.ph==='burn'){if(p.consumed)t='Cháy hết mẫu';else if(burning){t='Đang cháy';k='ok'}else{t='Lửa yếu dần, sắp tắt';k='w'}}
-  else{t='Đã tắt: '+p.reason;k='o'}
+  if(p.ph==='ready')t='Ready';else if(p.ph==='ignite')t='Igniting';
+  else if(p.ph==='burn'){if(p.consumed)t='Fuel burnout';else if(burning){t='Burning';k='ok'}else{t='Flame weakening, nearing extinction';k='w'}}
+  else{t='Extinguished: '+p.reason;k='o'}
   if(el.textContent!==t)el.textContent=t;el.className='badge '+k}
 function updatePane(p,T){
   const I=p.I,sh=S.sample==='sheet',u=p.U,m1=p.m===0;

@@ -244,13 +244,13 @@ cv.onpointerdown=e=>{drag=1;cv.setPointerCapture(e.pointerId)};
 cv.onpointermove=e=>{if(drag){cam.th-=e.movementX*.006;cam.ph=clamp(cam.ph+e.movementY*.004,-.3,1.2)}};
 cv.onpointerup=()=>drag=0;
 cv.addEventListener('wheel',e=>{e.preventDefault();cam.d=clamp(cam.d*Math.exp(e.deltaY*.001),9,40)},{passive:false});
-function togglePause(){st.pause=!st.pause;$('bP').textContent=st.pause?'Tiếp tục':'Tạm dừng';}
+function togglePause(){st.pause=!st.pause;$('bP').textContent=st.pause?'Resume':'Pause';}
 addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='BUTTON'){e.preventDefault();togglePause();}});
 function upd(){st.V=+$('sV').value;st.d=+$('sD').value;const o=+$('sO').value,oc=o!==st.o;st.o=o;st.sp=+$('sp').value;
  $('vV').textContent=st.V+' cm/s';$('vD').textContent=st.d.toFixed(2)+' mm';$('vO').textContent=o+'%';$('vS').textContent='×'+st.sp;
  if(oc)Q.forEach((_,i)=>buildMap(i));
  const q=lim(st.d,st.o);
- $('rd').textContent=q.thick?`δ ≥ δc ≈ ${q.dc.toFixed(2)} mm: luôn tắt (assumed)`:`μg: lan khi ${q.Vq.toFixed(1)} ≤ V ≤ ${q.Vb.toFixed(0)} cm/s · δc ≈ ${q.dc.toFixed(2)} mm (assumed, chỉ tác dụng khi δ > 0,4 mm) · mốc 2 và ~40 cm/s: BASS-II, 0,1 mm`;
+ $('rd').textContent=q.thick?`δ ≥ δc ≈ ${q.dc.toFixed(2)} mm: always extinguishes (assumed)`:`μg: spread when ${q.Vq.toFixed(1)} ≤ V ≤ ${q.Vb.toFixed(0)} cm/s · δc ≈ ${q.dc.toFixed(2)} mm (assumed, applies only when δ > 0.4 mm) · reference points 2 and ~40 cm/s: BASS-II, 0.1 mm`;
  clearTimeout(tmr);if($('cA').checked)tmr=setTimeout(()=>Q.forEach(p=>{if(p.out)reset(p);}),350);}
 ['sV','sD','sO','sp'].forEach(id=>$(id).addEventListener('input',upd));
 $('bR').onclick=()=>Q.forEach(reset);$('bP').onclick=togglePause;

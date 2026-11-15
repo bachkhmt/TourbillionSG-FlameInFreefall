@@ -167,7 +167,7 @@ const P=[mkPanel(0),mkPanel(1)];
 const S=[0,1].map(m=>({m,cfg:m?CONFIG.ug:CONFIG.g1}));
 let flushing=false,paused=false,speed=4,A=0;
 
-function ignite(){S.forEach(s=>{s.t=0;s.I=0;s.R0=s.R=+$('dm').value/2;s.o2=+$('o2').value;s.out=false;s.st='mồi lửa'});flushing=false}
+function ignite(){S.forEach(s=>{s.t=0;s.I=0;s.R0=s.R=+$('dm').value/2;s.o2=+$('o2').value;s.out=false;s.st='igniting'});flushing=false}
 function step(s,dt){
   const c=s.cfg;s.t+=dt;
   const fuel=clamp((s.R/s.R0-.4)/.35,0,1),ox=sm(15.5,19.5,s.o2);

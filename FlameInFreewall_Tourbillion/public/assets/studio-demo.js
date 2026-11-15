@@ -11,13 +11,13 @@
     report('error', detail);
   }
   window.addEventListener('error', (event) => {
-    fail(event.message || 'Không tải được tài nguyên của minh họa.');
+    fail(event.message || 'Unable to load a simulation resource.');
   }, true);
-  window.addEventListener('unhandledrejection', () => fail('Minh họa gặp lỗi khi khởi tạo.'));
+  window.addEventListener('unhandledrejection', () => fail('The simulation encountered an initialization error.'));
   document.addEventListener('webglcontextcreationerror', () => {
     // Candle supplies its own poster and retry controls when WebGL is unavailable.
     if (document.getElementById('scene')) return;
-    fail('Trình duyệt chưa tạo được WebGL. Hãy bật tăng tốc đồ họa và thử lại.');
+    fail('The browser could not create a WebGL context. Enable hardware acceleration and try again.');
   }, true);
   window.addEventListener('load', () => {
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -29,7 +29,7 @@
       }
       const canvas = document.querySelector('canvas');
       if (!canvas || !canvas.width || !canvas.height) {
-        fail('Chưa khởi tạo được vùng vẽ. Bạn có thể thử tải lại.');
+        fail('Unable to initialize the canvas. Please try reloading.');
         return;
       }
       // The existing candle viewer has its own actionable WebGL fallback.

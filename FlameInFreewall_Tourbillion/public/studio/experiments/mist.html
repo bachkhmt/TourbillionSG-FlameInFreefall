@@ -45,7 +45,7 @@ th,td{text-align:left;padding:4px 8px;border-bottom:1px solid var(--bd)}th{color
 <h1>MIST: Ignition and Extinction on PMMA Rod</h1>
 <p class="sub">NASA SoFIE Investigation by C. Fernandez-Pello (UC Berkeley) & M. Gollner. Sample is mounted centrally within a transparent duct, surrounded by radiant heaters with a downstream Kanthal igniter wire; flame spreads opposed to forced flow. Boundary curves represent illustrative trends from reference literature (higher radiant flux lowers the limiting oxygen index).</p>
 <div class="steps" id="steps"><span>1 Preheating</span><span>2 Wire Ignition</span><span>3 Opposed Spread</span><span>4 Extinction / Burnout</span></div>
-<div class="stage"><canvas id="rig" aria-label="Sơ đồ ống thí nghiệm MIST"></canvas><canvas id="fx" aria-hidden="true"></canvas></div>
+<div class="stage"><canvas id="rig" aria-label="MIST experiment duct diagram"></canvas><canvas id="fx" aria-hidden="true"></canvas></div>
 <div class="card">
 <div class="grid">
 <label>External Radiant Flux <b id="vq"></b><input type="range" id="q" min="0" max="3.3" step="0.1" value="1.5"></label>
@@ -54,18 +54,18 @@ th,td{text-align:left;padding:4px 8px;border-bottom:1px solid var(--bd)}th{color
 <label>Rod Diameter <b id="vd"></b><input type="range" id="d" min="4" max="20" step="0.1" value="12.7"></label>
 </div>
 <div class="row">
-<div class="seg" role="group" aria-label="Mức trọng lực"><button id="g0" class="on">μg</button><button id="g1">1g</button></div>
-<select id="sp" aria-label="Tốc độ mô phỏng"><option value="10">Chậm ×10</option><option value="30" selected>Vừa ×30</option><option value="100">Nhanh ×100</option></select>
-<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="dep" checked>Buồng kín, O₂ giảm tự nhiên như trên ISS</label>
-<button id="go" class="pri">Chạy thí nghiệm</button><button id="rs">Reset ống</button><button id="cl">Xóa bản đồ</button>
+<div class="seg" role="group" aria-label="Gravity level"><button id="g0" class="on">μg</button><button id="g1">1g</button></div>
+<select id="sp" aria-label="Simulation speed"><option value="10">Slow ×10</option><option value="30" selected>Medium ×30</option><option value="100">Fast ×100</option></select>
+<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="dep" checked>Closed chamber, natural O₂ depletion as on the ISS</label>
+<button id="go" class="pri">Run Experiment</button><button id="rs">Reset Duct</button><button id="cl">Clear Maps</button>
 </div></div>
 <div class="card"><div class="ro">
-<div>Giai đoạn<b id="rp"></b></div><div>Thời gian mô phỏng<b id="rt"></b></div><div>Công suất tấm đốt<b id="rpw"></b></div><div>T bề mặt (ước lượng)<b id="rts"></b></div>
-<div>O₂ hiện tại<b id="ro"></b></div><div>Dòng hiện tại<b id="rv"></b></div><div>Áp suất<b id="rP"></b></div><div>Lửa đã lan<b id="rx"></b></div></div>
+<div>Phase<b id="rp"></b></div><div>Simulation Time<b id="rt"></b></div><div>Heater Power<b id="rpw"></b></div><div>Surface Temperature (estimated)<b id="rts"></b></div>
+<div>Current O₂<b id="ro"></b></div><div>Current Flow<b id="rv"></b></div><div>Pressure<b id="rP"></b></div><div>Spread Distance<b id="rx"></b></div></div>
 <p id="msg"></p></div>
-<div class="card"><h2>Dập lửa: ba cách độc lập, bấm khi lửa đang lan</h2>
+<div class="card"><h2>Suppression: three independent methods; activate while the flame is spreading</h2>
 <div class="sup">
-<div><button id="bn">Pha loãng N₂</button><p id="mn">—</p></div>
+<div><button id="bn">N₂ Dilution</button><p id="mn">—</p></div>
 <div><button id="bf">Cut Flow</button><p id="mf">—</p></div>
 <div><button id="bv">Depressurize</button><p id="mv">—</p></div></div></div>
 <div class="maps">

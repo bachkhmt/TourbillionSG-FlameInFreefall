@@ -1,7 +1,9 @@
-"""Publish the root illustrations into Studio without modifying their sources.
+"""Import legacy root illustrations without replacing reviewed English pages.
 
 Run from any directory: python3 scripts/sync_studio_examples.py
 Three.js r128 is vendored separately in public/assets/vendor with its MIT license.
+English Studio pages are maintained in public/studio/experiments. Translate a
+newly imported legacy page there before publishing; later imports preserve it.
 """
 
 from pathlib import Path
@@ -23,6 +25,12 @@ def main() -> None:
     destination = PUBLIC / "studio/experiments"
     destination.mkdir(parents=True, exist_ok=True)
     for slug, filename in EXAMPLES.items():
+        output = destination / f"{slug}.html"
+        if output.exists() and re.search(
+            r'<html\b[^>]*\blang=[\"\']en[\"\']', output.read_text()
+        ):
+            print(f"Preserved English {slug} (maintained in {output.relative_to(ROOT)})")
+            continue
         text = (ROOT / filename).read_text()
         text = text.replace(
             '<html lang="vi">', f'<html lang="vi" data-theme="dark" data-studio-demo="{slug}">'
@@ -47,7 +55,7 @@ def main() -> None:
             '<script src="/assets/studio-demo.js"></script></head>',
             1,
         )
-        (destination / f"{slug}.html").write_text(text)
+        output.write_text(text)
         print(f"Published {slug} ← {filename}")
 
 

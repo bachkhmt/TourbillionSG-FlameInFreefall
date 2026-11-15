@@ -37,7 +37,7 @@ h2{font-size:13px;margin:0 0 6px}
 <div>
  <h1>GEL: Extinction Dynamics on Spherical PMMA</h1>
  <p class="sub">NASA SoFIE Investigation. Spherical PMMA fuel sample (Ø4 cm) mounted on a 6.35 mm steel tube within a 13.3 × 13.3 cm flow duct. Forced airflow travels left to right; stagnation point is located on the left leading edge. Drag to rotate, scroll to zoom.</p>
- <div class="card"><div class="stage"><canvas id="cv" aria-label="Mô phỏng 3D ngọn lửa quanh quả cầu PMMA"></canvas>
+ <div class="card"><div class="stage"><canvas id="cv" aria-label="3D flame simulation around a PMMA sphere"></canvas>
   <span class="ov" style="left:12px;top:8px" id="oU"></span><span class="ov" style="right:12px;top:8px" id="oG"></span></div>
   <div class="hud">
    <div><small>Combustion Regime</small><b id="hMode">–</b></div>
@@ -64,11 +64,11 @@ h2{font-size:13px;margin:0 0 6px}
   <label class="chk"><input id="cDep" type="checkbox" checked> Natural O₂ depletion (combustion consumption, constant flow)</label>
   <label class="chk"><input id="cExit" type="checkbox"> Sample at duct exit (weaker internal flame)</label>
   <div class="row"><button id="g0" class="on">μg</button><button id="g1">1g</button>
-   <select id="sp" aria-label="Tốc độ mô phỏng"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+   <select id="sp" aria-label="Simulation speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
    <button id="rst">Reignite</button></div>
  </div>
  <div class="card"><h2>Flow Velocity × O₂ Boundary Plane</h2>
-  <canvas id="mp" aria-label="Bản đồ giới hạn dập tắt"></canvas>
+  <canvas id="mp" aria-label="Extinction boundary map"></canvas>
   <p class="note">Click the regime map to set initial conditions. ○ = NASA experimental calibration points. Sample preheating shifts the extinction boundary by ~4.6 %O₂ per W/cm² critical flux. Chamber O₂ depletes accelerated for interaction; extinction sequence runs in real-time. Qualitative 3D visualization, not raw CFD.</p>
  </div>
 </div></div>
@@ -168,20 +168,20 @@ function drawMap(){
  mx.fillStyle='#929bab';mx.font='10px system-ui,sans-serif';mx.strokeStyle='#929bab';mx.lineWidth=1;
  for(const u of[.2,1,10,80])mx.fillText(String(u).replace('.',','),mpX(u)-6,MH-14);
  for(const o of[13,20,28])mx.fillText(o,6,mpY(o)+3);
- mx.fillText('Dòng (cm/s, log)',x0+60,MH-3);mx.fillText('O₂ %',4,10);
- mx.fillText('Quench',x0+10,yb-6);mx.fillText('Blowoff',x1-44,yb-6);mx.fillText('Cháy bền',x0+70,yt+12);
+ mx.fillText('Flow (cm/s, log)',x0+60,MH-3);mx.fillText('O₂ %',4,10);
+ mx.fillText('Quench',x0+10,yb-6);mx.fillText('Blowoff',x1-44,yb-6);mx.fillText('Sustained',x0+70,yt+12);
  mx.beginPath();for(const u of[9,13]){mx.moveTo(mpX(u),yb);mx.lineTo(mpX(u),yb-10)}mx.stroke();
  mx.strokeStyle='#fff';for(const c of CAL){mx.beginPath();mx.arc(mpX(c[0]),mpY(c[1]),3.2,0,7);mx.stroke()}
  const cxp=mpX(Ue());
  if(S.dep){mx.strokeStyle='rgba(255,255,255,.35)';mx.setLineDash([3,3]);mx.beginPath();mx.moveTo(cxp,mpY(S.o2s));mx.lineTo(cxp,mpY(S.o2));mx.stroke();mx.setLineDash([])}
  mx.fillStyle=S.st=='out'?'#ff5a4a':S.st=='ext'?'#ffb340':'#7ff0a8';mx.beginPath();mx.arc(cxp,mpY(S.o2),5,0,7);mx.fill()}
 function hud(F){const U=Ue(),m=S.st=='burn'?regime(U):S.mode,blow=S.st=='ext'&&S.mode=='B';
- $('hMode').textContent=NAMES[m];$('hO2').textContent=f1(S.o2)+' %  (giới hạn '+f1(limit(U,S.h))+')';
- $('hAL').textContent=blow?'Vị trí gốc lửa (từ điểm trì trệ)':'Vị trí đuôi lửa (từ điểm trì trệ)';
+ $('hMode').textContent=NAMES[m];$('hO2').textContent=f1(S.o2)+' %  (limit '+f1(limit(U,S.h))+')';
+ $('hAL').textContent=blow?'Flame Base Position (from Stagnation Point)':'Flame Tail Position (from Stagnation Point)';
  if(!F){$('hAng').textContent='–';$('hD').textContent='–'}
  else{$('hAng').textContent=Math.round(180*(blow?F.ta:F.tb))+'°';
-  const h=blow&&F.ta>.02;$('hD').textContent=f1(h?F.d*(1+.8*Math.sin(Math.PI*F.ta/2)):F.d)+' mm'+(h?' (tại gốc lửa)':'')}
- $('hSt').textContent=S.st=='burn'?'Cháy ổn định (a = '+f1(.75*S.U)+' s⁻¹, Re = '+Math.round(26.7*S.U)+(S.g?'; 1g: lực nổi ≈'+UB+' cm/s, giả định, không có nhánh quench':'')+')'+(S.dep?'; O₂ đang giảm.':'.')+(regime(U)=='D'?' Dao động tự duy trì '+f1(S.fq)+' Hz.':''):S.st=='ext'?'Đang tắt…':'Đã tắt. Nhấn “Mồi lửa lại” hoặc chọn kịch bản.'}
+  const h=blow&&F.ta>.02;$('hD').textContent=f1(h?F.d*(1+.8*Math.sin(Math.PI*F.ta/2)):F.d)+' mm'+(h?' (at flame base)':'')}
+ $('hSt').textContent=S.st=='burn'?'Steady burning (a = '+f1(.75*S.U)+' s⁻¹, Re = '+Math.round(26.7*S.U)+(S.g?'; 1g: buoyant flow ≈'+UB+' cm/s, assumed, no quench branch':'')+')'+(S.dep?'; O₂ depleting.':'.')+(regime(U)=='D'?' Self-sustained oscillation '+f1(S.fq)+' Hz.':''):S.st=='ext'?'Extinguishing…':'Extinguished. Click “Reignite” or select a case.'}
 // ---------- Three.js: ngọn lửa raymarching thể tích ----------
 const NOISE=`
 float h31(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
