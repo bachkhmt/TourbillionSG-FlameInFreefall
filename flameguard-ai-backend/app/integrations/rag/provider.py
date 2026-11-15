@@ -5,10 +5,11 @@ from decimal import Decimal
 
 from app.integrations.chat import CorpusPassage
 from app.integrations.rag.retrieval import fold, refusal, select_passages
+from app.integrations.rag.vocabulary import language, message
 from app.schemas.api.chat import Answer, Citation
 
 # Answer-composition version; bump when the text/selection rules change.
-VERSION = "nasa-extractive-v2"
+VERSION = "nasa-extractive-v3"
 MAX_CITATIONS = 4
 
 FLEX_RUN = re.compile(r"\bflex[- ]?(\d{3})\b")
@@ -38,6 +39,15 @@ def flex_diameter_comparison(question, citations):
             values.setdefault(citation.source_document_id, (index, label, match[1]))
     if len({Decimal(value) for _, _, value in values.values()}) < 2:
         return None
+    if language(question) == "en":
+        lines = "\n".join(
+            f"• {'CSV table' if label == 'Bảng CSV' else 'Test sheet'}: {value} mm [{index}]."
+            for index, label, value in values.values()
+        )
+        return (
+            f"Sources report different initial diameters (D0) for {run_id.upper()}.\n"
+            f"{lines}\nBoth values are retained with their source context."
+        )
     lines = "\n".join(
         f"• {label} ghi {value} mm [{index}]." for index, label, value in values.values()
     )
@@ -73,23 +83,20 @@ class ExtractiveProvider:
     async def answer(self, request):
         reason = refusal(request.question)
         citations = () if reason else request.allowed_sources[:MAX_CITATIONS]
-        text = (
-            reason
-            or flex_diameter_comparison(request.question, citations)
-            or (
-                "Tìm thấy các trích đoạn nguồn sau. Giữ nguyên đơn vị "
-                "và các giá trị khác nhau theo từng nguồn:\n\n"
-                + "\n\n".join(
-                    f"[{index}] {citation.source_excerpt}"
-                    for index, citation in enumerate(citations, 1)
+        text = reason or flex_diameter_comparison(request.question, citations)
+        if text is None:
+            text = (
+                (
+                    message("found", request.question)
+                    + "\n\n"
+                    + "\n\n".join(
+                        f"[{index}] {citation.source_excerpt}"
+                        for index, citation in enumerate(citations, 1)
+                    )
                 )
                 if citations
-                else (
-                    "Không tìm thấy bằng chứng phù hợp trong corpus hiện tại. "
-                    "Hãy nêu tên thí nghiệm, mã run hoặc thông số cụ thể."
-                )
+                else message("missing", request.question)
             )
-        )
         return Answer(
             state="answered" if citations else "abstained",
             text=text,

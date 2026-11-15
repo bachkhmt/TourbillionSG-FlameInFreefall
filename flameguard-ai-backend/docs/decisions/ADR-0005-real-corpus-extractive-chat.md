@@ -47,3 +47,8 @@ send logic.
 - Operators enable the feature with `CHAT_PROVIDER=extractive` plus a v2 manifest
   containing `corpusPolicy`. Rollback means unsetting `CHAT_PROVIDER` or removing
   the declaration. Stored rows stay readable.
+
+
+## 2026-11-15 — Extractive provider v3
+
+Under the user-requested RAG quality fixes (Phase6b quality spec), lexical normalization, bilingual boilerplate, family comparison excerpts and explicit aggregate abstention are versioned as `nasa-extractive-v3`. The provider extension, original-source slice checks, numeric grounding and unreviewed status remain enforced. No generated condition summaries or LLM provider are admitted. See the versioned evaluation report in `specs/phase6b-real-corpus-chat/evaluation.md` (relative to backend root).

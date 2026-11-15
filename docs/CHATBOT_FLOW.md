@@ -1,6 +1,6 @@
 # Chatbot NASA (RAG extractive): luồng hoạt động và cách chạy
 
-Cập nhật 2026-11-14.
+Cập nhật 2026-11-15.
 
 **Kiến trúc:** chat chạy trong chính backend của repo này. RAG cắm vào qua extension point
 `RagProvider` của Phase 6 và bật bằng `CHAT_PROVIDER=extractive`. Quyết định được ghi tại:
@@ -154,3 +154,16 @@ Kết quả ngày 2026-11-14:
 Advisor báo `PROVIDER_UNAVAILABLE`, nguồn lạ (404) và corpus cũ (409).
 
 Đây là xác minh truy xuất và lưu trữ cho bản demo local, không phải đánh giá khoa học hay production.
+
+
+## Sửa chất lượng ngày 2026-11-15
+
+Provider `nasa-extractive-v3` dùng vocabulary song ngữ/hóa học có giới hạn, nhận diện họ study và cân bằng trích đoạn khi so sánh. Câu dẫn và từ chối theo ngôn ngữ câu hỏi; trích đoạn vẫn nguyên văn. Câu cần tổng hợp qua bản ghi (cao nhất/thấp nhất/bao nhiêu/range) sẽ abstain và hướng dẫn Explorer nếu không có mã run cụ thể. Không tính số tổng hợp rồi giả làm câu NASA.
+
+Bộ đánh giá sản phẩm: `integration_tests/data/chat_eval.json` (40 câu, 20 EN/20 VI, khóa split/hash trước tuning). Chạy development:
+
+```bash
+PYTHONPATH=.:flameguard-ai-backend flameguard-ai-backend/.venv/bin/python -m integrations.nasa_data.chat_evaluation --split development
+```
+
+Mười câu holdout chỉ chạy sau khi đóng quy tắc retrieval; kết quả được báo riêng trong `flameguard-ai-backend/specs/phase6b-real-corpus-chat/evaluation.md`. Đây là benchmark nhỏ do nhóm tự soạn, không phải xác minh khoa học. Benchmark prototype `playbook-rag/` không áp dụng cho chatbot này.
