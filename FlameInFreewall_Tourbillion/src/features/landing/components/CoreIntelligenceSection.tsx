@@ -53,7 +53,7 @@ export const CoreIntelligenceSection: React.FC = () => {
                 Cross-Study Data Harmonization
               </h3>
               <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mb-6">
-                Unifies 24 NASA PSI flight investigations (BASS, ACME, SoFIE, Saffire, FLEX) into a synchronized schema for solid, droplet, and gaseous fuel comparisons.
+                Unifies 24 NASA PSI flight investigations (BASS, ACME, Saffire, FLEX) into a synchronized schema for solid, droplet, and gaseous fuel comparisons.
               </p>
             </div>
             <div className="pt-4 border-t border-gray-300/60 flex items-center justify-between text-xs sm:text-sm">
@@ -80,7 +80,7 @@ export const CoreIntelligenceSection: React.FC = () => {
                 Evidence Gap Matrix Engine
               </h3>
               <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mb-6">
-                Audits partial-gravity knowledge voids ($0 &lt; g &lt; 1$). Explicitly flags the Moon ($0.16g$) and Mars ($0.38g$) as critical empirical gaps lacking direct burn tests.
+                Audits partial-gravity knowledge voids (0 &lt; g &lt; 1). Explicitly flags the Moon (0.16g) and Mars (0.38g) as critical empirical gaps lacking direct burn tests.
               </p>
             </div>
             <div className="pt-4 border-t border-gray-300/60 flex items-center justify-between text-xs sm:text-sm">

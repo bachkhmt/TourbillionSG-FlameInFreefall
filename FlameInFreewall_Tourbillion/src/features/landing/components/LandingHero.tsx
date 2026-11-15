@@ -159,7 +159,7 @@ export const LandingHero: React.FC = () => {
               <div className="text-xl sm:text-2xl font-black text-zinc-950">
                 24 Studies
               </div>
-              <p className="text-xs text-zinc-500 mt-1">BASS, ACME, SoFIE, Saffire flight logs</p>
+              <p className="text-xs text-zinc-500 mt-1">BASS, ACME, FLEX, Saffire flight logs</p>
             </div>
 
             <div className="rounded-3xl bg-gray-200/50 p-4 hover:shadow-xs hover:border-gray-300 transition-all">

@@ -7,6 +7,7 @@ retain fields the upstream schema cannot represent. This grants no review status
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
 from app.models import Base
@@ -41,6 +42,39 @@ def build_snapshot(release):
                 "platform": study["platform"],
             }
         )
+    # Stable, source-derived navigation labels, never scientific review.
+    tags = {}
+    for study in release["investigations"]:
+        values = [
+            ("code", study.get("code")),
+            ("hardware", study.get("hardware")),
+            ("fuel-type", study.get("fuelType")),
+        ]
+        hardware = study.get("hardware") or ""
+        values += [
+            ("hardware", symbol)
+            for symbol in ("CIR", "MDCA", "MSG", "ACME")
+            if re.search(rf"\b{symbol}\b", hardware)
+        ]
+        values += [("pillar", value) for value in study.get("pillars", [])]
+        for category, label in values:
+            if not isinstance(label, str) or not label.strip():
+                continue
+            identity = uid(f"navigation-tag-v1:{category}:{label}")
+            tags[identity] = {
+                "id": identity,
+                "slug": f"{category}-" + hashlib.sha256(label.encode()).hexdigest()[:16],
+                "label": label,
+                "category": category,
+            }
+            link = {
+                "id": uid(f"navigation-link-v1:{study['uuid']}:{identity}"),
+                "investigation_id": study["uuid"],
+                "tag_id": identity,
+            }
+            if link not in tables["investigation_tag"]:
+                tables["investigation_tag"].append(link)
+    tables["tag"] = sorted(tags.values(), key=lambda tag: tag["id"])
     for source in release["sources"]:
         tables["source_document"].append(
             {
@@ -87,6 +121,19 @@ def build_snapshot(release):
                         "data_status": "source_checked",
                     }
                 )
+        context = run["conditions"].get("oxygenContext")
+        if context and context != "unknown":
+            tables["test_condition"].append(
+                {
+                    "id": uid(f"{run['id']}:condition:oxygenContext"),
+                    "test_run_id": run["id"],
+                    "variable": "oxygenContext",
+                    "value_numeric": None,
+                    "value_text": context,
+                    "unit": None,
+                    "data_status": "source_checked",
+                }
+            )
         for index, observation in enumerate(run["observations"]):
             tables["measurement"].append(
                 {
@@ -146,6 +193,7 @@ def export_bundle(destination, profile="unified"):
             "origin": "real",
             "reviewState": "unreviewed",
             "schemaTables": 21,
+            "snapshotAdapterVersion": "source-tags-oxygen-context-v2",
             "limitations": release["limitations"],
             "unmappedFields": (
                 "Complete originals, raw strings, context and telemetry are in "

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import React from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Database,
   Flame,
@@ -11,16 +11,18 @@ import {
   AlertTriangle,
   ArrowUpRight,
   ShieldAlert,
-} from 'lucide-react';
-import { useDashboardSummaryQuery } from '../hooks/useDashboardQueries';
-import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
-import type { MappedDashboardSummary } from '@/types/api';
+} from "lucide-react";
+import { useDashboardSummaryQuery } from "../hooks/useDashboardQueries";
+import { ApiErrorBanner } from "@/components/ui/ApiErrorBanner";
+import type { MappedDashboardSummary } from "@/types/api";
 
 export interface KpiStatCardsProps {
   summary?: MappedDashboardSummary;
 }
 
-export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp }) => {
+export const KpiStatCards: React.FC<KpiStatCardsProps> = ({
+  summary: summaryProp,
+}) => {
   const summaryQuery = useDashboardSummaryQuery(undefined, {
     enabled: summaryProp === undefined,
   });
@@ -69,11 +71,11 @@ export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp
   const coveragePctLabel =
     sourceCoverage.percentage !== null
       ? `${Math.round(sourceCoverage.percentage)}%`
-      : 'No denominator';
+      : "No denominator";
 
   const verificationNote =
     verifiedRunCount === null
-      ? `Verification not established (${unavailableFields.verifiedRunCount ?? 'UNVERIFIED'})`
+      ? "Verification not established"
       : `${verifiedRunCount} verified test runs established.`;
 
   return (
@@ -94,7 +96,7 @@ export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp
           data-testid="kpi-studies"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 transition-all flex flex-col justify-between min-h-[170px]"
         >
           <div>
@@ -114,16 +116,16 @@ export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp
             </div>
           </div>
           <p className="text-[11px] text-[#64748B] mt-2 leading-relaxed">
-            Indexed investigations in collection {summary.context.collectionId}.
+            Investigations in the admitted collection.
           </p>
         </motion.div>
 
-        {/* KPI 2: Experimental Test Runs */}
+        {/* KPI 2: Source records */}
         <motion.div
           data-testid="kpi-runs"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 transition-all flex flex-col justify-between min-h-[170px]"
         >
           <div>
@@ -139,7 +141,7 @@ export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp
               {runCount}
             </div>
             <div className="text-xs sm:text-sm font-semibold text-[#1A1A1A] mt-1">
-              Experimental Test Runs
+              Source records
             </div>
           </div>
           <p className="text-[11px] text-[#64748B] mt-2 leading-relaxed">
@@ -152,7 +154,7 @@ export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp
           data-testid="kpi-datapoints"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 transition-all flex flex-col justify-between min-h-[170px]"
         >
           <div>
@@ -176,12 +178,12 @@ export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp
           </p>
         </motion.div>
 
-        {/* KPI 4: Evidence Claims */}
+        {/* KPI 4: {claimCount === 0 ? 'No reviewed claims yet' : 'Evidence claims'} */}
         <motion.div
           data-testid="kpi-claims"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           className="relative group bg-gray-200/50 rounded-[36px] p-5 border border-gray-100 transition-all flex flex-col justify-between min-h-[170px]"
         >
           <div>
@@ -197,11 +199,12 @@ export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp
               {claimCount}
             </div>
             <div className="text-xs sm:text-sm font-semibold text-[#1A1A1A] mt-1">
-              Evidence Claims
+              {claimCount === 0 ? "No reviewed claims yet" : "Evidence claims"}
             </div>
           </div>
           <p className="text-[11px] text-[#64748B] mt-2 leading-relaxed">
-            Extracted provenance claims linked across {sourceCount} indexed documents.
+            Extracted provenance claims linked across {sourceCount} indexed
+            documents.
           </p>
         </motion.div>
 
@@ -210,7 +213,7 @@ export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp
           data-testid="kpi-gap-alert"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           className="relative group bg-amber-100/60 rounded-[36px] p-5 hover:shadow-[0_8px_30px_rgba(245,158,11,0.15)] transition-all flex flex-col justify-between min-h-[170px]"
         >
           <div>
@@ -232,13 +235,15 @@ export const KpiStatCards: React.FC<KpiStatCardsProps> = ({ summary: summaryProp
           </div>
           <div className="mt-2 space-y-1.5">
             <p className="text-[10px] text-amber-800 leading-tight">
-              <strong>NASA Disclaimer:</strong> Moon (0.16g) &amp; Mars (0.38g) lack direct microgravity combustion data in PSI. Extrapolations are illustrative.
+              <strong>Coverage limitation:</strong> Moon (0.16g) &amp; Mars
+              (0.38g) lack direct partial-gravity combustion data in PSI.
+              Extrapolations are illustrative.
             </p>
             <Link
               href="/mission"
               className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B2374] hover:text-[#102B82] hover:underline"
             >
-              Simulate in Mission Lab <ArrowUpRight className="w-3 h-3" />
+              Inspect scenario evidence <ArrowUpRight className="w-3 h-3" />
             </Link>
           </div>
         </motion.div>

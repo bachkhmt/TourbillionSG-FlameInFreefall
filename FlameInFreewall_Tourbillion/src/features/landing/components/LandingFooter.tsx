@@ -164,7 +164,7 @@ export const LandingFooter: React.FC = () => {
           </div>
         </div>
 
-        {/* Mandatory NASA Fire Safety Disclaimer Box - Concise */}
+        {/* Research scope disclaimer */}
         <div
           data-testid="safety-disclaimer"
           className="p-4 mb-8 flex items-start gap-3 bg-amber-50/60 rounded-2xl border border-amber-200/80"
@@ -172,12 +172,12 @@ export const LandingFooter: React.FC = () => {
           <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           <div className="text-xs text-amber-950 leading-relaxed">
             <span className="font-bold text-amber-900 block mb-0.5">
-              NASA Physical Sciences Fire Safety Protocol &amp; Disclaimer
+              Research scope &amp; limitations
             </span>
-            Project synthesizes empirical datasets from NASA Physical Sciences Informatics (PSI).
+            FlameGuard AI helps users explore, compare and interpret NASA Physical Sciences Informatics (PSI) combustion research.
+            Research relevance is not a fire-risk probability or operational safety certification.
+            Partial-gravity conditions (0 &lt; g &lt; 1) remain an evidence gap where direct measurements are unavailable.
             NASA does not endorse any non-U.S. Government entity and is not responsible for information contained on non-U.S. Government websites.
-            Spaceflight certification requires certified chamber qualification under NASA-STD-6001 standards.
-            Partial-gravity regimes ($0 &lt; g &lt; 1$) represent open empirical knowledge voids.
           </div>
         </div>
 

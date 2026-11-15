@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
+import { useDescriptiveQuery } from "@/api/services/evidenceNavigation";
 import {
   Search,
   LayoutGrid,
@@ -9,15 +10,18 @@ import {
   X,
   SlidersHorizontal,
   FlaskConical,
-} from 'lucide-react';
-import type { CatalogSortDto } from '@/api/dto';
-import type { MappedCatalogCapabilities } from '@/types/api';
-import { CustomSelect, type CustomSelectOption } from '@/components/ui/CustomSelect';
+} from "lucide-react";
+import type { CatalogSortDto } from "@/api/dto";
+import type { MappedCatalogCapabilities } from "@/types/api";
+import {
+  CustomSelect,
+  type CustomSelectOption,
+} from "@/components/ui/CustomSelect";
 
-export type PlatformFilterValue = 'all' | 'CIR' | 'MSG' | 'Cygnus' | 'Drop Tower';
-export type GravityFilterValue = 'all' | '0g' | 'partial' | '1g';
+export type PlatformFilterValue = string;
+export type GravityFilterValue = string;
 export type ExplorerSortOption = CatalogSortDto;
-export type ViewMode = 'grid' | 'table';
+export type ViewMode = "grid" | "table";
 
 export interface ExplorerFiltersBarProps {
   className?: string;
@@ -39,28 +43,13 @@ export interface ExplorerFiltersBarProps {
   capabilities?: MappedCatalogCapabilities;
 }
 
-const PLATFORM_OPTIONS: CustomSelectOption<PlatformFilterValue>[] = [
-  { value: 'all', label: 'All Platforms' },
-  { value: 'CIR', label: 'CIR (Combustion Rack)' },
-  { value: 'MSG', label: 'MSG (Glovebox)' },
-  { value: 'Cygnus', label: 'Cygnus (Saffire)' },
-  { value: 'Drop Tower', label: 'Drop Tower' },
-];
-
-const GRAVITY_OPTIONS: CustomSelectOption<GravityFilterValue>[] = [
-  { value: 'all', label: 'All Gravity Regimes' },
-  { value: '0g', label: 'Microgravity (0g)' },
-  { value: 'partial', label: 'Partial Gravity' },
-  { value: '1g', label: 'Terrestrial (1g)' },
-];
-
 const SORT_OPTIONS: CustomSelectOption<ExplorerSortOption>[] = [
-  { value: 'title-asc', label: 'Sort: Title (A–Z)' },
-  { value: 'runs-desc', label: 'Sort: Most Test Runs' },
+  { value: "title-asc", label: "Sort: Title (A–Z)" },
+  { value: "runs-desc", label: "Sort: Most Test Runs" },
 ];
 
 export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
-  className = 'sticky top-0 z-30 space-y-3',
+  className = "sticky top-0 z-30 space-y-3",
   searchQuery,
   onSearchChange,
   platformFilter,
@@ -78,12 +67,27 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
   onResetFilters,
   capabilities,
 }) => {
+  const descriptive = useDescriptiveQuery();
+  const platformOptions = [
+    { value: "all", label: "All Platforms" },
+    ...(descriptive.data?.platforms ?? []).map((value) => ({
+      value,
+      label: value,
+    })),
+  ];
+  const gravityOptions = [
+    { value: "all", label: "All Gravity Regimes" },
+    ...(descriptive.data?.gravities ?? []).map((value) => ({
+      value,
+      label: value,
+    })),
+  ];
   const isFiltered =
     searchQuery.trim().length > 0 ||
-    platformFilter !== 'all' ||
+    platformFilter !== "all" ||
     materialFilter.trim().length > 0 ||
-    gravityFilter !== 'all' ||
-    sortBy !== 'title-asc';
+    gravityFilter !== "all" ||
+    sortBy !== "title-asc";
 
   return (
     <div data-testid="explorer-filters-bar" className={className}>
@@ -102,7 +106,7 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search investigations by PSI ID, title, or research purpose..."
-            style={{ boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.09)' }}
+            style={{ boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.09)" }}
             className="w-full bg-slate-50/90 border-2 border-white focus:border-[#D4FC02]/40 rounded-3xl py-3.5 sm:py-4 pl-14 pr-12 text-sm sm:text-base font-bold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-[#D4FC02]/10 transition-all shadow-eatzy-inner hover:shadow-eatzy-inner-hover"
           />
 
@@ -110,7 +114,7 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
             <button
               type="button"
               data-testid="clear-search-btn"
-              onClick={() => onSearchChange('')}
+              onClick={() => onSearchChange("")}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl bg-zinc-200 hover:bg-zinc-300 flex items-center justify-center transition-all group/close cursor-pointer"
               title="Clear search"
             >
@@ -122,7 +126,9 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
         {/* View Mode & Reset Controls */}
         <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
           <div className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white border border-gray-200/70 text-xs font-bold text-zinc-700 shadow-2xs">
-            <span className="text-[#0B2374] font-extrabold">{filteredCount}</span>
+            <span className="text-[#0B2374] font-extrabold">
+              {filteredCount}
+            </span>
             <span className="text-zinc-400">/</span>
             <span>{totalCount} Studies</span>
           </div>
@@ -144,11 +150,11 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
             <button
               type="button"
               data-testid="view-grid-btn"
-              onClick={() => onViewModeChange('grid')}
+              onClick={() => onViewModeChange("grid")}
               className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-zinc-900 text-white font-bold shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-950'
+                viewMode === "grid"
+                  ? "bg-zinc-900 text-white font-bold shadow-xs"
+                  : "text-zinc-600 hover:text-zinc-950"
               }`}
               title="Grid View"
               aria-label="Grid View"
@@ -158,11 +164,11 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
             <button
               type="button"
               data-testid="view-table-btn"
-              onClick={() => onViewModeChange('table')}
+              onClick={() => onViewModeChange("table")}
               className={`p-1.5 rounded-xl transition-all duration-150 cursor-pointer ${
-                viewMode === 'table'
-                  ? 'bg-zinc-900 text-white font-bold shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-950'
+                viewMode === "table"
+                  ? "bg-zinc-900 text-white font-bold shadow-xs"
+                  : "text-zinc-600 hover:text-zinc-950"
               }`}
               title="Table View"
               aria-label="Table View"
@@ -195,7 +201,7 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
             {materialFilter && (
               <button
                 type="button"
-                onClick={() => onMaterialFilterChange('')}
+                onClick={() => onMaterialFilterChange("")}
                 className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-zinc-200 hover:bg-zinc-300 flex items-center justify-center text-zinc-600 transition-colors cursor-pointer"
                 title="Clear material filter"
               >
@@ -206,37 +212,32 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
 
           <div className="w-44">
             <CustomSelect
-              options={PLATFORM_OPTIONS}
+              options={platformOptions}
               value={platformFilter}
               onChange={onPlatformFilterChange}
               testId="platform-filter-select"
               ariaLabel="Filter by Platform"
-              leadingIcon={<SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" />}
+              leadingIcon={
+                <SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" />
+              }
             />
           </div>
 
           <div className="w-44">
             <CustomSelect
-              options={GRAVITY_OPTIONS}
+              options={gravityOptions}
               value={gravityFilter}
               onChange={onGravityFilterChange}
               testId="gravity-filter-select"
               ariaLabel="Filter by Gravity Regime"
-              leadingIcon={<SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" />}
+              leadingIcon={
+                <SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" />
+              }
             />
           </div>
         </div>
 
         <div className="flex items-center gap-2 self-end lg:self-auto shrink-0">
-          {capabilities && (
-            <span
-              data-testid="catalog-capabilities-hint"
-              className="hidden xl:inline-flex text-[11px] font-medium text-zinc-500 px-2.5 py-1 rounded-full bg-white/80 border border-gray-200/60"
-            >
-              Filters: {capabilities.supportedFilters.join(', ')} · Max {capabilities.maxPageSize}/page
-            </span>
-          )}
-
           <div className="w-52">
             <CustomSelect
               options={SORT_OPTIONS}
@@ -244,7 +245,9 @@ export const ExplorerFiltersBar: React.FC<ExplorerFiltersBarProps> = ({
               onChange={onSortChange}
               testId="sort-by-select"
               ariaLabel="Sort Studies"
-              leadingIcon={<SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" />}
+              leadingIcon={
+                <SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" />
+              }
             />
           </div>
         </div>

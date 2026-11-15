@@ -2,64 +2,35 @@ import {
   useMutation,
   useQuery,
   type UseMutationOptions,
-  type UseMutationResult,
-  type UseQueryResult,
-} from '@tanstack/react-query';
+} from "@tanstack/react-query";
 import type {
   PredictionRequestDto,
   PredictionResponseDto,
   ReadinessDto,
-} from '@/api/dto';
-import { executePrediction, getPredictionReadiness } from '@/api/services';
-import {
-  getMockPredictionReadiness,
-  getMockPredictionResponse,
-} from '@/api/mockFallback';
-import type { ApiQueryOptions } from '@/hooks/api/queryHelpers';
-import { handleTimeoutFallback, shouldFallback } from '@/hooks/api/queryHelpers';
-import { apiQueryKeys } from '@/hooks/api/queryKeys';
+} from "@/api/dto";
+import { executePrediction, getPredictionReadiness } from "@/api/services";
+import type { ApiQueryOptions } from "@/hooks/api/queryHelpers";
 
-/**
- * Queries physical prediction readiness and declared capability bounds (`GET /prediction/readiness`).
- * Gracefully falls back to NASA PSI physics solver readiness when backend is unavailable.
- */
 export function usePredictionReadinessQuery(
   modelId?: string,
-  options?: ApiQueryOptions<ReadinessDto>
-): UseQueryResult<ReadinessDto, Error> {
+  options?: ApiQueryOptions<ReadinessDto>,
+) {
   return useQuery<ReadinessDto, Error>({
     ...options,
-    queryKey: apiQueryKeys.predictionReadiness(modelId),
-    queryFn: async ({ signal }) => {
-      try {
-        return await getPredictionReadiness(modelId, signal);
-      } catch (err) {
-        if (shouldFallback(options?.enableFallback)) {
-          handleTimeoutFallback(err);
-          return getMockPredictionReadiness(modelId);
-        }
-        throw err;
-      }
-    },
-    enabled: options?.enabled ?? true,
+    queryKey: ["prediction-readiness", modelId],
+    queryFn: ({ signal }) => getPredictionReadiness(modelId, signal),
   });
 }
 
-/**
- * Imperative mutation to execute a microgravity predictive combustion physics solver run (`POST /predictions`).
- * Gracefully falls back to empirical extrapolation if backend model provider is unavailable.
- */
 export function usePredictionMutation(
-  options?: UseMutationOptions<PredictionResponseDto, Error, PredictionRequestDto>
-): UseMutationResult<PredictionResponseDto, Error, PredictionRequestDto> {
+  options?: UseMutationOptions<
+    PredictionResponseDto,
+    Error,
+    PredictionRequestDto
+  >,
+) {
   return useMutation<PredictionResponseDto, Error, PredictionRequestDto>({
     ...options,
-    mutationFn: async (payload) => {
-      try {
-        return await executePrediction(payload);
-      } catch (err) {
-        return getMockPredictionResponse(payload);
-      }
-    },
+    mutationFn: (payload) => executePrediction(payload),
   });
 }

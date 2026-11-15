@@ -49,3 +49,9 @@ def get_scenarios(request: Request) -> ScenarioService:
     settings = request.app.state.settings
     providers = fixture_providers() if settings.scenario_test_providers else ScenarioProviders()
     return ScenarioService(request.app.state.database.session_factory, settings, providers)
+
+
+def get_descriptive(value: Annotated[tuple, Depends(get_read_context)]):
+    from app.services.descriptive import DescriptiveService
+
+    return DescriptiveService(*value)

@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
+import { SourceOverview } from "./SourceOverview";
 import {
   Sparkles,
   BookOpen,
@@ -9,9 +10,9 @@ import {
   AlertTriangle,
   Building2,
   Database,
-} from 'lucide-react';
-import type { MappedInvestigationDetail, MappedSource } from '@/types/api';
-import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner';
+} from "lucide-react";
+import type { MappedInvestigationDetail, MappedSource } from "@/types/api";
+import { ApiErrorBanner } from "@/components/ui/ApiErrorBanner";
 
 export interface ChamberOverviewTabProps {
   study: MappedInvestigationDetail;
@@ -32,6 +33,7 @@ export const ChamberOverviewTab: React.FC<ChamberOverviewTabProps> = ({
 
   return (
     <div data-testid="chamber-overview-tab" className="space-y-6">
+      <SourceOverview id={study.id} />
       {/* Research Purpose & Catalog Metadata */}
       <div className="p-6 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-4">
         <h3 className="text-base font-bold text-[#1A1A1A] flex items-center gap-2">
@@ -39,7 +41,8 @@ export const ChamberOverviewTab: React.FC<ChamberOverviewTabProps> = ({
           <span>Research Purpose &amp; Catalog Profile</span>
         </h3>
         <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
-          {study.researchPurpose ?? 'Research purpose is not mapped in the current backend catalog.'}
+          {study.researchPurpose ??
+            "Research purpose is not mapped in the current backend catalog."}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-100 text-xs">
@@ -49,7 +52,7 @@ export const ChamberOverviewTab: React.FC<ChamberOverviewTabProps> = ({
               <span>Platform</span>
             </div>
             <div className="font-bold text-zinc-900 mt-1">
-              {study.platform ?? 'Platform unmapped'}
+              {study.platform ?? "Platform unmapped"}
             </div>
           </div>
           <div>
@@ -57,19 +60,29 @@ export const ChamberOverviewTab: React.FC<ChamberOverviewTabProps> = ({
               <Database className="w-3 h-3 text-[#0B2374]" />
               <span>Collection Context</span>
             </div>
-            <div className="font-bold text-zinc-900 mt-1">{study.context.collectionId}</div>
+            <div
+              className="font-bold text-zinc-900 mt-1"
+              title={study.context.collectionId}
+            >
+              {study.context.origin} · {study.context.reviewState}
+            </div>
           </div>
           <div>
-            <div className="text-[10px] uppercase text-zinc-500 font-semibold">Mapped Counts</div>
+            <div className="text-[10px] uppercase text-zinc-500 font-semibold">
+              Mapped Counts
+            </div>
             <div className="font-bold text-zinc-900 mt-1">
-              {study.runsMeta.total} runs · {study.sourcesMeta.total} sources · {study.claimsMeta.total} claims
+              {study.runsMeta.total} runs · {study.sourcesMeta.total} sources ·{" "}
+              {study.claimsMeta.total} claims
             </div>
           </div>
         </div>
 
         {/* Tags */}
         <div className="space-y-2 pt-1">
-          <span className="text-xs uppercase text-zinc-500 font-bold">Catalog Tags</span>
+          <span className="text-xs uppercase text-zinc-500 font-bold">
+            Catalog Tags
+          </span>
           {study.tags.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {study.tags.map((tag) => (
@@ -78,49 +91,60 @@ export const ChamberOverviewTab: React.FC<ChamberOverviewTabProps> = ({
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 border border-gray-200 text-xs font-semibold text-zinc-800"
                 >
                   <Tag className="w-3 h-3 text-[#0B2374]" />
-                  <span>{tag.label}</span>
+                  <a
+                    href={`/explorer?tag=${encodeURIComponent(tag.slug)}`}
+                    className="underline"
+                  >
+                    {tag.label}
+                  </a>
                   {tag.category && (
-                    <span className="text-[10px] text-zinc-500">({tag.category})</span>
+                    <span className="text-[10px] text-zinc-500">
+                      (
+                      {tag.category === "pillar"
+                        ? "team annotation, unreviewed"
+                        : tag.category}
+                      )
+                    </span>
                   )}
                 </span>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-zinc-500">No catalog tags mapped for this investigation.</p>
+            <p className="text-xs text-zinc-500">
+              No catalog tags mapped for this investigation.
+            </p>
           )}
         </div>
       </div>
 
-      {/* Unavailable Fields & Honest Provenance Disclosure */}
-      <div
+      <details
         data-testid="unavailable-fields-card"
-        className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs space-y-3"
+        className="rounded-3xl border border-gray-100 bg-white p-4 text-xs text-slate-500"
       >
-        <h3 className="text-sm font-bold text-[#1A1A1A] flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 text-amber-600" />
-          <span>Unavailable Display Fields &amp; Mapping Disclosure</span>
-        </h3>
-        {unavailableEntries.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {unavailableEntries.map(([field, reason]) => (
-              <span
-                key={field}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-xs text-amber-900"
-              >
-                <span className="font-bold">{field}</span>
-                <span className="text-amber-700">({reason})</span>
-              </span>
-            ))}
-          </div>
-        ) : (
-          <p className="text-xs text-zinc-600">
-            All catalog-level investigation fields are mapped for this record.
-          </p>
-        )}
-        <p className="text-[11px] text-zinc-500 leading-relaxed">
-          Chamber atmospheric ranges, objectives, and historical syntheses are not fabricated when absent from the backend investigation payload. Inspect Test Runs and Observations for measured experimental parameters.
+        <summary>
+          Not available in this release:{" "}
+          {unavailableEntries
+            .filter(
+              ([field]) =>
+                !study.tags.some(
+                  (tag) =>
+                    (
+                      ({
+                        code: "code",
+                        hardware: "hardware",
+                        fuelCategory: "fuel-type",
+                      }) as Record<string, string>
+                    )[field] === tag.category,
+                ),
+            )
+            .map(([field]) => field.replace(/([A-Z])/g, " $1").toLowerCase())
+            .join(", ") || "no additional catalog fields"}
+        </summary>
+        <p className="pt-2">
+          Fields are omitted when source data or review is unavailable. See
+          source excerpts and records for supported detail.
         </p>
-      </div>
+      </details>
 
       {/* Linked NASA PSI / DOI Sources */}
       <div
@@ -144,7 +168,9 @@ export const ChamberOverviewTab: React.FC<ChamberOverviewTabProps> = ({
             onRetry={onRetrySources}
           />
         ) : sources.length === 0 ? (
-          <p className="text-xs text-zinc-500">No linked source records returned for this study.</p>
+          <p className="text-xs text-zinc-500">
+            No linked source records returned for this study.
+          </p>
         ) : (
           <div className="space-y-2">
             {sources.map((src) => (
@@ -162,10 +188,14 @@ export const ChamberOverviewTab: React.FC<ChamberOverviewTabProps> = ({
                       {src.ingestionStatus}
                     </span>
                     {src.version && (
-                      <span className="text-[11px] text-zinc-500">v{src.version}</span>
+                      <span className="text-[11px] text-zinc-500">
+                        v{src.version}
+                      </span>
                     )}
                   </div>
-                  <div className="text-zinc-600 truncate text-[11px]">{src.sourceUrl}</div>
+                  <div className="text-zinc-600 truncate text-[11px]">
+                    {src.sourceUrl}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
